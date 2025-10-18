@@ -1,0 +1,19 @@
+﻿@using ViewModels
+@model List<IncidentShiftModifyViewModel>
+
+<div class="incident-shift-list">
+    @foreach (var item in Model)
+    {
+        <div class="list-item" id="IncidentShiftItem_@item.Id">
+            <input type="hidden" name="Id" value="@item.Id" />
+            <div class="meta">
+                <strong>@item.Name</strong>
+                <p>@item.Description</p>
+            </div>
+            <div class="actions">
+                <a class="btn editIncidentShift" id="@item.Id" href="javascript:void(0);"><i class="fa-solid fa-pen"></i></a>
+                <a class="btn deleteIncidentShift" id="@item.Id" href="javascript:void(0);"><i class="fa-solid fa-trash"></i></a>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,108 @@
+﻿/* Custom styling for the nav tabs */
+.tabs-section .nav-tabs {
+    border-bottom: none; /* Remove default bottom border */
+    justify-content: center; /* Center the tabs */
+}
+
+    .tabs-section .nav-tabs .nav-link.active {
+        border-color: #f54c01; /* Green underline */
+        color: #f54c01; /* Optional: set text color to green for the active tab */
+        border-bottom: 3px solid #f54c01; /* Green underline for active tab */
+        background: transparent;
+    }
+
+.tabs-section #dashboard-tabs.nav-tabs .nav-link.active {
+    color: white; /* Optional: set text color to green for the active tab */
+    border: 1px solid #f54c01;
+    background: #f54c01;
+}
+
+   .tabs-section #dashboard-tabs.nav-tabs .nav-link {
+   border-radius: 10px;
+    border: 1px solid #202740;
+    }
+    .tabs-section .nav-tabs .nav-link {
+        /* color: #495057; */
+        border: none;
+        padding-bottom: 10px;
+        color: inherit; /* Maintain color for inactive tabs */
+    }
+
+        .tabs-section .nav-tabs .nav-link:hover {
+            border-color: #f54c01; /* Green underline on hover */
+            color: #f54c01; /* Optional: set text color to green on hover */
+        }
+
+.tabs-section .custom-card {
+    background-color: #f8f9fa; /* Light background color */
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    padding: 20px;
+    margin: 10px;
+    text-align: left;
+    width: 320px;
+    flex: 0 0 calc(50% - 10px); /* Each card takes up half the width minus a gap */
+    box-sizing: border-box; /* Ensure padding and border are included in width */
+}
+
+    /* Icon styling */
+    .tabs-section .custom-card i {
+        color: #f54c01; /* Green icon */
+        font-size: 24px;
+        margin-right: 10px;
+    }
+
+    /* Title styling */
+    .tabs-section .custom-card h6 {
+        color: #f54c01; /* Green text */
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    /* Description styling */
+    .tabs-section .custom-card p {
+        color: #6c757d; /* Gray text for description */
+        font-size: 14px;
+    }
+
+    .tabs-section .custom-card:hover {
+        transform: scale(1.05);
+    }
+
+.tabs-section .nav {
+    display: block !important;
+}
+
+.tabs-section .nav-item {
+    position: relative;
+    display: inline-block;
+}
+
+    .tabs-section .nav-item button {
+        background: transparent;
+    }
+/* CSS to make the entire card clickable */
+.tabs-section .card-link {
+    display: block;
+    color: inherit;
+    margin-left: 0px !important;
+}
+
+    .tabs-section .card-link:hover .card {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .tabs-section .card-link:hover .card {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+
+.tabs-section .menu-items-container {
+    max-width: 1500px;
+    /* Limit the width of the container for better alignment */
+    margin: 0 auto; /* Center the container */
+}
+
+.tabs-section .ml-15 {
+    margin-left: 15rem;
+}

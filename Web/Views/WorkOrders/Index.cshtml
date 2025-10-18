@@ -1,0 +1,70 @@
+﻿@model ViewModels.CRUD.TabViewModel
+@{
+    ViewBag.Title = "Work Orders";
+}
+@* <style>
+    .thead-primary th, .table .thead-primary th, #technician-table .thead-primary th, .comments-container .table .thead-primary th, #cost-table .thead-primary th {
+        background-color: #832d20 !important;
+        color: white !important;
+    }
+
+    #cost-table table, #cost-table tr, #cost-table td {
+        border-collapse: collapse;
+    }
+
+    .comments-image-container .detail-images .photo {
+        width: 50px;
+        height: 50px;
+    }
+
+    .btn-modal-save:hover {
+        border-color: #832d20 !important;
+        color: #832d20 !important;
+        background-color: white !important;
+    }
+
+    .btn-site-primary {
+        border-color: #832d20 !important;
+        background-color: #832d20 !important;
+        color: #f8f9fa !important;
+    }
+
+        .btn-site-primary:hover {
+            border-color: #832d20 !important;
+            background-color: #fff !important;
+            color: #832d20 !important;
+        }
+
+    .btn-primary {
+        border-color: #832d20 !important;
+        background-color: #832d20 !important;
+    }
+
+    .footer-logo img, .navbar-brand img {
+        background: #f8f9fa !important;
+    }
+
+    .page-top {
+        position: absolute;
+        right: 60px;
+        margin-top: -60px;
+    }
+</style> *@
+@await Html.PartialAsync("~/Views/Shared/Crud/Tabs/_Tabs.cshtml", Model)
+
+
+<script src="~/js/bundles/datatable.js"></script>
+<script src="~/js/bundles/datatable-buttons.js"></script>
+<script src="~/js/custom/loader/loader.js"></script>
+@* <script src="~/js/bundles/custom-datatable.js"></script> *@
+<script src="~/js/custom/datatable/auto-datatable.js" asp-append-version="true"></script>
+    <script src="~/js/custom/gantt-chart.js"></script>
+
+
+@section Scripts {
+        <script>
+            function afterTabLoad() {
+                // ReInitializeDataTables();
+            }
+        </script>
+}

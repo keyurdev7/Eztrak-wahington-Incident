@@ -1,0 +1,17 @@
+﻿<script>
+    function SetLocationSelect2(identifier) {
+        let id = identifier;
+        let pageSize = 10;
+        let url = '/Location/Select2';
+        let dataArray = function (params) {
+            params.page = params.page || 1;
+            return {
+                prefix: params.term,
+                pageSize: pageSize,
+                pageNumber: params.page,
+            };
+        };
+        Select2AutoCompleteAjax(id, url, dataArray, pageSize, "Select Location");
+
+    }
+</script>

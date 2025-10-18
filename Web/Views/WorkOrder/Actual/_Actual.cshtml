@@ -1,0 +1,38 @@
+﻿@model ViewModels.WorkOrder.CostPerformance.CostPerformanceViewModel
+@{
+    var totalActualLaborHours = Model.LaborsCostPerformance.Sum(x => x.ActualHours);
+    var totalLaborActualCost = Model.LaborsCostPerformance.Sum(x => x.ActualCost);
+    var totalMaterialActualCost = Model.MaterialsCostPerformance.Sum(x => x.ActualCost);
+    var totalEquipmentActualCost = Model.EquipmentsCostPerformance.Sum(x => x.ActualCost);
+    var totalActualCost = totalLaborActualCost + totalMaterialActualCost + totalEquipmentActualCost;
+}
+<div class="row">
+    <div class="col-12 mb-3">
+        @await Html.PartialAsync("~/Views/WorkOrder/Actual/_TaskLabor.cshtml", Model)
+    </div>
+    <div class="col-12 mb-3">
+        @await Html.PartialAsync("~/Views/WorkOrder/Actual/_TaskMaterial.cshtml", Model)
+    </div>
+    <div class="col-12 mb-3">
+        @await Html.PartialAsync("~/Views/WorkOrder/Actual/_TaskEquipment.cshtml", Model)
+    </div>
+    <div class="col-12 mb-3">
+        <table class="table dataTable" id="cost-table">
+            <tbody>
+                <tr>
+                    <td colspan="2" style="">
+                        <h6 class="summary-header">Summary</h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-end"><label class="form-label fw-600">Hours</label></td>
+                    <td class="text-end"><label class="form-label fw-600">@totalActualLaborHours</label></td>
+                </tr>
+                <tr>
+                    <td class="text-end"><label class="form-label fw-600">Cost</label></td>
+                    <td class="text-end"><label class="form-label fw-600">@totalActualCost.ToString("C")</label></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

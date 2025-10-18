@@ -1,0 +1,88 @@
+﻿@using ViewModels
+@model List<MaterialModifyViewModel>
+
+<style>
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 15px;
+    }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .cardHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card h4 {
+        margin: 0;
+        font-size: 16px;
+    }
+
+        .card h4 .fa-pen {
+            color: #2563eb;
+            cursor: pointer;
+        }
+
+
+    .card p {
+        margin: 6px 0;
+        font-size: 14px;
+    }
+
+    .card p {
+        font-size: 14px;
+        font-weight: 400;
+        margin-top: 0;
+        margin-bottom: 6px;
+        color: grey;
+    }
+
+    .card .lbl {
+        font-size: 14px;
+        font-weight: 700;
+        color: dimgrey;
+    }
+
+    .editDeIcons .fa-edit {
+        color: orange;
+    }
+
+    .editDeIcons .fa-trash-alt {
+        color: red;
+    }
+</style>
+
+<div class="cards">
+    @if (Model != null && Model.Count > 0)
+    {
+        foreach (var m in Model)
+        {
+            <div class="card">
+                <div class="cardHeader">
+                    <h4>@m.Name</h4>
+                    <div class="editDeIcons">
+                        <i class="fa-regular fa-edit edit editMaterial" id="@m.Id"></i>
+                        <i class="far fa-trash-alt deleteMaterial" id="@m.Id"></i>
+                    </div>
+                </div>
+
+                @* <p><span class="lbl">Material ID:</span> @m.MaterialID</p> *@
+                <p><span class="lbl">Category:</span> @(!string.IsNullOrWhiteSpace(m.Category) ? m.Category : "N/A")</p>
+                <p><span class="lbl">Unit:</span> @(!string.IsNullOrWhiteSpace(m.Unit) ? m.Unit : "N/A")</p>
+                <p><span class="lbl">Unit Cost:</span> @m.UnitCost ($)</p>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="card p-3"><span>No materials found.</span></div>
+    }
+</div>

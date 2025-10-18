@@ -1,0 +1,32 @@
+﻿@using ViewModels
+@model MUTCDDetailViewModel
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Code" class="form-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.Code) ? "-" : Model.Code)</div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="mb-3 form-group">
+                    <label asp-for="Description" class="form-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.Description) ? "-" : Model.Description)</div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="mb-3 form-group">
+                    <label class="form-label fw-600">Image</label>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <a href="@Model.ImageUrl" target="_blank" class="rounded detail-images"><img class="photo" src="@Model.ImageUrl" alt="" /></a>
+            </div>
+        </div>
+    </div>
+</div>

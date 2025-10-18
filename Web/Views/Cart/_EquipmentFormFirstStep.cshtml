@@ -1,0 +1,64 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model ViewModels.OrderModifyViewModel
+
+@{
+    Layout = null;
+    var equipmentOrderItems = Model.OrderItems.ToList();
+}
+
+
+<div class="nwoStep">
+    <div class="step-title d-flex justify-content-between align-items-start gap-3 mb-3">
+        <h5 class="m-0">Cart</h5>
+        <h6 class="bg-info-subtle text-info-emphasis fw-normal rounded-pill text-nowrap px-3 py-1 m-0">
+            1 /
+            2
+        </h6>
+    </div>
+
+    <div id="grd_Cart_Wrapper" class="equipment-report-table table-responsive" role="grid">
+        <h5>Equipment</h5>
+        <table id="grd_Cart" class="table table-striped table-bordered">
+            <thead>@* class="thead-primary" *@
+                <tr>
+                    <th>Item # </th>
+                    <th>Description</th>
+                    <th>OH QTY</th>
+                    <th>QTY</th>
+                    <th>UOM</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (equipmentOrderItems.Count > 0)
+                {
+                    @for (int i = 0; i < equipmentOrderItems.Count; i++)
+                    {
+                        var item = equipmentOrderItems[i];
+                        var collectionName = $"OrderItems[{i}].";
+                        var quantityName = collectionName + "Quantity";
+                        var inventoryIdName = collectionName + "Equipment.Id";
+                        <tr>
+                            <td>@item.Equipment.ItemNo</td>
+                            <td>@item.Equipment.Description</td>
+                            <td>@item.OHQuantity</td>
+                            <td>
+                                <input name="@quantityName" class="form-control" type="number" value="@item.Quantity" min="1" max="@item.OHQuantity" />
+                                <input type="hidden" name="@inventoryIdName" value="@item.Equipment.Id" />
+                            </td>
+                            <td>@item.Equipment.UOM.Name</td>
+                            <td><a href='#' onclick='deleteEquipmentFromCart(@item.Equipment.Id, this);' class='btn btn-danger delete-btn'>Remove</a></td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="6">No Equipment Selected.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

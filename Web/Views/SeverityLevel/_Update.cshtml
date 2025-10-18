@@ -1,0 +1,39 @@
+﻿@using Enums
+@using ViewModels;
+@model SeverityLevelModifyViewModel
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <!-- Name -->
+                <div class="mb-3 form-group">
+                    <label asp-for="Name" class="form-label fw-600"></label>
+                    <input asp-for="Name" type="text" class="form-control" />
+                    <span asp-validation-for="Name" class="validation-invalid-label"></span>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3 form-group">
+                    <label asp-for="Description" class="form-label fw-600"></label>
+                    <input asp-for="Description" type="text" class="form-control" />
+                    <span asp-validation-for="Description" class="validation-invalid-label"></span>
+                </div>
+
+                <!-- Color -->
+                <div class="mb-3 form-group">
+                    <label asp-for="Color" class="form-label fw-600"></label>
+                    <input asp-for="Color" type="text" class="form-control" placeholder="e.g. Red, #FF0000" />
+                    <span asp-validation-for="Color" class="validation-invalid-label"></span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" asp-for="Id" />

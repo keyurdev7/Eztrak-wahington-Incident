@@ -1,0 +1,14 @@
+﻿@model ViewModels.Dashboard.Common.Card.DashboardCardViewModel
+@{
+    Layout = null;
+}
+
+<div id="@Model.Id" class="card mh-500">
+    @*<div class="card-header">@Model.Title</div>*@
+    <div class="card-data" data-url="@Model.Url" style="">
+
+    </div>
+</div>
+<script>
+    initializeDataCard('@Model.Id');
+</script>

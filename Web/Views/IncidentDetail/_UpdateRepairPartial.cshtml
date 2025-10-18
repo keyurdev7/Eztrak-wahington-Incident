@@ -1,0 +1,287 @@
+﻿@model ViewModels.Incident.IncidentRepairEditViewModel
+
+<link href="~/css/custom/views/incident/validation.css" rel="stylesheet" />
+<!-- Update Incident Repair Modal -->
+<div class="modal fade" id="updateIncidentRepairModal" tabindex="-1" aria-labelledby="updateIncidentRepairModallabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateIncidentRepairModallabel">Update Incident Repair</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form id="UpdateIncidentRepairForm">
+                    <input type="hidden" id="repairId" value="@Model.Id" />
+                    <input type="hidden" id="FieldTypeId" value="@Model.FieldTypeId" />
+                    <input type="hidden" id="IncidentId" value="@Model.IncidentId" />
+                    <input type="hidden" id="IncidentValidationId" value="@Model.IncidentValidationId" />
+                    @* <input type="hidden" id="mainstepId" value="@Model.MainStepId" />
+<input type="hidden" id="substepId" value="@Model.SubStepId" /> *@
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group d-flex align-items-center">
+                                <label class="form-label">Main Step</label>
+                                <label asp-for="@Model.FieldType">: <b>@Model.FieldType</b></label>
+                            </div>
+                            <div class="form-group d-flex align-items-center">
+                                @* <label class="form-label">Main Step</label>
+<label asp-for="@Model.FieldType">: <b>@Model.FieldType</b></label> *@
+                            </div>
+                            @if (Model.FieldTypeId == 1)
+                            {
+                                <div class="form-group">
+                                    <input type="hidden" id="hdn_ResponsibleRole" asp-for="@Model.SourceOfLeak" name="@Model.SourceOfLeak" />
+                                    <label>Responsible Role (Multiple)</label>
+                                    <div class="multiselect-dropdown" id="chk_ResponsibleRole">
+                                        <div class="dropdown-btn">Choose roles</div>
+                                        <div class="dropdown-list">
+                                            @foreach (var item in Model.RoleList)
+                                            {
+                                                <label><input class="form-check-input" type="checkbox" value="@item.Value" data-name="@item.Text"> @item.Text</label>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-select" id="status" asp-for="@Model.SourceOfLeakStatus" name="@Model.SourceOfLeakStatus">
+                                        @* asp-for="@Model.StatusId" *@
+                                        <option value="">Select status</option>
+                                        @foreach (var item in Model.Status)
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Description</label>
+                                    <textarea class="form-control" id="description" rows="3" asp-for="@Model.SOL_Remark" placeholder="Enter description or notes"></textarea>
+                                </div>
+                            }
+
+                            @if (Model.FieldTypeId == 2)
+
+                            {
+                                <div class="form-group d-flex align-items-center">
+
+                                    @* <label class="form-label">Main Step</label>
+<label asp-for="@Model.FieldType">: <b>@Model.FieldType</b></label> *@
+                                </div>
+                                <div class="form-group">
+                                    <input type="hidden" id="hdn_ResponsibleRole" asp-for="@Model.PreventFurtherOutage" name="@Model.PreventFurtherOutage" />
+                                    <label>Responsible Role (Multiple)</label>
+                                    <div class="multiselect-dropdown" id="chk_ResponsibleRole">
+                                        <div class="dropdown-btn">Choose roles</div>
+                                        <div class="dropdown-list">
+
+                                            @foreach (var item in Model.RoleList)
+
+                                            {
+                                                <label><input class="form-check-input" type="checkbox" value="@item.Value" data-name="@item.Text"> @item.Text</label>
+
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-select" id="status" asp-for="@Model.PreventFurtherOutageStatus" name="@Model.PreventFurtherOutageStatus">
+
+                                        @* asp-for="@Model.StatusId" *@
+                                        <option value="">Select status</option>
+
+                                        @foreach (var item in Model.Status)
+
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Description</label>
+                                    <textarea class="form-control" id="description" rows="3" asp-for="@Model.PFO_Remark" placeholder="Enter description or notes"></textarea>
+                                </div>
+
+                            }
+
+                            @if (Model.FieldTypeId == 3)
+
+                            {
+                                <div class="form-group d-flex align-items-center">
+
+                                    @* <label class="form-label">Main Step</label>
+<label asp-for="@Model.FieldType">: <b>@Model.FieldType</b></label> *@
+                                </div>
+                                <div class="form-group">
+                                    <input type="hidden" id="hdn_ResponsibleRole" asp-for="@Model.VacuumTruckFitting" name="@Model.VacuumTruckFitting" />
+                                    <label>Responsible Role (Multiple)</label>
+                                    <div class="multiselect-dropdown" id="chk_ResponsibleRole">
+                                        <div class="dropdown-btn">Choose roles</div>
+                                        <div class="dropdown-list">
+
+                                            @foreach (var item in Model.RoleList)
+
+                                            {
+                                                <label><input class="form-check-input" type="checkbox" value="@item.Value" data-name="@item.Text"> @item.Text</label>
+
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-select" id="status" asp-for="@Model.VacuumTruckFittingStatus" name="@Model.VacuumTruckFittingStatus">
+
+                                        @* asp-for="@Model.StatusId" *@
+                                        <option value="">Select status</option>
+
+                                        @foreach (var item in Model.Status)
+
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Description</label>
+                                    <textarea class="form-control" id="description" rows="3" asp-for="@Model.VTF_Remark" placeholder="Enter description or notes"></textarea>
+                                </div>
+
+                            }
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Evidence</label>
+                                <input type="file" id="fileInputRepair" multiple class="file-upload" asp-for="@Model.File">
+                                <div id="previewContainerRepair" class="d-flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer d-flex justify-content-end">
+                <button type="submit" class="btn btn-success" id="btnUpdateRepair">
+                    <i class="fas fa-check"></i> Update
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+
+    $(document).ready(function () {
+
+        initMultiselectRepair();
+
+    });
+
+    function initMultiselectRepair() {
+
+        $('.multiselect-dropdown').each(function () {
+
+            var $dropdown = $(this);
+
+            var $btn = $dropdown.find('.dropdown-btn');
+
+            var $list = $dropdown.find('.dropdown-list');
+
+            var $hidden = $dropdown.find('input[type="hidden"]'); // your hidden input
+
+            // 🔽 Toggle dropdown open/close
+
+            $btn.on('click', function (e) {
+
+                e.stopPropagation();
+
+                $('.dropdown-list').not($list).hide();
+
+                $list.toggle();
+
+            });
+
+            // ✅ Handle checkbox changes (event delegation)
+
+            $list.on('change', 'input[type="checkbox"]', function () {
+
+                var $checkboxes = $list.find('input[type="checkbox"]');
+
+                // Get selected items (id + name)
+
+                var selected = $checkboxes
+
+                    .filter(':checked')
+
+                    .map(function () {
+
+                        return {
+
+                            id: $(this).val(),
+
+                            name: $(this).data('name') || $(this).parent().text().trim()
+
+                        };
+
+                    })
+
+                    .get();
+
+                // Update button text
+
+                var selectedNames = selected.map(function (s) { return s.name; });
+
+                $btn.text(selectedNames.length ? selectedNames.join(', ') : 'Choose roles');
+
+                var dropdownId = $dropdown.attr('id'); // e.g., chk_VTFResponsibleRole
+
+                var hiddenId = dropdownId.replace('chk_', 'hdn_'); // => hdn_VTFResponsibleRole
+
+                var $hidden = $('#' + hiddenId);
+
+                // 🟢 Update hidden input value
+
+                if ($hidden.length) {
+
+                    $hidden.val(selected.map(function (s) { return s.id; }).join(','));
+
+                }
+
+            });
+
+            // 🧩 Hide dropdown when clicking outside
+
+            $(document).on('click', function (e) {
+
+                if (!$dropdown.is(e.target) && $dropdown.has(e.target).length === 0) {
+
+                    $list.hide();
+
+                }
+
+            });
+
+        });
+
+    }
+</script>
+
+
+

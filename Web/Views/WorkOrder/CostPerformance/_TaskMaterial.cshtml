@@ -1,0 +1,53 @@
+﻿@model ViewModels.WorkOrder.CostPerformance.CostPerformanceViewModel
+@{
+    Layout = null;
+    var hideEstimatedCost = ViewData["HideEstimatedCost"] != null ? bool.Parse(ViewData["HideEstimatedCost"].ToString()) : false;
+    var totalMaterialCost = Model.MaterialsCostPerformance.Sum(x => x.Cost);
+    var totalMaterialActualCost = Model.MaterialsCostPerformance.Sum(x => x.ActualCost);
+}
+<h6 class="text-start">Material</h6>
+<div class="table-responsive my-3" id="materialTable">
+
+    <table class="table table-bordered dataTable">
+        <thead>@* class="thead-primary" *@
+            <tr>
+                <th>Material</th>
+                @if (!hideEstimatedCost)
+                {
+                    <th>Estimated Cost</th>
+                }
+                <th>@(hideEstimatedCost ? "Cost" : "Actual Cost")</th>
+            </tr>
+        </thead>
+        <tbody class="task-material-tbody">
+            @if (Model.MaterialsCostPerformance.Count > 0)
+            {
+                for (var i = 0; i < Model.MaterialsCostPerformance.Count(); i++)
+                {
+                    @await Html.PartialAsync("~/Views/WorkOrder/CostPerformance/_TaskMaterialRow.cshtml", Model.MaterialsCostPerformance[i], new ViewDataDictionary(ViewData) { { "RowNumber", i } })
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center">No Records Added.</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            @if (!hideEstimatedCost)
+            {
+                <tr>
+                    <td colspan="2" class="text-end"><label class="form-label fw-600">Estimated Material Cost</label></td>
+                    <td class="text-end"><label class="form-label fw-600">@totalMaterialCost.ToString("C")</label></td>
+                </tr>
+            }
+            <tr>
+                <td colspan="@(hideEstimatedCost?1:2)" class="text-end"><label class="form-label fw-600">@(hideEstimatedCost ? "Material Cost" : "Actual Material Cost")</label></td>
+                <td class="text-end"><label class="form-label fw-600">@totalMaterialActualCost.ToString("C")</label></td>
+            </tr>
+        </tfoot>
+    </table>
+
+</div>
+

@@ -1,0 +1,83 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model ViewModels.IssueInventoryItemViewModel
+@{
+    Layout = null;
+}
+
+
+<form action="/Home/SaveOrderIssueInventoryItemDetails" id="issue-material-form">
+    <input type="hidden" name="OrderItem.Order.Id" value="@Model.OrderItem.Order.Id" class="issue-material-data" id="hdn-order-id">
+    <input type="hidden" name="Inventory.Id" value="@Model.Inventory.Id" class="issue-material-data">
+    <input type="hidden" name="OrderItem.Id" value="@Model.OrderItem.Id" class="issue-material-data" id="hdn-order-item-id">
+
+
+    <input type="hidden" value="Issue Material" id="modal-title" />
+    <div class="row">
+        <div class="col-sm-4"><h6>@Model.Inventory.Description</h6></div>
+        <div class="col-sm-4">
+            <h6>Order Qty: <br /><b>@Model.OrderItem.Quantity.ToString("N0")</b></h6>
+            <input type="hidden" id="hdnOrderedQty" value="@Model.OrderItem.Quantity" />
+        </div>
+        @*<div class="col-sm-4">
+                <div class="status-box text-right">
+                    <div class="d-inline-flex align-items-center"><span class="stat-dot stat-box stat-red mr-1"></span><span class="stat-name">Expired</span></div>
+                </div>
+            </div>*@
+    </div>
+    <br />
+    <h5>Available Quantities:</h5>
+    <br />
+
+    <table class="table table-striped issue-material-table">
+        <thead>@* class="thead-primary" *@
+            <tr>
+                <th>Purchase Order</th>
+                <th>Inventory</th>
+                <th>Source</th>
+                <th>Supplier</th>
+                <th>Rate</th>
+                <th>Location</th>
+                <th>OH Quantity</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var (transaction, index) in Model.Transactions.Select((value, i) => (value, i)))
+            {
+                var locationId = "location-id-" + index;
+
+                <tr>
+                    <td>
+                        <input type="hidden" name="Transactions[@index].LotNO" value="@Model.Transactions[index].LotNO">
+                        @*<input type="hidden" name="Transactions[index].Quantity" value="@Model.Transactions[index].Quantity">*@
+                        <input type="hidden" name="Transactions[@index].ItemPrice" value="@Model.Transactions[index].ItemPrice">
+                        <input type="hidden" name="Transactions[@index].Source.Id" value="@Model.Transactions[index].Source.Id">
+                        <input type="hidden" name="Transactions[@index].Supplier.Id" value="@Model.Transactions[index].Supplier.Id">
+                        <input type="hidden" name="Transactions[@index].Location.Id" value="@Model.Transactions[index].Location.Id">
+                        <input type="hidden" name="Transactions[@index].Inventory.Id" value="@Model.Inventory.Id">
+                        @transaction.LotNO
+                    </td>
+                    <td>@Model.Inventory.Description</td>
+                    <td>@transaction.Source.Name</td>
+                    <td>@transaction.Supplier.Name</td>
+                    <td>@transaction.ItemPrice</td>
+                    <td>@transaction.Location.Name</td>
+                    <td>@transaction.Quantity</td>
+                    <td><input type="number" class="form-control issue-material-quantity" max="@(Math.Min(Model.OrderItem.Quantity,transaction.Quantity))" name="Transactions[@index].Quantity" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <span class="field-validation-valid error text-danger" id="spnOrderIssueInventoryItem" data-valmsg-replace="true"></span>
+    <div class="modal-btns d-flex justify-content-end pt-3">
+        <button type="button" onclick="SaveIssueInventoryItem('@Model.OrderItem.Order.Id')" class="btn btn-site-primary ml-2">Save</button>
+    </div>
+
+
+</form>
+@*<script src="/Scripts/jquery.validate.js"></script>
+    <script src="/Scripts/jquery.validate.unobtrusive.js"></script>*@
+<script src="/js/views/execute/issue-material.js"></script>
+

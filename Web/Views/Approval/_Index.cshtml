@@ -1,0 +1,198 @@
+﻿
+
+@using System.Web
+@using ViewModels
+@model ViewModels.CRUD.CrudListViewModel
+@{
+    ViewBag.Title = Model.Title;
+    if (Model.IsLayoutNull)
+    {
+        Layout = null;
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    var createUrl = HttpUtility.UrlDecode(Url.Action(Model.CreateButtonAction ?? "Create", Model.ControllerName));
+    var controllerName = Model.ControllerName;
+}
+
+
+<link href="~/css/bundles/datatable-buttons.css" rel="stylesheet" />
+<link href="~/css/bundles/datatable.css" rel="stylesheet" />
+<script src="~/js/custom/loader/loader.js"></script>
+@if (Model.LoadDatatableScript)
+{
+    <script src="~/js/bundles/custom-datatable.js"></script><!--Placed here because Assets Screen have to Extend Datatable Manager-->
+}
+
+<div class="page-top d-lg-flex justify-content-between align-items-center mb-3">
+    @if (Model.HideTitle == false)
+    {
+        if (!string.IsNullOrEmpty(Model.TitleHtml))
+        {
+            @Html.Raw(Model.TitleHtml)
+        }
+        else
+        {
+            <h3 class="page-title text-site-primary m-md-0">@Model.Title</h3>
+        }
+    }
+    @if (Model.HideCreateButton == false)
+    {
+        <button class="btn btn-primary" onclick="loadCreateModalPanel('@createUrl')" data-bs-target="#newSupModal">
+            <i class="fa-regular fa-square-plus"></i>
+            Add New
+        </button>
+    }
+
+</div>
+
+@if (string.IsNullOrEmpty(Model.TableViewPath))
+{
+    @await Html.PartialAsync("~/Views/Shared/Crud/ListView/DataTable/_Table.cshtml", Model)
+}
+else
+{
+    @await Html.PartialAsync(Model.TableViewPath, Model)
+}
+
+<div class="modal fade" id="crudDeleteModal">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Enter your password:</h4>
+                <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+            </div>
+            <div id="crudDeleteModalPanelBody" class="modal-body">
+                <div id="crudDeleteModalError">
+                </div>
+                <input name="Password" type="password" id="user-password" class="form-control" placeholder="Password" autocomplete="new-password" />
+                <br />
+                <div class="text-center">
+                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn blue-btn" id="validate-password">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="line-modal modal fade" id="timesheetModal" tabindex="-1" aria-labelledby="lineModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="d-flex justify-content-end mb-2">
+                    <button type="button" id="print-approval" class="btn-circle mr-1" data-toggle="tooltip" title="Print"><i class="icon-printer icon-1x"></i></button>
+                    <button type="button" class="btn-circle" data-bs-dismiss="modal" aria-label="Close" data-toggle="tooltip" title="Close"><i class="icon-cross icon-1x"></i></button>
+                </div>
+
+                <div id="timesheet-modal">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="data-cell-edit-form-div">
+    <form id="data-cell-edit-form">
+    </form>
+</div>
+
+
+
+@if (Model.LoadDatatableScript)
+{
+    <script src="~/js/bundles/datatable.js"></script>
+    <script src="~/js/bundles/datatable-buttons.js"></script>
+}
+<script src="~/js/custom/crud/ajaxCrud.js"></script>
+<partial name="_ValidationScriptsPartial" />
+<script src="~/js/views/approval/approval-script.js"></script>
+
+
+<script>
+
+    var clickTimer;
+    var delay = 250;
+
+    $(function () {
+    @if (Model.LoadDefaultDatatableScript)
+    {
+        @:ReInitializeDataTables();
+    }
+        var timeoutId; // Variable to store the timer ID
+        $("body").off("click", ".crud-list-table > tbody > tr > td:not(.action)");
+        $("body").on("click", ".crud-list-table > tbody > tr > td:not(.action)", function () {
+            if ($(this).find(".processing").length > 0) {
+                return;
+            }
+            clearTimeout(timeoutId); // Clear any previous timer
+            timeoutId = setTimeout(()=> {
+                // Single click handler
+                if ($(this).siblings("td").length > 1) {
+                    var id = $(this).parent().attr("id");
+                    var controllerName = "@controllerName";
+                    var url = '/' + controllerName + '/Detail/' + id;
+                    loadUpdateAndDetailModalPanel(url);
+                }
+
+            }, 350); // Set a timer for 250 milliseconds
+
+        });
+        $("body").off("dblclick", ".crud-list-table > tbody > tr > td:not(.action)");
+        $("body").on("dblclick", ".crud-list-table > tbody > tr > td:not(.action)", function () {
+            clearTimeout(timeoutId); // Clear the timer if a double click occurs
+        });
+
+        $("#print-approval").on("click", function () {
+            printContent("timsheet-print-container");
+        });
+
+        $("#pay-period-id").on("change", function () {
+            if ($('#pay-period-id').select2('data').length > 0) {
+                var payPeriodId = $('#pay-period-id').select2('data')[0].id;
+                var payPeriodName = $('#pay-period-id').select2('data')[0].text;
+            }
+            $("#pay-period-range").val(payPeriodName);
+            $(".search-form-btn").click();
+        });
+
+    });
+
+   @if (Model.LoadDefaultDatatableScript)
+    {
+        <text>
+        var dataTableManager = new DataTableManager();
+
+        function ReInitializeDataTables() {
+            let formId = $(".search-form").attr('id');
+            if ($("#crud-list-table").length > 0) {
+                let dataTableId = $("#crud-list-table").attr('id');
+                if ($.fn.DataTable.fnIsDataTable($("#" + dataTableId))) {
+                    $("#" + dataTableId).dataTable().fnDestroy();
+                    $("#crud-list-table").addClass("dataTable");
+                }
+                dataTableManager.initialize("crud-list-table", formId, @Html.Raw(Model.DatatableColumnsJson), '@Model.ShowDatatableButtons', '@Model.DataUrl', '@Model.IsPasscodeRequiredForDelete');
+                // InitializeDataTables();
+            }
+    }
+        </text>
+    }
+
+    function printContent(id) {
+        var divToPrint = document.getElementById(id);
+        var newWin = window.open("", "Print-Window");
+        newWin.document.open();
+        //var html = '<!doctype html><body><div>';// TO TEST WITHOUT PRINT
+        var html = '<!doctype html><body onload = "window.print()"><div>';
+        html += divToPrint.innerHTML;
+        html += `</div><\/body></html>`;
+        newWin.document.write(html);
+        newWin.document.close();
+        CalculateHoursForAllRows();
+        setTimeout(function () { newWin.close(); }, 1000);//TO TEST WITHOUT PRINT COMMENT THIS
+    }
+</script>
+
+

@@ -1,0 +1,187 @@
+﻿@using Enums
+@using ViewModels;
+@model AssetModifyViewModel
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <partial name="~/Views/Shared/Select2/_AssetType.cshtml" for="AssetType" />
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <partial name="~/Views/Shared/Select2/_MUTCD.cshtml" for="MUTCD" />
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="PoleId" class="form-label fw-600"></label>
+                    <input asp-for="PoleId" type="text" class="form-control" />
+                    <span asp-validation-for="PoleId" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Description" class="form-label fw-600"></label>
+                    <input asp-for="Description" type="text" class="form-control" />
+                    <span asp-validation-for="Description" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <partial name="~/Views/Shared/Select2/_Manufacturer.cshtml" for="Manufacturer" />
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <partial name="~/Views/Shared/Select2/_Condition.cshtml" for="Condition" />
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Value" class="form-label fw-600"></label>
+                    <input asp-for="Value" type="text" class="form-control input-currency" />
+                    <span asp-validation-for="Value" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Intersection" class="form-label fw-600"></label>
+                    <input asp-for="Intersection" type="text" class="form-control" />
+                    <span asp-validation-for="Intersection" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Latitude" class="form-label fw-600"></label>
+                    <input asp-for="Latitude" type="number" class="form-control" />
+                    <span asp-validation-for="Latitude" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Longitude" class="form-label fw-600"></label>
+                    <input asp-for="Longitude" type="number" class="form-control" />
+                    <span asp-validation-for="Longitude" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="AssetClass" class="form-label fw-600"></label>
+                    <input asp-for="AssetClass" class="form-control" />
+                    <span asp-validation-for="AssetClass" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="InstalledDate" class="form-label fw-600"></label>
+                    <input asp-for="InstalledDate" type="date" class="form-control" />
+                    <span asp-validation-for="InstalledDate" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="ReplacementYear" class="form-label fw-600"></label>
+                    <select asp-for="ReplacementYear" class="form-select" asp-items="@Html.GetEnumSelectList<ReplacementCycleCatalog>()">
+                        <option value="">-- Select --</option>
+                    </select>
+                    <span asp-validation-for="ReplacementYear" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            @if(Model.Id > 0)
+            {
+                <div class="col-lg-6">
+                    <div class="mb-3 form-group">
+                        <label asp-for="ReplacementDate" class="form-label fw-600"></label>
+                        <input asp-for="ReplacementDate" type="date" class="form-control" />
+                        <span asp-validation-for="ReplacementDate" class="validation-invalid-label"></span>
+                    </div>
+                </div>
+            }
+          
+
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="NextMaintenanceYear" class="form-label fw-600"></label>
+                    <select asp-for="NextMaintenanceYear" class="form-select" asp-items="@Html.GetEnumSelectList<MaintenanceCycleCatalog>()">
+                        <option value="">-- Select --</option>
+                    </select>
+                    <span asp-validation-for="NextMaintenanceYear" class="validation-invalid-label"></span>
+                </div>
+            </div>
+
+            @if (Model.Id > 0)
+            {
+                <div class="col-lg-6">
+                    <div class="mb-3 form-group">
+                        <label asp-for="NextMaintenanceDate" class="form-label fw-600"></label>
+                        <input asp-for="NextMaintenanceDate" type="date" class="form-control" />
+                        <span asp-validation-for="NextMaintenanceDate" class="validation-invalid-label"></span>
+                    </div>
+                </div>
+            }
+
+            @await Html.PartialAsync("~/Views/DynamicColumn/_ShowDynamicColumns.cshtml", Model)
+        </div>
+
+        <div class="row" id="asset-type-level-radio">
+        </div>
+
+
+        <div class="row">
+            @await Html.PartialAsync("~/Views/Shared/Crud/DropZoneView/_Upload.cshtml", Model.ImagesList)
+        </div>
+    </div>
+</div>
+
+<input type="hidden" asp-for="Id" id="asset-id" />
+<input type="hidden" asp-for="SystemGeneratedId" />
+<script>
+
+    $(function () {
+        loadAssetRadios();
+
+        $(document).off("change", "#asset-type-id");
+        $(document).on("change", "#asset-type-id", function () {
+            loadAssetRadios();
+        });
+    });
+
+    function loadAssetRadios() {
+        var assetTypeId = $("#asset-type-id").select2('data')[0].id;
+        var assetId = $("#asset-id").val();
+        $.ajax({
+            type: "GET",
+            url: `/Asset/GetAssetTypeHtml?assetTypeId=${assetTypeId}&assetId=${assetId}`,
+            dataType: "html",
+            success: function (content) {
+                $("#asset-type-level-radio").empty();
+                $("#asset-type-level-radio").html(content);
+            },
+            error: function (e) { }
+        });
+    }
+
+    function ProcessFormData(formData) {
+        $(".asset-type-association-radio:checked").each(function (i, v) {
+            var assetId = $("#asset-id").val();
+            var assetTypeId = $("#asset-type-id").select2('data')[0].id;
+            var assetTypeLevel1Id = $(v).attr("attr-level1-id");
+            var assetTypeLevel2Id = $(v).val();
+
+            formData.append(`AssetAssociations[${i}].Asset.Id`, assetId);
+            formData.append(`AssetAssociations[${i}].AssetType.Id`, assetTypeId);
+            formData.append(`AssetAssociations[${i}].AssetTypeLevel1.Id`, assetTypeLevel1Id);
+            formData.append(`AssetAssociations[${i}].AssetTypeLevel2.Id`, assetTypeLevel2Id);
+        });
+    }
+  
+</script>

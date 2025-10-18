@@ -1,0 +1,144 @@
+﻿@model ViewModels.CRUD.CrudListViewModel
+@{
+    ViewBag.Title = Model.Title;
+    if (Model.IsLayoutNull)
+    {
+        Layout = null;
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+}
+@* <style>
+    .text-site-primary {
+        color: #832d20 !important;
+    }
+
+    ]
+
+    .thead-primary th, .table .thead-primary th, #technician-table .thead-primary th, .comments-container .table .thead-primary th, #cost-table .thead-primary th {
+        background-color: #832d20 !important;
+        color: white !important;
+    }
+
+    #cost-table table, #cost-table tr, #cost-table td {
+        border-collapse: collapse;
+    }
+
+    .comments-image-container .detail-images .photo {
+        width: 50px;
+        height: 50px;
+    }
+
+    .btn-modal-save:hover {
+        border-color: #832d20 !important;
+        color: #832d20 !important;
+        background-color: white !important;
+    }
+
+    .btn-site-primary {
+        border-color: #832d20 !important;
+        background-color: #832d20 !important;
+        color: #f8f9fa !important;
+    }
+
+        .btn-site-primary:hover {
+            border-color: #832d20 !important;
+            background-color: #fff !important;
+            color: #832d20 !important;
+        }
+
+    .btn-primary {
+        border-color: #832d20 !important;
+        background-color: #832d20 !important;
+    }
+
+    .footer-logo img, .navbar-brand img {
+        background: #f8f9fa !important;
+    }
+</style> *@
+
+@await Html.PartialAsync("~/Views/Shared/Crud/ListView/DataTable/_Index.cshtml", Model)
+
+<div id="attachment-detail-modal" class="modal fade show" tabindex="-1" style="padding-right: 17px;">
+    <div class="modal-lg modal-dialog modal-dialog-centered" style="max-width: 1150px;">
+        <div class="modal-content" style="border: 1px solid #707070; background-color: #E9EDEF;">
+            <div class="modal-header">
+                <h5 class="modal-title">Images</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12 row" id="attachment-detail-modal-body">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="printModal" tabindex="-1" aria-labelledby="printModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Print</h5>
+                <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" id="print-content-container">
+                <!-- AJAX response will be displayed here -->
+            </div>
+            <div class="col-12 text-center">
+                <button type="button" class="btn btn-primary mb-4" onclick="printResponse()">Print</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/js/views/attachments-gallery/attachments-gallery.js"></script>
+<script>
+    $(function () {
+        $(document).off("click", '.imgbadge')
+        $(document).on("click", '.imgbadge', function () {
+            var id = parseInt($(this).closest("tr").attr("id"));
+            var attachmentCount = parseInt($(this).html().split("+")[1]);
+            if (attachmentCount > 0) {
+                $("#attachment-detail-modal").modal("show");
+                ViewAttachmentGrid(id, "/WorkOrder/_GetAttachmentView");
+            }
+            else {
+                GetAttachmentUrl(id, "/WorkOrder/_GetAttachmentUrl");
+            }
+        });
+        $(document).off("click", ".print-work-order");
+        $(document).on("click", ".print-work-order", function (e) {
+            e.preventDefault();
+            var id = $(this).attr("attr-id");
+            LoadPrintWorkOrder(id);
+        });
+    });
+
+    function LoadPrintWorkOrder(id) {
+        $.ajax({
+            url: "/WorkOrder/Print/" + id,
+            type: "get",
+            dataType: "html",
+            success: function (response) {
+                $('#print-content-container').html(response);
+                $('#printModal').modal('show');
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
+            }
+        });
+    }
+    function printResponse() {
+        var divToPrint = document.getElementById('print-content-container');
+        var newWin = window.open('', 'Print-Window');
+        newWin.document.open();
+        var html = '<!doctype html><body onload="window.print()"><div>';
+        html += divToPrint.innerHTML;
+        html += `</div><\/body></html>`;
+        newWin.document.write(html);
+        newWin.document.close();
+    }
+</script>

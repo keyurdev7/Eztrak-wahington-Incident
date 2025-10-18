@@ -1,0 +1,212 @@
+﻿@using ViewModels
+@model WorkOrderTasksIndexViewModel
+@{
+    Layout = null;
+    var workOrderId = ViewBag.WorkOrderId;
+    var createUrl = "/WorkOrder/AddTasks/" + workOrderId;
+}
+<header>
+    <link rel="stylesheet" href="~/css/custom/tasks-style-sheet.css" />
+</header>
+<div class="page-content page-container" id="page-content">
+    <div class="padding">
+        <div class="row container d-flex justify-content-center">
+            <div class="col-md-12">
+                <div class="card px-3">
+                    <div class="card-body">
+                        <div class="row col-md-12">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6">
+                                <div class="add-items d-flex">
+                                    <button class="add btn btn-primary font-weight-bold todo-list-add-btn" onclick="loadCreate('@createUrl')">Add</button>
+                                </div>
+                            </div>
+                        </div>
+                        <h4 class="card-title">Uncompleted Tasks</h4>
+                        <div class="row col-md-12">
+                            <div class="list-wrapper">
+                                <ul class="d-flex flex-column-reverse todo-list uncompleted-ul">
+                                    @if (Model != null && Model.UnCompletedTasks.Count > 0)
+                                    {
+                                        @foreach (var item in Model.UnCompletedTasks)
+                                        {
+                                            <li class="li list-@item.Id">
+                                                <div class="form-check">
+                                                    <label class="form-check-label">
+                                                        <input class="checkList-checkbox checkbox" value="@item.Id" type="checkbox" id="custom @item.Status" attr-data="@item.Status" />
+                                                        @item.TaskDescription
+                                                        <i class="input-helper"></i>
+                                                    </label>
+                                                </div>
+                                                <i class="remove remove-checklist mdi mdi-close-circle-outline" id="@item.Id"></i>
+                                                <input type="hidden" asp-for="@item.WorkOrderId" />
+                                            </li>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <li class="no-tasks"><div class="form-check"><label class="form-check-label"><span class="pending-default-text">No new tasks added.</span> <i class="input-helper"></i></label></div></li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                        <h4 class="card-title">Completed Tasks</h4>
+                        <div class="row col-md-12">
+                            <div class="list-wrapper">
+                                <ul class="d-flex flex-column-reverse todo-list completed-ul">
+                                    @if (Model != null && Model.CompletedTasks.Count > 0)
+                                    {
+                                        @foreach (var item in Model.CompletedTasks)
+                                        {
+                                            <li class="li list-@item.Id">
+                                                <div class="form-check">
+                                                    <label class="form-check-label">
+                                                        <input class="checkList-checkbox checkbox" value="@item.Id" type="checkbox" id="custom @item.Status" attr-data="@item.Status" />
+                                                        @item.TaskDescription
+                                                        <i class="input-helper"></i>
+                                                    </label>
+                                                </div>
+                                                <i class="remove remove-checklist mdi mdi-close-circle-outline" id="@item.Id"></i>
+                                                <input type="hidden" asp-for="@item.WorkOrderId" />
+                                            </li>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <li class="no-tasks"><div class="form-check"><label class="form-check-label"><span class="complete-default-text">No tasks completed.</span><i class="input-helper"></i></label></div></li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="modal-title" value="Work Order Tasks" />
+
+<script>
+    $(function () {
+        var todoListItem = $('.todo-list');
+        var todoListInput = $('.todo-list-input');
+
+        $('.todo-list-add-btn').on("click", function (event) {
+            event.preventDefault();
+            var item = todoListInput.val();
+            if (item) {
+                var listItem = `
+                        <li>
+                            <div class='form-check'>
+                                <label class='form-check-label'>
+                                    <input class='checkbox' type='checkbox' data-id=''/>
+                                    ${item}
+                                    <i class='input-helper'></i>
+                                </label>
+                            </div>
+                            <i class='remove mdi mdi-close-circle-outline'></i>
+                        </li>`;
+                todoListItem.append(listItem);
+                todoListInput.val("");
+            }
+            checkEmptyLists();
+        });
+
+        todoListItem.on('change', '.checkbox', function () {
+            var isChecked = $(this).prop("checked");
+            var id = parseInt($(this).val());
+            var status = isChecked ? "Completed" : "Pending";
+
+            SendAjax(id, status);
+            $(this).closest("li").toggleClass('completed', isChecked);
+            checkEmptyLists();
+        });
+
+        todoListItem.on('click', '.remove', function () {
+            var id = parseInt($(this).attr("id"));
+
+            SendAjaxToDelete(id, "Deleted");
+            $(this).closest('li').remove();
+            checkEmptyLists();
+        });
+
+        $(".todo-list li").each(function () {
+            var isCompleted = $(this).find('.checkbox').attr('attr-data') === "Completed";
+            if (isCompleted) {
+                $(this).addClass("completed");
+                $(this).find('.checkbox').prop('checked', true);
+            }
+        });
+    });
+
+    function checkEmptyLists() {
+        if ($('.uncompleted-ul li').length === 0) {
+            $('.uncompleted-ul').append('<li class="no-tasks"><div class="form-check"><label class="form-check-label"><span class="pending-default-text">No new tasks added.</span><i class="input-helper"></i></label></div></li>');
+        } else {
+            $('.uncompleted-ul .no-tasks').remove();
+        }
+
+        if ($('.completed-ul li').length === 0) {
+            $('.completed-ul').append('<li class="no-tasks"><div class="form-check"><label class="form-check-label"><span class="complete-default-text">No tasks completed.</span><i class="input-helper"></i></label></div></li>');
+        } else {
+            $('.completed-ul .no-tasks').remove();
+        }
+    }
+
+    function loadCreate(url) {
+        $("#crudModalPanel").modal("hide");
+        setTimeout(function () {
+            loadCreateModalPanel(url);
+        }, 1000);
+    }
+
+    function SendAjax(id, status) {
+        $.ajax({
+            url: "/WorkOrder/_SetWorkOrderTaskStatus",
+            type: "post",
+            data: { 'Id': id, Status: status },
+            dataType: "html",
+            success: function (response) {
+                var id = parseInt(response);
+                if (id > 0) {
+                    var list = $(".list-" + id);
+
+                    if ($(".list-" + id).hasClass("completed")) {
+                        $(".list-" + id).remove();
+                        $(".complete-default-text").html("");
+                        $(".completed-ul").append(list);
+                        if ($(".uncompleted-ul li").length < 2) {
+                            $(".pending-default-text").html("No new tasks added.");
+                        }
+                    }
+                    else {
+                        $(".list-" + id).remove();
+                        $(".uncompleted-ul").append(list);
+                        if ($(".completed-ul li").length < 2) {
+                            $(".complete-default-text").html("No tasks completed.");
+                        }
+                    }
+                    checkEmptyLists();
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
+            }
+        });
+    }
+
+    function SendAjaxToDelete(id, status) {
+        $.ajax({
+            url: "/WorkOrder/_SetWorkOrderTaskStatus",
+            type: "post",
+            data: { 'Id': id, Status: status },
+            dataType: "html",
+            success: function (response) {
+                checkEmptyLists();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
+            }
+        });
+    }
+</script>

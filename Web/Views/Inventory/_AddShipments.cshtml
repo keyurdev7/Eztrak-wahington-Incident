@@ -1,0 +1,238 @@
+﻿@using ViewModels
+@model ShipmentGridViewModel
+@{
+    Layout = null;
+}
+<form action="CreateShipments" method="post" id="save-line-items-form">
+
+    <table class="table" id="shipment-table">
+        <thead>@* class="thead-primary" *@
+            <tr>
+                <th>PO No</th>
+                <th>Rate</th>
+                <th>Quantity</th>
+                <th>Location</th>
+                <th>Supplier</th>
+                <th>Source</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Shipments != null && Model.Shipments.Count > 0)
+            {
+                for (int i = 0; i < Model.Shipments.Count; i++)
+                {
+                    var locationId = "location-id-" + i;
+                    var supplierId = "supplier-id-" + i;
+                    var sourceId = "source-id-" + i;
+                    <tr class="shipment-table-row">
+                        <td style="width: 120px;">
+                            <input type="number" class="form-control" name="Shipments[@i].LotNo" data-val="true" data-val-number="The field PO No must be a number." data-val-required="The field PO No is required." />
+                            <span class="validation-invalid-label field-validation-valid" data-valmsg-for="Shipments[@i].LotNo" data-valmsg-replace="true"></span>
+                        </td>
+                        <td style="width: 120px;">
+                            <input type="text" class="form-control input-currency" name="Shipments[@i].ItemPrice" data-val="true" data-val-number="The field Item Price must be a number." data-val-required="The field Item Price is required." />
+                            <span class="validation-invalid-label field-validation-valid" data-valmsg-for="Shipments[@i].ItemPrice" data-valmsg-replace="true"></span>
+
+                        </td>
+                        <td style="width: 120px;">
+                            <input type="number" class="form-control" name="Shipments[@i].Quantity" data-val="true" data-val-number="The field Quantity must be a number." data-val-required="The field Quantity is required." />
+                            <span class="validation-invalid-label field-validation-valid" data-valmsg-for="Shipments[@i].Quantity" data-valmsg-replace="true"></span>
+                        </td>
+                        <td style="width:180px;">
+                            <partial name="~/Views/Shared/Select2/Location/_LocationHtml.cshtml" for="@Model.Shipments[i].Location" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", locationId }   }' />
+                        </td>
+                        <td style="width:180px;">
+                            <partial name="~/Views/Shared/Select2/Supplier/_SupplierHtml.cshtml" for="@Model.Shipments[i].Supplier" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", supplierId}  }' />
+                        </td>
+                        <td style="width:180px;">
+                            <partial name="~/Views/Shared/Select2/Source/_SourceHtml.cshtml" for="@Model.Shipments[i].Source" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", sourceId}  }' />
+                        </td>
+                        <td class="delete-action-container">
+                            @if (i > 0)
+                            {
+
+                                <a data-id="@i" class="table-link delete-btn" onclick="fnDeleteShipmentLineItems(this)"><i class="far fa-trash-alt"></i></a>
+                            }
+                        </td>
+                        <input type="hidden" id="txtInventoryId" class="form-control txtInventoryId" name="Shipments[@i].InventoryId" value="@Model.Shipments[i].InventoryId" />
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    <div class="d-flex align-items-center mt-2">
+        @if (Model?.Shipments?.Count() == 1)
+        {
+            <button onclick="AddNewShipmentLineItems()" class="btn btn-primary me-3" type="button">Add Line Item</button>
+        }
+        <div class="flex-fill"></div>
+        <button type="button" id="save-shipments" class="btn btn-primary me-3">Submit</button>
+    </div>
+</form>
+
+<partial name="~/Views/Shared/Select2/Location/_LocationJs.cshtml" />
+<partial name="~/Views/Shared/Select2/Source/_SourceJs.cshtml" />
+<partial name="~/Views/Shared/Select2/Supplier/_SupplierJs.cshtml" />
+
+<script src="~/js/masking/initiate-masking.js"></script>
+<script src="~/js/custom/crud/ajaxCrud.js"></script>
+
+<script>
+    var lastSelect2Index = @(Model?.Shipments?.Count - 1);
+    $(function () {
+        initializeLocationSelect2($('[id^="location-id"]'));
+        initializeSourceSelect2($('[id^="source-id"]'));
+        initializeSupplierSelect2($('[id^="supplier-id"]'));
+        $("body").off("click", "#save-shipments");
+        $("body").on("click", "#save-shipments", function () {
+            removeCurrencyMasking();
+            let form = $(this).closest("form");
+            $(form).removeData("validator").removeData("unobtrusiveValidation");
+            $.validator.unobtrusive.parse($(form));
+            if ($(form).valid()) {
+                var formData = $(this).closest("form").serialize();
+                CreateShipments(formData);
+            }
+            addCurrencyMasking();
+
+        });
+    })
+
+    function fnDeleteShipmentLineItems(_this) {
+        var rowCnt = $('#shipment-table').find("tbody tr").length;
+        if (rowCnt > 1) {
+            if (confirm('Are you sure want to delete ?')) {
+                var row = $(_this).parents('tr');
+                row.remove();
+                RefreshInputIndexes("#shipment-table tr", "shipment-table-row", "Shipments");
+
+            }
+        }
+    }
+
+    function RefreshInputIndexes(trSelector, rowPrefix, collectionName) {
+        var rowIndex = 0;
+        $.each($(trSelector), function () {
+            if ($(this).find('input, select').length > 1) {
+                // var id = $(this).attr("id");
+                // if (id != null && id != "") {
+                //     $(this).attr("id", rowPrefix + "-" + rowIndex);
+                // }
+                $.each($(this).find('input, select'), function () {
+                    if ($(this).is('select')) {
+                        if ($(this).attr('name').split(".").length > 2) {
+                            $(this).attr("name", collectionName + "[" + rowIndex + "]." + $(this).attr('name').split(".")[1] + "." + $(this).attr('name').split(".")[2]);
+                        } else {
+                            $(this).attr("name", collectionName + "[" + rowIndex + "]." + $(this).attr('name').split(".")[1]);
+                        }
+                    } else {
+                        if ($(this).attr('name').split(".").length > 2) {
+                            $(this).attr("name", collectionName + "[" + rowIndex + "]." + $(this).attr('name').split(".")[1] + "." + $(this).attr('name').split(".")[2]);
+                        } else {
+                            $(this).attr("name", collectionName + "[" + rowIndex + "]." + $(this).attr('name').split(".")[1]);
+                        }
+                    }
+                });
+                rowIndex++;
+            }
+        });
+    }
+
+    function CreateShipments(data) {
+        //  showAjaxLoader("#bid-container");
+        $.ajax({
+            url: '/Inventory/CreateShipments',
+            type: 'Post',
+            data: data,
+            success: function (res) {
+                if (res.status) {
+                    $("#inventory-shipment-modal").modal("hide");
+                    // hideAjaxLoader("#bid-container");
+                    ReInitializeDataTables();
+                }
+                else {
+                    $.each(res.fieldErrors, function (fieldName, errors) {
+                        var errorContainer = $('[data-valmsg-for="' + fieldName + '"]');
+                        errorContainer.removeClass('field-validation-valid').addClass('field-validation-error');
+                        $(errorContainer).html('<span class="" for="' + fieldName + '">' + errors[0] + '</span>');
+                    });
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr);
+                //  hideAjaxLoader("#bid-container");
+
+            }
+        });
+    }
+    function AddNewShipmentLineItems() {
+        removeCurrencyMasking();
+        lastSelect2Index = lastSelect2Index + 1;
+        // Clone the row
+        var newRow = $('.shipment-table-row').first().clone();
+
+        // Find the table
+        var table = $('#shipment-table');
+
+        // Find the current number of rows
+        var index = (table.find('tr').length - 1);
+
+        // Increment the index in the cloned row
+        newRow.find('input, select').each(function () {
+            var nameAttr = $(this).attr('name');
+            if (nameAttr) {
+                $(this).attr('name', nameAttr.replace('[0]', '[' + index + ']'));
+            }
+            // Reset input values and select options to their default states, excluding hidden fields
+            if ($(this).is('input')) {
+                var inputType = $(this).attr('type');
+                if (inputType === 'checkbox' || inputType === 'radio') {
+                    $(this).prop('checked', false);  // Uncheck checkboxes and radio buttons
+                } else if (inputType !== 'hidden') {
+                    $(this).val('');  // Clear other input types (text, number, etc.), excluding hidden fields
+                }
+            } else if ($(this).is('select')) {
+                $(this).prop('selectedIndex', 0);  // Reset select elements to their default option
+            }
+        });
+        newRow.find("[data-valmsg-for^= 'Shipments[0]']").attr("data-valmsg-for", function (i, oldVal) {
+            return oldVal.replace(/Shipments\[0\]/, "Shipments[" + index + "]");
+        });
+
+        // Append the cloned row to the table
+        table.append(newRow);
+        $('#shipment-table tr:last').find(".delete-action-container").html('<a class="table-link delete-btn" onclick = "fnDeleteShipmentLineItems(this)" > <i class="far fa-trash-alt" > </i></a >')
+        updateSelect2Ids("location", lastSelect2Index);
+        updateSelect2Ids("source", lastSelect2Index);
+        updateSelect2Ids("supplier", lastSelect2Index);
+        initializeLocationSelect2($("#location-id-" + lastSelect2Index));
+        initializeSourceSelect2($("#source-id-" + lastSelect2Index));
+        initializeSupplierSelect2($("#supplier-id-" + lastSelect2Index));
+        addCurrencyMasking();
+    }
+    function updateSelect2Ids(name, newIndex) {
+        $('#shipment-table tr:last').find(`[id^='${name}-id']`).each(function (index) {
+            let id = "location-id-" + newIndex;
+            $(this).attr('id', `${name}-id-` + newIndex);
+            $(this).removeAttr("data-select2-id");
+            $(this).siblings(".select2.select2-container").remove();
+        });
+    }
+    function initializeLocationSelect2(locationIds) {
+        locationIds.each(function () {
+            let id = "#" + $(this).attr('id');
+            SetLocationSelect2(id);
+        });
+    }
+    function initializeSourceSelect2(sourceIds) {
+        sourceIds.each(function () {
+            SetSourceSelect2("#" + $(this).attr('id'));
+        });
+    }
+    function initializeSupplierSelect2(supplierIds) {
+        supplierIds.each(function () {
+            SetSupplierSelect2("#" + $(this).attr('id'));
+        });
+    }
+</script>

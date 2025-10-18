@@ -1,0 +1,16 @@
+﻿<script>function SetConditionSelect2(identifier) {
+        let id = identifier;
+        var pageSize = 10;
+        var url = '/Condition/Select2';
+
+        var dataArray = function (params) {
+            params.page = params.page || 1;
+            return {
+                prefix: params.term,
+                pageSize: pageSize,
+                pageNumber: params.page,
+            };
+        };
+        Select2AutoCompleteAjax(id, url, dataArray, pageSize, "Select Condition");
+
+    }</script>

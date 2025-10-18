@@ -1,0 +1,14 @@
+﻿@model ViewModels.BaseSelect2VM
+@{
+    var elementId = ViewData["Id"] != null && !string.IsNullOrEmpty(ViewData["Id"].ToString()) ? ViewData["Id"].ToString() : "location-id";
+}
+<partial name="~/Views/Shared/Select2/Location/_LocationHtml.cshtml" model="@Model" />
+<partial name="~/Views/Shared/Select2/Location/_LocationJs.cshtml" model="@Model" />
+
+<script src="~/js/custom/select2/select2-methods.js"></script>
+<script>
+    $(function () {
+        var id = "#" + "@elementId";
+        SetLocationSelect2(id);
+    });
+</script>

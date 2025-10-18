@@ -1,0 +1,17 @@
+﻿@using ViewModels;
+@using Enums
+@model TicketSearchViewModel
+
+<div class="col-12 col-sm-3 col-lg-2">
+    <div class="mb-3 form-group">
+        <input asp-for="Search.value" type="search" class="form-control" placeholder="Keyword" aria-controls="crud-list-table" autocomplete="new-password">
+    </div>
+    
+        <div class="mb-3 form-group">
+            <select  asp-for="Status" class="form-select"
+                    asp-items="@Html.GetEnumSelectList<TicketStatus>()">
+                <option value="">Select a Status</option>
+            </select>
+        </div>
+    
+</div>

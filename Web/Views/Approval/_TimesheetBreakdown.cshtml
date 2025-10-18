@@ -1,0 +1,498 @@
+﻿@model ViewModels.Timesheet.TimeSheetWithBreakdownViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering;
+@using Enums;
+
+@{
+    Layout = null;
+    double totalHours = 0;
+    bool isInvoice = ViewBag.IsInvoice;
+    var costStyle = isInvoice ? "" : "display:none;";
+    var switchClass = isInvoice ? "switch disable" : "switch";
+}
+<style>
+    #signaturename {
+        text-align: center;
+        font-weight: bold;
+        font-size: 150%;
+    }
+
+    #signature {
+        width: 100%;
+        border-bottom: 1px solid black;
+        height: 30px;
+    }
+
+    #approval-app-logo {
+        width: 80px !important;
+    }
+
+    .row-total td input {
+        min-width: 75px;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+    input:checked + .slider {
+        background-color: #2196F3;
+    }
+
+    input:focus + .slider {
+        box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+        border-radius: 34px;
+    }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+    #po-info, #payment-info {
+        flex-basis: 25%;
+    }
+
+    /* Chrome, Safari, Edge, Opera */
+    input:disabled::-webkit-outer-spin-button,
+    input:disabled::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+        color: #000 !important;
+        background-color: white !important;
+    }
+
+    /* Firefox */
+    input:disabled[type=number] {
+        -moz-appearance: textfield;
+        max-width: 75px;
+        color: #000 !important;
+        background-color: white !important;
+    }
+
+    input:disabled, textarea:disabled {
+        width: 100%;
+        padding: 2px;
+        margin: 0px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        border: 0px;
+        color: #000 !important;
+        background-color: white !important;
+    }
+
+    select:disabled {
+        display: block;
+        border: none;
+        background: white;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: none;
+        background-color: transparent;
+        color: #000 !important;
+        background-color: white !important;
+    }
+</style>
+
+<form asp-action="UpdateBreakdownSheets" enctype="multipart/form-data" id="breakdown-sheets" class="modal-form">
+    <div id="timsheet-print-container">
+        <link href="~/css/views/approval/print.css" rel="stylesheet" />
+        <div class="timesheet-text-main d-flex">
+            @if (ViewBag.IsInvoice)
+            {
+                <h2 class="text-center">Invoice (@(Model.FormattedInvoiceNumber))</h2>
+            }
+            <div class="timesheet-text-row">
+                <div class="timesheet-text">
+                    <img id="approval-app-logo" src="~/img/logo.png" alt="">
+                    @*<p>Elite Project Management, LLC</p>
+                        <p>2437 Otero Pass</p>
+                        <p>Fort Worth TX, 76131</p>
+                        <p>Mobile: 909-609-9385</p>*@
+                </div>
+                @*<div class="timesheet-text" id="po-info">
+                        <p>Approver: <span>@Model.Approver.Name</span></p>
+                        @if (ViewBag.IsInvoice)
+                        {
+                            <p>Due Date: <input asp-for="DueDate" type="date" class="form-control" /></p>
+                        }
+                        else
+                        {
+                            <p>Invoice #: <input asp-for="InvoiceNo" type="text" class="form-control" /></p>
+                        }
+                    </div>*@
+            </div>
+            <div class="timesheet-text-row ms-auto d-flex justify-content-end p-4">
+                <div class="timesheet-text">
+                    <p><b>Week Ending</b>:<span> @Model.WeekEnding.ToString("MM/dd/yyyy")</span></p>
+                    <p><b>Employee Name</b>: <span>@($"{Model.Technician.FirstName} {Model.Technician.LastName}")</span></p>
+                    <p><b>Employee Craft</b>: <span>@Model.Craft.Name</span></p>
+                    <p><b>Description</b>: <span>@Model.WorkOrder.Description</span></p>
+                </div>
+                @if (ViewBag.IsInvoice)
+                {
+                    <div class="timesheet-text" id="payment-info">
+                        <p><b>Total Invoice</b>: <span>@Model.TotalCostFormatted</span></p>
+                        <p><b>Cash Received</b>: <span>@Model.TotalReceivedCostFormatted</span></p>
+                        <p><b>Balance Due</b>: <span>@Model.BalanceDueFormatted</span></p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="table-responsive text-center">
+            <table class="order-table table table-bordered dataTable table-sm timesheet-table">
+                <thead>
+                    <tr>
+                        <th><b>Date</b></th>
+                        <th><b>Day</b></th>
+                        @*<th><b>TS Ref Status</b></th>
+                            <th><b>TS Ref Number</b></th>
+                            <th><b>Payment Indicator</b></th>
+                            <th><b>On Site</b></th>
+                            <th><b>Per Diem</b></th>
+                            <th><b>Per Diem Amount</b></th>*@
+                        <th><b>Regular Hrs.</b></th>
+                        <th style="@costStyle"><b>ST Rate</b></th>
+                        <th><b>Overtime Hrs.</b></th>
+                        <th style="@costStyle"><b>OT Rate</b></th>
+                        <th><b>Double-time Hrs.</b></th>
+                        <th style="@costStyle"><b>DT Rate</b></th>
+                        <th><b>Total Hrs.</b></th>
+                        <th style="@costStyle"><b>Total $.</b></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @for (int i = 0; i < Model.TimesheetBreakdowns.Count; i++)
+                    {
+                        var isDayDisabled = Model.TimesheetBreakdowns[i].DisableDayEntry;
+                        //var isDayPerDiemEntryDisabled = Model.TimesheetBreakdowns[i].DisableDayPerDiemEntry;
+                        var total = Model.TimesheetBreakdowns[i].RegularHours + Model.TimesheetBreakdowns[i].OvertimeHours + Model.TimesheetBreakdowns[i].DoubleTimeHours;
+                        totalHours = totalHours + total;
+                        <tr>
+                            <td class="align-middle text-center">@Model.TimesheetBreakdowns[i].Date.ToString("MM/dd/yyyy") <input asp-for="TimesheetBreakdowns[i].Date" type="hidden" /> </td>
+                            <td class="align-middle text-center">@Model.TimesheetBreakdowns[i].Day<input asp-for="TimesheetBreakdowns[i].Day" type="hidden" /></td>
+                            @*<td class="align-middle text-center">
+                                    <select class="form-control  ts-ref-status" asp-for="TimesheetBreakdowns[i].TSRefStatus" disabled=@(isInvoice?"disabled":null) asp-items="Html.GetEnumSelectList<TSRefStatus>()">
+                                        <option value=""></option>
+                                    </select>
+                                </td>
+                                <td class="align-middle text-center">
+                                    <input class="form-control ts-ref-number" type="number" disabled=@(isInvoice?"disabled":null) asp-for="TimesheetBreakdowns[i].TSRefNumber">
+                                </td>
+                                <td class="align-middle text-center">
+                                    <select class="form-control payment-indicator" asp-for="TimesheetBreakdowns[i].PaymentIndicator" disabled=@(isInvoice?"disabled":null) asp-items="Html.GetEnumSelectList<PaymentIndicatorStatus>()">
+                                        <option value=""></option>
+                                    </select>
+                                </td>
+                                <td>
+
+                                    @if (ViewBag.IsInvoice)
+                                    {
+                                        <span>@(Model.TimesheetBreakdowns[i].IsOnSite ? "On Site" : "Remote")</span>
+                                    }
+                                    else
+                                    {
+                                        <label class="@switchClass">
+                                            <input type="checkbox" asp-for="TimesheetBreakdowns[i].IsOnSite" value="@Model.TimesheetBreakdowns[i].IsOnSite">
+                                            <span class="slider round"></span>
+                                        </label>
+                                        <span class="on-site-text ml-2">@(Model.TimesheetBreakdowns[i].IsOnSite ? "On Site" : "Remote")</span>
+                                    }
+
+                                </td>
+
+                                <td class="align-middle text-center">
+                                        @if (ViewBag.IsInvoice)
+                                        {
+                                            if (Model.TimesheetBreakdowns[i].IncludePerDiem)
+                                            {
+                                                <span>&#10003;</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <input asp-for="TimesheetBreakdowns[i].IncludePerDiem" class="include-per-diem" disabled=@((isDayPerDiemEntryDisabled|| isInvoice)?"disabled":null) type="checkbox" data-toggle="tooltip" title=@(isDayPerDiemEntryDisabled?"Per Diem has already been approved in another time sheet, for this week.":null) />
+                                        }
+
+                                    </td>
+                                    <td>
+                                        <input asp-for="TimesheetBreakdowns[i].DailyPerDiem" min="0" type="number" class="form-control breakdown-daily-per-diem" disabled=@((isDayDisabled || isDayPerDiemEntryDisabled || isInvoice)?"disabled":null) value="@Model.TimesheetBreakdowns[i].DailyPerDiem" />
+                                    </td>*@
+                            <td><input asp-for="TimesheetBreakdowns[i].RegularHours" min="0" type="number" class="form-control breakdown-input breakdown-sthours" disabled=@((isDayDisabled||isInvoice )?"disabled":null) value="@Model.TimesheetBreakdowns[i].RegularHours" /></td>
+                            <td style="@costStyle" class="align-middle text-center st-rate td-currency" data-rate="@Model.STRate">@Model.STRate </td>
+                            <td><input asp-for="TimesheetBreakdowns[i].OvertimeHours" min="0" type="number" class="form-control breakdown-input breakdown-othours" disabled=@((isDayDisabled|| isInvoice)?"disabled":null) value="@Model.TimesheetBreakdowns[i].OvertimeHours" /></td>
+                            <td style="@costStyle" class="align-middle text-center ot-rate td-currency" data-rate="@Model.OTRate">@Model.OTRate </td>
+                            <td><input asp-for="TimesheetBreakdowns[i].DoubleTimeHours" min="0" type="number" class="form-control breakdown-input breakdown-dthours" disabled=@((isDayDisabled||isInvoice)?"disabled":null) value="@Model.TimesheetBreakdowns[i].DoubleTimeHours" /></td>
+                            <td style="@costStyle" class="align-middle text-center dt-rate td-currency" data-rate="@Model.DTRate">@Model.DTRate </td>
+                            <td><input type="number" class="form-control row-total-hours" disabled=@(isInvoice?"disabled":null) readonly value="@total" /></td>
+                            <td style="@costStyle" class="align-middle text-center td-currency row-total-amount"></td>
+
+                            <input asp-for="TimesheetBreakdowns[i].Id" type="hidden" />
+                            <input asp-for="TimesheetBreakdowns[i].TimesheetId" type="hidden" />
+
+                        </tr>
+                    }
+
+
+                    <tr>
+                        <td class="align-middle text-center" colspan="2"><b>Weekly Totals</b></td>
+                        <td><input type="number" id="total-st-hours" class="form-control" disabled=@(isInvoice?"disabled":null) readonly value="@Model.TOTSt" /></td>
+                        <td style="@costStyle" class="td-currency">@Model.STRate</td>
+                        <td><input type="number" id="total-ot-hours" disabled=@(isInvoice?"disabled":null) class="form-control" readonly value="@Model.TOTOt" /></td>
+                        <td style="@costStyle" class="td-currency">@Model.OTRate</td>
+                        <td><input type="number" id="total-dt-hours" disabled=@(isInvoice?"disabled":null) class="form-control" readonly value="@Model.TOTDt" /></td>
+                        <td style="@costStyle" class="td-currency">@Model.DTRate</td>
+                        <td><input type="number" id="total-hours" disabled=@(isInvoice?"disabled":null) class="form-control" readonly value="@totalHours" /></td>
+                        <td style="@costStyle" class="align-middle text-center td-currency" id="total-labor"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="fluid-container">
+            <div class="row">
+                <div class="col-md-12">
+                    <label asp-for="Note" class="form-label fw-600"></label>
+                    <textarea asp-for="Note" class="form-control" name="Note" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+        @if (ViewBag.IsInvoice == false)
+        {
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 offset-lg-9 pt-5">
+                        <div id="signature">
+                        </div>
+                        <div id="signaturename">
+                            Signature
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    @if (ViewBag.IsInvoice == false)
+    {
+        <div class="col-lg-12 text-center pt-3">
+            <button class="btn blue-btn me-2 submit-approval-btn submit-btn" attr-data="Rejecting" id="reject-btn" type="button">Reject</button>
+            <button class="btn blue-btn me-2 submit-approval-btn submit-btn" attr-data="Saving" type="button">Save</button>
+            <button class="btn blue-btn submit-approval-btn submit-btn" attr-data="Approving" id="approve-btn" type="button">Approve </button>
+        </div>
+    }
+    <input asp-for="Id" type="hidden" id="approval-id" value="@Model.Id" />
+    <input asp-for="ApproveStatus" type="hidden" id="approve-status" value="@Model.ApproveStatus" />
+    <input asp-for="STRate" type="hidden" value="@Model.STRate" />
+    <input asp-for="OTRate" type="hidden" value="@Model.OTRate" />
+    <input asp-for="DTRate" type="hidden" value="@Model.DTRate" />
+    <input asp-for="DailyPerDiem" id="daily-per-diem-rate" type="hidden" value="@Model.DailyPerDiem" />
+    @*<input asp-for="InvoiceNo" type="hidden" value="@Model.InvoiceNo" />*@
+    <input asp-for="DueDate" type="hidden" value="@Model.DueDate" />
+    <input asp-for="WorkOrder.Id" type="hidden" value="@Model.WorkOrder.Id" />
+    <input asp-for="TotalCost" type="hidden" value="@Model.TotalCost" />
+
+    @if (Model.Id > 0)
+    {
+        <div class="col-lg-3 fa-pull-right">
+            <partial name="~/Views/Shared/Crud/UpdateView/PartialViews/_LastUpdatedByPartialView.cshtml" model="Model" />
+        </div>
+    }
+
+</form>
+
+<script src="~/js/print/jQuery-print.js"></script>
+<script src="~/js/custom-scripts/approval-script.js"></script>
+<script src="~/js/masking/initiate-masking.js"></script>
+<script>$(function () {
+
+        $("body").on("change", ".breakdown-input", function () {
+            SetBreakdownTable(this);
+        });
+
+        $("body").on("change", "#Material", function () {
+            CalculateTotal();
+        });
+        $("body").on("change", "#Equipment", function () {
+            CalculateTotal();
+        });
+        $("body").on("change", "#Airfare", function () {
+            CalculateTotal();
+        });
+        $("body").on("change", "#Miles", function () {
+            CalculateTotal();
+        });
+        $("body").on("change", "#Other", function () {
+            CalculateTotal();
+        });
+        $("body").on("change", ".include-per-diem", function () {
+            CalculatePerDiem($(this));
+        });
+        $("body").on("change", ".breakdown-daily-per-diem", function () {
+            CalculatePerDiem($(this), true);
+        });
+        $("body").off("click", ".slider")
+        $("body").on("click", ".slider", function () {
+            var element = $(this).siblings("input");
+            var currentValue = $(element).val();
+            if (currentValue.toLowerCase() == "true") {
+                $(element).val(false);
+                $(element).parents().eq(1).find(".on-site-text").html("Remote");
+            }
+            else {
+                $(element).val(true);
+                $(element).parents().eq(1).find(".on-site-text").html("On Site");
+            }
+        });
+
+    });
+
+    function SetBreakdownTable(element) {
+        let rowTotalTime = 0;
+        let stTotalHours = 0;
+        let otTotalHours = 0;
+        let dtTotalHours = 0;
+        let stRate = parseFloat($(element).parents().eq(1).find(".st-rate").data("rate")).toFixed(2);
+        let otRate = parseFloat($(element).parents().eq(1).find(".ot-rate").data("rate")).toFixed(2);
+        let dtRate = parseFloat($(element).parents().eq(1).find(".dt-rate").data("rate")).toFixed(2);
+        let stHours = parseFloat($(element).parents().eq(1).find(".breakdown-sthours").val());
+        let otHours = parseFloat($(element).parents().eq(1).find(".breakdown-othours").val());
+        let dtHours = parseFloat($(element).parents().eq(1).find(".breakdown-dthours").val());
+        let dailyPerDiem = parseFloat($(element).parents().eq(1).find(".breakdown-daily-per-diem").val());
+
+
+        //---------------calculating and setting RowTotalAmount--------------
+        let rowTotalAmount = ((stRate * stHours) + (otRate * otHours) + (dtRate * dtHours) + dailyPerDiem).toFixed(2);
+        $(element).parents().eq(1).find(".row-total-amount").html(rowTotalAmount)
+        $(element).parents().eq(1).find(".row-total-amount").data('row-total-amount', rowTotalAmount).attr('data-row-total-amount', rowTotalAmount);
+
+        //---------------calculating and setting rowTotalHours-----------------
+        $(element).parents().eq(1).find(".breakdown-input").each(function (i, v) { rowTotalTime += parseFloat($(v).val()); });
+        $(element).parents().eq(1).find(".row-total-hours").val(rowTotalTime.toFixed(2));
+
+        //---------------calculating breakdown hours column wise-------------------
+        if ($(element).hasClass("breakdown-sthours")) {
+
+            $(".breakdown-sthours").each(function (i, v) { stTotalHours += parseFloat($(v).val()); });
+            $("#total-st-hours").val(stTotalHours);
+        }
+        if ($(element).hasClass("breakdown-othours")) {
+            $(".breakdown-othours").each(function (i, v) { otTotalHours += parseFloat($(v).val()); });
+            $("#total-ot-hours").val(otTotalHours);
+        }
+        if ($(element).hasClass("breakdown-dthours")) {
+            $(".breakdown-dthours").each(function (i, v) { dtTotalHours += parseFloat($(v).val()); });
+            $("#total-dt-hours").val(dtTotalHours);
+        }
+        CalculateSubTotal();
+        CalculateTotal();
+    }
+    function CalculateHoursForAllRows() {
+        $(".timesheet-table").find("tbody>tr").find(".breakdown-sthours").each(function (i, v) {
+            SetBreakdownTable(v);
+        })
+    }
+    function CalculateSubTotal() {
+
+        //---------------calculating and setting totalHours-----------------
+        let totalHours = 0;
+        $(".row-total-hours").each(function (i, v) { totalHours += parseFloat($(v).val()); });
+        $("#total-hours").val(totalHours);
+
+        let totalLabor = 0;
+        $(".row-total-amount").each(function (i, v) { totalLabor += parseFloat($(v).data("row-total-amount")); });
+        //totalLabor += parseFloat($("#PerDiem").data("per-diem"));
+        $("#total-labor").data('total-labor', totalLabor).attr('data-total-labor', totalLabor);
+        $("#total-labor").html(totalLabor);
+
+    }
+    function CalculatePerDiem(element, ignorePerDiemRate = false) {
+        let perDiemRate = $("#daily-per-diem-rate").val();
+        //let includePerDiemElements = [].slice.call(document.querySelectorAll('.include-per-diem'));
+        //let perDiem = (includePerDiemElements.filter(chk => chk.checked).length * perDiemRate);
+
+        let perDiem = 0;
+        if ($(element).parents().eq(1).find(".include-per-diem").prop("checked")) {
+            var inputValue = $(element).parents().eq(1).find(".breakdown-daily-per-diem").val();
+            perDiemRate = ignorePerDiemRate ? inputValue : perDiemRate;
+            $(element).parents().eq(1).find(".breakdown-daily-per-diem").val(perDiemRate);
+            $(element).parents().eq(1).find(".breakdown-daily-per-diem").prop('readonly', false);
+        }
+        else {
+            $(element).parents().eq(1).find(".breakdown-daily-per-diem").val(0);
+            $(element).parents().eq(1).find(".breakdown-daily-per-diem").prop('readonly', true);;
+        }
+        $(".breakdown-daily-per-diem").each(function (i, v) {
+            perDiem += parseFloat($(v).val());
+        });
+        perDiem = perDiem.toFixed(2);
+        $("#PerDiem").data("per-diem", perDiem);
+        $("#PerDiem").val(perDiem);
+        CalculateTotal();
+    }
+    function CalculateTotal() {
+        //---------------calculating and setting subTotalAmount--------------
+        let totalAmount = parseFloat($("#total-labor").data("total-labor"));
+        //totalAmount += parseFloat($("#PerDiem").data("per-diem"));
+
+        totalAmount += parseFloat($("#Material").val());
+        totalAmount += parseFloat($("#Equipment").val());
+        totalAmount += parseFloat($("#Airfare").val());
+        totalAmount += parseFloat($("#Miles").val());
+        totalAmount += parseFloat($("#Other").val());
+        totalAmount = totalAmount.toFixed(2);
+        $("#total-amount").html(totalAmount);
+        formatCurrency();
+    }
+
+    function formatCurrency() {
+        $(".td-currency").each(function () {
+            if ($(this).html().indexOf("$") === -1) {
+                $(this).html(parseFloat($(this).text()).toLocaleString('en-US', { style: 'currency', currency: 'USD' }));
+            }
+
+        })
+    }</script>

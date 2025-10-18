@@ -1,0 +1,43 @@
+﻿@using ViewModels.WorkOrder.CostPerformance
+@model CostPerformanceLaborViewModel
+@{
+    var isDetailPage = ViewData["IsDetailPage"] != null ? bool.Parse(ViewData["IsDetailPage"].ToString()) : false;
+    var hideEstimatedCost = ViewData["HideEstimatedCost"] != null ? bool.Parse(ViewData["HideEstimatedCost"].ToString()) : false;
+
+    var collectionType = "TaskLabors";
+    var rowNumber = ViewData["RowNumber"] != null ? int.Parse(ViewData["RowNumber"].ToString()) : 0;
+
+    var rowName = "section-row[" + rowNumber + "]";
+    var rowId = "step-section-row-" + rowNumber;
+
+    var titleName = collectionType + "[" + rowNumber + "].Title";
+    var hoursName = collectionType + "[" + rowNumber + "].Hours";
+    var rateName = collectionType + "[" + rowNumber + "].Rate";
+    var totalName = collectionType + "[" + rowNumber + "].Total";
+    var hiddenId = collectionType + "[" + rowNumber + "].Id";
+}
+
+<tr>
+    <td>
+        <div>@Model.CraftSkill.Name</div>
+    </td>
+    @if (!hideEstimatedCost)
+    {
+        <td>
+            <div>@Model.Hours</div>
+        </td>
+    }
+    <td>
+        <div>@Model.ActualHours</div>
+    </td>
+    @if (!hideEstimatedCost)
+    {
+        <td>
+            <div>@Model.Cost.ToString("C")</div>
+        </td>
+    }
+    <td>
+        <div>@(Model.ActualCost.ToString("C"))</div>
+    </td>
+</tr>
+

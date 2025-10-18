@@ -1,0 +1,38 @@
+﻿@using ViewModels.CRUD
+@model CrudListViewModel
+<script>
+    $(document).ready(function () {
+        //$('[data-toggle="tooltip"]').tooltip();
+    });
+    function loadCreateModalPanel(contentUrl) {
+        loadModalPanel(contentUrl, "crudModalPanel", "crudModalPanelBody")
+    }</script>
+
+<div class="card-header header-elements-inline d-none">
+    <div class="d-flex w-100 p-0 m-0">
+        @if (string.IsNullOrEmpty(Model.DataTableHeaderHtml))
+        {
+            <div class="selected-filters-container d-flex flex-fill align-items-center mt-2 p-0"></div>
+            <div class="d-flex p-0 m-0">
+                <div class="d-flex justify-content-end">
+                    @if (!string.IsNullOrEmpty(Model.DataTableHeaderHtml))
+                    {
+                        @Html.Raw(Model.DataTableHeaderHtml)
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="selected-filters-container col-7 mt-2 p-0"></div>
+            <div class="row col-5 p-0  m-0">
+                <div class="col-lg-9 d-flex flex-row-reverse">
+                    @Html.Raw(Model.DataTableHeaderHtml)
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+

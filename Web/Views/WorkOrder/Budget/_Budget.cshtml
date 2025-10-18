@@ -1,0 +1,13 @@
+﻿@model ViewModels.WorkOrder.CostPerformance.CostPerformanceViewModel
+<div class="row">
+    <div class="col-12 mb-3">
+        @await Html.PartialAsync("~/Views/WorkOrder/Budget/_TaskLabor.cshtml", Model)
+    </div>
+    <div class="col-12 mb-3">
+        @await Html.PartialAsync("~/Views/WorkOrder/Budget/_TaskMaterial.cshtml", Model)
+    </div>
+    <div class="col-12 mb-3">
+        @await Html.PartialAsync("~/Views/WorkOrder/Budget/_TaskEquipment.cshtml", Model)
+    </div>
+
+</div>

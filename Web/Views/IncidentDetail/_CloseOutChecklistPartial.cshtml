@@ -1,0 +1,81 @@
+﻿@using ViewModels.Incident
+@model IncidentViewTaskViewModel
+
+<table class="table align-middle text-left">
+    <thead class="table-light">
+        <tr>
+            <th>Task</th>
+            <th>Responsible Party</th>
+            <th>Status</th>
+            <th>Completed</th>
+            <th>Attachment</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @if (Model.listIncidentViewTaskCloseOutViewModel.Count > 0)
+        {
+
+            @foreach (var closeout in Model.listIncidentViewTaskCloseOutViewModel)
+            {
+                <tr>
+                    <td>@closeout.Task</td>
+                    <td>@closeout.FieldValue</td>
+
+                    @if (!string.IsNullOrWhiteSpace(closeout.Status))
+                    {
+                        @if (closeout.Status.ToLower() == "in progress")
+                        {
+                            <td><span class="status-badge progressing">@closeout.Status</span></td>
+                        }
+                        else if (closeout.Status.ToLower() == "not started")
+                        {
+                            <td><span class="status-badge not-started">@closeout.Status</span></td>
+                        }
+                        else if (closeout.Status.ToLower() == "done")
+                        {
+                            <td><span class="status-badge done">@closeout.Status</span></td>
+                        }
+                        else
+                        {
+                            <td><span class="status-badge not-started">@closeout.Status</span></td>
+                        }
+                    }
+                    else
+                    {
+                        <td><span class="status-badge not-started">Not Started</span></td>
+                    }
+
+                    <td>@closeout.Completed</td>
+                    @if (closeout.ImageCount > 0)
+                    {
+                        <td><i class="fa fa-file-alt text-secondary me-1"></i>@closeout.ImageCount file </td>
+                    }
+                    else
+                    {
+                        <td><i class="fa fa-file-alt text-secondary me-1"></i></td>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(closeout.Completed) && closeout.Completed != "-")
+                    {
+                        <td><a href="#" class="text-primary text-decoration-none" onclick="ViewCloseOutDetails('@closeout.Id')">View</a></td>
+                    }
+                    else
+                    {
+                        <td><button class="btn btn-update btn-sm" onclick="EditCloseOutDetails('@closeout.Id')">Update</button></td>
+                    }
+
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="7" style=" text-align:center">
+                    No records found
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

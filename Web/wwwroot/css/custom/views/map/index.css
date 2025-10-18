@@ -1,0 +1,38 @@
+﻿.content-body-container {
+    flex: 1;
+    padding: 0 !important;
+    background-color: white;
+}
+
+.main.index-main {
+    height: 100%;
+    min-height: unset !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.wrapper {
+    width: 100w;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-sec {
+    flex: 1;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: unset !important;
+}
+
+.container-fluid {
+    width: 100%;
+    height: 100%;
+    padding: 0 16px;
+    margin: 0;
+}
+
+.site-footer {
+    display: none;
+}
+

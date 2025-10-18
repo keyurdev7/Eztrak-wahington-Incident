@@ -1,0 +1,409 @@
+﻿@using Enums
+@using ViewModels;
+@using Web.Extensions;
+@model TaskTypeModifyViewModel
+@{
+    Layout = null;
+    var totalMaterialCost = Model.TaskMaterials.Sum(x => x.Cost);
+    var totalEquipmentCost = Model.TaskEquipments.Sum(x => x.Cost);
+    var totalLaborCost = Model.TaskLabors.Sum(x => x.Total);
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+            @*      <div class="col-lg-4">
+            <div class="mb-3 form-group">
+            <label asp-for="Code" class="form-label fw-600"></label>
+            <input asp-for="Code" type="text" class="form-control" />
+            <span asp-validation-for="Code" class="validation-invalid-label"></span>
+            </div>
+            </div> *@
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Title" class="form-label fw-600"></label>
+                    <input asp-for="Title" type="text" class="form-control" />
+                    <span asp-validation-for="Title" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Category" class="form-label fw-600"></label>
+                    <select asp-for="Category" class="form-select"
+                            asp-items="@Html.GetEnumSelectList<TaskCatalog>()">
+                        <option value="">-- Select --</option>
+                    </select>
+                    <span asp-validation-for="Category" class="validation-invalid-label"></span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="table-responsive my-3" id="stepTable">
+            <table class="table table-striped">
+                <thead>@* class="thead-primary" *@
+                    <tr>
+                        <th>Work Steps</th>
+                        <th>Order</th>
+                        <th class="text-center" style="width: 20px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="task-step-tbody">
+                    @for (var i = 0; i < Model.TaskWorkSteps.Count(); i++)
+                    {
+                        @await Html.PartialAsync("~/Views/TaskType/_TaskWorkStepRows.cshtml", Model.TaskWorkSteps[i], new ViewDataDictionary(ViewData) { { "RowNumber", i } })
+                    }
+                </tbody>
+            </table>
+            <div class="unsaved-step-error text-danger">Please save or delete all unsaved rows before adding a new one.</div>
+            <button type="button" id="addStep" class="btn btn-sm btn-primary"><i class="fa-regular fa-square-plus"></i> Add Step</button>
+        </div>
+    </div>
+
+
+    <table class="table table-bordered dataTable" id="cost-table">
+        <thead></thead>
+        <tbody>
+            <tr>
+                <td>
+                    <div class="table-responsive my-3" id="laborTable">
+                        <table class="table table-bordered dataTable">
+                            <thead>@* class="thead-primary" *@
+                                <tr>
+                                    <th>Labor</th>
+                                    <th>Hours</th>
+                                    <th>Rate</th>
+                                    <th>Total</th>
+                                    <th class="text-center" style="width: 20px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="task-labor-tbody">
+                                @for (var i = 0; i < Model.TaskLabors.Count(); i++)
+                                {
+                                    @await Html.PartialAsync("~/Views/TaskType/_LaborRow.cshtml", Model.TaskLabors[i], new ViewDataDictionary(ViewData) { { "RowNumber", i } })
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="col-lg-12">
+                                            <div class="form-group text-right d-flex justify-content-end align-items-center">
+                                                <label class="form-label fw-600 me-5">Total Labor</label>
+                                                <div class="mb-2 fw-600">$<span id="labor-total">@totalLaborCost</span></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <div class="text-start">
+                            <button type="button" id="addLabor" class="btn btn-sm btn-primary"><i class="fa-regular fa-square-plus"></i> Add Labor</button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="table-responsive my-3" id="materialTable">
+                        <table class="table table-bordered dataTable">
+                            <thead>@* class="thead-primary" *@
+                                <tr>
+                                    <th>Material</th>
+                                    <th>Cost</th>
+                                    <th class="text-center" style="width: 20px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="task-material-tbody">
+                                @for (var i = 0; i < Model.TaskMaterials.Count(); i++)
+                                {
+                                    @await Html.PartialAsync("~/Views/TaskType/_MaterialRow.cshtml", Model.TaskMaterials[i], new ViewDataDictionary(ViewData) { { "RowNumber", i } })
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="col-lg-12">
+                                            <div class="form-group text-right d-flex justify-content-end align-items-center">
+                                                <label class="form-label fw-600 me-5">Total Material</label>
+                                                <div class="mb-2 fw-600">$<span id="material-total">@totalMaterialCost</span></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <div class="text-start">
+                            <button type="button" id="addMaterial" class="btn btn-sm btn-primary"><i class="fa-regular fa-square-plus"></i> Add Material</button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="table-responsive my-3" id="equipmentTable">
+                        <table class="table table-bordered dataTable">
+                            <thead>@* class="thead-primary" *@
+                                <tr>
+                                    <th>Equipment</th>
+                                    <th>Cost</th>
+                                    <th class="text-center" style="width: 20px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="task-equipment-tbody">
+                                @for (var i = 0; i < Model.TaskEquipments.Count(); i++)
+                                {
+                                    @await Html.PartialAsync("~/Views/TaskType/_EquipmentRow.cshtml", Model.TaskEquipments[i], new ViewDataDictionary(ViewData) { { "RowNumber", i } })
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="col-lg-12">
+                                            <div class="form-group text-right d-flex justify-content-end align-items-center">
+                                                <label class="form-label fw-600 me-5">Total Equipment</label>
+                                                <div class="mb-2 fw-600">$<span id="equipment-total">@totalEquipmentCost</span></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <div class="text-start">
+                            <button type="button" id="addEquipment" class="btn btn-sm btn-primary"><i class="fa-regular fa-square-plus"></i> Add Equipment</button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="col-lg-12">
+                        <div class="form-group text-right d-flex justify-content-end align-items-center">
+                            <label asp-for="BudgetHours" class="form-label fw-600 me-5"></label>
+                            <div class="mb-2 fw-600"><span id="budget-hours">@Model.BudgetHours</span></div>
+                            <input asp-for="BudgetHours" type="hidden" value="@Model.BudgetHours" id="budget-hours-input" />
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="col-lg-12">
+                        <div class="form-group text-right d-flex justify-content-end align-items-center">
+                            <label asp-for="BudgetCost" class="form-label fw-600 me-5"></label>
+                            <div class="mb-2 fw-600">$<span id="budget-cost">@Model.BudgetCost</span></div>
+                            <input asp-for="BudgetCost" type="hidden" value="@Model.BudgetCost" id="budget-cost-input" />
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<input type="hidden" asp-for="Id" />
+<input type="hidden" asp-for="Code" />
+<script src="~/js/custom/select2/select2-methods.js"></script>
+<partial name="~/Views/Shared/Select2/CraftSkill/_CraftSkillJs.cshtml" />
+<script src="~/js/views/work-steps/task-work-step.js"></script>
+
+<script>
+
+    $(function () {
+        updateTotalHours();
+        updateTotalCost();
+        //labor
+        $(document).off("click", "#addLabor");
+        $(document).on("click", "#addLabor", function () {
+            var rowNumber = $(".labor-row").length;
+            SendAjax(this, rowNumber, "/TaskType/_LaborRow", "#laborTable tbody")
+                .done(function () {
+                    updateTotalHours();
+                    removeCurrencyMasking();
+                    addCurrencyMasking();
+                });
+        });
+
+        $(document).off("click", ".remove-labor");
+        $(document).on("click", ".remove-labor", function () {
+            $(this).closest("tr").remove();
+            RefreshInputIndexes("#laborTable tr", "", "TaskLabors");
+        });
+
+        $(document).on('input', '.hour', function () {
+            var $row = $(this).closest('tr');
+            var hours = parseFloat($(this).val());
+            var rate = parseFloat($row.find('.rate').val());
+
+            if (!isNaN(hours) && !isNaN(rate)) {
+                var total = rate * hours;
+                $row.find('.total').val(total.toFixed(2));
+            } else {
+                $row.find('.total').val('');
+            }
+        });
+
+        //material
+        $(document).off("click", "#addMaterial");
+        $(document).on("click", "#addMaterial", function () {
+            var rowNumber = $(".material-row").length;
+            SendAjax(this, rowNumber, "/TaskType/_MaterialRow", "#materialTable tbody").done(function () {
+                removeCurrencyMasking();
+                addCurrencyMasking();
+            });
+        });
+
+        $(document).off("click", ".remove-material");
+        $(document).on("click", ".remove-material", function () {
+            $(this).closest("tr").remove();
+            RefreshInputIndexes("#materialTable tr", "material-row", "TaskMaterials");
+        });
+
+        //equipment
+        $(document).off("click", "#addEquipment");
+        $(document).on("click", "#addEquipment", function () {
+            var rowNumber = $(".equipment-row").length;
+            SendAjax(this, rowNumber, "/TaskType/_EquipmentRow", "#equipmentTable tbody").done(function () {
+                removeCurrencyMasking();
+                addCurrencyMasking();
+            });
+        });
+
+        $(document).off("click", ".remove-equipment");
+        $(document).on("click", ".remove-equipment", function () {
+            $(this).closest("tr").remove();
+            RefreshInputIndexes("#equipmentTable tr", "equipment-row", "TaskEquipments");
+        });
+
+
+        $(document).on('input change', '.hour', function () {
+            updateTotalHours();
+            updateTotalLabor(this);
+            updateTotalCost();
+        });
+
+        $(document).on('input change', '.material-cost', function () {
+            updateTotalMaterial();
+            updateTotalCost();
+
+        });
+
+        $(document).on('input change', '.equipment-cost', function () {
+            updateTotalEquipment();
+            updateTotalCost();
+
+        });
+    });
+
+    function SendAjax(element, rowNumber, url, target) {
+        return $.ajax({
+            type: "GET",
+            url: url,
+            data: { rowNumber: rowNumber },
+            success: function (response) {
+                $(target).append(response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error: " + error);
+            }
+        });
+    }
+
+    function RefreshInputIndexes(trSelector, rowPrefix, collectionName) {
+        var rowIndex = 0;
+        $.each($(trSelector), function () {
+            if ($(this).find('input, select').length > 1) {
+                var id = $(this).attr("id");
+                if (id != null && id != "") {
+                    $(this).attr("id", rowIndex);
+                }
+                $.each($(this).find('input, select'), function () {
+                    if ($(this).is('select')) {
+                        if ($(this).attr('name').split(".").length > 2) {
+                            $(this).attr("name", collectionName + "[" + rowIndex + "]." + $(this).attr('name').split(".")[1] + "." + $(this).attr('name').split(".")[2]);
+                        } else {
+                            $(this).attr("name", collectionName + "[" + rowIndex + "]." + $(this).attr('name').split(".")[1]);
+                        }
+                    } else {
+                        if ($(this).attr('name').split(".").length > 2) {
+                            $(this).attr("name", collectionName + "[" + rowIndex + "]." + $(this).attr('name').split(".")[1] + "." + $(this).attr('name').split(".")[2]);
+                        } else {
+                            $(this).attr("name", collectionName + "[" + rowIndex + "]." + $(this).attr('name').split(".")[1]);
+                        }
+                    }
+                });
+                rowIndex++;
+            }
+        });
+        updateTotalCost();
+        if (collectionName == "TaskLabors") {
+            updateTotalHours();
+        }
+    }
+
+    function updateTotalCost() {
+        let totalCost = 0;
+        $('.cost').each(function () {
+            if ($(this).is('input')) {
+                totalCost += parseFloat(currencyToDouble($(this).val())) || 0;
+            }
+        });
+
+        $('#budget-cost').html(totalCost.toFixed(2));
+        $('#budget-cost-input').val(totalCost);
+    }
+    function updateTotalHours() {
+        let totalHours = 0;
+        $('.hour').each(function () {
+            totalHours += parseFloat($(this).val()) || 0;
+        });
+        $('#budget-hours').html(totalHours);
+        $('#budget-hours-input').val(totalHours);
+    }
+
+    function updateTotalLabor(element) {
+        const row = $(element).closest('tr');
+        const hours = parseFloat(row.find('.hour').val());
+        const rate = currencyToDouble(row.find('.rate').val());
+        if (!isNaN(hours)) {
+            let total = rate * hours;
+            row.find('.total').val(total.toFixed(2));
+        }
+        let totalLabors = 0;
+        $('.total-labor').each(function () {
+            totalLabors += parseFloat(currencyToDouble($(this).val())) || 0;
+        });
+        $('#labor-total').html(totalLabors.toFixed(2));
+    }
+
+    function updateTotalMaterial() {
+        let totalMaterials = 0;
+        $('.material-cost').each(function () {
+            totalMaterials += parseFloat(currencyToDouble($(this).val())) || 0;
+        });
+        $('#material-total').html(totalMaterials.toFixed(2));
+
+    }
+
+    function updateTotalEquipment() {
+        let totalEquipment = 0;
+        $('.equipment-cost').each(function () {
+            totalEquipment += parseFloat(currencyToDouble($(this).val())) || 0;
+        });
+        $('#equipment-total').html(totalEquipment.toFixed(2));
+    }
+
+    function craftSkillAfterSelect(element, event, recordId, modelPropertyName, model) {
+        const rate = model.STRate;
+        const row = $(element).closest('tr');
+        row.find('.rate').val(rate);
+        updateTotalLabor(element);
+        updateTotalCost();
+    }
+
+    function currencyToDouble(value) {
+        return value.replace(/^\$|,/g, "");
+    }
+
+</script>

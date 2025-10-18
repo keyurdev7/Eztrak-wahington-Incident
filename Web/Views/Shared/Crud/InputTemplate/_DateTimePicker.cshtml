@@ -1,0 +1,11 @@
+﻿@{ DateTime? currentValue = null;
+    if (ViewData["Value"] != null)
+    {
+        currentValue = DateTime.Parse(@ViewData["Value"].ToString());
+    } }
+<div class="input-group date" id="@ViewData["Key"]" data-target-input="nearest">
+    <input type="text" name="@ViewData["Key"]" value="@currentValue?.ToString("dddd, dd MMMM, yyyy hh:mm tt")" class="form-control datetimepicker-input" data-target="#@ViewData["Key"]" />
+    <div class="input-group-append" data-target="#@ViewData["Key"]" data-toggle="datetimepicker">
+        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+    </div>
+</div>

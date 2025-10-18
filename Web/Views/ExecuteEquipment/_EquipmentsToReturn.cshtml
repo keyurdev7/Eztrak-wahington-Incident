@@ -1,0 +1,58 @@
+﻿@using ViewModels;
+@using Enums;
+@model ReturnEquipmentViewModel
+
+<table class="table table-striped">
+    <thead>@* class="thead-primary" *@
+        <tr>
+            <th></th> <!-- Empty header for the checkbox column -->
+            <th>Item</th>
+            <th>Purchase Order</th>
+            <th>Supplier</th>
+            <th>Condition</th>
+            <th>Purchase Date</th>
+            <th>Rate</th>
+            <th>Hourly Rate</th>
+            <th>Location</th>
+            <th>Quantity</th>
+            <th>Order#</th>
+            <th>Returned Quantity</th>
+            <th>Hours</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var (transaction, index) in Model.Transactions.Select((value, i) => (value, i)))
+        {
+            <tr>
+                <td>
+                    <input type="checkbox" class="transactions-checkbox" />
+                    <input type="hidden" name="Transactions[@index].ItemNo" value="@Model.Transactions[index].ItemNo">
+                    <input type="hidden" name="Transactions[@index].PONo" value="@Model.Transactions[index].PONo">
+                    <input type="hidden" name="Transactions[@index].Quantity" value="@Model.Transactions[index].Quantity">
+                    <input type="hidden" name="Transactions[@index].ItemPrice" value="@Model.Transactions[index].ItemPrice">
+                    <input type="hidden" name="Transactions[@index].HourlyRate" value="@Model.Transactions[index].HourlyRate">
+                    <input type="hidden" name="Transactions[@index].Supplier.Id" value="@Model.Transactions[index].Supplier.Id">
+                    <input type="hidden" name="Transactions[@index].Condition.Id" value="@Model.Transactions[index].Condition.Id">
+                    <input type="hidden" name="Transactions[@index].PurchaseDate" value="@Model.Transactions[index].PurchaseDate">
+                    <input type="hidden" name="Transactions[@index].Location.Id" value="@Model.Transactions[index].Location.Id">
+                    <input type="hidden" name="Transactions[@index].Equipment.Id" value="@Model.Transactions[index].Equipment.Id">
+                    <input type="hidden" name="Transactions[@index].EntityId" value="@Model.Transactions[index].EntityId">
+                    <input type="hidden" name="Transactions[@index].EntityDetailId" value="@Model.Transactions[index].EntityDetailId">
+                </td>
+
+                <td>@transaction.Equipment.Description</td>
+                <td>@transaction.ItemNo</td>
+                <td>@transaction.Supplier.Name</td>
+                <td>@transaction.Condition.Name</td>
+                <td>@transaction.FormattedPurchaseDate</td>
+                <td>@transaction.ItemPrice.ToString("C")</td>
+                <td>@transaction.HourlyRate.ToString("C")</td>
+                <td>@transaction.Location.Name</td>
+                <td>@Math.Abs(transaction.Quantity)</td>
+                <td>@transaction.EntityName</td>
+                <td><input type="number" class="form-control" max="@Math.Abs(Model.Transactions[index].Quantity)" name="Transactions[@index].ReturnedQuantity" /></td>
+                <td><input type="number" class="form-control" name="Transactions[@index].Hours" /></td>
+            </tr>
+        }
+    </tbody>
+</table>

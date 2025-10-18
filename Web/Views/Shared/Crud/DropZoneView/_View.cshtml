@@ -1,0 +1,42 @@
+﻿@model List<ViewModels.Shared.AttachmentVM>
+@{
+    var hideLabel = ViewData["HideLabel"] != null && !string.IsNullOrEmpty(ViewData["HideLabel"].ToString()) ? ViewData["HideLabel"].ToString() : "false";
+}
+@if (Model != null && Model.Any())
+{
+    if (hideLabel == "false")
+    {
+        <div class="col-lg-12">
+            <div class="mb-3 attachment-box">
+                <label class="form-label fw-600">Images</label>
+            </div>
+        </div>
+    }
+
+}
+<div class="col-lg-12 d-flex flex-wrap">
+    @if (Model != null && Model.Any())
+    {
+        var additionalImagesCount = Model.Count - 3;
+        for (var i = 0; i < Model.Count; i++)
+        {
+            if (Model[i].Url != "")
+            {
+                if (i < 3)
+                {
+                    <a href="@Model[i].Url" target="_blank" class="rounded detail-images"><img class="photo" src="@Model[i].Url" alt="" /></a>
+                }
+                else if (i == 3)
+                {
+                    <a class="detail-imgbadge">+@additionalImagesCount</a>
+                    break;
+                }
+            }
+        }
+    }
+    else
+    {
+        <div>-</div>
+    }
+</div>
+<script src="~/js/views/attachments-gallery/attachments-gallery.js"></script>

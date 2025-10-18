@@ -1,0 +1,1407 @@
+@model ViewModels.Incident.IncidentViewModel
+<style>
+    #imgPreviewModal.modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        padding-top: 60px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,61%);
+    }
+
+    #imgPreviewModal .modal-content {
+        display: block;
+        margin: auto;
+        max-width: 50%;
+        max-height: 80%;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    #imgPreviewModal .close {
+        position: absolute;
+        top: 20px;
+        right: 35px;
+        color: white;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+        opacity: 1;
+    }
+
+    #incidentDetailsModal .modal-body {
+        background: #f9fafb;
+    }
+    /*****************Team Communication************************/
+    .team-communications {
+        background: #fff;
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        
+        margin: auto;
+    }
+
+        /* Header */
+        .team-communications .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+            box-shadow: none;
+            padding: 0;
+            margin-bottom: 16px;
+        }
+
+            .team-communications .header h3 {
+                font-size: 18px;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+        .team-communications .messages-count {
+            font-size: 14px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+    /* Message Type */
+    .message-type {
+        margin: 6px 0px 6px 0;
+        display: flex;
+        gap: 20px;
+    }
+
+    .messageSec {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+    }
+
+    .message-type label {
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .message-type input[type="radio"] {
+        margin-right: 6px;
+    }
+
+    /* Message Box */
+    .message-box label {
+        font-weight: 500;
+        display: block;
+        margin-bottom: 6px;
+        font-size: 14px;
+    }
+
+    .message-box select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        margin-bottom: 12px;
+    }
+
+    .msg-input {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .send-message-image textarea {
+            width:100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 50px;
+        }
+
+    .btn-send {
+        background: #7da8f8;
+        border: none;
+        padding: 12px 16px;
+        border-radius: 6px;
+        color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+
+        .btn-send:hover {
+            background: #5c89e6;
+        }
+
+    /* Timeline */
+    .timeline {
+        margin-top: 20px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        padding: 16px;
+        border-radius: 8px;
+    }
+
+        .timeline h4 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .timeline ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .timeline li {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .timeline .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-top: 6px;
+        }
+
+            .timeline .dot.blue {
+                background: #007bff;
+            }
+
+            .timeline .dot.green {
+                background: #28a745;
+            }
+
+            .timeline .dot.gray {
+                background: #6c757d;
+            }
+
+        .timeline li strong {
+            display: block;
+            font-size: 14px;
+        }
+
+        .timeline li p {
+            margin: 2px 0;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .timeline li small {
+            font-size: 12px;
+            color: #888;
+        }
+
+    .task-container {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        max-width: 900px;
+        margin: auto;
+    }
+
+        .task-container h4 {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            line-height: normal;
+        }
+
+    .dropdown {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+
+    .task-section {
+        background: #fff;
+        border: 1px solid #e6e6e6;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px 0;
+    }
+    .team-detail{
+        background: #fff;
+        border: 1px solid #e6e6e6;
+        border-radius: 8px;
+        padding: 15px;
+    }
+    .team-detailTitle{
+        font-size:18px;
+    }
+
+        .task-section h5 {
+            /* margin: 0 0 10px; */
+            font-size: 15px;
+            font-weight: bold;
+        }
+        .assign-task{
+            margin:6px 6px;
+        }
+        .teamName-info h5{
+            margin-bottom:0;
+            line-height:normal;
+        }
+
+    .listInfo{
+        max-height:280px;
+        overflow:auto;
+    }
+    .task-section{
+        max-height:392px;
+        
+    }
+
+    .specializations span {
+        display: inline-block;
+       /*  background: #e9f1ff;
+        color: #2468f3; */
+        /* padding: 4px 10px;
+        border-radius: 20px; */
+        font-size: 13px;
+        /* margin: 2px; */
+        /* margin: 2px; */
+    }
+
+    .task-list {
+        margin-top: 10px;
+        border-radius: 6px;
+       
+        border: 1px solid #ddd;
+    }
+
+    .task-item {
+        padding: 6px;
+        border-radius: 6px;
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 7px;
+    }
+
+    .selectedTask {
+        font-size: 12px;
+        background: #0044cc;
+        border-radius: 6px;
+        padding: 2px 6px;
+        color: #ffffff;
+    }
+
+    .task-item.complete {
+        background: #e9fce9;
+        color: #207820;
+       
+    }
+
+    .task-item.started {
+        background: #e8f1ff;
+        color: #0044cc;
+       
+    }
+
+    .task-item.pending {
+        background: #f9f9f9;
+        color: #555;
+       
+    }
+
+    .task-item i {
+        margin-right: 8px;
+    }
+
+    .task-footer {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 15px;
+        padding-top: 14px;
+        font-weight: 800;
+        border-top: 1px solid #eeeeee;
+    }
+
+        .task-footer span {
+            font-size: 14px;
+        }
+
+        .task-footer p {
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+
+    .green {
+        color: #2ca64c;
+        text-align: center;
+    }
+
+    .blue {
+        color: #2468f3;
+        text-align: center;
+    }
+
+    .gray {
+        color: #666;
+        text-align: center;
+    }
+    /*****************chat message*********************/
+    .chat-message {
+        display: flex;
+        margin-bottom: 15px;
+    }
+
+    .avatar {
+        width: 30px;
+        height: 30px;
+        background: #1e73be;
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        margin-right: 10px;
+    }
+
+    .message-box {
+        flex: 1;
+        position: relative;
+    }
+
+    .message-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 5px;
+    }
+
+    .role {
+        font-size: 12px;
+        padding: 2px 6px;
+        border-radius: 8px;
+        background: #d4b6f1;
+        color: #5c2d91;
+    }
+
+    .tag-yellow {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .tag-green {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .tag-purple {
+        background: #e0d4f7;
+        color: #6f42c1;
+    }
+
+    .message-text {
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .timestamp {
+        position: absolute;
+        right: 10px;
+        bottom: 5px;
+        font-size: 12px;
+        color: #666;
+    }
+
+    .bg-yellow {
+        background: #fffbea;
+        border: 1px solid #f6e05e;
+        border-radius: 10px;
+        padding: 10px 15px;
+    }
+
+    .bg-blue {
+        background: #f0f7ff;
+        border: 1px solid #bee3f8;
+        border-radius: 10px;
+        padding: 10px 15px;
+    }
+    /******************Top 4 card and caller information and location information****************************/
+    .top-card-sec .card ,
+    .saftey-assesment .card,
+    .incident-detail-sec .card ,
+    .validation-detail-sec .card ,
+    .supporting-information-sec .card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+        .top-card-sec .card h4 {
+            margin: 0;
+            font-size: 14px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .top-card-sec .card .value {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 4px 0;
+        }
+
+        .top-card-sec .card .subtext ,
+        .incident-detail-sec .card .fixwidth {
+            font-size: 13px;
+            color: #666;
+        }
+
+    .top-card-sec .red {
+        color: #d93025;
+    }
+
+    .top-card-sec .green {
+        color: #28a745;
+    }
+
+    .top-card-sec .orange {
+        color: #f57c00;
+    }
+
+    .top-card-sec .blue {
+        color: #1a73e8;
+    }
+
+    .section {
+        margin-top: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 15px;
+    }
+
+    .section-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+        .section-card h3 {
+            margin: 0 0 15px;
+            font-size: 18px;
+            font-weight:800;
+        }
+
+    .info-item {
+        margin-bottom: 12px;
+    }
+
+        .info-item i {
+            width: 18px;
+            color: #777;
+            margin-right:8px;
+        }
+
+    .info-title {
+        font-weight: bold;
+        margin-top: 4px;
+    }
+
+    .badge {
+        background: #e6f0ff;
+        color: #1a73e8;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        display: inline-block;
+        margin: 3px 3px 0 0;
+    }
+    /******************Incident details and safety style****************************/
+    .saftey-assesment .card h3,
+    .incident-detail-sec .card h3,
+    .validation-detail-sec .card h3 ,
+    .supporting-information-sec .card h3 {
+        font-size:18px;
+        font-weight:800;
+    }
+    .validation-detail-sec .card h3 i.fa{
+        margin-right:8px;
+    }
+
+    .saftey-assesment ,
+    .incident-detail-sec  {
+        margin-top:16px;
+    }
+    /* Header right corner info */
+    .incident-detail-sec .header-meta ,
+        .validation-detail-sec .header-meta {
+        text-align: right;
+        font-size: 14px;
+        color: #555;
+    }
+
+    .incident-detail-sec  .header-meta div ,
+            .validation-detail-sec .header-meta div {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .incident-detail-sec .header-meta i ,
+            .validation-detail-sec .header-meta i {
+        color: #555;
+    }
+
+    /* Badge */
+    .incident-detail-sec .badge-red {
+            background: #d93025;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+    }
+
+    /* Two-column layout inside card */
+    .incident-detail-sec  .flex-between {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .incident-detail-sec  .flex-col {
+        flex: 1;
+        
+    }
+
+    .fixwidth{
+        width:50%;
+    }
+    .fixwidth div{
+        margin-bottom:10px;
+    }
+
+        .fixwidth strong,
+        .validation-detail-sec strong {
+            font-size:16px;
+            color:#000000;
+        }
+
+        .fixwidth .subtext,
+        .validation-detail-sec .subtext {
+            font-size:16px;
+            font-weight:400;
+        }
+    /* Safety grid */
+    .safety-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 12px;
+        margin-top: 15px;
+    }
+
+    .safety-item {
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    .saftey-assesment .bg-green {
+        background: #e6f8e6;
+        color: #166534;
+    }
+
+    .saftey-assesment .bg-grey {
+        background: #f4f4f6;
+        color: #111;
+    }
+
+    .saftey-assesment .bg-red {
+        background: #fde8e8;
+        color: #b91c1c;
+    }
+
+    .safety-item h4 {
+        margin: 0 0 5px;
+        font-size: 14px;
+        font-weight: normal;
+    }
+
+    .safety-item strong {
+        font-size: 16px;
+    }
+    /****************validataion detail ********************/
+    .validation-detail-sec .badge-success {
+        background: #e6f8e6;
+        color: #166534;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 13px;
+        width: fit-content;
+    }
+
+    
+    .validation-detail-sec .badge-red{
+        background: #d93025;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 13px;
+        width:fit-content;
+    }
+
+    .notes{
+        background: #f9fafb;
+        color:dimgrey;
+        font-size:16px;
+        font-weight:400;
+        border:1px solid dimgrey;
+        border-radius:6px;
+        padding:8px;
+        margin-top:6px;
+    }
+
+    .validated-info{
+        display:grid;
+        grid-template-columns:1fr 1fr 1fr;
+        gap:20px;
+
+    }
+    .validation-note{
+        margin-top:10px;
+    }
+    /**************Supporting information************************/
+    .supporting-information-sec{
+        margin:16px 0;
+    }
+    /* Notes section */
+    .note-title {
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+        font-size: 15px;
+        margin-bottom: 5px;
+    }
+
+        .note-title i {
+            margin-right: 6px;
+            color: #555;
+        }
+
+    .note-box {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+
+    /* Photos section */
+    .photos-title {
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+        font-size: 15px;
+        margin-bottom: 8px;
+    }
+
+        .photos-title i {
+            margin-right: 6px;
+            color: #555;
+        }
+
+    .photos-grid {
+        display: flex;
+        gap: 12px;
+    }
+
+    .photo-item {
+        background: #f8f9fa;
+        border-radius: 8px;
+        width: 100px;
+        height: 100px;
+        text-align: center;
+        font-size: 14px;
+        color: #555;
+        cursor: pointer;
+    }
+
+    .photo-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s;
+    }
+
+    .photo-item:hover img {
+        transform: scale(1.05);
+    }
+    /*****************tab sec******************/
+    #incidentDetailsModal .tabs {
+        display: flex;
+        border-bottom: 1px solid #e5e7eb;
+        gap: 30px;
+    }
+
+    #incidentDetailsModal .tab-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 0;
+        font-size: 15px;
+        font-weight: 500;
+        color: #6b7280;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+    }
+
+        #incidentDetailsModal .tab-item.active {
+            color: #f54e00;
+            border-bottom: 2px solid #f54e00;
+        }
+
+        #incidentDetailsModal .tab-item i {
+            font-size: 16px;
+        }
+
+    /* Content area */
+    .tab-content {
+        display: none;
+        padding: 20px 0;
+    }
+
+        .tab-content.active {
+            display: block;
+        }
+
+    .send-message-image .file-upload {
+        margin-bottom: 15px;
+    }
+
+    .send-message-image .preview {
+        padding: 10px;
+       
+    }
+
+        .send-message-image .preview img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+    .send-message-image .file-name {
+        font-size: 14px;
+        color: #333;
+        word-break: break-word;
+    }
+</style>
+<div class="modal fade" id="incidentDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" id="incidentDetailsContent">
+
+
+            <div class="modal-header">
+                <h5 class="modal-title"> @Model.incidentDetailByIdViewModel?.IncidentNumber</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="tabs">
+                    <div class="tab-item active" data-tab="incident">
+                        <i class="far fa-file-alt"></i> Incident
+                    </div>
+                    <div class="tab-item" data-tab="validation">
+                        <i class="fas fa-shield-alt"></i> Validation
+                    </div>
+                    <div class="tab-item" data-tab="worksteps">
+                        <i class="fas fa-tasks"></i> Work Steps
+                    </div>
+                    <div class="tab-item" data-tab="communication">
+                        <i class="fas fa-comment-dots"></i> Communication
+                    </div>
+                </div>
+                <div id="incident" class="tab-content active">
+                    <!--------------top card sec-------------------->
+                    <div class="top-card-sec">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="card">
+                                    <h4><i class="fa-solid fa-circle text-red" style="color:@Model.incidentDetailByIdViewModel?.StatusLegendColor"></i> Status</h4>
+                                    <div class="value">@Model.incidentDetailByIdViewModel?.StatusLegendName</div>
+                                    <div class="subtext">@Model.incidentDetailByIdViewModel?.UpdatedOn</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card">
+                                    <h4><i class="fa-solid fa-triangle-exclamation orange"></i> Severity</h4>
+                                    <div class="value" style="color:@Model.incidentDetailByIdViewModel?.SeverityColor">@Model.incidentDetailByIdViewModel?.SeverityName</div>
+                                    <div class="subtext">@Model.incidentDetails.EventTypeNames.FirstOrDefault()</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card">
+                                    <h4><i class="fa-solid fa-calendar blue"></i> Created</h4>
+                                    <div class="value">@Model.incidentDetailByIdViewModel?.CreatedOnDate</div>
+                                    <div class="subtext">@Model.incidentDetailByIdViewModel?.CreatedOnTime</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card">
+                                    <h4><i class="fa-solid fa-user green"></i> Reporter</h4>
+                                    <div class="value">@Model.incidentCellerInformation?.CallerName</div>
+                                    <div class="subtext">@Model.incidentCellerInformation?.RelationshipName</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-----------------location and incident information--------------------------->
+                    <div class="section">
+                        <div class="section-card">
+                            <h3>Caller Information</h3>
+                            <div class="info-item d-flex align-items-start">
+                                <i class="fa-regular fa-user"></i>
+                                <div>
+                                    <span>@Model.incidentCellerInformation?.CallerName</span>
+                                    <div class="subtext">@Model.incidentCellerInformation?.RelationshipName</div>
+                                </div>
+                            </div>
+                            <div class="info-item d-flex align-items-start">
+                                <i class="fa-solid fa-phone"></i>
+                                <div>
+                                    <strong>@Model.incidentCellerInformation?.CallerPhoneNumber</strong>
+                                    <div class="subtext">Primary contact</div>
+                                </div>
+                            </div>
+                            <div class="info-item d-flex align-items-start">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <div>
+                                    <span class="info-title">Caller Address</span>
+                                    <div class="subtext">@Model.incidentCellerInformation?.CallerAddress</div>
+                                </div>
+                            </div>
+                            <div class="info-item d-flex align-items-start">
+                                <i class="fa-regular fa-calendar"></i>
+                                <div>
+                                    <span class="info-title">Call Time</span>
+                                    <div class="subtext">@Model.incidentCellerInformation?.CallDateInFormat @Model.incidentCellerInformation?.CallTimeInFormat</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-card">
+                            <h3>Incident Location</h3>
+                            <div class="info-item d-flex align-items-start">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <div>
+                                    <span class="info-title">Address</span>
+                                    <div class="subtext">@Model.incidentiLocation?.Address</div>
+                                </div>
+                            </div>
+                            <div class="info-item ">
+                                <span class="info-title">Nearest Intersection</span> <br><span class="subtext">@Model.incidentiLocation?.Landmark</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-title">Service Account</span> <br><span class="subtext">@Model.incidentiLocation?.ServiceAccount</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-title">Affected Assets</span> <br>
+                                @foreach (var asset in Model.incidentiLocation?.AssetNames)
+                                {
+                                    <span class="badge">@asset</span>
+                                }
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <!------------------------incident detail and saftey-------------------------------------->
+                    <div class="incident-detail-sec">
+                        <!-- Incident Details -->
+                        <div class="card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h3>Incident Details</h3>
+                                <div class="header-meta">
+                                    <div><i class="fa-regular fa-user"></i> Created by @Model.incidentCellerInformation?.CallerName</div>
+                                    <div><i class="fa-regular fa-calendar"></i> @Model.incidentDetailByIdViewModel?.CreatedOnDate @Model.incidentDetailByIdViewModel?.CreatedOnTime</div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="fixwidth">
+                                    <div>
+                                        <strong>Event Type</strong>
+                                        <div class="subtext">@Model.incidentDetails.EventTypeNames.FirstOrDefault()</div>
+                                    </div>
+                                    <div>
+                                        <strong>Description </strong>
+                                        <div class="subtext">@Model.DescriptionIssue</div>
+                                    </div>
+
+                                </div>
+                                <div class="fixwidth">
+                                    <p><strong>Severity Level</strong></p>
+                                    <span class="badge-red" style="background-color:@Model.incidentDetailByIdViewModel?.SeverityColor">@Model.incidentDetailByIdViewModel?.SeverityName</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-----------------Supporting information--------------------------->
+                    <div class="supporting-information-sec">
+                        <div class="card">
+                            <h3>Supporting Information</h3>
+
+                            <!-- Service Notes -->
+                            <div class="note-title">
+                                <i class="fa-regular fa-file-lines"></i> Service Representative Notes
+                            </div>
+                            <div class="note-box">@Model.incidentSupportingInfoViewModel.Notes</div>
+
+                            <!-- Photos -->
+                            <div class="photos-title">
+                                <i class="fa-regular fa-image"></i> Photos (@Model.incidentSupportingInfoViewModel?.ImageUrls.Count())
+                            </div>
+                            <div class="photos-grid">
+                                @foreach (var imageUrl in Model.incidentSupportingInfoViewModel?.ImageUrls)
+                                {
+                                    <div class="photo-item">
+                                        <img src="@imageUrl" alt="incidentPhoto" />
+                                    </div>
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="validation" class="tab-content">
+                    <!---------------------Validation details-------------------------->
+                    <div class="validation-detail-sec">
+                        <div class="card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h3><i class="fa-regular fa-circle-check"></i>Validation Details</h3>
+                                <div class="header-meta">
+                                    <div><i class="fa-regular fa-user"></i> Validated by Administrator</div>
+                                    <div><i class="fa-regular fa-calendar"></i>@Model.incidentValidationsDetailsViewModel?.CreatedDateInFormat @Model.incidentValidationsDetailsViewModel?.CreatedTimeInFormat</div>
+                                </div>
+                            </div>
+                            <div class="validated-info">
+                                <div>
+                                    <strong>Validated Severity</strong>
+                                    <div class="badge-red" style="background-color:@Model.incidentValidationsDetailsViewModel?.SeverityLevelColor">@Model.incidentValidationsDetailsViewModel?.SeverityLevelName</div>
+                                </div>
+                                <div>
+                                    <strong>Discovery Perimeter</strong>
+                                    <div class="subtext">@Model.incidentValidationsDetailsViewModel?.DiscoveryPerimeterName</div>
+                                </div>
+                                <div>
+                                    <strong>Status</strong>
+                                    <div class="badge-success">Validated</div>
+                                </div>
+                            </div>
+                            <div class="validation-note">
+                                <strong>Validation Notes</strong>
+                                <div class="notes">
+                                    @Model.incidentValidationsDetailsViewModel?.ValidationNotes
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="saftey-assesment">
+                        <!-- Safety Assessment -->
+                        <div class="card">
+                            <h3>Safety Assessment</h3>
+                            <div class="safety-grid">
+                                <div class="safety-item @(Model.incidentEnvironmentalViewModel?.GasodorpresentID == 1 ? "bg-green" : Model.incidentEnvironmentalViewModel?.GasodorpresentID == 0 ? "bg-red" : "bg-grey")">
+                                    <h4>Gas Odor Present</h4>
+                                    <strong>@Model.incidentEnvironmentalViewModel?.GasOdorText</strong>
+                                </div>
+                                <div class="safety-item @(Model.incidentEnvironmentalViewModel?.HissingSoundPresentID == 1 ? "bg-green" : Model.incidentEnvironmentalViewModel?.HissingSoundPresentID == 0 ? "bg-red" : "bg-grey")">
+                                    <h4>Hissing Sound</h4>
+                                    <strong>@Model.incidentEnvironmentalViewModel?.HissingSoundText</strong>
+                                </div>
+                                <div class="safety-item @(Model.incidentEnvironmentalViewModel?.VisibleDamageID == 1 ? "bg-green" : Model.incidentEnvironmentalViewModel?.VisibleDamageID == 0 ? "bg-red" : "bg-grey")">
+                                    <h4>Visible Damage/Fire</h4>
+                                    <strong>@Model.incidentEnvironmentalViewModel?.VisibleDamageText</strong>
+                                </div>
+                                <div class="safety-item @(Model.incidentEnvironmentalViewModel?.PeopleInjuredID == 1 ? "bg-green" : Model.incidentEnvironmentalViewModel?.PeopleInjuredID == 0 ? "bg-red" : "bg-grey")">
+                                    <h4>People Injured</h4>
+                                    <strong>@Model.incidentEnvironmentalViewModel?.PeopleInjuredText</strong>
+                                </div>
+                                <div class="safety-item @(Model.incidentEnvironmentalViewModel?.EvacuationRequiredID == 1 ? "bg-green" : Model.incidentEnvironmentalViewModel?.EvacuationRequiredID == 0 ? "bg-red" : "bg-grey")">
+                                    <h4>Evacuation Required</h4>
+                                    <strong>@Model.incidentEnvironmentalViewModel?.EvacuationRequiredText</strong>
+                                </div>
+                                <div class="safety-item @(Model.incidentEnvironmentalViewModel?.EmergencyResponseNotifiedID == 1 ? "bg-green" : Model.incidentEnvironmentalViewModel?.EmergencyResponseNotifiedID == 0 ? "bg-red" : "bg-grey")">
+                                    <h4>Emergency Response Notified</h4>
+                                    <strong>@Model.incidentEnvironmentalViewModel?.EmergencyResponseNotifiedText</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="worksteps" class="tab-content">
+                    <div class="team-detail">
+                        <h3 class="team-detailTitle">Assigned Policies and Procedures to Team(s)</h3>
+                        <div class="row AllteamSec">
+                        @foreach(var team in Model.workStepsByPolicy)
+                        {
+                           
+                                <div class="col-md-4">
+                                    <div class="task-section">
+                                        <div class="teamName-icon d-flex align-items-center">
+                                            <div class="avatar"><i class="fa-solid fa-people-group"></i></div>
+                                            <div class="teamName-info">
+                                                <h5>@team.FirstOrDefault().PolicyName</h5>
+                                                <div class="specializations">
+                                                    <span>@team.FirstOrDefault().TeamsByPolicy</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="task-list">
+                                            <h5 class="assign-task">Assigned Tasks:</h5>
+                                            <div class="listInfo">
+                                                @for (int i = 0; i < team.FirstOrDefault().Steps.Count(); i++)
+                                                {
+                                                    var task = team.FirstOrDefault().Steps[i];
+                                                    string cssClass;
+
+                                                    switch (i % 3)
+                                                    {
+                                                        case 0: // 1st in cycle
+                                                            cssClass = "complete";
+                                                            break;
+                                                        case 1: // 2nd in cycle
+                                                            cssClass = "started";
+                                                            break;
+                                                        default: // 3rd in cycle
+                                                            cssClass = "pending";
+                                                            break;
+                                                    }
+
+                                                    <div class="task-item @cssClass">
+                                                        <span>@task</span>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                           
+                        }
+                        </div>
+
+                    </div>
+                    
+                </div>
+
+                <div id="communication" class="tab-content">
+                    <!-------------------------team communication-------------------------------->
+                    <div class="team-communications">
+                        <!-- Header -->
+                        <div class="header">
+                            <h3><i class="fa fa-comments"></i>Team Communications</h3>
+                            <div class="messages-count">
+                                <i class="fa fa-user"></i> @Model.incidentValidationsDetailsViewModel?.IncidentValidationCommunicationHistoriesViewModelList.Count() messages
+                            </div>
+                        </div>
+                        <div class="messageSec">
+                            <!-- Team Message Box -->
+                            <div class="message-box team-message-box">
+                                <div class="send-message-image">
+                                    <textarea id="messageText" placeholder="Type your message here..."></textarea>
+                                    <input type="file" id="fileInput" class="file-upload" accept="image/*">
+                                    <div id="previewContainer"></div>
+                                    <button class="btn-send" onclick="sendMessage()"><i class="fa fa-paper-plane"></i> Send</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="messagesContainer">
+                        <!-------------------Chat Message--------------------------->
+                        @for (int i = 0; i < Model.incidentValidationsDetailsViewModel?.IncidentValidationCommunicationHistoriesViewModelList.Count; i++)
+                        {
+                            var communication = Model.incidentValidationsDetailsViewModel?.IncidentValidationCommunicationHistoriesViewModelList[i];
+                            bool isEven = i % 2 == 0;
+
+                            if (isEven)
+                            {
+                                <div class="chat-message bg-yellow">
+                                    <div class="avatar"><i class="fa-regular fa-user"></i></div>
+                                    <div class="message-box">
+                                        <div class="message-header">
+                                                <strong>Administrator</strong>
+                                            @* <span class="role">Super Admin</span>
+                                            <span class="role tag-yellow">Internal</span> *@
+                                        </div>
+                                        <div class="message-text">@communication?.Message</div>
+                                            @if (!string.IsNullOrEmpty(communication.Image))
+                                            {
+                                                <div class="attachments">
+                                                   @*  <strong>Attachments:</strong> *@
+                                                    <i class="fas fa-paperclip"></i>
+                                                    <a href="#">@communication.Image</a>
+                                                </div>
+                                        }
+                                        <div class="timestamp">@communication?.TimeStamp</div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="chat-message bg-blue">
+                                    <div class="avatar"><i class="fa-regular fa-user"></i></div>
+                                    <div class="message-box">
+                                        <div class="message-header">
+                                                <strong>Administrator</strong>
+                                            @* <span class="role">Super Admin</span> *@
+                                           @*  <span class="role tag-green">→ Distribution Emergency Team</span>
+                                            <span class="role tag-purple">Task: Notify & Dispatch</span> *@
+                                        </div>
+                                        <div class="message-text">@communication?.Message</div>
+                                            @if (!string.IsNullOrEmpty(communication.Image))
+                                            {
+                                                <div class="attachments">
+                                                    <strong>Attachments:</strong>
+                                                    <i class="fas fa-paperclip"></i>
+                                                    <a href="#">@communication.Image</a>
+                                                </div>
+                                            }
+                                        <div class="timestamp">@communication?.TimeStamp</div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        </div>
+
+                        <!-- Timeline -->
+                        <div class="timeline">
+                            <h4><i class="fa fa-clock"></i> Timeline</h4>
+                            <ul>
+                                <li>
+                                    <span class="dot blue"></span>
+                                    <div>
+                                        <strong>Incident Created</strong>
+                                        <p>@Model.incidentDetailByIdViewModel?.CreatedOnDate @Model.incidentDetailByIdViewModel?.CreatedOnTime</p>
+                                        <small>by @Model.incidentCellerInformation?.CallerName</small>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="dot green"></span>
+                                    <div>
+                                        <strong>Incident Validated</strong>
+                                        <p>@Model.incidentValidationsDetailsViewModel?.CreatedDateInFormat @Model.incidentValidationsDetailsViewModel?.CreatedTimeInFormat</p>
+                                        <small>by Administrator</small>
+                                    </div>
+                                </li>
+                                @* <li>
+                                    <span class="dot gray"></span>
+                                    <div>
+                                        <strong>Status: Cancelled</strong>
+                                        <p>Sep 09, 2025 04:02 PM</p>
+                                        <small>by System</small>
+                                    </div>
+                                </li> *@
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="imgPreviewModal" class="modal">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="previewImg" src="~/img/banner.jpg">
+</div>
+<script>
+    // Tab click handler
+    document.querySelectorAll(".tab-item").forEach(tab => {
+      tab.addEventListener("click", function () {
+        // Remove active from all tabs
+        document.querySelectorAll(".tab-item").forEach(el => el.classList.remove("active"));
+        this.classList.add("active");
+
+        // Hide all contents
+        document.querySelectorAll(".tab-content").forEach(content => content.classList.remove("active"));
+
+        // Show selected content
+        const tabId = this.getAttribute("data-tab");
+        document.getElementById(tabId).classList.add("active");
+      });
+    });
+</script>
+<script>
+        document.querySelectorAll('.photo-thumb').forEach(link => {
+
+      link.addEventListener('click', function (e) {
+        e.preventDefault(); // prevent normal link behavior
+        const modal = document.getElementById("imgPreviewModal");
+        const modalImg = document.getElementById("previewImg");
+        modal.style.display = "block";
+        modalImg.src = $(this).find('img').attr('src'); // show clicked image
+      });
+    });
+
+    // Close modal on click of X
+    document.querySelector('.close').onclick = function () {
+      document.getElementById("imgPreviewModal").style.display = "none";
+    };
+
+    // Close modal when clicking outside the image
+    window.onclick = function (event) {
+      const modal = document.getElementById("imgPreviewModal");
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    };
+
+
+        document.querySelectorAll('input[name="msgType"]').forEach(radio => {
+      radio.addEventListener("change", function() {
+        document.querySelector(".team-message-box").style.display =
+          this.value === "team" ? "block" : "none";
+        document.querySelector(".internal-note-box").style.display =
+          this.value === "note" ? "block" : "none";
+      });
+    });
+</script>
+<script>
+    const fileInput = document.getElementById("fileInput");
+    const previewContainer = document.getElementById("previewContainer");
+
+    fileInput.addEventListener("change", function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          previewContainer.innerHTML = `
+            <div class="preview">
+              <img src="${e.target.result}" alt="Image Preview">
+              
+            </div>
+          `;
+        };
+
+        reader.readAsDataURL(file);
+      } else {
+        previewContainer.innerHTML = "";
+      }
+    });
+
+    function sendMessage() {
+        const messageText = document.getElementById('messageText').value.trim();
+        const fileInput = document.getElementById('fileInput');
+        
+        if (!messageText) {
+            alert('Please enter a message.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('IncidentId', @(Model.Id ?? 0));
+        formData.append('IncidentValidationId', @(Model.incidentValidationsDetailsViewModel?.IncidentValidationId ?? 0));
+        formData.append('Message', messageText);
+        formData.append('MessageType', 1);
+        
+        for (let i = 0; i < fileInput.files.length; i++) {
+            formData.append('File', fileInput.files[i]);
+        }
+
+        fetch('/Incidents/SaveCommunicationMessage', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Get filename if file was uploaded
+                const fileName = fileInput.files.length > 0 ? fileInput.files[0].name : '';
+                
+                // Clear the form
+                document.getElementById('messageText').value = '';
+                document.getElementById('previewContainer').innerHTML = '';
+                fileInput.value = '';
+                     const now = new Date();
+                const formattedTime = now.toLocaleString("en-US", {
+                    month: "short",   // "Sep"
+                    day: "numeric",   // "16"
+                    hour: "2-digit",  // "05"
+                    minute: "2-digit",// "20"
+                    hour12: true      // "PM"
+                });
+
+                addMessageToUI(messageText, formattedTime, fileName);
+                
+                // Update message count
+                updateMessageCount();
+            } else {
+                alert('Failed to send message: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while sending the message.');
+        });
+    }
+
+    function addMessageToUI(message, timestamp, attachmentUrl = '') {
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageCount = messagesContainer.children.length;
+        const isEven = messageCount % 2 === 0;
+        
+        const attachmentHtml = attachmentUrl ? `
+            <div class="attachments">
+                <strong>Attachments:</strong>
+                <i class="fas fa-paperclip"></i>
+                <a href="#">${attachmentUrl}</a>
+            </div>
+        ` : '';
+        
+        const messageHtml = `
+            <div class="chat-message ${isEven ? 'bg-yellow' : 'bg-blue'}">
+                <div class="avatar"><i class="fa-regular fa-user"></i></div>
+                <div class="message-box">
+                    <div class="message-header">
+                        <strong>Administrator</strong>
+                    </div>
+                    <div class="message-text">${message}</div>
+                    ${attachmentHtml}
+                    <div class="timestamp">${timestamp}</div>
+                </div>
+            </div>
+        `;
+        
+        messagesContainer.insertAdjacentHTML('afterbegin', messageHtml);
+    }
+
+    function updateMessageCount() {
+        const messageCount = document.getElementById('messagesContainer').children.length;
+        const countElement = document.querySelector('.messages-count');
+        if (countElement) {
+            countElement.innerHTML = `<i class="fa fa-user"></i> ${messageCount} messages`;
+        }
+    }
+</script>

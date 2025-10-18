@@ -1,0 +1,47 @@
+﻿@using ViewModels.Shared.Notes
+@model List<INotesViewModel>
+@{
+    Layout = null;
+}
+<div id="notes-list-container">
+    <table class="table datatable-basic dataTable">
+        <thead>
+            @* class="thead-primary" *@
+            <tr>
+                <th width="40%" class="text-left">Notes</th>
+                <th width="20%">File</th>
+                <th width="20%">Added On</th>
+                <th width="20%">Added By</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="ellipsis text-left" title="@item.Description">@item.Description</td>
+                        <td>
+                            @if (string.IsNullOrEmpty(item.FileUrl))
+                            {
+                                <a class='download-btn icon-color-black' href='#'><i class='fa fa-file-download' style="color:black;"></i></a>
+                            }
+                            else
+                            {
+                                <a class='download-btn' href='@item.FileUrl' target='_blank'><i class='fa fa-file-download'></i></a>
+                            }
+                        </td>
+                        <td>@item.FormattedCreatedOn</td>
+                        <td>@item.CreatedBy</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4">No Records Added.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

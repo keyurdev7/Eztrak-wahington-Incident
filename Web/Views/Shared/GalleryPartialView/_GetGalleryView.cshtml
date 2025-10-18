@@ -1,0 +1,150 @@
+﻿@using ViewModels.Shared
+@model List<AttachmentVM>
+@{
+    var list = Model;
+    Layout = null;
+}
+<style>
+    .lightbox-modal {
+        display: none;
+        position: fixed;
+        z-index: 999;
+        padding-top: 60px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.9);
+    }
+
+    .lightbox-content {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+    }
+
+    .close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+    .prev, .next {
+        cursor: pointer;
+        position: absolute;
+        top: 50%;
+        width: auto;
+        padding: 16px;
+        color: white;
+        font-weight: bold;
+        font-size: 20px;
+        transition: 0.6s ease;
+        user-select: none;
+    }
+
+    .prev {
+        left: 0;
+    }
+
+    .next {
+        right: 0;
+    }
+
+        .prev:hover, .next:hover {
+            background-color: rgba(0,0,0,0.8);
+        }
+
+</style>
+
+<div class="col-12 row">
+    @for (var i = 0; i < Model.Count(); i++)
+    {
+        var fileName = Model[i].Name;
+        if (fileName.Length > 20)
+        {
+            fileName = fileName.Substring(0, 17) + "...";
+        }
+        <div class="col-md-3 mb-1">
+            <div class="card card-img-actions p-2">
+                <div class=" m-1">
+                    <img class="card-img img-fluid w-100" src="@Model[i].Url" alt="">
+                    <div class="card-img-actions-overlay card-img">
+                        <a href="#" class="btn btn-outline-white border-2 btn-icon rounded-pill open-lightbox" data-index="@i" data-url="@Model[i].Url" data-gallery="gallery1">
+                            <i class="fas fa-plus fa-2x"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="align-items-start flex-nowrap">
+                        <div class="row col-12">
+                            <div class="font-weight-semibold mr-2 col-12 p-0">@fileName</div>
+                            <span class="font-size-sm text-muted col-12 p-0">Uploaded On: @Model[i].CreatedOn.ToString("yyyy-MM-dd")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+<div id="lightboxModal" class="lightbox-modal">
+    <span class="close">&times;</span>
+    <img class="lightbox-content" id="lightboxImg">
+    <a class="prev">&#10094;</a>
+    <a class="next">&#10095;</a>
+</div>
+
+<script>
+    $(document).ready(function () {
+        let lightboxIndex = 0;
+        const $lightboxModal = $('#lightboxModal');
+        const $lightboxImg = $('#lightboxImg');
+        const $images = $('.open-lightbox');
+
+        $images.each(function (index) {
+            $(this).on('click', function (event) {
+                event.preventDefault();
+                lightboxIndex = index;
+                openLightbox($(this).data('url'));
+            });
+        });
+
+        function openLightbox(url) {
+            $lightboxModal.show();
+            $lightboxImg.attr('src', url);
+        }
+
+        function closeLightbox() {
+            $lightboxModal.hide();
+        }
+
+        function showNext() {
+            lightboxIndex = (lightboxIndex + 1) % $images.length;
+            $lightboxImg.attr('src', $images.eq(lightboxIndex).data('url'));
+        }
+
+        function showPrev() {
+            lightboxIndex = (lightboxIndex - 1 + $images.length) % $images.length;
+            $lightboxImg.attr('src', $images.eq(lightboxIndex).data('url'));
+        }
+
+        $('.close').on('click', closeLightbox);
+        $('.next').on('click', showNext);
+        $('.prev').on('click', showPrev);
+    });
+
+</script>

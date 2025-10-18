@@ -1,0 +1,15 @@
+﻿@model ViewModels.MUTCDBriefViewModel
+@{
+    var elementId = ViewData["Id"] != null && !string.IsNullOrEmpty(ViewData["Id"].ToString()) ? ViewData["Id"].ToString() : "mutcd-id";
+}
+<partial name="~/Views/Shared/Select2/MUTCD/_MUTCDHtml.cshtml" model="@Model" />
+<partial name="~/Views/Shared/Select2/MUTCD/_MUTCDJs.cshtml" />
+
+<script src="~/js/custom/select2/select2-methods.js"></script>
+<script>
+    $(function () {
+        var id = "#" + "@elementId";
+        SetMUTCDSelect2(id);
+    });
+
+</script>

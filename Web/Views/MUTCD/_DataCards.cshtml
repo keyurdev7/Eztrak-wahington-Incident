@@ -1,0 +1,50 @@
+﻿@using ViewModels
+@using ViewModels.CRUD
+@model DataCardViewModel<MUTCDDetailViewModel>
+@{
+    Layout = null;
+}
+<div class="d-flex align-items-start flex-column flex-md-row">
+    <div class="w-100">
+        @if (Model.LastPage > 0)
+        {
+            <div class="row">
+                @foreach (var item in Model.PaginatedResult.Items)
+                {
+                    <div class="col-lg-2 mb-3">
+                        <div class="card data-card">
+                            <div class="card-img">
+                                <img src="@item.FormattedImageUrl" class="img-fluid card-img" alt="@($"{item.Code} Image")">
+                            </div>
+                            <div class="card-info mt-4 text-center">
+                                <h6 class="mb-1">@item.Code</h6>
+                                <div class="tooltip-container font-14 m-0" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="@item.Description">
+                                    @(item.Description.Length > 30 ? item.Description.Substring(0, 30) + "..." : item.Description)
+                                </div>
+                            </div>
+
+                            @* <div class="card-footer card-action text-center"> *@
+                                @* <a onclick="loadUpdateAndDetailModalPanel('/MUTCD/Update/@item.Id')" class="btn btn-site-primary btn-rounded"><i class="fas fa-folder-open"></i></a> *@
+                                @* <a onclick="loadUpdateAndDetailModalPanel('/MUTCD/Update/@item.Id')" class="btn btn-site-primary btn-rounded"><i class="fas fa-pen"></i></a> *@
+                                @* <a href="/MUTCD/Delete/@item.Id" class="btn btn-site-primary btn-rounded delete-data-card"><i class="fas fa-trash"></i></a> *@
+                            @* </div> *@
+                        </div>
+                    </div>
+                }
+            </div>
+            if (!Model.DisablePagination)
+            {
+                @await Html.PartialAsync("~/Views/Shared/Crud/ListView/DataCard/_Pagination.cshtml", Model)
+            }
+        }
+        else
+        {
+            <div> No Records Found</div>
+        }
+    </div>
+</div>
+<script>
+    $(function () {
+        $('[data-bs-toggle="tooltip"]').tooltip();
+    });
+</script>

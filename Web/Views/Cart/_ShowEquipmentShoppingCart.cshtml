@@ -1,0 +1,20 @@
+﻿@model ViewModels.CartViewModel
+<a id="aEquipmentCartLink" class="equipment-cart-btn order-lg-6 position-relative" href="#" onclick="fnRedirectToEquipmentCart()">
+    <i class="fa-solid fa-luggage-cart fa-2x" alt="Cart" style="color: white;"></i>
+    @if (Model.TotalItems > 0)
+    {
+        <span class="number-dot">@Model.TotalItems</span>
+    }
+</a>
+<script>
+    function fnRedirectToEquipmentCart()
+    {
+        var url = '@Url.Action("EquipmentIndex", "Cart", new { area = "" })'
+        if ($('#aCartLink').find('span.count').length > 0) {
+            window.location = url;
+        }
+        else {
+            SwalErrorAlert('Your cart is empty');
+        }
+    }
+</script>

@@ -1,0 +1,51 @@
+﻿@using System.Web
+@using ViewModels
+@model EquipmentFieldsModifyViewModel
+
+<form id="NewEquipmentFieldsForm" autocomplete="off">
+    <div id="saveEquipmentFieldsDiv" class="list-item addItem">
+        <input type="hidden" value="@Model.Id" name="Id" id="equipmentfields_@Model.Id" />
+        <div class="input-container type">
+            <input type="text" placeholder="Enter Equipment Field Name" asp-for="Name">
+            @{
+                var depts = new[] { "Vehicles", "Pumps", "Electrical", "Safety", "Safety" };
+            }
+            <select asp-for="Category" name="Category" id="categorySelect" class="form-control" data-val-required="Required">
+                <option value="">Select Category</option>
+                @foreach (var d in depts)
+                {
+                    if (string.Equals(d, Model?.Category, StringComparison.OrdinalIgnoreCase))
+                    {
+                        <option value="@d" selected="selected">@d</option>
+                    }
+                    else
+                    {
+                        <option value="@d">@d</option>
+                    }
+                }
+            </select>
+            <input type="text"
+                   id="HourlyRate"
+                   name="HourlyRate"
+                   placeholder="Enter Hourly Rate($)"
+                   asp-for="HourlyRate"
+                   inputmode="decimal"
+                   title="Please enter a valid number (e.g., 12.12)" />
+            <div class="actions">
+                <button class="btn check saveEquipmentFields"><i class="fa-solid fa-check"></i></button>
+                <button class="btn cancel cancelEquipmentFields"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function () {
+        $(document).on("input", "#HourlyRate", function () {
+            // Allow only digits and one decimal point
+            this.value = this.value
+                .replace(/[^0-9.]/g, '')   // Remove non-numeric and non-dot
+                .replace(/(\..*?)\..*/g, '$1'); // Allow only one dot
+        });
+    });
+</script>

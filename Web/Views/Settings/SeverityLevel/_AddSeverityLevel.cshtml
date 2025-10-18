@@ -1,0 +1,18 @@
+﻿@using System.Web
+@using ViewModels
+@model SeverityLevelModifyViewModel
+
+<form id="NewSeverityLevelForm">
+    <div class="list-item addItem" id="saveSeverityLevelDiv">
+        <input type="hidden" value="@Model.Id" name="Id" id="SeverityLevel_@Model.Id" />
+        <div class="input-container type">
+            <input type="text" placeholder="Enter name" asp-for="Name">
+            <textarea type="text" placeholder="Enter description" asp-for="Description"></textarea>
+            <input type="text" placeholder="Enter color" asp-for="Color">
+            <div class="actions">
+                <button class="btn check saveSeverityLevel"><i class="fa-solid fa-check"></i></button>
+                <button class="btn cancel cancelSeverityLevel"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+    </div>
+</form>

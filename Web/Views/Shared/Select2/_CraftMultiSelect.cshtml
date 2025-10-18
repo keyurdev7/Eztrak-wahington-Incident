@@ -1,0 +1,45 @@
+﻿@model ViewModels.CRUD.Interfaces.ICraftMultiSelect
+
+@{
+    var accessAllowed = ViewData["AccessAllowed"] != null && !string.IsNullOrEmpty(ViewData["AccessAllowed"].ToString()) ? bool.Parse(ViewData["AccessAllowed"].ToString()) : false;
+    var multiSelect = ViewData["MultiSelect"] != null && !string.IsNullOrEmpty(ViewData["MultiSelect"].ToString()) ? bool.Parse(ViewData["MultiSelect"].ToString()) : false;
+    var elementId = ViewData["Id"] != null && !string.IsNullOrEmpty(ViewData["Id"].ToString()) ? ViewData["Id"].ToString() : "multiple-craft-id";
+
+    var selectedCrafts = Model.Crafts.Select(m =>
+    new SelectListItem()
+            {
+                Value = (m != null && m.Id > 0) ? m.Id.ToString() : "",
+                Text = (m != null && m.Id > 0) ? m.Name : "",
+                Selected = (m != null && m.Id > 0) ? true : false,
+            }).ToList();
+}
+
+<div class="form-group select2-parent-container">
+    <label class="form-label fw-600">Craft(s)  </label>
+
+    <select class="form-control disable-field select2-hidden-accessible" id="@elementId" multiple="" data-val="true" data-val-required="At least one Craft required." name="CraftIds" aria-hidden="true">
+        @foreach (var item in selectedCrafts)
+        {
+            <option selected=@(item.Selected ? "selected" : "") value="@item.Value">@item.Text</option>
+        }
+    </select>
+    <span asp-validation-for="CraftIds" class="validation-invalid-label"></span>
+</div>
+<script src="~/js/custom/select2/select2-methods.js"></script>
+<script>
+    $(function() {
+        var id = "#" + "@elementId";
+        var pageSize = 10;
+        var url = '/CraftSkill/Select2';
+        var dataArray = function(params) {
+            params.page = params.page || 1;
+            return {
+                prefix: params.term,
+                pageSize: pageSize,
+                pageNumber: params.page,
+                customParams: JSON.stringify({})
+            };
+        };
+        Select2AutoCompleteAjax(id, url, dataArray, pageSize, "Select Crafts");
+    });
+</script>

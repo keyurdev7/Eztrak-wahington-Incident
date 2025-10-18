@@ -1,0 +1,30 @@
+﻿@using ViewModels
+@model TaskWorkStepViewModel
+@{
+    var isDetailPage = ViewData["IsDetailPage"] != null ? bool.Parse(ViewData["IsDetailPage"].ToString()) : false;
+
+    var collectionType = "TaskWorkSteps";
+    var rowNumber = ViewData["RowNumber"] != null ? int.Parse(ViewData["RowNumber"].ToString()) : 0;
+
+    var rowName = "section-row[" + rowNumber + "]";
+    var rowId = "step-section-row-" + rowNumber;
+   
+    var titleName = collectionType + "[" + rowNumber + "].Title";
+    var orderName = collectionType + "[" + rowNumber + "].Order";
+}
+
+<tr>
+    <td>
+        <div>@Model.Title</div>
+        <input type="hidden" name="@titleName" value="@Model.Title" data-name="Title">
+    </td>
+    <td>
+        <div>@Model.Order</div>
+        <input type="hidden" name="@orderName" value="@Model.Order" data-name="Order">
+    </td>
+    <td>
+        <span class="icon edit-step"><i class="icon-pencil5"></i></span>
+        <span class="icon delete-step"><i class="icon-trash"></i></span>
+    </td>
+</tr>
+

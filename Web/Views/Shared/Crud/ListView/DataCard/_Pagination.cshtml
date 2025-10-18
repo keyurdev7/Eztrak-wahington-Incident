@@ -1,0 +1,37 @@
+﻿@{
+    var visiblePages = 5; // Adjust this value to control the number of visible page buttons
+    var currentPage = Model.CurrentPage;
+    var lastPage = Model.LastPage;
+
+    var backNavigationDisabled = (currentPage == 1) ? "disabled" : "";
+    var forwardNavigationDisabled = (currentPage == lastPage) ? "disabled" : "";
+
+    // Calculate starting and ending page for visible range
+    var startIndex = Math.Max(1, Math.Min(currentPage - Math.Floor((double)(visiblePages / 2)), lastPage - visiblePages + 1));
+    var endIndex = Math.Min(lastPage, startIndex + visiblePages - 1);
+}
+
+<div class="d-flex justify-content-end mt-3 mb-3">
+    <ul class="pagination">
+        <li class="paginate_button page-item @backNavigationDisabled"><a href="#" data-page="1" class="page-link">First</a></li>
+        <li class="paginate_button page-item @backNavigationDisabled"><a href="#" data-page="@(currentPage - 1)" class="page-link"><i class="icon-arrow-left12"></i></a></li>
+
+        @if (startIndex > 2)
+        {
+            <li class="paginate_button page-item disabled"><a href="#" class="page-link">...</a></li>
+        }
+
+        @for (var i = startIndex; i <= endIndex; i++)
+        {
+            <li class="paginate_button page-item @(i==currentPage?"current":"")"><a href="#" data-page="@i" class="page-link">@i</a></li>
+        }
+
+        @if (endIndex < lastPage - 1)
+        {
+            <li class="paginate_button page-item disabled"><a href="#" class="page-link">...</a></li>
+
+        }
+        <li class="paginate_button page-item @forwardNavigationDisabled"><a href="#" data-page="@(currentPage + 1)" class="page-link"><i class="icon-arrow-right13"></i></a></li>
+        <li class="paginate_button page-item @forwardNavigationDisabled"><a href="#" data-page="@(lastPage)" class="page-link">Last</a></li>
+    </ul>
+</div>

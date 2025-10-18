@@ -1,0 +1,7 @@
+﻿@using ViewModels.CRUD
+@model CrudUpdateViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = null;
+}
+@await Html.PartialAsync("~/Views/Shared/Crud/UpdateView/_UpdateForm.cshtml", Model)

@@ -1,0 +1,44 @@
+﻿@model WorkOrderTechnicianModifyViewModel;
+@using Enums;
+@using System.Globalization;
+@using ViewModels.WorkOrderTechnician
+@{
+    var isDetailPage = ViewData["IsDetailPage"] != null ? bool.Parse(ViewData["IsDetailPage"].ToString()) : false;
+
+    var collectionType = "WorkOrderTechnicians";
+    var rowNumber = ViewData["RowNumber"] != null ? int.Parse(ViewData["RowNumber"].ToString()) : 0;
+
+    var rowName = "section-row[" + rowNumber + "]";
+    var rowId = "technician-section-row-" + rowNumber;
+
+    var craftSkillId = collectionType + "[" + rowNumber + "].CraftSkill.Id";
+    var craftSkillName = collectionType + "[" + rowNumber + "].CraftSkill.Name";
+    var technicianId = collectionType + "[" + rowNumber + "].Technician.Id";
+    var technicianName = collectionType + "[" + rowNumber + "].Technician.Name";
+    var hiddenId = collectionType + "[" + rowNumber + "].Id";
+
+}
+
+<tr class="technician-section-row" id="@rowId">
+
+    <td>
+        <span style=" text-align: initial !important;">@Model.Technician.Name</span>
+        <input type="hidden" name="@technicianId" value="@Model.Technician.Id" />
+        <input type="hidden" name="@technicianName" value="@Model.Technician.Name" />
+    </td>
+
+    <td>
+        <span style=" text-align: initial !important;">@Model.CraftSkill.Name</span>
+        <input type="hidden" name="@craftSkillId" value="@Model.CraftSkill.Id" />
+        <input type="hidden" name="@craftSkillName" value="@Model.CraftSkill.Name" />
+    </td>
+    <input type="hidden" name="@hiddenId" value="@Model.Id" />
+    @if (!isDetailPage)
+    {
+        <td>
+            <a href="javascript:void(0)" class="remove-technician mx-1 datatable-action btn bg-custom-dark" data-toggle="tooltip" title="Delete Technician"><i class="icon-trash"></i></a>
+        </td>
+    }
+
+</tr>
+

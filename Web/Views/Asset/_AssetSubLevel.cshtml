@@ -1,0 +1,54 @@
+﻿@using ViewModels
+@model List<AssetAssociationDetailViewModel>
+@{
+    Layout = null;
+    var assetId = ViewBag.AssetId;
+}
+
+<div class="container-fluid">
+    <table id="shipment-table-container" class="table table-striped table-bordered">
+        <thead>@* class="thead-primary" *@
+            <tr>
+                @foreach (var association in Model)
+                {
+                    <th>@association.AssetTypeLevel1.Name</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Count > 0)
+            {
+                <tr>
+                    @foreach (var item in Model)
+                    {
+                        <td>
+                            <div class="td-html-span"
+                                 attr-cell-name="@item.AssetTypeLevel1.Name"
+                                 attr-additional-fields="[]"
+                                 attr-cell-data="@item.AssetTypeLevel2.Name"
+                                 attr-field-name="@item.AssetTypeLevel1.Name"
+                                 attr-entity-name="AssetAssociation"
+                                 attr-entity-property="AssetTypeLevel2Id"
+                                 attr-entity-id="@item.Id"
+                                 attr-entity-is-tooltip="false"
+                                 attr-cell-html="@item.AssetTypeLevel2.Name"
+                                 attr-entity-form-id="hidden-asset-create-form">
+                                @item.AssetTypeLevel2.Name
+                            </div>
+                        </td>
+                    }
+                </tr>
+
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7">No records found!</td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+
+

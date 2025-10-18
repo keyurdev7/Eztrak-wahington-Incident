@@ -1,0 +1,16 @@
+﻿@model Models.Common.Interfaces.IImageBaseViewModel
+<label asp-for="ImageUrl" class="control-label"></label>
+<div class="row">
+    <div class="col-md-9">
+        <div class="uniform-uploader custom-file">
+            <input type="file" asp-for="Image" class="form-control-uniform-custom custom-file-input">
+            <span class="filename" style="user-select: none;overflow: hidden;">No file selected</span>
+            <span class="action btn bg-custom-dark" style="user-select: none;">Choose File</span>
+        </div>
+        <a href="javascript:void(0)" style="display:block;" class="remove-img">Remove</a>
+        <span asp-validation-for="Image" class="validation-invalid-label"></span>
+    </div>
+    <div class="col-md-3">
+        <img class="image-thumbnail rounded-circle" src="@Model.ImageUrl" alt="" style="max-width:80px;display:block;margin-top:-25px;max-height:80px;">
+    </div>
+</div>

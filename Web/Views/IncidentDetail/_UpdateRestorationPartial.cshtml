@@ -1,0 +1,225 @@
+﻿@model ViewModels.Incident.IncidentEditTaskListViewModel
+
+<!-- Update Incident Assessment Modal -->
+<div class="modal fade" id="updateIncidentRestorationModal" tabindex="-1" aria-labelledby="updateIncidentRestorationModallabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateIncidentRestorationModallabel">Update Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form id="UpdateIncidentResortationForm">
+                    <input type="hidden" id="restorationId" value="@Model.Id" />
+                    <div class="row">
+                        <div class="col-md-6">
+                        
+                            <div class="form-group">
+                                <label class="form-label">Task</label>
+                                <textarea class="form-control" id="task" rows="3" asp-for="@Model.Task" placeholder="Enter task description"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" id="status" asp-for="@Model.StatusId" disabled>
+                                    <option value="">Select status</option>
+                                    @foreach (var item in Model.StatusList)
+                                    {
+                                        if (Model.StatusId == null)
+                                        {
+                                            if (item.Text == "Not Started")
+                                            {
+                                                <option value="@item.Value" selected>@item.Text</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (item.Value == Model.StatusId.ToString())
+                                            {
+                                                <option value="@item.Value" selected>@item.Text</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="d-flex align-items-center row">
+                                <div class="form-group col-md-6">
+                                    <label class="form-label">Started</label>
+                                    <input type="time" class="form-control" id="startedTime" asp-for="@Model.Started">
+                                </div>
+
+                                <!-- Completed (Time only) -->
+                                <div class="form-group col-md-6">
+                                    <label class="form-label">Completed</label>
+                                    <input type="time" class="form-control" id="completedTime" asp-for="@Model.Completed">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" id="description" rows="3" asp-for="@Model.Description" placeholder="Enter description or notes"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                           
+                            @* <div class="form-group">
+                                <label class="form-label">Role</label>
+                                <select class="form-select" id="assignee" asp-for="@Model.RoleIds">
+                                    <option value="">Select Assignee</option>
+                                    @foreach (var item in Model.RoleList)
+                                    {
+                                        @if (item.Value == Model.RoleIds?.ToString())
+                                        {
+                                            <option value="@item.Value" selected>@item.Text</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div> *@
+
+                            <div class="form-group mb-3" id="div_UpdateResortationRole">
+                                <input type="hidden" id="hdn_UpdateResortationRole" asp-for="@Model.RoleIds" name="RoleIds" />
+                                <label>Responsible Role (Multiple)</label>
+                                <div class="multiselect-dropdown" id="chk_UpdateResortationRole">
+                                    <div class="dropdown-btn">Choose roles</div>
+                                    <div class="dropdown-list">
+                                        @foreach (var item in Model.RoleList)
+                                        {
+                                            var isChecked = Model.RoleIds != null && Model.RoleIds.Contains(item.Value);
+                                            <label>
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       value="@item.Value"
+                                                       data-name="@item.Text"
+                                                       @(isChecked ? "checked" : "") />
+                                                @item.Text
+                                            </label>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="form-label">Evidence</label>
+                                <input type="file" id="fileInputRestoration" multiple class="file-upload" asp-for="@Model.File">
+                                <div id="previewContainerRestoration" class="d-flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer d-flex justify-content-end">
+                <button type="submit" class="btn btn-success" id="btnUpdateRestoration">
+                    <i class="fas fa-check"></i> Update
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        flatpickr("#startedTime", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true });
+        flatpickr("#completedTime", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true });
+    });
+
+    $(document).ready(function() {
+        initMultiselectResortation();
+
+        updateRoleDropdown();
+    });
+    function initMultiselectResortation() {
+        $('.multiselect-dropdown').each(function () {
+            var $dropdown = $(this);
+            var $btn = $dropdown.find('.dropdown-btn');
+            var $list = $dropdown.find('.dropdown-list');
+            var $hidden = $dropdown.find('input[type="hidden"]'); // your hidden input
+
+            // 🔽 Toggle dropdown open/close
+            $btn.on('click', function (e) {
+                e.stopPropagation();
+                $('.dropdown-list').not($list).hide();
+                $list.toggle();
+            });
+
+            // ✅ Handle checkbox changes (event delegation)
+            $list.on('change', 'input[type="checkbox"]', function () {
+                var $checkboxes = $list.find('input[type="checkbox"]');
+
+                // Get selected items (id + name)
+                var selected = $checkboxes
+                    .filter(':checked')
+                    .map(function () {
+                        return {
+                            id: $(this).val(),
+                            name: $(this).data('name') || $(this).parent().text().trim()
+                        };
+                    })
+                    .get();
+
+                // Update button text
+                var selectedNames = selected.map(function (s) { return s.name; });
+                $btn.text(selectedNames.length ? selectedNames.join(', ') : 'Choose roles');
+
+                var dropdownId = $dropdown.attr('id'); // e.g., chk_VTFResponsibleRole
+                var hiddenId = dropdownId.replace('chk_', 'hdn_'); // => hdn_VTFResponsibleRole
+                var $hidden = $('#' + hiddenId);
+
+                // 🟢 Update hidden input value
+                if ($hidden.length) {
+                    $hidden.val(selected.map(function (s) { return s.id; }).join(','));
+                }
+            });
+
+            // 🧩 Hide dropdown when clicking outside
+            $(document).on('click', function (e) {
+                if (!$dropdown.is(e.target) && $dropdown.has(e.target).length === 0) {
+                    $list.hide();
+                }
+            });
+        });
+    }
+
+     function updateRoleDropdown() {
+        const selectedNames = [];
+        const selectedValues = [];
+
+        $("#chk_UpdateResortationRole input[type='checkbox']:checked").each(function () {
+            selectedNames.push($(this).data("name"));
+            selectedValues.push($(this).val());
+        });
+
+        // Show selected names on dropdown button
+        const displayText = selectedNames.length > 0 ? selectedNames.join(", ") : "Choose roles";
+        $("#chk_UpdateResortationRole .dropdown-btn").text(displayText);
+
+        // Update hidden input with comma-separated IDs
+        $("#hdn_UpdateResortationRole").val(selectedValues.join(","));
+    }
+
+
+</script>

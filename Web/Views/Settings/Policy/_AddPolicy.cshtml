@@ -1,0 +1,161 @@
+﻿@using System.Web
+@using ViewModels
+@model PolicyModifyViewModel
+
+@Html.AntiForgeryToken()
+<style>
+     .form-container {
+        background: #ecfdf5;
+        border: 1px solid #bbf7d0;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+     .form-control,  textarea {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        border: 1px solid #d0d7e2;
+        border-radius: 8px;
+        outline: none;
+        margin-bottom: 12px;
+    }
+
+     textarea {
+        resize: vertical;
+        height: 80px;
+    }
+
+     .btn {
+        padding: 10px 18px;
+        font-size: 14px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+     .btn-green {
+        background: #22c55e;
+        color: white;
+        margin-right: 10px;
+    }
+
+     .btn-gray {
+        background: #4b5563;
+        color: white;}
+        .pending-list li
+
+    {
+        margin: 6px 0;
+    }
+    </style>
+<form id="NewPolicyForm" class="policiesRightSec ">
+    <div class="form-container">
+        <h3>Add New Policy</h3>
+        <input type="hidden" value="@Model.Id" name="Id" id="policy_@Model.Id" />
+
+        <input type="text" class="form-control" placeholder="Enter name" asp-for="Name" />
+       @*  <textarea placeholder="Enter description" class="form-control" asp-for="Description"></textarea> *@
+
+        <!-- Steps UI -->
+        <div class="mb-2">
+            <label class="form-label">Add New Procedure</label>
+            <div class="d-flex">
+                <input id="stepText" type="text" class="form-control" placeholder="Add Procedure" />
+                <button id="addStepBtn" type="button" class="btn btn-outline-secondary ms-2">Add</button>
+            </div>
+            @* <small class="text-muted">Added procedures (you can remove before saving):</small> *@
+            <ul id="pendingStepsList" class="pending-list" style="list-style:none; padding-left:0; margin-top:8px;"></ul>
+
+            <!-- Hidden field to send to server as comma-separated string -->
+            <input type="hidden" id="PolicyStepsHidden" name="PolicySteps" value="" />
+        </div>
+
+        <div class="d-flex align-item-center justify-content-end">
+            <!-- important: class savePolicy so existing settings.js SavePolicy() handler triggers -->
+            <button type="button" class="btn btn-green savePolicy">Add Policy</button>
+            <button type="button" class="btn btn-gray cancelPolicy">Cancel</button>
+        </div>
+    </div>
+</form>
+<!-- Inline script for the partial (you can move to your JS file if preferred) -->
+<script>
+    (function () {
+        let pendingSteps = @Html.Raw(Json.Serialize(Model.PolicySteps ?? new List<string>()));
+
+        function renderPendingList() {
+            const ul = $("#pendingStepsList");
+            ul.empty();
+            if (pendingSteps.length === 0) {
+                ul.append("<li class='text-muted'>No procedures added yet.</li>");
+                return;
+            }
+            pendingSteps.forEach((s, i) => {
+                const encoded = $('<div/>').text(s).html();
+                ul.append(`<li class="d-flex justify-content-between align-items-center">
+                    <span>${encoded}</span>
+                    <button data-index="${i}" type="button" class="btn btn-sm btn-link removePendingStep">Remove</button>
+                </li>`);
+            });
+        }
+
+        // add handler: Add button
+        $(document).off("click", "#addStepBtn");
+        $(document).on("click", "#addStepBtn", function () {
+            const val = $("#stepText").val().trim();
+            if (!val) { /* alert("Enter a procedure name."); */ return; }
+            // avoid duplicate (case-insensitive)
+            if (!pendingSteps.some(s => s.trim().toLowerCase() === val.toLowerCase())) {
+                pendingSteps.push(val);
+            }
+            $("#stepText").val("");
+            renderPendingList();
+        });
+
+        // Enter key adds
+        $(document).off("keypress", "#stepText");
+        $(document).on("keypress", "#stepText", function (e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                $("#addStepBtn").click();
+            }
+        });
+
+        // remove
+        $(document).off("click", ".removePendingStep");
+        $(document).on("click", ".removePendingStep", function () {
+            const idx = $(this).data("index");
+            if (idx >= 0) {
+                pendingSteps.splice(idx, 1);
+                renderPendingList();
+            }
+        });
+
+          $(document).off("click", ".savePolicy");
+    $(document).on("click", ".savePolicy", function (e) {
+        e.preventDefault(); // prevent default just in case
+
+        // Include whatever is currently typed too
+        const typed = $("#stepText").val().trim();
+        if (typed && !pendingSteps.some(s => s.trim().toLowerCase() === typed.toLowerCase())) {
+            pendingSteps.push(typed);
+        }
+
+        // set hidden input value as comma separated
+        $("#PolicyStepsHidden").val(pendingSteps.join(", "));
+
+        // now call the existing SavePolicy() function that sends the form
+        // SavePolicy() is defined in your setting.js so call it directly:
+        if (typeof SavePolicy === "function") {
+            SavePolicy();
+        } else {
+            // fallback: submit the form if SavePolicy() not found
+            $("#NewPolicyForm")[0].submit();
+        }
+    });
+
+        // initial render
+        renderPendingList();
+    })();
+</script>

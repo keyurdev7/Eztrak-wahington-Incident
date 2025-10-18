@@ -1,0 +1,3 @@
+﻿dotnet nuget push -s https://nuget.centangle.com/v3/index.json D:\Programming\Repositories\Microservices\Helpers\RequestHelpers\RequestHelpers\bin\Debug\Centangle.Common.RequestHelpers.1.0.0.nupkg  -k SecrEt@KeyOfOurCompanyC3ntAngle
+
+dotnet nuget delete Centangle.Common.RequestHelpers.1.0.0 -s https://nuget.centangle.com/v3/index.json -k SecrEt@KeyOfOurCompanyC3ntAngle

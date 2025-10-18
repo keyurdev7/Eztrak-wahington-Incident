@@ -1,0 +1,247 @@
+﻿@using Enums
+@using ViewModels
+@model EquipmentShipmentGridViewModel
+@{
+    Layout = null;
+}
+<form action="CreateShipments" method="post" id="save-line-items-form">
+
+    <table class="table" id="subline-table">
+        <thead>@* class="thead-primary" *@
+            <tr>
+                @*<th>Status</th>*@
+                <th>Serial #</th>
+                <th>Supplier</th>
+                <th>Location</th>
+                @* <th>Purchase Date</th> *@
+                <th style="width:15%;">Purchase Price</th>
+                @* <th>Hourly Rate</th> *@
+                <th>Quantity</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.EquipmentShipments != null && Model.EquipmentShipments.Count > 0)
+            {
+                for (int i = 0; i < Model.EquipmentShipments.Count; i++)
+                {
+                    var locationId = "location-id-" + i;
+                    var supplierId = "supplier-id-" + i;
+                    @* var conditionId = "condition-id-" + i; *@
+                    <tr class="subline-table-row">
+                        @*<td style="width: 120px;">
+                <select asp-for="@Model.EquipmentShipments[i].Status" class="form-select"
+                asp-items="@Html.GetEnumSelectList<EquipmentStatusCatalog>()"></select>
+                <span class="validation-invalid-label field-validation-valid" data-valmsg-for="EquipmentShipments[@i].Status" data-valmsg-replace="true"></span>
+                </td>*@
+                        <td style="width:180px;">
+                            <input type="text" class="form-control" name="EquipmentShipments[@i].PONo" data-val="true" data-val-required="The field PO # is required." />
+                            <span class="validation-invalid-label field-validation-valid" data-valmsg-for="EquipmentShipments[@i].PONo" data-valmsg-replace="true"></span>
+                        </td>
+                        <td style="width:180px;">
+                            <partial name="~/Views/Shared/Select2/_Supplier.cshtml" for="@Model.EquipmentShipments[i].Supplier" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", supplierId} }' />
+                        </td>
+
+                        <td style="width:180px;">
+                            <partial name="~/Views/Shared/Select2/_Location.cshtml" for="@Model.EquipmentShipments[i].Location" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", locationId } }' />
+                        </td>
+                        @*            <td style="width: 120px;">
+                <input type="date" class="form-control" name="EquipmentShipments[@i].PurchaseDate" data-val="true" data-val-required="The field Purchase Date is required." />
+                <span class="validation-invalid-label field-validation-valid" data-valmsg-for="EquipmentShipments[@i].PurchaseDate" data-valmsg-replace="true"></span>
+                </td> *@
+                        <td style="width: 120px;">
+                            <input type="text" class="form-control input-currency" name="EquipmentShipments[@i].ItemPrice" data-val="true" data-val-required="The field Cost is required." />
+                            <span class="validation-invalid-label field-validation-valid" data-valmsg-for="EquipmentShipments[@i].ItemPrice" data-valmsg-replace="true"></span>
+                        </td>
+                        @*       <td style="width: 120px;">
+                <input type="text" class="form-control input-currency" name="EquipmentShipments[@i].HourlyRate" data-val="true" data-val-required="The field Hourly Rate is required." />
+                <span class="validation-invalid-label field-validation-valid" data-valmsg-for="EquipmentShipments[@i].HourlyRate" data-valmsg-replace="true"></span>
+                </td> *@
+                        <td style="width: 120px;">
+                            <input type="number" class="form-control" name="EquipmentShipments[@i].Quantity" data-val="true" data-val-required="The field Quantity is required." />
+                            <span class="validation-invalid-label field-validation-valid" data-valmsg-for="EquipmentShipments[@i].Quantity" data-valmsg-replace="true"></span>
+                        </td>
+
+                        <td class="delete-action-container">
+                            @if (i > 0)
+                            {
+                                <a data-id="@i" class="table-link delete-btn" onclick="fnDeleteSublineLineItems(this)"><i class="far fa-trash-alt"></i></a>
+                            }
+                        </td>
+                        <input type="hidden" id="txtInventoryId" class="form-control txtInventoryId" name="EquipmentShipments[@i].EquipmentId" value="@Model.EquipmentShipments[i].EquipmentId" />
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    <div class="d-flex align-items-center mt-2">
+        @if (Model?.EquipmentShipments?.Count() == 1)
+        {
+            <button onclick="AddNewSubLineItems()" class="btn btn-primary me-3" type="button">Add Line Item</button>
+        }
+        <div class="flex-fill"></div>
+        <button type="button" id="save-sublines" class="btn btn-primary me-3">Submit</button>
+    </div>
+</form>
+
+<partial name="~/Views/Shared/Select2/Location/_LocationJs.cshtml" />
+<partial name="~/Views/Shared/Select2/Supplier/_SupplierJs.cshtml" />
+
+<script src="~/js/masking/initiate-masking.js"></script>
+<script src="~/js/custom/crud/ajaxCrud.js"></script>
+
+<script>
+    var lastSelect2Index = @(Model?.EquipmentShipments?.Count - 1);
+    $(function () {
+
+        $("body").off("click", "#save-sublines");
+        $("body").on("click", "#save-sublines", function () {
+            let form = $(this).closest("form");
+            $(form).removeData("validator").removeData("unobtrusiveValidation");
+            $.validator.unobtrusive.parse($(form));
+            if ($(form).valid()) {
+                removeCurrencyMasking();
+                var formData = $(this).closest("form").serialize();
+                CreateSublines(formData);
+                addCurrencyMasking();
+            }
+        });
+    })
+
+    function fnDeleteSublineLineItems(_this) {
+        var rowCnt = $('#subline-table').find("tbody tr").length;
+        if (rowCnt > 1) {
+            if (confirm('Are you sure want to delete ?')) {
+                var row = $(_this).parents('tr');
+                row.remove();
+                RefreshInputIndexes("#subline-table tr", "subline-table-row", "EquipmentShipments");
+
+            }
+        }
+    }
+
+    function RefreshInputIndexes(trSelector, rowPrefix, collectionName) {
+        var rowIndex = 0;
+        $.each($(trSelector), function () {
+            if ($(this).find('input, select').length > 1) {
+                // var id = $(this).attr("id");
+                // if (id != null && id != "") {
+                //     $(this).attr("id", rowPrefix + "-" + rowIndex);
+                // }
+                $.each($(this).find('input, select'), function () {
+                    if ($(this).is('select')) {
+                        if ($(this).attr('name').split(".").length > 2) {
+                            $(this).attr("name", collectionName + "[" + rowIndex + "]." + $(this).attr('name').split(".")[1] + "." + $(this).attr('name').split(".")[2]);
+                        } else {
+                            $(this).attr("name", collectionName + "[" + rowIndex + "]." + $(this).attr('name').split(".")[1]);
+                        }
+                    } else {
+                        if ($(this).attr('name').split(".").length > 2) {
+                            $(this).attr("name", collectionName + "[" + rowIndex + "]." + $(this).attr('name').split(".")[1] + "." + $(this).attr('name').split(".")[2]);
+                        } else {
+                            $(this).attr("name", collectionName + "[" + rowIndex + "]." + $(this).attr('name').split(".")[1]);
+                        }
+                    }
+                });
+                rowIndex++;
+            }
+        });
+    }
+
+    function CreateSublines(data) {
+        //  showAjaxLoader("#bid-container");
+        $.ajax({
+            url: '/Equipment/CreateShipments',
+            type: 'Post',
+            data: data,
+            success: function (res) {
+                if (res.status) {
+                    $("#equipment-shipment-modal").modal("hide");
+                    ReInitializeDataTables();
+                    // hideAjaxLoader("#bid-container");
+                }
+                else {
+                    $.each(res.fieldErrors, function (fieldName, errors) {
+                        var errorContainer = $('[data-valmsg-for="' + fieldName + '"]');
+                        errorContainer.removeClass('field-validation-valid').addClass('field-validation-error');
+                        $(errorContainer).html('<span class="" for="' + fieldName + '">' + errors[0] + '</span>');
+                    });
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr);
+                //  hideAjaxLoader("#bid-container");
+
+            }
+        });
+    }
+    function AddNewSubLineItems() {
+        removeCurrencyMasking();
+        lastSelect2Index = lastSelect2Index + 1;
+        // Clone the row
+        var newRow = $('.subline-table-row').first().clone();
+
+        // Find the table
+        var table = $('#subline-table');
+
+        // Find the current number of rows
+        var index = (table.find('tr').length - 1);
+
+        // Increment the index in the cloned row
+        newRow.find('input, select').each(function () {
+            var nameAttr = $(this).attr('name');
+            if (nameAttr) {
+                $(this).attr('name', nameAttr.replace('[0]', '[' + index + ']'));
+            }
+            // Reset input values and select options to their default states, excluding hidden fields
+            if ($(this).is('input')) {
+                var inputType = $(this).attr('type');
+                if (inputType === 'checkbox' || inputType === 'radio') {
+                    $(this).prop('checked', false);  // Uncheck checkboxes and radio buttons
+                } else if (inputType !== 'hidden') {
+                    $(this).val('');  // Clear other input types (text, number, etc.), excluding hidden fields
+                }
+            } else if ($(this).is('select')) {
+                $(this).prop('selectedIndex', 0);  // Reset select elements to their default option
+            }
+        });
+        newRow.find("[data-valmsg-for^= 'EquipmentShipments[0]']").attr("data-valmsg-for", function (i, oldVal) {
+            return oldVal.replace(/EquipmentShipments\[0\]/, "EquipmentShipments[" + index + "]");
+        });
+
+        // Append the cloned row to the table
+        table.append(newRow);
+        $('#subline-table tr:last').find(".delete-action-container").html('<a class="table-link delete-btn" onclick = "fnDeleteSublineLineItems(this)" > <i class="far fa-trash-alt" > </i></a >')
+        updateSelect2Ids("location", lastSelect2Index);
+        updateSelect2Ids("condition", lastSelect2Index);
+        updateSelect2Ids("supplier", lastSelect2Index);
+        initializeLocationSelect2($("#location-id-" + lastSelect2Index));
+        initializeConditionSelect2($("#condition-id-" + lastSelect2Index));
+        initializeSupplierSelect2($("#supplier-id-" + lastSelect2Index));
+        addCurrencyMasking();
+    }
+    function updateSelect2Ids(name, newIndex) {
+        $('#subline-table tr:last').find(`[id^='${name}-id']`).each(function (index) {
+            let id = "location-id-" + newIndex;
+            $(this).attr('id', `${name}-id-` + newIndex);
+            $(this).removeAttr("data-select2-id");
+            $(this).siblings(".select2.select2-container").remove();
+        });
+    }
+    function initializeLocationSelect2(locationIds) {
+        locationIds.each(function () {
+            let id = "#" + $(this).attr('id');
+            SetLocationSelect2(id);
+        });
+    }
+    function initializeConditionSelect2(conditionIds) {
+        conditionIds.each(function () {
+            SetConditionSelect2("#" + $(this).attr('id'));
+        });
+    }
+    function initializeSupplierSelect2(supplierIds) {
+        supplierIds.each(function () {
+            SetSupplierSelect2("#" + $(this).attr('id'));
+        });
+    }
+</script>

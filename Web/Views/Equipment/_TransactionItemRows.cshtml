@@ -1,0 +1,81 @@
+﻿@using ViewModels
+@model List<EquipmentTransactionDetailViewModel>
+@{
+    Layout = null;
+    var equipmentId = ViewBag.EquipmentId;
+
+}
+
+<div class="container-fluid">
+    <table id="shipment-table-container" class="table table-striped table-bordered">
+        <thead>@* class="thead-primary" *@
+            <tr>
+                <th>PO #</th>
+                <th>Supplier</th>
+                <th>Location</th>
+                @* <th>Purchase Date</th> *@
+                <th>Purchase Price</th>
+                @* <th>Hourly Rate</th> *@
+                <th>Quantity</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Count > 0)
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.PONo  </td>
+                        <td>@item.Supplier.Name </td>
+                        <td>@item.Location.Name </td>
+                        @* <td>@item.PurchaseDate</td> *@
+                        <td>@item.ItemPrice.ToString("C")</td>
+                        @* <td>@item.HourlyRate</td> *@
+                        <td>@item.Quantity</td>
+                        <td>
+                            <a href='#' style="color:black;" class='table-link delete-btn' onClick='ShowEquipmentShipmentHistory("@equipmentId","@item.PONo","@item.Location.Id")'><i title='Item History' class='fas fa-history'></i></a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7">No records found!</td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+
+
+
+<script>function ShowEquipmentShipmentHistory(equipmentId, poNo, locationId) {
+        $.ajax({
+            url: "/Equipment/GetEquipmentIssueHistory",
+            type: "GET",
+            data: { "Id": equipmentId, "poNo": poNo, "locationId": locationId },
+            success: function (data) {
+                if (data) {
+                    $(".modal-title").html($("#transaction-history-modal-title").val());
+                    $("#equipment-shipment-modal-body").empty();
+                    $("#equipment-shipment-modal-body").html(data);
+                    $("#equipment-shipment-modal").modal("show");
+                }
+                else {
+                    SwalErrorAlert("Equipment Transaction History failed to load!");
+                }
+                // $('#ajax-loader').hide();
+            },
+            complete: function () {
+                //refreshequipmentGrid();
+                // $('#ajax-loader').hide();
+            },
+            error: function (r, s, t) {
+                SwalErrorAlert('Equipment Transaction History failed to load!');
+                // $('#ajax-loader').hide();
+            }
+        });
+    }</script>

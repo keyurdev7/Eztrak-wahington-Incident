@@ -1,0 +1,18 @@
+﻿<script>
+    function SetSupplierSelect2(identifier) {
+        let id = identifier;
+        var pageSize = 10;
+        var url = '/Supplier/Select2';
+
+        var dataArray = function (params) {
+            params.page = params.page || 1;
+            return {
+                prefix: params.term,
+                pageSize: pageSize,
+                pageNumber: params.page,
+            };
+        };
+        Select2AutoCompleteAjax(id, url, dataArray, pageSize, "Select Supplier");
+
+    }
+</script>

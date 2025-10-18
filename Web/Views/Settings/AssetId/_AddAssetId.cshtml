@@ -1,0 +1,15 @@
+﻿@using ViewModels
+@model AssetIdModifyViewModel
+
+<form id="NewAssetForm">
+    <div class="list-item addItem" id="saveAssetDiv">
+
+        <input type="hidden" value="@Model.Id" name="Id" id="asset_@Model.Id" />
+
+        <div class="input-container">
+            <input type="text" placeholder="Enter asset..." asp-for="Name" />
+            <button class="btn check saveAsset"><i class="fa-solid fa-check"></i></button>
+            <button class="btn cancel cancelAsset"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+    </div>
+</form>

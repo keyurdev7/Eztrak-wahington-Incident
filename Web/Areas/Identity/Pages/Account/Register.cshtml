@@ -1,0 +1,67 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Areas/Identity/Pages/_LoginLayout.cshtml";
+}
+
+<div class="d-flex justify-content-center row">
+    <div class="col-md-4">
+        <div class="login-box">
+            <div class="login-form">
+                <h2>Register</h2>
+                <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
+                            </div>
+                            <input asp-for="Input.Email" placeholder="E-mail" class="form-control" autocomplete="username" aria-required="true" />
+
+                        </div>
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            </div>
+                            <input asp-for="Input.Password" class="form-control" placeholder="Password" autocomplete="off" aria-required="true" />
+                        </div>
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            </div>
+                            <input asp-for="Input.ConfirmPassword" class="form-control" placeholder="Confirm Password" autocomplete="off" aria-required="true" />
+                        </div>
+                        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            </div>
+                            <input asp-for="Input.Role" class="form-control" placeholder="Role" autocomplete="off" aria-required="true" />
+                        </div>
+                        <span asp-validation-for="Input.Role" class="text-danger"></span>
+                    </div>
+                   
+                    <div class="form-group text-center">
+                        <input id="login-submit" type="submit" class="btn col-md-12" value="Register" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,17 @@
+﻿@model ViewModels.Dashboard.Common.Table.DashboardTableViewModel
+@{
+    Layout = null;
+}
+<div class="card mh-500">
+    <div class="card-header">
+        @Model.Title
+    </div>
+    <div class="card-body dashboard-table-container">
+        <table class="table table-striped table-data-container" id="@Model.Id" data-url="@Model.Url">
+        </table>
+    </div>
+</div>
+
+<script>
+    initializeDashboardTable('@Model.Id');
+</script>

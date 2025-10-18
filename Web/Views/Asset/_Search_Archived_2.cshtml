@@ -1,0 +1,63 @@
+﻿@using ViewModels;
+@model AssetSearchViewModel
+
+@{
+    var assetTypes = ViewBag.AssetTypes as List<AssetTypeDetailViewModel>;
+    var assetTree = ViewBag.AssetTree as List<AssetTypeTreeViewModel>;
+    var index = 0;
+}
+<div class="col-12 col-md-3 col-lg-2">
+    <div class="mb-3 form-group">
+        <input asp-for="Search.value" type="search" class="form-control" placeholder="Keyword" aria-controls="crud-list-table" autocomplete="new-password">
+    </div>
+</div>
+<div class="col-12 col-md-3 col-lg-2">
+    <div class="mb-3 form-group">
+        <partial name="~/Views/Shared/Select2/_AssetType.cshtml" for="AssetType" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "asset-type-search-id"} }' />
+    </div>
+</div>
+<div class="col-12 col-md-3 col-lg-2">
+    <div class="mb-3 form-group">
+        <partial name="~/Views/Shared/Select2/_Manufacturer.cshtml" for="Manufacturer" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "manufacturer-search-id"} }' />
+    </div>
+</div>
+<div class="col-12 col-md-3 col-lg-2">
+    <div class="mb-3 form-group">
+        <partial name="~/Views/Shared/Select2/_Condition.cshtml" for="Condition" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "condition-search-id"} }' />
+    </div>
+</div>
+
+<div class="w-100"></div>
+@* <div class="col-12 col-md-3 col-lg-2">
+    <div class="mb-3 form-group">
+        <partial name="~/Views/Shared/Select2/_MUTCD.cshtml" for="MUTCD" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "mutcd-search-id"} }' />
+    </div>
+</div> *@
+
+@foreach (var assetType in assetTypes.Take(1))
+{
+    var assetTypeLevel1List = assetTree.Where(x => x.Id == assetType.Id).SelectMany(x => x.AssetTypeLevel1);
+    if (assetTypeLevel1List.Count() > 0)
+    {
+        @foreach (var assetTypeLevel1 in assetTypeLevel1List.Select((value, index) => new { Value = value, Index = index }))
+        {
+            <div class="col-12 col-md-3 col-lg-2">
+                <div class="mb-3 form-group">
+                    @* <label class="form-label fw-600">@assetTypeLevel1.Value.Name</label> *@
+                    <select name="AssetTypeLevel2[@assetTypeLevel1.Index]" class="form-select">
+                        <option value="-1">Select @assetTypeLevel1.Value.Name</option>
+                        @foreach (var assetTypeLevel2 in assetTypeLevel1.Value.AssetTypeLevel2)
+                        {
+                            <option value="@assetTypeLevel2.Id">@assetTypeLevel2.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            index++;
+            if (index== 3)
+            {
+                <div class="w-100"></div>
+            }
+        }
+    }
+}

@@ -1,0 +1,103 @@
+﻿@using System.Web
+@using ViewModels.Incident
+@model IncidentViewModel
+
+
+<div class="shadow-sm border border-gray-200 card-body InfoCard">
+    <h6 class="fw-bold mb-3">Incident Details</h6>
+    <div class="row">
+        <label class="form-label">Type of Event<span class="text-danger">*</span></label>
+        <div class="col-md-12">
+            @* <div class="eventType">
+
+                @foreach (var et in Model.incidentDetails.EventTypes)
+                {
+                    var id = "eventType_" + et.Value;
+                    var checkedAttr = Model.incidentDetails.EventTypeIds != null ? (Model.incidentDetails.EventTypeIds.Contains(et.Value) ? "checked" : "") : "";
+                    <div class="form-check form-check-inline eventCheck">
+                        <input class="form-check-input" type="checkbox" id="@id" name="incidentDetails.EventTypeIds"
+                               value="@et.Value" data-val="true" data-val-required="The Event Type field is required." @checkedAttr>
+                                <label class="form-check-label" for="@id">
+                                    @if(!string.IsNullOrEmpty(et.Text))
+                                    {
+                                        var encodedText = et.Text.ToLower();
+                                        @if (encodedText == "water in the main")
+                                        {
+                                            <b>@et.Text</b>   <!-- This will make it bold -->
+                                        }
+                                        else
+                                        {
+                                            @et.Text
+                                        }
+                                    }
+                                    else
+                                    {
+                                        @et.Text
+                                    }
+                                </label>
+                    </div>
+                }
+
+            </div> *@
+            <div class="eventType">
+                @{
+                    var reorderedEvents = Model.incidentDetails.EventTypes
+                    .OrderByDescending(et => et.Text != null && et.Text.ToLower() == "water in the main")
+                    .ToList();
+                }
+
+                @foreach (var et in reorderedEvents)
+                {
+                    var id = "eventType_" + et.Value;
+                    var checkedAttr = Model.incidentDetails.EventTypeIds != null
+                    ? (Model.incidentDetails.EventTypeIds.Contains(et.Value) ? "checked" : "")
+                    : "";
+                    <div class="form-check form-check-inline eventCheck">
+                        <input class="form-check-input" type="checkbox" id="@id" name="incidentDetails.EventTypeIds"
+                               value="@et.Value" data-val="true" data-val-required="The Event Type field is required." @checkedAttr>
+                        <label class="form-check-label" for="@id">
+                            @if (!string.IsNullOrEmpty(et.Text))
+                            {
+                                var encodedText = et.Text.ToLower();
+                                if (encodedText == "water in the main")
+                                {
+                                    <b>@et.Text</b>
+                                }
+                                else
+                                {
+                                    @et.Text
+                                }
+                            }
+                            else
+                            {
+                                @et.Text
+                            }
+                        </label>
+                    </div>
+                }
+            </div>
+
+            <div class="col-md-12">
+                <div class="mb-3">
+                    @{
+                        var checkedAttrOther = Model.incidentDetails.IsOtherEvent ? "checked" : "";
+                    }
+
+                    <input type="radio" id="IsOtherEvent" class="form-check-input" name="incidentDetails.IsOtherEvent" @checkedAttrOther>
+                    <label class="form-check-label" asp-for="incidentDetails.IsOtherEvent">Other</label>
+                </div>
+                <div class="mb-3 OtherEventDetail" style="@(Model.incidentDetails.IsOtherEvent ? "display:block" : "display:none")">
+                    <input type="text" id="OtherEventDetail" class="form-control" asp-for="incidentDetails.OtherEventDetail">
+                </div>
+
+            </div>
+        </div>
+
+
+
+        <div class="d-flex justify-content-end gap-2 mt-3 addIncidentBtns">
+            <button type="button" class="btn btnBack" id="backButtonToAdditionalLoc">Back</button>
+            <button type="button" class="btn btn-primary" id="nextToDescriptionIssue">Next</button>
+        </div>
+    </div>
+</div>

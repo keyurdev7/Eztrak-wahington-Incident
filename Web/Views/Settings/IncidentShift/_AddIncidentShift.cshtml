@@ -1,0 +1,16 @@
+﻿@using ViewModels
+@model IncidentShiftModifyViewModel
+
+<form id="NewIncidentShiftForm">
+    <div class="list-item addItem" id="saveIncidentShiftDiv">
+        <input type="hidden" value="@Model.Id" name="Id" id="IncidentShift_@Model.Id" />
+        <div class="input-container type">
+            <input type="text" placeholder="Enter name" asp-for="Name" />
+            <textarea placeholder="Enter description" asp-for="Description"></textarea>
+            <div class="actions">
+                <button type="button" class="btn check saveIncidentShift"><i class="fa-solid fa-check"></i></button>
+                <button type="button" class="btn cancel cancelIncidentShift"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+    </div>
+</form>

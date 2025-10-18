@@ -1,0 +1,37 @@
+﻿
+@using ViewModels;
+@model List<AssetTypeLevel1DetailViewModel>
+@{
+    Layout = null;
+}
+<style>
+    .asset-type-level-1-title{
+        min-width: 155px;
+    }
+</style>
+@foreach (var item in Model)
+{
+    <div class="col-lg-12">
+        <div class="mb-3 form-group d-flex">
+            <label class="form-label asset-type-level-1-title fw-600">@item.Name</label>
+            @foreach (var l2 in item.AssetTypeLevel2)
+            {
+                var id = $"level-{l2.Id}";
+
+
+                <div class="form-check ms-3">
+                    @if (l2.IsChecked)
+                    {
+                        <input name="@item.Name" attr-level1-id="@item.Id" type="radio" class="form-check-input asset-type-association-radio" id="@id" value="@l2.Id" checked="checked">
+                    }
+                    else
+                    {
+                        <input name="@item.Name" attr-level1-id="@item.Id" type="radio" class="form-check-input asset-type-association-radio" id="@id" value="@l2.Id">
+                    }
+                    <label class="form-check-label" for="@id">@l2.Name</label>
+                </div>
+            }
+            <span asp-validation-for="@item.Name" class="text-danger"></span>
+        </div>
+    </div>
+}

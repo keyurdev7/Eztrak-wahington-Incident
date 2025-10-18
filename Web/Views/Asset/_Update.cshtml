@@ -1,0 +1,108 @@
+﻿@using Enums
+@using ViewModels;
+@model AssetTabsModifyViewModel
+@{
+    Layout = null;
+    var assetId = ViewBag.AssetId;
+    var modifyModel = Model.CrudUpdateViewModel.UpdateModel as AssetModifyViewModel;
+}
+<style>
+    #crudModalPanel .modal-dialog {
+        min-width: 80%;
+    }
+
+ 
+</style>
+
+<div class="row">
+    <div class="col-lg-12 update-nav-container">
+        <!-- Nav pills -->
+        <ul class="nav nav-pills mb-3" id="assetTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="asset-information-tab" data-bs-toggle="pill" data-bs-target="#asset-information" type="button" role="tab" aria-controls="asset-information" aria-selected="true">Information</button>
+            </li>
+
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="asset-details-tab" data-bs-toggle="pill" data-bs-target="#asset-details" type="button" role="tab" aria-controls="asset-details" aria-selected="false">Details</button>
+            </li>
+            @if ((Model.CrudUpdateViewModel.UpdateModel as AssetModifyViewModel).DynamicColumns.Count > 0)
+            {
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="asset-customized-columns-tab" data-bs-toggle="pill" data-bs-target="#asset-customized-columns" type="button" role="tab" aria-controls="asset-customized-columns" aria-selected="false">Customized Columns</button>
+                </li>
+            }
+            <li class="nav-item hide-form-save-btn" role="presentation">
+                <button class="nav-link" id="notes-tab" data-bs-toggle="pill" data-bs-target="#notes" type="button" role="tab" aria-controls="notes" aria-selected="false">Notes</button>
+            </li>
+            <li class="nav-item hide-form-save-btn" role="presentation">
+                <button class="nav-link" id="approval-work-order-history-tab" data-bs-toggle="pill" data-bs-target="#approval-work-order-history" type="button" role="tab" aria-controls="approval-work-order-history" aria-selected="false">Work Order History</button>
+            </li>
+        </ul>
+
+        <!-- Pill content -->
+        <div class="tab-content" id="assetTabContent">
+            <form asp-action="@Model.CrudUpdateViewModel.FormAction" asp-controller="@Model.CrudUpdateViewModel.FormController" enctype="@Model.CrudUpdateViewModel.FormType" id="@Model.CrudUpdateViewModel.FormId">
+                <div class="validation-summary-errors text-danger"></div>
+                <fieldset class="mb-3">
+                    <div class="tab-pane fade show active" id="asset-information" role="tabpanel" aria-labelledby="asset-information-tab">
+                        @await Html.PartialAsync("_UpdateAssetTab", modifyModel)
+
+                    </div>
+                    <div class="tab-pane fade" id="asset-details" role="tabpanel" aria-labelledby="asset-details-tab">
+                        <div class="radio-row row" class="mt-3" id="asset-type-level-radio">
+                        </div>
+                        <div class="col-12 col-sm-12 radio-row">
+                            <div class="mb-3 form-group d-flex">
+                                <label class="form-label asset-type-level-1-title fw-600">Conditions</label>
+                                @foreach (var condition in Model.Conditions)
+                                {
+                                    var id = "condition_" + condition.Id;
+                                    var checkedAttr = condition.Id == modifyModel.Condition.Id ? "checked" : "";
+                                    <div class="form-check ms-3">
+                                        <input name="Condition.Id" type="radio" class="form-check-input" data-val="true" data-val-required="The Condition field is required." @checkedAttr value="@condition.Id" id="@id">
+                                        <label class="form-check-label" for="@id">@condition.Name</label>
+                                    </div>
+                                }
+                            </div>
+                            <span class="validation-invalid-label condition-error-span field-validation-valid" data-valmsg-for="Condition.Id" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="asset-customized-columns" role="tabpanel" aria-labelledby="asset-customized-columns-tab">
+                        <div class="row">
+                            @await Html.PartialAsync("~/Views/AssetCustomFields/_ShowDynamicColumns.cshtml", modifyModel)
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="form-group">
+                    <input type="hidden" id="modal-title" value="@Model.CrudUpdateViewModel.Title" />
+                    <div class="text-center">
+                        <button type="button" onclick="@Model.CrudUpdateViewModel.SubmitOnClick" class="btn btn-lg btn-modal-save form-btn btn-primary" id="submit-btn">Save</button>
+                    </div>
+                </div>
+            </form>
+            <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
+                <div class="row">
+                    @await Html.PartialAsync("_Notes", Model.Notes)
+                </div>
+            </div>
+            <div class="tab-pane fade" id="approval-work-order-history" role="tabpanel" aria-labelledby="approval-work-order-history-tab">
+                <div class="row">
+                    @await Html.PartialAsync("_AssetApprovedWorkHistory", Model.ApprovalWorkOrderHistory)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/views/assets/assets-script.js"></script>
+<script src="~/js/custom/crud/add_asterik_on_required.js"></script>
+<script>
+    $(function () {
+        $('#assetTab button[data-bs-toggle="pill"]').on('shown.bs.tab', function (event) {
+            if ($(event.target).parent().hasClass('hide-form-save-btn')) {
+                $('#submit-btn').hide();
+            } else {
+                $('#submit-btn').show();
+            }
+        });
+    });
+</script>

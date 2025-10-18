@@ -1,0 +1,182 @@
+﻿@using Helpers.Extensions
+@using ViewModels
+@using Enums
+@model WorkOrderModifyStatusViewModel
+
+@{
+    Layout = null;
+    bool isTechnician = User.IsInRole("Technician");
+    var allStatuses = Enum.GetValues(typeof(WOStatusCatalog)).Cast<WOStatusCatalog>();
+    var filteredStatuses = allStatuses;//.Where(status => status > Model.Status);
+    if (isTechnician)
+    {
+        filteredStatuses = filteredStatuses.Where(x => x != WOStatusCatalog.Approved).ToList();
+    }
+    var selectList = new SelectList(filteredStatuses);
+}
+<style>
+    .form-check-input:checked {
+        background-color: gray;
+        border-color: gray;
+    }
+
+    .d-flex {
+        display: flex;
+        align-items: center;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+    }
+
+    .form-check-label {
+        margin-left: 5px;
+        min-width: 75px;
+    }
+
+    .form-check + .form-check {
+        margin-left: 15px;
+    }
+</style>
+@if (Model.Status != WOStatusCatalog.Approved)
+{
+    <form action="UpdateStatus" method="post" id="update-status-form">
+        <div class="row">
+            <div class="col-lg-6 col-sm-12">
+                <div class="mb-3 form-group">
+                    <div class="mb-3 form-group">
+                        <label asp-for="SystemGeneratedId" class="form-label fw-600"></label>
+                        <div>@Model.SystemGeneratedId</div>
+                        <input asp-for="SystemGeneratedId" type="hidden" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-sm-12">
+                <div class="mb-3 form-group">
+                    <label asp-for="Status" class="form-label fw-600">Current Status</label>
+                    <div>@Model.FormattedStatus</div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="mb-3 form-group">
+                    <label asp-for="Status" class="form-label fw-600"></label>
+                    <div id="work-order-status" class="d-flex">
+                        @foreach (var item in allStatuses)
+                        {
+                            <div class="form-check me-3">
+                                <input class="form-check-input" type="radio" asp-for="Status" id="status-@item" name="Status" value="@item">
+                                <label class="form-check-label" for="status-@item">@item.GetDisplayName()</label>
+                            </div>
+                        }
+                    </div>
+                    <span asp-validation-for="Status" class="validation-invalid-label"></span>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="mb-3 form-group">
+                    <label asp-for="Comment" class="form-label fw-600"></label>
+                    <textarea asp-for="Comment" class="form-control" rows="5"></textarea>
+                    <span asp-validation-for="Comment" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-12 image-input-container">
+                <div class="col1-12">
+                    <div class="mb-3 attachment-box">
+                        <label class="form-label fw-600">Images</label>
+                        <input type="file" id="uploadDrawingBtn" multiple name="Images" />
+                    </div>
+                </div>
+                <div class="col-12" id="drawingFileList">
+                    <div class="upload-img-container">
+                    </div>
+                </div>
+                <div class="col-12 m-3" id="drawingFileListDrop" style="width:auto"> Drop your file here for Images.</div>
+            </div>
+            <input type="hidden" asp-for="Id" value="@Model.Id" />
+            <input type="hidden" id="modal-title" value="Update Status">
+
+            <div class="text-center mt-4">
+                <button type="button" id="update-status-btn" class="btn btn-primary me-3">Submit</button>
+            </div>
+        </div>
+    </form>
+}
+<script src="~/js/custom/dropzone.js"></script>
+<script>
+    $(function () {
+        onWorkOrderStatusChanged();
+        $("body").off("change", "#update-status-form input[name='Status']");
+        $("body").on("change", "#update-status-form input[name='Status']", function () {
+            onWorkOrderStatusChanged();
+        });
+
+        $("body").off("click", "#update-status-btn");
+        $("body").on("click", "#update-status-btn", function () {
+            let form = $(this).closest("form");
+            $(form).removeData("validator").removeData("unobtrusiveValidation");
+            $.validator.unobtrusive.parse($(form));
+            if ($(form).valid()) {
+                var formData = $(this).closest("form").serializeFiles();
+                UpdateStatus(formData);
+            }
+        });
+    });
+
+
+    function onWorkOrderStatusChanged() {
+        var selectedValue = $("#update-status-form input[name='Status']:checked").val();
+        if (selectedValue == "@WOStatusCatalog.Approved.ToString()") {
+            $(".image-input-container").show();
+        } else {
+            $(".image-input-container").hide();
+        }
+    }
+
+    function UpdateStatus(data) {
+        swal.fire({
+            title: 'Are you sure?',
+            text: "",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            confirmButtonClass: 'btn btn-success me-2',
+            cancelButtonClass: 'btn btn-danger',
+            buttonsStyling: false
+        }).then(function (result) {
+            if (result.value) {
+                $.ajax({
+                    url: '/WorkOrder/UpdateStatus',
+                    type: 'Post',
+                    data: data,
+                    processData: false,
+                    contentType: false,
+                    success: function (res) {
+                        if (res.Status == true) {
+                            $("#crudModalPanel").modal("hide");
+                            if (typeof dataTableManager !== "undefined" && dataTableManager !== null && dataTableManager.searchDataTable) {
+                                dataTableManager.searchDataTable();
+                            } else {
+                                processAfterUpdateStatus();
+                            }
+                        }
+                        else {
+                            $.each(res.fieldErrors, function (fieldName, errors) {
+                                var errorContainer = $('[data-valmsg-for="' + fieldName + '"]');
+                                errorContainer.removeClass('field-validation-valid').addClass('field-validation-error');
+                                $(errorContainer).html('<span class="" for="' + fieldName + '">' + errors[0] + '</span>');
+                            });
+                        }
+                    },
+                    error: function (xhr) {
+                        console.log(xhr);
+                    }
+                });
+            }
+            else if (result.dismiss === swal.DismissReason.cancel) {
+            }
+        });
+    }
+</script>

@@ -1,0 +1,44 @@
+﻿@model ViewModels.WorkOrderEquipmentModifyViewModel;
+@using Enums;
+@using System.Globalization;
+@{
+    var isDetailPage = ViewData["IsDetailPage"] != null ? bool.Parse(ViewData["IsDetailPage"].ToString()) : false;
+
+    var collectionType = "WorkOrderEquipments";
+    var rowNumber = ViewData["RowNumber"] != null ? int.Parse(ViewData["RowNumber"].ToString()) : 0;
+
+    var rowName = "section-row[" + rowNumber + "]";
+    var rowId = "equipment-section-row-" + rowNumber;
+
+    var equipmentId = collectionType + "[" + rowNumber + "].Equipment.Id";
+    var equipmentDescription = collectionType + "[" + rowNumber + "].Equipment.Description";
+    var quantity = collectionType + "[" + rowNumber + "].Quantity";
+    var hours = collectionType + "[" + rowNumber + "].Hours";
+    var hiddenId = collectionType + "[" + rowNumber + "].Id";
+
+}
+
+<tr class="equipment-section-row" id="@rowId">
+
+    <td>
+        <span style=" text-align: initial !important;">@Model.Equipment.Description</span>
+        <input type="hidden" name="@equipmentId" value="@Model.Equipment.Id" />
+        <input type="hidden" name="@equipmentDescription" value="@Model.Equipment.Description" />
+    </td>
+    <td>
+        <span style="text-align: initial !important;">@Model.Quantity</span>
+        <input type="hidden" name="@quantity" value="@Model.Quantity" />
+    </td>
+    <td>
+        <span style="text-align: initial !important;">@Model.Hours</span>
+        <input type="hidden" name="@hours" value="@Model.Hours" />
+    </td>
+    @if (!isDetailPage)
+    {
+        <td>
+            <a href="javascript:void(0)" class="remove-equipment mx-1 datatable-action btn bg-custom-dark" data-toggle="tooltip" title="Delete Material"><i class="icon-trash"></i></a>
+        </td>
+    }
+
+</tr>
+

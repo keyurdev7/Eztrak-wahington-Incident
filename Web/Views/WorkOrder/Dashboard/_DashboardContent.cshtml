@@ -1,0 +1,239 @@
+﻿@model List<ViewModels.Report.WorkOrder.WorkOrderDashboardViewModel>
+<style>
+    .f-14 {
+        font-size: 14px;
+    }
+
+    /* Style for when item is being dragged */
+    .sortable-ghost {
+        opacity: 0.4;
+        background-color: #f0f0f0;
+    }
+
+    /* Style for when item is being dragged over a valid drop target */
+    .sortable-chosen {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Highlight drop area */
+    .list_cards.highlight {
+        background-color: rgba(0, 0, 0, 0.05);
+        min-height: 100px;
+    }
+</style>
+
+<div class="desk_wrap">
+    <div class="desk">
+        <div class="row desk_list">
+            @foreach (var item in Model)
+            {
+                var columnClass = "column-" + item.Status;
+                var badgeClass = "badge-" + item.Status;
+
+                <div class="col item @columnClass">
+                    <div class="inner">
+                        <div class="block_title">
+                            @item.Status
+                        </div>
+                        <div class="list_cards" data-status="@item.Status">
+                            @foreach (var workOrder in item.WorkOrders)
+                            {
+                                var divId = "work-order-" + workOrder.Id;
+                                var urgencyBackgroundColor = "border-" + workOrder.Urgency;
+                                var urgencyBadgeColor = "bg-" + workOrder.Urgency;
+
+                                <div id="@divId" class="item dash-list" data-id="@workOrder.Id" data-status="@item.Status">
+                                    <div class="card_header">
+                                        <div class="image">
+                                            <img src="@workOrder.ImageUrl">
+                                        </div>
+                                        <div>
+                                            <div class="card_title">
+                                                @workOrder.FormattedTitle
+                                            </div>
+                                            <span class="card_description text-muted f-14">@workOrder.Description</span>
+                                        </div>
+                                    </div>
+                                    <div class="card_footer">
+                                        <div class="tags">
+                                            @workOrder.Number
+                                        </div>
+                                        <div class="time">
+                                            @workOrder.FormattedNeedBy
+                                        </div>
+                                        <div class="author">
+                                            @workOrder.Manager
+                                        </div>
+                                        <div class="label">
+                                            <span class="@workOrder.Urgency.ToString().ToLower()">
+                                                @workOrder.Urgency.ToString()
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Include Sortable.js library before your script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        // Truncate card descriptions and set up tooltips
+        $('.card_description').each(function () {
+            var text = $(this).text();
+            if (text.length > 20) {
+                $(this)
+                    .attr('data-bs-toggle', 'tooltip')
+                    .attr('data-bs-placement', 'top')
+                    .attr('title', text)
+                    .css('cursor', 'pointer');
+
+                // Truncate the visible text with ellipsis
+                var truncatedText = text.substring(0, 20) + '...';
+                $(this).text(truncatedText);
+            }
+        });
+
+        // Initialize all tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Check if Sortable is loaded
+        if (typeof Sortable === 'undefined') {
+            console.error('Sortable library not loaded. Loading it now.');
+            // Try to load it synchronously as a fallback
+            var sortableScript = document.createElement('script');
+            sortableScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js';
+            sortableScript.onload = initSortable;
+            document.head.appendChild(sortableScript);
+        } else {
+            initSortable();
+        }
+    });
+
+    function initSortable() {
+       
+
+        // Setup Sortable on each list_cards container
+        var containers = document.querySelectorAll('.list_cards');
+        var sortables = [];
+
+        containers.forEach(function (container) {
+            var sortable = new Sortable(container, {
+                group: 'workOrders', // Set the same group for all containers to allow drag between them
+                animation: 150,      // Animation speed in ms
+                ghostClass: 'sortable-ghost', // Class for the dropped placeholder
+                chosenClass: 'sortable-chosen', // Class for the dragged item
+                dragClass: 'sortable-drag',    // Class for the dragging item
+                handle: '.card_header', // Drag handle selector within list items
+                filter: '.filtered',    // Selectors that should not be draggable
+
+                // Called when dragging starts
+                onStart: function (evt) {
+                    $('.list_cards').addClass('highlight');
+                },
+
+                // Called when dragging ends
+                onEnd: function (evt) {
+                    $('.list_cards').removeClass('highlight');
+
+                    if (evt.from !== evt.to) {
+                        // Get relevant data
+                        var workOrderId = evt.item.getAttribute('data-id');
+                        var newStatus = evt.to.getAttribute('data-status');
+                        var oldStatus = evt.from.getAttribute('data-status');
+
+                        // Update the data-status attribute on the moved item
+                        evt.item.setAttribute('data-status', newStatus);
+
+                        // Send status update to server
+                        updateWorkOrderStatus(workOrderId, newStatus, oldStatus);
+                    }
+                }
+            });
+
+            sortables.push(sortable);
+        });
+
+        // Function to send status update to the server
+        function updateWorkOrderStatus(workOrderId, newStatus, oldStatus) {
+          
+            $.ajax({
+                url: '/WorkOrder/UpdateStatus',
+                type: 'POST',
+                data: {
+                    Id: workOrderId,
+                    Status: newStatus
+                },
+                success: function (response) {
+                    if (response.Status) {
+                        // Success notification
+                        showToast('Work order status updated successfully', 'success');
+                    } else {
+                        // Error handling - move the item back to the original column
+                        showToast(response.message || 'Failed to update work order status', 'error');
+
+                        // Get all containers
+                        var containers = document.querySelectorAll('.list_cards');
+
+                        // Find the element
+                        var movedElement = document.querySelector(`[data-id="${workOrderId}"]`);
+
+                        // Find the original container
+                        var originalContainer = document.querySelector(`.list_cards[data-status="${oldStatus}"]`);
+
+                        // If element and original container exist, move it back
+                        if (movedElement && originalContainer) {
+                            movedElement.setAttribute('data-status', oldStatus);
+                            originalContainer.appendChild(movedElement);
+                        }
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // Handle server error - move the item back
+                    showToast('Server error occurred', 'error');
+
+                    // Find the element
+                    var movedElement = document.querySelector(`[data-id="${workOrderId}"]`);
+
+                    // Find the original container
+                    var originalContainer = document.querySelector(`.list_cards[data-status="${oldStatus}"]`);
+
+                    // If element and original container exist, move it back
+                    if (movedElement && originalContainer) {
+                        movedElement.setAttribute('data-status', oldStatus);
+                        originalContainer.appendChild(movedElement);
+                    }
+                }
+            });
+        }
+    }
+    
+    var showToast = (message, type) => {
+        // Remove any existing toasts
+        const existingToasts = document.querySelectorAll('.toast-notification');
+        existingToasts.forEach(toast => toast.remove());
+
+        // Create new toast
+        const toast = document.createElement('div');
+        toast.className = `toast-notification toast-${type === 'success' ? 'success' : 'error'}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        // Auto-remove after a delay
+        setTimeout(() => {
+            toast.style.animation = 'fadeOut 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    };
+</script>

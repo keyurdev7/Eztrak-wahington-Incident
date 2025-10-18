@@ -1,0 +1,17 @@
+﻿@using ViewModels
+@using ViewModels.Shared.Notes
+@model List<INotesViewModel>
+
+@{
+    Layout = null;
+    var ssrId = ViewBag.StreetServiceRequestId;
+}
+
+@await Html.PartialAsync("~/Views/Shared/Notes/_NotesPartialView.cshtml", Model, new ViewDataDictionary(ViewData) { { "ParentId", ssrId }, { "ParentName", "StreetServiceRequestId" } })
+
+<script src="~/js/views/notes/notes.js"></script>
+<script>
+    $(function () {
+        notesUrl = "/StreetServiceRequest/SaveNotes";
+    })
+</script>

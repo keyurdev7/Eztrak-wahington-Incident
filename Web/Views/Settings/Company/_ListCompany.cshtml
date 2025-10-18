@@ -1,0 +1,26 @@
+﻿@using System.Web
+@using ViewModels
+@model List<CompanyModifyViewModel>
+
+@if (Model != null && Model.Count > 0)
+{
+    @foreach (var company in Model)
+    {
+        <div class="list-item">
+            <div class="item-info">
+                <strong>@company.Name</strong>
+                <p>@company.Description</p>
+            </div>
+            <div class="actions">
+                <i class="fa-regular fa-edit edit editCompany" id="@company.Id"></i>
+                <i class="far fa-trash-alt delete deleteCompany" id="@company.Id"></i>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="list-item">
+        <span>No company found.</span>
+    </div>
+}

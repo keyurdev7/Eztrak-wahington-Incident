@@ -1,0 +1,177 @@
+﻿@using Enums
+@using ViewModels;
+@model StreetServiceRequestModifyViewModel
+@{
+    Layout = null;
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Name" class="form-label fw-600"></label>
+                    <input asp-for="Name" type="text" class="form-control" />
+                    <span asp-validation-for="Name" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="PhoneNumber" class="form-label fw-600"></label>
+                    <input asp-for="PhoneNumber" type="text" class="form-control" />
+                    <span asp-validation-for="PhoneNumber" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="StreetAddress" class="form-label fw-600"></label>
+                    <input asp-for="StreetAddress" type="text" class="form-control" />
+                    <span asp-validation-for="StreetAddress" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="City" class="form-label fw-600"></label>
+                    <input asp-for="City" type="text" class="form-control" />
+                    <span asp-validation-for="City" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="State" class="form-label fw-600"></label>
+                    <input asp-for="State" type="text" class="form-control" />
+                    <span asp-validation-for="State" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Zip" class="form-label fw-600"></label>
+                    <input asp-for="Zip" type="text" class="form-control" />
+                    <span asp-validation-for="Zip" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Email" class="form-label fw-600"></label>
+                    <input asp-for="Email" type="text" class="form-control" />
+                    <span asp-validation-for="Email" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Subject" class="form-label fw-600"></label>
+                    <input asp-for="Subject" type="text" class="form-control" />
+                    <span asp-validation-for="Subject" class="validation-invalid-label"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="mb-3 form-group">
+                    <input asp-for="CallMe" data-val-ignore="true" id="CallMe" data-val="false" type="checkbox" style="width:40px;" height="40px;" />
+                    <label class="form-label"> Please call me</label>
+                    <span asp-validation-for="CallMe" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="mb-3 form-group">
+                    <input asp-for="EmailMe" data-val-ignore="true" id="EmailMe" type="checkbox" style="width:40px;" height="40px;" />
+                    <label asp-for="EmailMe" class="form-label"></label>
+                    <span asp-validation-for="EmailMe" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="mb-3 form-group">
+                    <input asp-for="NoNeedToContact" data-val-ignore="true" id="NoNeedToContact" type="checkbox" style="width:40px;" height="40px;" />
+                    <label asp-for="NoNeedToContact" class="form-label"></label>
+                    <span asp-validation-for="NoNeedToContact" class="validation-invalid-label"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="form-label fw-600 mb-3">Type of problem:</label>
+
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <input asp-for="SideWalk" data-val-ignore="true" id="SideWalk" type="checkbox" style="width:40px;" height="40px;" />
+                    <label asp-for="SideWalk" class="form-label"></label>
+                    <span asp-validation-for="SideWalk" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <input asp-for="Potholes" data-val-ignore="true" id="Potholes" type="checkbox" style="width:40px;" height="40px;" />
+                    <label asp-for="Potholes" class="form-label"></label>
+                    <span asp-validation-for="Potholes" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <input asp-for="Drainage" data-val-ignore="true" id="Drainage" type="checkbox" style="width:40px;" height="40px;" />
+                    <label asp-for="Drainage" class="form-label"></label>
+                    <span asp-validation-for="Drainage" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <input asp-for="StreetSweeping" data-val-ignore="true" id="StreetSweeping" type="checkbox" style="width:40px;" height="40px;" />
+                    <label asp-for="StreetSweeping" class="form-label"></label>
+                    <span asp-validation-for="StreetSweeping" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <input asp-for="ParkwayTree" data-val-ignore="true" id="ParkwayTree" type="checkbox" style="width:40px;" height="40px;" />
+                    <label asp-for="ParkwayTree" class="form-label"></label>
+                    <span asp-validation-for="ParkwayTree" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <input asp-for="Other" data-val-ignore="true" id="Other" type="checkbox" style="width:40px;" height="40px;" />
+                    <label asp-for="Other" class="form-label"></label>
+                    <span asp-validation-for="Other" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Description" class="form-label fw-600"></label>
+                    <textarea asp-for="Description" class="form-control"></textarea>
+                    <span asp-validation-for="Description" class="validation-invalid-label"></span>
+                </div>
+            </div>
+        </div>
+      @*   <div class="row">
+            <div class="col-lg-12">
+                <div class="mb-3 form-group">
+                    <label asp-for="LocationOfProblem" class="form-label fw-600"></label>
+                    <textarea asp-for="LocationOfProblem" class="form-control"></textarea>
+                    <span asp-validation-for="LocationOfProblem" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="mb-3 form-group">
+                    <label asp-for="DescriptionOfProblem" class="form-label fw-600"></label>
+                    <textarea asp-for="DescriptionOfProblem" class="form-control"></textarea>
+                    <span asp-validation-for="DescriptionOfProblem" class="validation-invalid-label"></span>
+                </div>
+            </div>
+        </div> *@
+        @if ((User.IsInRole("SystemAdministrator") || User.IsInRole("SuperAdministrator")) && Model.Id > 0)
+        {
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="mb-3 form-group">
+                        <label asp-for="Status" class="form-label fw-600"></label>
+                        <select asp-for="Status" class="form-select" asp-items="@Html.GetEnumSelectList<SSRStatus>()">
+                            <option value="">-- Select --</option>
+                        </select>
+                        <span asp-validation-for="Status" class="validation-invalid-label"></span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<input type="hidden" asp-for="Id" />

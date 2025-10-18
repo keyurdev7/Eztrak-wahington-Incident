@@ -1,0 +1,1560 @@
+﻿@using System.Web
+@using ViewModels.Incident
+@model IncidentViewModel
+
+<style>
+    .text-submitted {
+        color: #bfbfbf;
+    }
+
+    .status-unknown {
+        background-color: #0000FFFF;
+    }
+
+    .status-submitted {
+        background-color: #bfbfbf;
+    }
+
+    .status-validated {
+        background-color: #ccffcc;
+    }
+
+    .text-validated {
+        color: #ccffcc;
+        font-weight: 600;
+    }
+
+    .status-dispatched {
+        background-color: #ccffcc;
+    }
+
+    .text-dispatched {
+        color: #ccffcc;
+        font-weight: 600;
+    }
+
+    .status-started {
+        background-color: #66cc66;
+    }
+
+    .text-started {
+        color: #66cc66;
+        font-weight: 600;
+    }
+
+    .status-completed {
+        background-color: #003300;
+    }
+
+    .text-completed {
+        color: #003300;
+        font-weight: 600;
+    }
+
+    .status-cancelled {
+        background-color: #cc0000;
+    }
+
+    .text-cancelled {
+        color: #cc0000;
+        font-weight: 600;
+    }
+
+
+    .badge-low {
+        background-color: limegreen !important;
+        color: #ffffff !important;
+    }
+
+    .badge-medium {
+        background-color: darkorange !important;
+        color: #ffffff !important;
+    }
+
+    .badge-high {
+        background-color: red !important;
+        color: #ffffff !important;
+    }
+
+    .statusFilter {
+        margin-right: 16px;
+    }
+
+    #statusSelect {
+        width: auto;
+    }
+
+    .btn.btn-primary {
+        width: 200px;
+    }
+
+    .form-control.search-input {
+        height: 38px;
+        min-height: 38px;
+    }
+
+    th, td {
+        white-space: nowrap;
+        text-align: left !important;
+    }
+
+    .btnIcon {
+        margin-right: 8px;
+    }
+
+    /* .incident-table {
+            overflow-y: hidden;
+            overflow-x: auto;
+            overflow: visible !important;
+        } */
+    .incident-table.table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .incident-table {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        overflow: auto;
+        min-height: calc(100vh - 280px);
+    }
+
+        .incident-table input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #555;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            vertical-align: middle;
+            margin: 0;
+            outline: none;
+            background-color: #fff;
+            transition: all 0.2s ease-in-out;
+        }
+
+            /* When checked */
+            .incident-table input[type="checkbox"]:checked {
+                background-color: #007bff;
+                border-color: #007bff;
+            }
+
+                /* Tick mark */
+                .incident-table input[type="checkbox"]:checked::after {
+                    content: "";
+                    position: absolute;
+                    left: 5px;
+                    top: 1px;
+                    width: 5px;
+                    height: 10px;
+                    border: solid #fff;
+                    border-width: 0 2px 2px 0;
+                    transform: rotate(45deg);
+                }
+
+        .incident-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .incident-table th, .incident-table td {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 14px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .incident-table th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+
+
+    .customTableDropdown .dropdown-toggle {
+        font-size: 14px;
+        padding: 4px 15px 4px 15px !important;
+        color: #ffffff !important;
+    }
+
+        .customTableDropdown .dropdown-toggle:hover {
+            background-color: transparent !important;
+            border-color: #000000;
+            color: #000000 !important;
+        }
+
+            .customTableDropdown .dropdown-toggle:hover::before {
+                filter: brightness(0) !important;
+            }
+
+        .customTableDropdown .dropdown-toggle::before {
+            display: none;
+            /*    width: 11px;
+                                        filter: brightness(1) !important;
+                                        left: 81% !important;
+                                        rotate: 92deg !important; */
+        }
+
+        .customTableDropdown .dropdown-toggle.status-started::before {
+            left: 71% !important;
+        }
+
+    .eyeIcon {
+        color: #1d4ed8;
+    }
+
+    .noteIcon {
+        color: #15803d;
+    }
+
+    .historyIcon,
+    .validateIcon {
+        color: #7e22ce;
+    }
+
+    .editIcon {
+        color: #f54e00;
+    }
+
+    .map i.fa {
+        color: grey;
+        margin-right: 5px;
+    }
+
+    .date-time-sec p {
+        font-size: 14px;
+        font-weight: 400;
+        margin-bottom: 1px;
+    }
+
+    .AddIncident {
+        margin-left: 16px;
+    }
+
+    .right-sec .btn {
+        width: auto !important;
+    }
+
+        .right-sec .btn i.fa {
+            margin-right: 6px;
+        }
+
+    .incidentFilter {
+        margin-bottom: 20px;
+    }
+
+    .InfoCard {
+        border-radius: 6px;
+        background: #f7f7f7;
+    }
+
+    .CustomTab .nav-link {
+        border: none;
+        color: #2f2f2f !important;
+        border-bottom: none !important;
+        border-radius: 0;
+        text-align: left !important;
+    }
+
+        .CustomTab .nav-link:hover {
+            color: #000 !important;
+            border-bottom: none !important;
+        }
+
+        .CustomTab .nav-link.active {
+            color: #ffffff !important;
+            border-bottom: 1px solid #f54e00 !important;
+            background-color: #f54e00 !important;
+            border-radius: 8px;
+        }
+
+            .CustomTab .nav-link.active i.fa {
+                color: #ffffff !important;
+            }
+
+            .CustomTab .nav-link.active:hover {
+                color: #ffffff !important;
+                border: 1px solid #f54e00 !important;
+            }
+
+    .CustomTab .nav-item {
+        margin-bottom: 8px !important;
+        display: block !important;
+        width: 100% !important;
+    }
+
+    .CustomTab .nav-link .fa {
+        margin-right: 10px !important;
+    }
+
+    .nav-link i.fa {
+        color: #f54e00;
+    }
+
+    .checkBoxTitle {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 15px;
+    }
+
+    .checkBoxTitle {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 15px;
+    }
+
+    #addIncidentModal .form-check-input {
+        width: 20px;
+        height: 20px;
+        margin-right: 8px;
+        margin-top: 0;
+    }
+
+    #addIncidentModal .form-check-label {
+        font-size: 15px;
+    }
+
+    #addIncidentModal .form-label {
+        font-size: 15px;
+        width: 250px;
+    }
+
+    /********************View Incident css***************************/
+    /*   #incidentDetailsModal .badge-status {
+            background-color: #dc3545;
+            font-size: 0.875rem;
+            padding: 0.4rem 0.8rem;
+        }
+
+        #incidentDetailsModal .badge-severity {
+            background-color: #28a745;
+            font-size: 0.875rem;
+            padding: 0.4rem 0.8rem;
+        }
+
+        #incidentDetailsModal .badge-unknown {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        #incidentDetailsModal .badge-yes {
+            background-color: #28a745;
+        }
+
+        #incidentDetailsModal .badge-no {
+            background-color: #c6f6d5;
+            color: #155724;
+        }
+
+        #incidentDetailsModal .asset-badge {
+            background-color: #e5e7eb;
+            color: #374151;
+            margin-right: 0.25rem;
+            font-size: 0.8rem;
+        }
+
+        #incidentDetailsModal .section-title {
+            font-weight: 600;
+            font-size: 19px;
+            margin-bottom: 0.75rem;
+        }
+
+        #incidentDetailsModal .info-label {
+            font-weight: 500;
+        }
+
+        #incidentDetailsModal .card,
+        #noteIncidentModal .card,
+        #historyIncidentModal .card {
+            border-radius: 6px;
+            background: #f7f7f7;
+            margin-bottom: 22px;
+            padding: 16px;
+        }
+
+        .callerInfo i.fa {
+            margin-right: 8px;
+        } */
+    /********************Note Modal Css********************/
+    #noteIncidentModal .card h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    #noteIncidentModal .log-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px;
+    }
+
+    #noteIncidentModal .log-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        font-size: 14px;
+    }
+
+    #noteIncidentModal .log-header {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    #noteIncidentModal .tag {
+        display: inline-block;
+        font-size: 12px;
+        padding: 2px 8px;
+        border-radius: 12px;
+        margin-left: 5px;
+        color: #fff;
+    }
+
+        #noteIncidentModal .tag.system {
+            background: #2563eb;
+        }
+
+        #noteIncidentModal .tag.internal {
+            background: #9ca3af;
+        }
+
+        #noteIncidentModal .tag.external {
+            background: #2563eb; /* blue */
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+    #noteIncidentModal .log-time {
+        font-size: 12px;
+        color: #6b7280;
+        margin-left: 5px;
+        font-weight: 400;
+    }
+
+    #noteIncidentModal .log-text {
+        font-size: 14px;
+        color: #111827;
+        margin-top: 2px;
+    }
+
+    .communication-sec h3 {
+        border-bottom: 1px solid #eeeeee;
+    }
+
+    /* Right Section */
+
+
+    #noteIncidentModal .form-group {
+        margin-bottom: 15px;
+    }
+
+    #noteIncidentModal label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    #noteIncidentModal select, #noteIncidentModal textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    #noteIncidentModal textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    #noteIncidentModal .btn {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 6px;
+        background: #F54E00;
+        color: white;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+        #noteIncidentModal .btn:hover {
+            background: #ff7332;
+        }
+
+    #noteIncidentModal .summary p {
+        margin: 5px 0;
+        font-size: 14px;
+        font-weight: 400;
+    }
+
+        #noteIncidentModal .summary p span {
+            font-weight: bold;
+        }
+
+    #noteIncidentModal .modal-dialog {
+        width: 1200px;
+    }
+
+    .attached i.fa {
+        font-size: 14px;
+        color: purple;
+        margin-left: 4px;
+        margin-right: 4px;
+    }
+
+    .attached {
+        font-size: 12px;
+        font-weight: 400;
+        line-height: normal;
+    }
+
+    .NoteFileUpload {
+        margin-top: 13px;
+    }
+    /**********************history modal css*************************/
+    /* Left timeline */
+
+
+    #historyIncidentModal .timeline h3 {
+        margin-bottom: 20px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    #historyIncidentModal .timeline ul {
+        list-style: none;
+        padding: 0;
+        position: relative;
+    }
+
+        #historyIncidentModal .timeline ul::before {
+            content: '';
+            position: absolute;
+            left: 18px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e5e7eb;
+        }
+
+    #historyIncidentModal .timeline li {
+        position: relative;
+        margin-bottom: 25px;
+        padding-left: 50px;
+    }
+
+        #historyIncidentModal .timeline li:last-child {
+            margin-bottom: 0;
+        }
+
+        #historyIncidentModal .timeline li .icon {
+            position: absolute;
+            left: -2px;
+            top: 0;
+            background: #fff;
+            border-radius: 50%;
+            border: 2px solid #e5e7eb;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+
+
+        #historyIncidentModal .timeline li .title {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        #historyIncidentModal .timeline li .author {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 4px;
+            line-height: normal;
+        }
+
+        #historyIncidentModal .timeline li .desc {
+            font-size: 14px;
+            color: #374151;
+            margin-bottom: 4px;
+            line-height: normal;
+        }
+
+        #historyIncidentModal .timeline li .time {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+    /* Different colors */
+    #historyIncidentModal .blue {
+        color: #3b82f6;
+        border-color: #3b82f6;
+    }
+
+    #historyIncidentModal .yellow {
+        color: #f59e0b;
+        border-color: #f59e0b;
+    }
+
+    #historyIncidentModal .green {
+        color: #10b981;
+        border-color: #10b981;
+    }
+
+    #historyIncidentModal .purple {
+        color: #8b5cf6;
+        border-color: #8b5cf6;
+    }
+
+
+    #historyIncidentModal .card h4 {
+        margin-bottom: 12px;
+        font-size: 16px;
+        font-weight: bold;
+        line-height: normal;
+    }
+
+    #historyIncidentModal .card p {
+        font-size: 14px;
+        margin: 4px 0;
+        display: flex;
+        justify-content: space-between;
+        font-weight: 400;
+    }
+
+    #historyIncidentModal .content .right-sec p {
+        font-size: 12px;
+        margin-bottom: 4px;
+        display: block;
+        font-weight: 400;
+        line-height: normal;
+        text-align: right;
+    }
+
+    .newAddFormSidebar {
+        border-radius: 6px;
+        background: #f7f7f7;
+        margin-bottom: 22px;
+        padding: 16px;
+    }
+
+    #historyIncidentModal .historyModalTable {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    /*
+        .incident-photos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .photo-thumb {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid #ddd;
+        }
+
+            .photo-thumb img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s;
+            }
+
+            .photo-thumb:hover img {
+                transform: scale(1.05);
+            } */
+
+    .file-upload {
+        margin: 12px 0;
+        padding: 10px;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.2s ease;
+        background: #fafafa;
+    }
+
+        .file-upload:hover {
+            border-color: #888;
+        }
+
+        .file-upload label {
+            font-size: 14px;
+            color: #555;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+    .file-preview {
+        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+        .file-preview img {
+            width: 60px;
+            height: 60px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+
+    .btn.btnBack {
+        background: #ffffff;
+        color: #f54e00;
+        width: auto;
+    }
+
+    .addIncidentBtns .btn-primary {
+        width: auto !important;
+    }
+
+    .ValidateIncident {
+        background-color: #16a34a;
+        color: #fff;
+        border-color: #16a34a;
+    }
+
+    .eventCheck {
+        margin-right: 10px;
+        width: 100%;
+        display: block;
+    }
+
+    .Statuslegend {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        font-size: 14px;
+        /* margin-left: 25px; */
+    }
+
+        .Statuslegend .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .Statuslegend .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+    .submitted {
+        background-color: #dc2626;
+    }
+    /* Grey */
+    .dispacthed {
+        background-color: #facc15;
+    }
+    /* Light Green */
+    .started {
+        background-color: #3b82f6;
+    }
+    /* Green */
+    .complete {
+        background-color: #003300;
+    }
+    /* Dark Green */
+    .rejected {
+        background-color: #6b7280;
+    }
+    /* Red */
+    /*****************Header style***************************/
+    .header {
+        background: #ffffff;
+        padding: 16px;
+        box-shadow: 0px 0px 14px #efefef;
+    }
+
+    .logo-section .title h2 {
+        font-weight: 800;
+        font-size: 28px;
+        margin-bottom: 0;
+        line-height: normal;
+        color: #494949;
+    }
+
+    .logo-section .title span {
+        color: darkgrey;
+    }
+
+    .profile .sidebar-account.dropdown-toggle::before {
+        display: none;
+    }
+
+    .icon {
+        position: relative;
+        font-size: 18px;
+        color: #666;
+        cursor: pointer;
+        margin-right: 16px;
+    }
+
+    .notification-dot {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        width: 8px;
+        height: 8px;
+        background-color: red;
+        border-radius: 50%;
+    }
+
+    .profile {
+        width: 34px;
+        height: 34px;
+        background: #f54e00;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+        .profile i.fa {
+            color: #ffffff;
+        }
+
+    .header .logo {
+        background-color: #ededed;
+        color: #f54e00;
+        border-radius: 12px;
+        padding: 10px;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+    }
+
+    .header .dropdown-toggle::before {
+        display: none;
+    }
+    /***********************Validate Modal**********************/
+    #ValidateIncidentModal .modal-header h2 {
+        margin: 0;
+        font-size: 20px;
+        line-height: normal;
+    }
+
+    #ValidateIncidentModal .modal-header .sub-text {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 0;
+    }
+
+    #ValidateIncidentModal .close-btn {
+        position: absolute;
+        top: 16px;
+        right: 20px;
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+    }
+
+    /* Incident Card */
+    #ValidateIncidentModal .incident-card {
+        border: 1px solid #eee;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        padding: 16px;
+        background: #fff;
+    }
+
+
+    .incident-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+        .incident-header h3 {
+            margin: 0;
+            font-size: 18px;
+            line-height: normal;
+        }
+
+    .incident-meta {
+        font-size: 14px;
+        margin: 2px 0;
+        color: #333;
+    }
+
+        .incident-meta .low {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+    .incident-location {
+        font-size: 13px;
+        color: #666;
+    }
+
+    .incident-date {
+        font-size: 13px;
+        color: #666;
+    }
+
+    /* Form Section */
+    .incident-form {
+        margin-top: 16px;
+    }
+
+    #ValidateIncidentModal .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 12px;
+        align-items: end;
+    }
+
+    #ValidateIncidentModal .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+        #ValidateIncidentModal .form-group label {
+            font-size: 15px;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        #ValidateIncidentModal .form-group select,
+        #ValidateIncidentModal .form-group textarea {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        #ValidateIncidentModal .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+    .full-width {
+        margin-top: 12px;
+        width: 100%;
+    }
+
+    /* Buttons */
+    #ValidateIncidentModal .btn-false-alarm {
+        padding: 10px 16px;
+        background: #e95420;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        white-space: nowrap;
+        font-size: 14px;
+    }
+
+    .btn-false-alarm:hover {
+        background: #cf491d;
+    }
+
+    #ValidateIncidentModal .location-preview {
+        background: #f9f9f9;
+        border-radius: 6px;
+        padding: 12px;
+        margin-top: 16px;
+        font-size: 14px;
+    }
+
+        #ValidateIncidentModal .location-preview p {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: normal;
+            margin-bottom: 3px;
+        }
+
+        #ValidateIncidentModal .location-preview a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+            #ValidateIncidentModal .location-preview a:hover {
+                text-decoration: underline;
+            }
+
+    /* Footer */
+    #ValidateIncidentModal .modal-footer {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 20px;
+        border-top: 1px solid #eee;
+        background: #fafafa;
+    }
+
+    #ValidateIncidentModal .btn-cancel {
+        background: #495057;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 16px;
+        cursor: pointer;
+    }
+
+    #ValidateIncidentModal .btn-validate {
+        background: #28a745;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 16px;
+        cursor: pointer;
+    }
+
+        #ValidateIncidentModal .btn-cancel i,
+        #ValidateIncidentModal .btn-validate i {
+            margin-right: 6px;
+        }
+
+    #ValidateIncidentModal .false-alarm-box {
+        background: #fff8f2;
+        border: 1px solid #f5c59d;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 20px 0;
+    }
+
+        #ValidateIncidentModal .false-alarm-box h4 {
+            margin: 0 0 10px;
+            color: #8b3e00;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* Textarea */
+        #ValidateIncidentModal .false-alarm-box textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            border: 1px solid #f5c59d;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            resize: vertical;
+        }
+
+            #ValidateIncidentModal .false-alarm-box textarea:focus {
+                border-color: #e67e22;
+                box-shadow: 0 0 4px rgba(230,126,34,0.3);
+            }
+
+    /* Action Buttons */
+    #ValidateIncidentModal .false-alarm-actions {
+        margin-top: 12px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+        #ValidateIncidentModal .false-alarm-actions button {
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+    /* Button Variants */
+    #ValidateIncidentModal .btn-undo {
+        background: #495057;
+        color: #fff;
+    }
+
+
+    #ValidateIncidentModal .btn-cancel {
+        background: #e57373;
+        color: #fff;
+    }
+
+    a.disabled {
+        pointer-events: none; /* disables clicking */
+        opacity: 0.5; /* faded look */
+        cursor: not-allowed; /* show "not allowed" cursor */
+    }
+
+    /* Hover Effects */
+    .btn-undo:hover {
+        background: #343a40;
+    }
+
+    .btn-confirm:hover {
+        background: #f39c72;
+    }
+
+    .btn-cancel:hover {
+        background: #d9534f;
+    }
+</style>
+<header class="header dashboard-header d-flex align-items-center justify-content-between">
+    <!-- Left section -->
+    <div class="logo-section d-flex align-items-center">
+        <div class="logo"><i class="fa-solid fa-home"></i></div>
+        <div class="title">
+            <h2>Incidents</h2>
+            <span>Track and review incidents quickly</span>
+        </div>
+    </div>
+
+    <!-- Right section -->
+    <div class="right-section d-flex align-items-center">
+
+        <div class="icon">
+            <i class="fa-regular fa-bell"></i>
+            <span class="notification-dot"></span>
+        </div>
+        <a class="icon" href="/Settings"><i class="fa fa-gear"></i></a>
+        <div class="profile">
+            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle pl-3 " id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-user"></i>
+                @* <div class="d-flex flex-column">
+                        <span class="ml-1 user-name menu-text">Account</span>
+                        <span class="ml-1 user-name menu-text"><small>Admin</small></span>
+                    </div> *@
+            </a>
+            <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser3"
+                style="background-color: white;">
+                <li class="dropdown-item">
+                    <a class="nav-link d-flex align-items-center" href="/Identity/Account/Manage/ChangePassword">
+                        <i class="fa fa-lock"></i>
+                        <span class="menu-text">Change Password</span>
+                    </a>
+                </li>
+
+                <li class="dropdown-item">
+                    <a class="nav-link d-flex align-items-center" href="/Identity/Account/Logout">
+                        <i class="fa fa-user"></i>
+                        <span class="menu-text">Log Out</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>
+<div class="container-fluid">
+    <div class="incidentSec">
+
+        <div class="bg-white rounded p-4 shadow-sm border border-gray-200 mb-4 mt-4">
+            <div class="IncidentTopfilter d-flex justify-content-between align-items-center mb-3 ">
+                <div class="left-sec d-flex justify-content-center">
+                    <div class="search-container me-3">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" class="form-control search-input" placeholder="Search incidents..." id="global_search_value">
+                    </div>
+                    <div class="statusFilter">
+                        <select class="form-select" id="statusSelect" placeholder="status">
+                            <option value="" selected>Select Status</option>
+                            @foreach (var item in Model.statusLegends)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="severityFilter">
+                        <select class="form-select" id="severitySelect" placeholder="Severity">
+                            <option value="" selected>Select Severity</option>
+                            @foreach (var item in Model.severityLevels)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="progressFilter" style="display:none">
+                        <select class="form-select" id="progressSelect" placeholder="Progress">
+                            <option value="" selected>All Progress</option>
+                            @foreach (var item in Model.progressLevels)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="right-sec">
+
+                    <a href="#" class="btn btn-primary AddIncident" id="btnAddIncident"><i class="fa fa-plus"></i>Incident</a>
+                    @* <button data-bs-toggle="modal" data-bs-target="#ValidateIncidentModal" class="btn btn-primary ValidateIncident" id="btnValidatedIncident"><i class="fa fa-plus"></i>Validation (0)</button> *@
+                </div>
+
+
+            </div>
+            <div class="Statuslegend">
+
+                @foreach (var item in Model.statusLegends)
+                {
+                    <div class="legend-item"><span class="dot" style="background-color:@item.Group?.Name"></span> @item.Text</div>
+                }
+            </div>
+        </div>
+        <div class="table-responsive incident-table" id="incidentGrid">
+            @await Html.PartialAsync("~/Views/Incidents/_IncidentGrid.cshtml", Model)
+        </div>
+    </div>
+</div>
+<!-- Placeholder where modal will be injected -->
+<div id="incidentAddEditModalContainer"></div>
+<div id="incidentDetailModalContainer"></div>
+<div id="incidentNotesModalContainer"></div>
+<div id="incidentHistoryContainer"></div>
+
+
+<div class="modal fade" id="additionalLocationsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Additional Locations</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="additionalLocationsModalBody">
+                <div class="text-center py-3">
+                    <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="incidentMapContainer">
+</div>
+<div class="modal fade" id="ValidateIncidentModal" tabindex="-1" aria-labelledby="ValidateIncidentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <div class="title">
+                    <h2>Validate Incidents</h2>
+                    <p class="sub-text">Validate 2 selected incidents</p>
+                </div>
+                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close" type="button"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div class="incident-card">
+                    <div class="incident-header">
+                        <div>
+                            <h3>INC-0003</h3>
+                            <p class="incident-meta">Third-Party Damage - <span class="low">Low</span></p>
+                            <p class="incident-location">1380 Service Ave, City, ST 12345</p>
+                        </div>
+                        <div class="incident-date">Sep 08, 2025 02:53 PM</div>
+                    </div>
+
+                    <div class="false-alarm-box">
+                        <h4>Mark as False Alarm</h4>
+                        <textarea placeholder="Explain why this incident is a false alarm..."></textarea>
+
+                        <div class="false-alarm-actions">
+                            <button class="btn-undo"><i class="fa fa-undo"></i> Undo False Alarm</button>
+                            <button class="btn-cancel"><i class="fa fa-times"></i> Cancel Incident</button>
+                        </div>
+                    </div>
+                    <div class="incident-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Confirmed Severity *</label>
+                                <select>
+                                    <option>Select severity</option>
+                                    <option>Low</option>
+                                    <option>Moderate</option>
+                                    <option>High</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Discovery Perimeter *</label>
+                                <select>
+                                    <option>Select radius</option>
+                                    <option>10m</option>
+                                    <option>50m</option>
+                                    <option>100m</option>
+                                </select>
+                            </div>
+                            <button class="btn-false-alarm">Mark as False Alarm</button>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Validation Notes</label>
+                            <textarea placeholder="Add validation notes..."></textarea>
+                        </div>
+                        <div class="location-preview">
+                            <p><i class="fa fa-map-marker-alt"></i> <strong>Location Preview</strong></p>
+                            <p>1380 Service Ave, City, ST 12345</p>
+                            <a href="#">View on Map</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="incident-card">
+                    <div class="incident-header">
+                        <div>
+                            <h3>INC-0003</h3>
+                            <p class="incident-meta">Third-Party Damage - <span class="low">Low</span></p>
+                            <p class="incident-location">1380 Service Ave, City, ST 12345</p>
+                        </div>
+                        <div class="incident-date">Sep 08, 2025 02:53 PM</div>
+                    </div>
+                    <div class="incident-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Confirmed Severity *</label>
+                                <select>
+                                    <option>Select severity</option>
+                                    <option>Low</option>
+                                    <option>Moderate</option>
+                                    <option>High</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Discovery Perimeter *</label>
+                                <select>
+                                    <option>Select radius</option>
+                                    <option>10m</option>
+                                    <option>50m</option>
+                                    <option>100m</option>
+                                </select>
+                            </div>
+                            <button class="btn-false-alarm">Mark as False Alarm</button>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Validation Notes</label>
+                            <textarea placeholder="Add validation notes..."></textarea>
+                        </div>
+                        <div class="location-preview">
+                            <p><i class="fa fa-map-marker-alt"></i> <strong>Location Preview</strong></p>
+                            <p>1380 Service Ave, City, ST 12345</p>
+                            <a href="#">View on Map</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button class="btn-cancel" type="button" data-bs-dismiss="modal"><i class="fa fa-times"></i> Cancel</button>
+                <button class="btn-validate" type="button"><i class="fa fa-check"></i> Validate Selected</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/custom/loader/loader.js"></script>
+<script src="~/js/masking/initiate-masking.js"></script>
+<script src="~/js/views/incident/incidentform.js"></script>
+<script>
+    (function () {
+        async function loadAdditionalLocations(incidentId) {
+            const url = `/Incidents/GetAdditionalLocations?incidentId=${incidentId}`;
+            const modalBody = document.getElementById('additionalLocationsModalBody');
+
+            modalBody.innerHTML = '<div class="text-center py-3"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+
+            try {
+                const resp = await fetch(url, {
+                    method: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                if (!resp.ok) {
+                    modalBody.innerHTML = '<div class="alert alert-danger">Failed to load additional locations.</div>';
+                    return;
+                }
+
+                const html = await resp.text();
+                modalBody.innerHTML = html;
+
+                var modalEl = document.getElementById('additionalLocationsModal');
+                var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                modal.show();
+            } catch (err) {
+                modalBody.innerHTML = '<div class="alert alert-danger">An error occurred while loading.</div>';
+                console.error(err);
+            }
+        }
+
+        document.addEventListener('click', function (e) {
+            var anchor = e.target.closest && e.target.closest('.more-locations-link');
+            if (anchor) {
+                var incidentId = anchor.getAttribute('data-incident-id');
+                if (incidentId) loadAdditionalLocations(incidentId);
+            }
+        });
+    })();
+</script>
+
+<link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/light/main.css">
+<script src="https://js.arcgis.com/4.27/"></script>
+
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+               const photoInput1 = document.getElementById('photoInput1');
+        const photoPreview = document.getElementById('photoPreview1');
+
+        photoInput1.addEventListener('change', function() {
+          const file = this.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              photoPreview.src = e.target.result;
+              photoPreview.classList.remove('d-none');
+            }
+            reader.readAsDataURL(file);
+          } else {
+            photoPreview.src = "";
+            photoPreview.classList.add('d-none');
+          }
+        });
+
+        const eventSelect = document.getElementById('eventTypeId');
+
+        const eventSections  = {
+            gas: document.getElementById('gasOptions'),
+            equipment: document.getElementById('equipmentOptions'),
+            thirdparty: document.getElementById('thirdpartyOptions'),
+            natural: document.getElementById('naturalOptions'),
+            other: document.getElementById('otherInputWrapper')
+        };
+
+        eventSelect.addEventListener('change', function () {
+            // hide all first
+            Object.values(eventSections).forEach(sec => sec.classList.add('d-none'));
+
+            // show selected
+            const selected = this.value;
+            if (eventSections[selected]) {
+                eventSections[selected].classList.remove('d-none');
+            }
+        });
+
+        const severitySelect  = document.getElementById('severity');
+
+        const severitySections  = {
+          moderate: document.getElementById('moderateOptions'),
+          low: document.getElementById('lowOptions'),
+          high: document.getElementById('highOptions'),
+
+        };
+
+        severitySelect.addEventListener('change', function () {
+          // hide all sections first
+          Object.values(severitySections).forEach(sec => sec.classList.add('d-none'));
+
+          // show the relevant one
+          const selected = this.value;
+          if (severitySections[selected]) {
+            severitySections[selected].classList.remove('d-none');
+          }
+        });
+
+        //   const photoInput = document.getElementById('photoInput');
+        // const photoPreview = document.getElementById('photoPreview');
+
+        photoInput.addEventListener('change', function() {
+          const file = this.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              photoPreview.src = e.target.result;
+              photoPreview.classList.remove('d-none');
+            }
+            reader.readAsDataURL(file);
+          } else {
+            photoPreview.src = "";
+            photoPreview.classList.add('d-none');
+          }
+        });
+             // ✅ Dynamic Incident View Loader
+
+         $('#historyIncidentModal').on('shown.bs.modal', function () {
+          $(this).find('.modal-dialog').css('max-width', '1200px');
+        });
+         $('#addIncidentModal').on('shown.bs.modal', function () {
+          $(this).find('.modal-dialog').css('max-width', '1200px');
+        });
+       $('#incidentDetailsModal').on('shown.bs.modal', function () {
+         $(this).find('.modal-dialog').css('max-width', '1200px');
+       });
+         $('#noteIncidentModal').on('shown.bs.modal', function () {
+          $(this).find('.modal-dialog').css('max-width', '1200px');
+        });
+
+
+
+
+    function removeImage() {
+      imageUpload.value = "";
+      fileName.textContent = "No file chosen";
+      preview.innerHTML = "";
+      removeBtn.style.display = "none";
+    }
+
+        });
+
+        async function OpenIncidentMap(id) {
+            try {
+                let payload = { id: id };
+
+                showLoader($(".main-content"));
+
+                const url = `/Incidents/GetIncidentMapDetailsbyId?id=${id}`;
+
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Accept": "text/html"
+                    }
+                });
+
+                if (!response.ok) throw new Error("Failed to load incident map");
+
+                const content = await response.text();
+                $("#incidentMapContainer").empty().html(content); // 👈 replace with your target div
+                $("#MapIncidentModal").modal("show");
+
+            } catch (error) {
+                console.error("Error loading incident map:", error);
+            } finally {
+                hideLoader($(".main-content"));
+            }
+        }
+</script>
+

@@ -1,0 +1,96 @@
+﻿@model ViewModels.CRUD.TabViewModel
+@{
+    ViewBag.Title = "Inventories";
+}
+<style>
+
+    /*
+        .btn-modal-save:hover {
+            color: grey !important;
+            border-color: grey !important;
+            background-color: white !important;
+        }
+     */
+    .custom-badge.Complete, .custom-badge.Delivered {
+        background-color: green;
+    }
+
+    .custom-badge.Submitted {
+        background-color: red;
+    }
+
+    /*
+            #shipment-table .thead-primary th, #subline-table .thead-primary th, #shipment-table-container.table .thead-primary th, table .thead-primary th, .issue-material-table .thead-primary th, #reservation-table .thead-primary th {
+                background: grey !important;
+                color: white !important;
+            } */
+
+    .staging-page .box-option:hover {
+        background-color: grey !important;
+    }
+
+    /*  .btn-site-primary {
+            border-color: grey !important;
+            background-color: grey !important;
+            color: #f8f9fa !important;
+        }
+
+            .btn-site-primary:hover {
+                border-color: grey !important;
+                background-color: #fff !important;
+                color: grey !important;
+            }
+
+        .btn-primary {
+            border-color: grey !important;
+            background-color: grey !important;
+        }
+
+        .footer-logo img, .navbar-brand img {
+            background: #f8f9fa !important;
+        } */
+
+
+
+    .total-price {
+        color: grey !important;
+    }
+</style>
+@await Html.PartialAsync("~/Views/Shared/Crud/Tabs/_Tabs.cshtml", Model)
+<script src="~/js/bundles/datatable.js"></script>
+<script src="~/js/bundles/datatable-buttons.js"></script>
+<script src="~/js/custom/loader/loader.js"></script>
+@* <script src="~/js/bundles/custom-datatable.js"></script> *@
+<script src="~/js/custom/datatable/auto-datatable.js" asp-append-version="true"></script>
+
+<script>
+    class InventoryDataTableManager extends DataTableManager {
+        // Override the afterDataCallBack function with a custom implementation
+        afterDataCallBack(response) {
+            appendTotal(response);
+        }
+    }
+
+    class EquipmentDataTableManager extends DataTableManager {
+        // Override the afterDataCallBack function with a custom implementation
+        afterDataCallBack(response) {
+            appendTotal(response);
+        }
+    }
+    function appendTotal(response) {
+        $("#crud-list-table_wrapper .dataTables_scroll .total-row").remove();
+        $("#crud-list-table_wrapper .dataTables_scroll").append(
+            `<div class="total-row d-flex justify-content-end">
+                                Total Inventory: <span id="inventory-total-price">${response.AdditionalData.TotalPrice}</span>
+                            </div>`
+        );
+    }
+</script>
+@section Scripts {
+    <script>
+
+        function afterTabLoad() {
+            // ReInitializeDataTables();
+        }
+    </script>
+}

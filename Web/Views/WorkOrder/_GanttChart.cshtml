@@ -1,0 +1,327 @@
+﻿@model ViewModels.WorkOrderGanttChartViewModel
+@{
+    Layout = null;
+
+    // Calculate date ranges for the Gantt chart
+    var today = DateTime.Today;
+    var startDate = today.AddDays(-30); // Start from 30 days ago
+    var endDate = today.AddDays(60);    // End 60 days in the future
+
+    // Create month ranges
+    var months = new List<(string Name, DateTime Start, DateTime End)>();
+    var currentDate = new DateTime(startDate.Year, startDate.Month, 1);
+
+    while (currentDate < endDate)
+    {
+        var monthEnd = currentDate.AddMonths(1).AddDays(-1);
+        months.Add((currentDate.ToString("MMMM"), currentDate, monthEnd));
+        currentDate = currentDate.AddMonths(1);
+    }
+
+    // Create date ranges (10-day periods)
+    var dateRanges = new List<(DateTime Start, DateTime End)>();
+    currentDate = startDate;
+
+    while (currentDate < endDate)
+    {
+        var rangeEnd = currentDate.AddDays(9);
+        dateRanges.Add((currentDate, rangeEnd));
+        currentDate = currentDate.AddDays(10);
+    }
+
+    // Helper function to calculate position percentage
+    Func<DateTime, double> getPositionPercentage = (date) =>
+    {
+        var totalDays = (endDate - startDate).TotalDays;
+        var daysSinceStart = (date - startDate).TotalDays;
+        return (daysSinceStart / totalDays) * 100;
+    };
+}
+
+<div class="gantt-container">
+    <!-- Month Headers -->
+    <div class="month-row">
+        @foreach (var month in months)
+        {
+            var widthPercentage = ((month.End - month.Start).TotalDays + 1) / (endDate - startDate).TotalDays * 100;
+            <div class="month-header" style="width: @widthPercentage%;">@month.Name</div>
+        }
+    </div>
+
+    <!-- Date Range Row -->
+    <div class="date-range-row">
+        @foreach (var range in dateRanges)
+        {
+            var widthPercentage = (range.End - range.Start).TotalDays / (endDate - startDate).TotalDays * 100;
+            <div class="date-range" style="width: @widthPercentage%;">
+                @range.Start.ToString("dd/MM") - @range.End.ToString("dd/MM")
+            </div>
+        }
+    </div>
+
+    <!-- Today marker -->
+    <div class="today-marker" style="left: @getPositionPercentage(today)%;"></div>
+
+    <!-- Dynamically generate sections based on status groups -->
+    @{
+        var statusGroups = Model.WorkOrders
+        .GroupBy(wo => wo.Status)
+        .OrderBy(g => g.Key)
+        .ToList();
+
+        var statusClasses = new Dictionary<string, string>
+    {
+    { "Open", "open" },
+    { "Working", "working" },
+    { "Complete", "complete" },
+    { "OnHold", "onhold" }
+    };
+    }
+
+    @foreach (var statusGroup in statusGroups)
+    {
+        var status = statusGroup.Key;
+        var statusClass = statusClasses.ContainsKey(status) ? statusClasses[status] : status.ToLower();
+
+        <div class="status-section @(statusClass)-section">
+            <div class="task-status">
+                <div class="status-label">
+                    <span class="status-dot @(statusClass)-dot"></span>
+                    <span class="status-text">@status</span>
+                </div>
+            </div>
+
+            <div class="task-container" id="@(statusClass)-tasks">
+                <div class="timeline-grid">
+                    @foreach (var workOrder in statusGroup)
+                    {
+                        @foreach (var task in workOrder.WorkOrders)
+                        {
+                            var startPos = getPositionPercentage(task.CreatedOn);
+                            var endPos = task.NeedBy.HasValue && task.NeedBy.Value != DateTime.MinValue
+                            ? getPositionPercentage(task.NeedBy.Value)
+                            : startPos + 10; // Default width if no need-by date
+
+                            var leftPos = startPos; // Always start from creation date
+                            var width = Math.Abs(endPos - startPos);
+
+                            // Add data attributes for overlap detection
+                            <div class="gantt-card"
+                                 data-id="@task.Id"
+                                 data-start="@startPos"
+                                 data-end="@endPos"
+                                 data-row="0"
+                                 data-cycle-index="0"
+                                 style="left: @leftPos%; width: @width%;">
+                                <div class="badge badge-primary card-controls">
+                                    @workOrder.WorkOrders.Count()
+                                </div>
+
+                                <div class="header">
+                                    <div class="icon">
+                                        @if (!string.IsNullOrEmpty(task.ImageUrl))
+                                        {
+                                            <img src="@task.ImageUrl" alt="Task Icon">
+                                        }
+                                        else
+                                        {
+                                            <img src="/api/placeholder/48/48" alt="Default Icon">
+                                        }
+                                    </div>
+                                    <h5 class="title">@task.FormattedTitle</h5>
+                                </div>
+
+                                <p class="description">@task.Description</p>
+
+                                <div class="details">
+                                    Created: @task.CreatedOn.ToString("MM/dd/yyyy"),
+                                    @if (task.NeedBy.HasValue && task.NeedBy.Value != DateTime.MinValue)
+                                    {
+                                        <span>Due: @task.FormattedNeedBy, </span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(task.WorkStep))
+                                    {
+                                        <span>Step: @task.WorkStep, </span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(task.Manager))
+                                    {
+                                        <span>Manager: @task.Manager, </span>
+                                    }
+                                    #@task.Number
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .gantt-container {
+        position: relative;
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .month-row, .date-range-row {
+        display: flex;
+        width: 100%;
+    }
+
+    .month-header, .date-range {
+        text-align: center;
+        padding: 8px;
+        border-right: 1px solid #ddd;
+    }
+
+    .today-marker {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background-color: red;
+        z-index: 10;
+    }
+
+    .status-section {
+        margin-bottom: 20px;
+    }
+
+    .task-status {
+        margin-bottom: 10px;
+    }
+
+    .status-label {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0;
+    }
+
+    .status-dot {
+        height: 12px;
+        width: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+
+    .open-dot {
+        background-color: red;
+    }
+
+    .working-dot {
+        background-color: #009900;
+    }
+
+    .complete-dot {
+        background-color: #530199;
+    }
+
+    .onhold-dot {
+        background-color: #d5b564;
+    }
+
+    .task-container {
+        position: relative;
+        min-height: 150px;
+        padding: 15px;
+    }
+
+    .timeline-grid {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .gantt-card {
+        position: absolute;
+        background-color: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        min-height: 80px;
+        overflow: hidden;
+        z-index: 2;
+        transition: all 0.3s ease;
+        height: 120px;
+        width: 350px !important;
+        cursor: pointer;
+    }
+
+        .gantt-card.top-card {
+            z-index: 5;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+    .card-controls {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        align-items: center;
+        background: #F44336;
+        border-radius: 50%;
+    }
+
+    .recycle-btn {
+        cursor: pointer;
+        color: #718096;
+        transition: color 0.2s;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .recycle-btn:hover {
+            color: #4a5568;
+        }
+
+        .recycle-btn i {
+            font-size: 14px;
+        }
+
+    .header {
+        display: flex;
+        align-items: center;
+    }
+
+    .icon {
+        margin-right: 8px;
+    }
+
+        .icon img {
+            width: 24px;
+            height: 24px;
+        }
+
+    .title {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .description {
+        font-size: 0.875rem;
+        margin-bottom: 8px;
+    }
+
+    .details {
+        font-size: 0.75rem;
+        color: #718096;
+    }
+
+    .stacked-card {
+        transform-origin: top left;
+        transition: all 0.3s ease;
+    }
+
+    .overlapping {
+        border: 2px dashed #fc8181;
+    }
+</style>
+
+<!-- Add FontAwesome CSS (add this to your layout if not already included) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">

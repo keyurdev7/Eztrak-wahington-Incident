@@ -1,0 +1,221 @@
+﻿@using System.Web
+@using ViewModels.Incident
+@model IncidentViewModel
+
+
+<div class="shadow-sm border border-gray-200 card-body InfoCard">
+    <h6 class="fw-bold mb-3">Environmental / Safety Indicators</h6>
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="mb-3 d-flex align-items-center justify-content-start indicators">
+                <label class="form-label d-block">Is Water Present</label>
+                <div class="selectRadio">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.WaterPresentID"
+                               id="WaterPresentYes" value="1" asp-for="incidentEnvironmentalViewModel.WaterPresentID">
+                        <label class="form-check-label" for="WaterPresentYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        @if (Model.Id > 0)
+                        {
+                            <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.WaterPresentID"
+                                   id="WaterPresentNo" value="0" asp-for="incidentEnvironmentalViewModel.WaterPresentID">
+                        }
+                        else
+                        {
+                            <input class="form-check-input" type="radio" checked name="incidentEnvironmentalViewModel.WaterPresentID"
+                                   id="WaterPresentNo" value="0" asp-for="incidentEnvironmentalViewModel.WaterPresentID">
+                        }
+                        <label class="form-check-label" for="WaterPresentNo">No</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.WaterPresentID"
+                               id="WaterPresentUnknown" value="2" asp-for="incidentEnvironmentalViewModel.WaterPresentID">
+                        <label class="form-check-label" for="WaterPresentUnknown">N/A</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="mb-3 d-flex align-items-center justify-content-start indicators">
+                <label class="form-label d-block">Is gas odor present?</label>
+                <div class="selectRadio">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.GasodorpresentID"
+                               id="gasOdorYes" value="1" asp-for="incidentEnvironmentalViewModel.GasodorpresentID">
+                        <label class="form-check-label" for="gasOdorYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+
+                        @if (Model.Id > 0)
+                        {
+                            <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.GasodorpresentID"
+                                   id="gasOdorNo" value="0" asp-for="incidentEnvironmentalViewModel.GasodorpresentID">
+                        }
+                        else
+                        {
+                            <input class="form-check-input" type="radio" checked name="incidentEnvironmentalViewModel.GasodorpresentID"
+                                   id="gasOdorNo" value="0" asp-for="incidentEnvironmentalViewModel.GasodorpresentID">
+                        }
+                       
+                        <label class="form-check-label" for="gasOdorNo">No</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.GasodorpresentID"
+                               id="gasOdorUnknown" value="2" asp-for="incidentEnvironmentalViewModel.GasodorpresentID">
+                        <label class="form-check-label" for="gasOdorUnknown">N/A</label>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="mb-3 d-flex align-items-center justify-content-start indicators">
+                <label class="form-label d-block">Is hissing sound present?</label>
+                <div class="selectRadio">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.HissingSoundPresentID"
+                               id="hissingYes" value="1" asp-for="incidentEnvironmentalViewModel.HissingSoundPresentID">
+                        <label class="form-check-label" for="hissingYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+
+                        @if (Model.Id > 0)
+                        {
+                            <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.HissingSoundPresentID"
+                                   id="hissingNo" value="0" asp-for="incidentEnvironmentalViewModel.HissingSoundPresentID">
+                        }
+                        else
+                        {
+                            <input class="form-check-input" type="radio" checked name="incidentEnvironmentalViewModel.HissingSoundPresentID"
+                                   id="hissingNo" value="0" asp-for="incidentEnvironmentalViewModel.HissingSoundPresentID">
+                        }
+                       
+                        <label class="form-check-label" for="hissingNo">No</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.HissingSoundPresentID"
+                               id="hissingUnknown" value="2" asp-for="incidentEnvironmentalViewModel.HissingSoundPresentID">
+                        <label class="form-check-label" for="hissingUnknown">N/A</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="mb-3 d-flex align-items-center justify-content-start indicators">
+                <label class="form-label d-block">Is visible damage/fire present?</label>
+                <div class="selectRadio">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.VisibleDamageID" id="damageYes" value="1" asp-for="incidentEnvironmentalViewModel.VisibleDamageID">
+                        <label class="form-check-label" for="damageYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        @if (Model.Id > 0)
+                        {
+                            <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.VisibleDamageID" id="damageNo" value="0" asp-for="incidentEnvironmentalViewModel.VisibleDamageID">
+                        }
+                        else
+                        {
+                            <input class="form-check-input" type="radio" checked name="incidentEnvironmentalViewModel.VisibleDamageID" id="damageNo" value="0" asp-for="incidentEnvironmentalViewModel.VisibleDamageID">
+                        }
+                        <label class="form-check-label" for="damageNo">No</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.VisibleDamageID" id="damageUnknown" value="2" asp-for="incidentEnvironmentalViewModel.VisibleDamageID">
+                        <label class="form-check-label" for="damageUnknown">N/A</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="mb-3 d-flex align-items-center justify-content-start indicators">
+                <label class="form-label d-block">Are people injured?</label>
+                <div class="selectRadio">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.PeopleInjuredID" id="injuredYes" value="1" asp-for="incidentEnvironmentalViewModel.PeopleInjuredID">
+                        <label class="form-check-label" for="injuredYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        @if (Model.Id > 0)
+                        {
+                            <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.PeopleInjuredID" id="injuredNo" value="0" asp-for="incidentEnvironmentalViewModel.PeopleInjuredID">
+                        }
+                        else
+                        {
+                            <input class="form-check-input" type="radio" checked name="incidentEnvironmentalViewModel.PeopleInjuredID" id="injuredNo" value="0" asp-for="incidentEnvironmentalViewModel.PeopleInjuredID">
+                        }
+                        <label class="form-check-label" for="injuredNo">No</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.PeopleInjuredID" id="injuredUnknown" value="2" asp-for="incidentEnvironmentalViewModel.PeopleInjuredID">
+                        <label class="form-check-label" for="injuredUnknown">N/A</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="mb-3 d-flex align-items-center justify-content-start indicators">
+                <label class="form-label d-block">Evacuation Required?</label>
+                <div class="selectRadio">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.EvacuationRequiredID" id="evacYes" value="1" asp-for="incidentEnvironmentalViewModel.EvacuationRequiredID">
+                        <label class="form-check-label" for="evacYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        @if (Model.Id > 0)
+                        {
+                            <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.EvacuationRequiredID" id="evacNo" value="0" asp-for="incidentEnvironmentalViewModel.EvacuationRequiredID">
+                        }
+                        else
+                        {
+                            <input class="form-check-input" type="radio" checked name="incidentEnvironmentalViewModel.EvacuationRequiredID" id="evacNo" value="0" asp-for="incidentEnvironmentalViewModel.EvacuationRequiredID">
+                        }
+                        <label class="form-check-label" for="evacNo">No</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.EvacuationRequiredID" id="evacUnknown" value="2" asp-for="incidentEnvironmentalViewModel.EvacuationRequiredID">
+                        <label class="form-check-label" for="evacUnknown">N/A</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="mb-3 d-flex align-items-center justify-content-start indicators">
+                <label class="form-label d-block">Emergency Response Notified?</label>
+                <div class="selectRadio">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.EmergencyResponseNotifiedID" id="evacYes" value="1" asp-for="incidentEnvironmentalViewModel.EmergencyResponseNotifiedID">
+                        <label class="form-check-label" for="evacYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        @if (Model.Id > 0)
+                        {
+                            <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.EmergencyResponseNotifiedID" id="evacNo" value="0" asp-for="incidentEnvironmentalViewModel.EmergencyResponseNotifiedID">
+                        }
+                        else
+                        {
+                            <input class="form-check-input" type="radio" checked name="incidentEnvironmentalViewModel.EmergencyResponseNotifiedID" id="evacNo" value="0" asp-for="incidentEnvironmentalViewModel.EmergencyResponseNotifiedID">
+                        }
+                        <label class="form-check-label" for="evacNo">No</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.EmergencyResponseNotifiedID" id="evacUnknown" value="2" asp-for="incidentEnvironmentalViewModel.EmergencyResponseNotifiedID">
+                        <label class="form-check-label" for="evacUnknown">N/A</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="d-flex justify-content-end gap-2 mt-3 addIncidentBtns">
+      @*   <button type="button" class="btn btnBack" id="backButtonToSeverity">Back</button>
+        <button type="button" class="btn btn-primary" id="nextToSupportInfo">Next</button> *@
+
+        <button type="button" class="btn btnBack" id="backButtonToDescription">Back</button>
+        <button type="button" class="btn btn-primary" id="nextToSupportInfo">Next</button>
+
+    </div>
+</div>

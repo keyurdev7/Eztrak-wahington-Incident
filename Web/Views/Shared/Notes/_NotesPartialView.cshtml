@@ -1,0 +1,34 @@
+﻿@using ViewModels.Shared.Notes
+@model List<INotesViewModel>
+
+@{
+    var parentId = ViewData["ParentId"] != null ? long.Parse(ViewData["ParentId"].ToString()) : 0;
+    var parentName = ViewData["ParentName"] != null ? ViewData["ParentName"].ToString() : "";
+}
+
+<h6>Previously added Notes</h6>
+
+@await Html.PartialAsync("~/Views/Shared/Notes/_NotesListPartialView.cshtml", Model)
+
+<form enctype="multipart/form-data" method="post" novalidate="novalidate" id="notes-form">
+
+    <div class="col-lg-12 mt-5">
+        <span class="validation-invalid-label notes-summary"></span>
+        <div class="mb-3 form-group">
+            <label name="Description" class="form-label fw-600">Notes <span class="required">*</span></label>
+            <textarea name="Description" type="text" id="notes-text" class="form-control"></textarea>
+            <span class="validation-invalid-label notes-description"></span>
+        </div>
+        <div>
+            <label name="File" class="form-label fw-600">File</label>
+            <input type="file" name="File" id="notes-file" class="form-control"></input>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <button type="submit" class="btn orange" id="submit-notes-btn">Submit</button>
+    </div>
+    <input type="hidden" name="@parentName" value="@parentId" />
+    <input type="hidden" id="modal-title" value="Add Notes" />
+</form>
+

@@ -1,0 +1,92 @@
+﻿@using Enums
+@using ViewModels.AssignedPermissions;
+@model List<AssignedPermissionUpdateViewModel>
+
+@{
+    Layout = null;
+}
+
+<div class="accordion" id="AssignedPermissionAccordion">
+    @{
+        RenderCategories(Model, null);
+    }
+</div>
+
+
+@functions {
+    private void RenderCategories(IEnumerable<AssignedPermissionUpdateViewModel> policies, string parentScreen)
+    {
+        var categoryGroups = policies
+        .Where(p => parentScreen == null || p.Permission.Screen.StartsWith(parentScreen + "/"))
+        .GroupBy(p => p.Permission.Screen.Split('/').ElementAtOrDefault(parentScreen?.Split('/').Length ?? 0))
+        .ToList();
+
+        foreach (var categoryGroup in categoryGroups)
+        {
+            var currentScreen = (parentScreen == null ? "" : (parentScreen + "/")) + categoryGroup.Key;
+            var dataBsParent = parentScreen == null ? "#accordionPermissions" : $"#{parentScreen.Replace("/", "_")}";
+            var accordionTargetId = currentScreen.Replace("/", "_");
+            <div class="accordion" id="accordionPermissions">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id=@($"heading_{accordionTargetId}")>
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target=@($"#collapse{accordionTargetId}") aria-expanded="true" aria-controls=@($"collapse{accordionTargetId}")>
+                            @categoryGroup.Key
+                        </button>
+                    </h2>
+                </div>
+
+                <div id=@($"collapse{accordionTargetId}") class="collapse show" aria-labelledby=@($"heading_{accordionTargetId}") data-bs-parent="@dataBsParent">
+                    <div class="accordion-body">
+                        @{
+                            var currentScreenItems = Model.Where(x => x.Permission.Screen == currentScreen).OrderBy(x => x.Priority).ToList();
+                            var index = 1;
+                            if (currentScreenItems != null && currentScreenItems.Count > 0)
+                            {
+                                <table class="table table-bordered dataTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Allowed</th>
+                                            <th>Disallowed</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var csi in currentScreenItems)
+                                        {
+                                            <tr class="assigned-permission-row">
+                                                <td>@csi.Permission.Name</td>
+                                                <td>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input permission-status" type="radio" id=@($"allowed_{accordionTargetId}_{index}") name=@($"status_{accordionTargetId}_{index}") value="Allowed" @(csi.Status == PermissionStatus.Allowed ? "checked" : "") />
+                                                        <label class="form-check-label cursor-pointer" for=@($"allowed_{accordionTargetId}_{index}")>Allowed</label>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input permission-status" type="radio" id=@($"disallowed_{accordionTargetId}_{index}") name=@($"status_{accordionTargetId}_{index}") value="NotAllowed" @(csi.Status == PermissionStatus.NotAllowed ? "checked" : "") />
+                                                        <label class="form-check-label cursor-pointer" for=@($"disallowed_{accordionTargetId}_{index}")>Disallowed</label>
+                                                    </div>
+                                                    <input type="hidden" name="Permission.Id" class="permission-id" value="@csi.Permission.Id" />
+                                                </td>
+                                            </tr>
+                                            index++;
+                                        }
+
+                                    </tbody>
+                                </table>
+                            }
+                        }
+                        @{
+                            RenderCategories(policies, currentScreen);
+                        }
+
+
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}
+<div class="col-12 mb-3 mt-3 text-center">
+    <button class="btn orange" id="set-permissions">Save</button>
+</div>

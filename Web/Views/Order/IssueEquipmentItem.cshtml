@@ -1,0 +1,80 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model ViewModels.IssueEquipmentItemViewModel
+@{
+    Layout = null;
+}
+
+<form action="/Home/SaveOrderIssueEquipmentItemDetails" id="issue-material-form">
+    <input type="hidden" name="OrderItem.Order.Id" value="@Model.OrderItem.Order.Id" class="issue-material-data" id="hdn-order-id">
+    <input type="hidden" name="Equipment.Id" value="@Model.Equipment.Id" class="issue-material-data">
+    <input type="hidden" name="OrderItem.Id" value="@Model.OrderItem.Id" class="issue-material-data" id="hdn-order-item-id">
+    <input type="hidden" value="Issue Equipment" id="modal-title" />
+
+    <div class="row">
+        <div class="col-sm-4"><h6>@Model.Equipment.Description</h6></div>
+        <div class="col-sm-4">
+            <h6>Order Qty: <br /><b>@Model.OrderItem.Quantity.ToString("N0")</b></h6>
+            <input type="hidden" id="hdnOrderedQty" value="@Model.OrderItem.Quantity" />
+        </div>
+    </div>
+    <br />
+    <h5>Available Quantities:</h5>
+    <br />
+
+    <table class="table table-striped issue-material-table">
+        <thead>@* class="thead-primary" *@
+            <tr>
+                <th>Serial #</th>
+                <th>Equipment</th>
+                <th>Supplier</th>
+                <th>Rate</th>
+                <th>Location</th>
+                <th>Hourly Rate</th>
+                <th>OH Quantity</th>
+                <th>Quantity</th>
+                @*<th>Hours</th>*@
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var (transaction, index) in Model.Transactions.Select((value, i) => (value, i)))
+            {
+                var locationId = "location-id-" + index;
+                <tr>
+                    <td>@transaction.PONo</td>
+                    <td>
+                        <input type="hidden" name="Transactions[@index].Condition.Id" value="@Model.Transactions[index].Condition.Id">
+                        <input type="hidden" name="Transactions[@index].PONo" value="@Model.Transactions[index].PONo">
+                        <input type="hidden" name="Transactions[@index].Equipment.HourlyRate" value="@Model.Transactions[index].Equipment.HourlyRate">
+                        @*<input type="hidden" name="Transactions[@index].Quantity" value="@Model.Transactions[index].Quantity">*@
+                        <input type="hidden" name="Transactions[@index].ItemPrice" value="@Model.Transactions[index].ItemPrice">
+                        <input type="hidden" name="Transactions[@index].Supplier.Id" value="@Model.Transactions[index].Supplier.Id">
+                        <input type="hidden" name="Transactions[@index].Location.Id" value="@Model.Transactions[index].Location.Id">
+                        <input type="hidden" name="Transactions[@index].Equipment.Id" value="@Model.Equipment.Id">
+                        <input type="hidden" name="Transactions[@index].HourlyRate" value="@Model.Transactions[index].HourlyRate">
+                        <input type="hidden" name="Transactions[@index].PurchaseDate" value="@Model.Transactions[index].PurchaseDate">
+                        @transaction.Equipment.Description
+                    </td>
+                    <td>@transaction.Supplier.Name</td>
+                    <td>@transaction.ItemPrice</td>
+                    <td>@transaction.Location.Name</td>
+                    <td>@transaction.Equipment.HourlyRate.ToString("C")</td>
+                    <td>@transaction.Quantity</td>
+                    <td><input type="number" class="form-control issue-material-quantity" max="@(Math.Min(Model.OrderItem.Quantity,transaction.Quantity))" name="Transactions[@index].Quantity" /></td>
+                    @*<td><input type="number" class="form-control issue-material-hours" min="0" )" name="Transactions[index].Hours" /></td>*@
+                </tr>
+            }
+        </tbody>
+    </table>
+    <span class="field-validation-valid error text-danger" id="spnOrderIssueEquipmentItem" data-valmsg-replace="true"></span>
+    <div class="modal-btns d-flex justify-content-end pt-3">
+        <button type="button" onclick="SaveIssueEquipmentItem('@Model.OrderItem.Order.Id')" class="btn btn-site-primary ml-2">Save</button>
+    </div>
+
+
+</form>
+@*<script src="/Scripts/jquery.validate.js"></script>
+    <script src="/Scripts/jquery.validate.unobtrusive.js"></script>*@
+<script src="/js/views/execute/issue-material.js"></script>
+

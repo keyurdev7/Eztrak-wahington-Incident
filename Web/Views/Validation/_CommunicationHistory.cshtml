@@ -1,0 +1,76 @@
+﻿@using ViewModels.Incident
+<div id="tempRecordsContainer">
+    @if (TempData["TempComRecords"] != null)
+    {
+        var tempList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<IncidentSubmitCommunicationViewModel>>(TempData["TempComRecords"].ToString());
+        if (tempList != null && tempList.Count > 0)
+        {
+            @foreach (var item in tempList)
+            {
+                @if (item.FileMeta != null && item.FileMeta.Count > 0)
+                {
+                    <div class="entry file">
+                        <div class="left">
+                            <div class="icon-wrapper">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="details">
+                                <div class="top">
+                                    @item.UserName <span class="label">File</span>
+                                </div>
+                                <div>@item.Message</div>
+                                <div class="attachments">
+                                    @* <strong>Attachments:</strong> *@
+                                    @if (item.FileMeta.Count > 0)
+                                    {
+                                        foreach (var itemFile in item.FileMeta)
+                                        {
+                                            <i class="fas fa-paperclip"></i>
+                                            <a href="#">@itemFile.OriginalName</a>
+                                        }
+                                    }
+                                </div>
+                                @* @if (!string.IsNullOrWhiteSpace(item.RecipientNames))
+                                {
+                                    <div class="attachments">
+                                        <strong>Sent to:</strong> <i class="fas fa-users"></i>
+                                        <a href="#">@item.RecipientNames</a>
+                                    </div>
+                                } *@
+                            </div>
+                        </div>
+                        <div class="timestamp">@item.TimeStamp</div>
+                    </div>
+                }
+                else
+                {
+                    <div class="entry note">
+                        <div class="left">
+                            <div class="icon-wrapper">
+                                <i class="fas fa-comment"></i>
+                            </div>
+                            <div class="details">
+                                <div class="top">
+                                    @item.UserName <span class="label">Note</span>
+                                </div>
+                                <div>@item.Message</div>
+
+                                @* @if (!string.IsNullOrWhiteSpace(item.RecipientNames))
+                                {
+                                    <div class="attachments">
+                                        <strong>Sent to:</strong> <i class="fas fa-users"></i>
+                                        <a href="#">@item.RecipientNames</a>
+                                    </div>
+                                } *@
+                            </div>
+                        </div>
+                        <div class="timestamp">@item.TimeStamp</div>
+                    </div>
+                }
+            }
+        }
+
+        // 👇 reassign so TempData survives next request
+        TempData.Keep("TempComRecords");
+    }
+</div>

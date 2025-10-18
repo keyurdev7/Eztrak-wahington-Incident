@@ -1,0 +1,45 @@
+﻿@model ViewModels.WorkOrder.CostPerformance.CostPerformanceViewModel
+@{
+    Layout = null;
+    var totalEquipmentCost = Model.TaskEquipments.Sum(x => x.Cost);
+}
+<h6 class="text-start">Equipment</h6>
+<div class="table-responsive my-3" id="equipmentTable">
+    <table class="table table-bordered dataTable">
+        <thead>@* class="thead-primary" *@
+            <tr>
+                <th>Equipment</th>
+                <th>Cost</th>
+            </tr>
+        </thead>
+        <tbody class="task-equipment-tbody">
+            @if (Model.TaskEquipments.Count > 0)
+            {
+                for (var i = 0; i < Model.TaskEquipments.Count(); i++)
+                {
+                    <tr>
+                        <td>
+                            <div>@Model.TaskEquipments[i].EquipmentName</div>
+                        </td>
+                        <td>
+                            <div>@Model.TaskEquipments[i].Cost.ToString("C")</div>
+                        </td>
+                    </tr>
+
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center">No Records Added.</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="1" class="text-end"><label class="form-label fw-600">Estimated Cost</label></td>
+                <td class="text-end"><label class="form-label fw-600">@totalEquipmentCost.ToString("C")</label></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

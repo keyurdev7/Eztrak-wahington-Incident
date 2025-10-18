@@ -1,0 +1,12 @@
+﻿@using ViewModels;
+@model ViewModels.CRUD.CrudUpdateViewModel
+@{
+}
+@await Html.PartialAsync("~/Views/Shared/Crud/UpdateView/_UpdateForm.cshtml", Model)
+<script src="~/js/custom/crud/ajaxCrud.js"></script>
+<script>
+    function onUpdateRecordSuccess(modalPanelId) {
+        window.location = "/WorkServiceRequest/Success"
+    }
+</script>
+

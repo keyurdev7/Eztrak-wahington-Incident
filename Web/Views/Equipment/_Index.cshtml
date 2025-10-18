@@ -1,0 +1,144 @@
+﻿@using System.Web
+@model ViewModels.CRUD.CrudListViewModel
+@{
+    ViewBag.Title = Model.Title;
+    if (Model.IsLayoutNull)
+    {
+        Layout = null;
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    var createUrl = HttpUtility.UrlDecode(Url.Action(Model.CreateButtonAction ?? "Create", Model.ControllerName));
+    var controllerName = Model.ControllerName;
+}
+<link href="~/css/bundles/datatable-buttons.css" rel="stylesheet" />
+<link href="~/css/bundles/datatable.css" rel="stylesheet" />
+<div class="page-top d-lg-flex justify-content-end align-items-center mb-3">
+    @if (Model.HideTitle == false)
+    {
+        if (!string.IsNullOrEmpty(Model.TitleHtml))
+        {
+            @Html.Raw(Model.TitleHtml)
+
+        }
+    }
+    @* <div class="d-flex justify-content-end mb-3">
+        @if (Model.HideCreateButton == false)
+        {
+        <button class="btn btn-primary me-2" onclick="loadCreateModalPanel('@createUrl')" data-bs-target="#newSupModal">
+        <i class="fa-regular fa-square-plus"></i>
+        Add New
+        </button>
+        }
+
+        <button class="btn btn-primary me-2" onclick="loadSublinesView('/Equipment/_AddSublines')" data-bs-target="#newSupModal">
+        <i class="fa-regular fa-square-plus"></i>
+        Add Sublines
+        </button>
+        </div> *@
+</div>
+    <div class="table_and_filters_wrap">
+
+        @await Html.PartialAsync("~/Views/Shared/Crud/ListView/Common/_Search.cshtml", Model)
+    @await Html.PartialAsync("~/Views/Shared/Crud/ListView/Common/_Header.cshtml", Model)
+            <div class="table_wrap">
+                <div class="table-opp table-responsive">
+                    <div class="dataTables_wrapper dt-bootstrap5 no-footer" style="min-height:300px;">
+                        <div class="datatable-scroll">
+                            <table class="table table-bordered dataTable table-sm datatable-basic dataTable w-100" style="box-sizing: border-box;" id="crud-list-table" role="grid" aria-describedby="DataTables_Table_0_info">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </>
+</div>
+
+<div id="equipment-shipment-modal" class="modal fade show" tabindex="-1" style="padding-right: 17px;">
+    <div class="modal-lg modal-dialog modal-dialog-centered" style="max-width: 1150px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Shipments</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12 row" id="equipment-shipment-modal-body">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script src="~/js/custom/crud/ajaxCrud.js"></script>
+<script src="~/js/views/cart/cart.js"></script>
+
+<partial name="_ValidationScriptsPartial" />
+
+<script>
+    $(function () {
+        ReInitializeDataTables();
+
+        $("body").off("click", ".crud-list-table > tbody > tr > td:not(.action)");
+        $("body").on("click", ".crud-list-table > tbody > tr > td:not(.action)", function () {
+            if ($(this).siblings("td").length > 1) {
+                var id = $(this).parent().attr("id");
+                var controllerName = "@controllerName";
+                var url = '/' + controllerName + '/Detail/' + id;
+                loadUpdateAndDetailModalPanel(url);
+            }
+        });
+
+        $("body").off("click", ".add-to-cart")
+        $("body").on("click", ".add-to-cart", function (e) {
+            e.stopPropagation();
+            addEquipmentToCart(this, $(this).attr("attr-id"));
+        });
+    });
+
+    function loadSublinesView(url) {
+        $('#ajax-loader').show();
+        var selectedCheckboxes = [];
+        $(".select-checkbox").each(function () {
+            if ($(this).parent().hasClass("selected")) {
+                var value = parseInt($(this).parent().attr("id"));
+                selectedCheckboxes.push(value);
+            }
+        });
+
+        if (selectedCheckboxes.length > 0) {
+            var ids = (selectedCheckboxes.join());
+            var href = url + '?equipmentIds=' + ids;
+            $.ajax({
+                url: href,
+                type: 'post',
+                success: function (data) {
+                    $("#equipment-shipment-modal").modal("show");
+                    $("#equipment-shipment-modal-body").html('');
+                    $("#equipment-shipment-modal-body").append(data);
+                }
+            });
+        }
+        else {
+
+            SwalErrorAlert('Please select at least one record.');
+            $('#ajax-loader').hide();
+        }
+    }
+
+    function ReInitializeDataTables() {
+        let formId = $(".search-form").attr('id');
+        if ($("#crud-list-table").length > 0) {
+            let dataTableId = $("#crud-list-table").attr('id');
+            if ($.fn.DataTable.fnIsDataTable($("#" + dataTableId))) {
+                $("#" + dataTableId).dataTable().fnDestroy();
+                $("#crud-list-table").addClass("dataTable");
+            }
+            var equipmentDataTableManager = new EquipmentDataTableManager();
+            equipmentDataTableManager.initialize("crud-list-table", formId, @Html.Raw(Model.DatatableColumnsJson), '@Model.ShowDatatableButtons', '@Model.DataUrl', '@Model.IsPasscodeRequiredForDelete', "Equipment", true, true, false, true);
+        }
+    }
+</script>

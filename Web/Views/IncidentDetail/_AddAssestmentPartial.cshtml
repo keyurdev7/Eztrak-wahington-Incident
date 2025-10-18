@@ -1,0 +1,307 @@
+﻿@model ViewModels.Incident.IncidentAssessmentAddViewModel
+
+<link href="~/css/custom/views/incident/validation.css" rel="stylesheet" />
+<!-- Add Incident Assessment Modal -->
+<div class="modal fade" id="addIncidentAssestmentModal" tabindex="-1" aria-labelledby="addIncidentAssestmentModallabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="addIncidentAssestmentModallabel">Add Incident Assessment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form id="AddIncidentAssessmentForm">
+
+                    <div class=" assessmentSec" id="div_AddIncidentAssessmentForm">
+                        <div class="section-body">
+                            <div class="row">
+                                <div class=" col-md-4">
+                                    <div class="borderCard IncidentCommander">
+                                        <h6 class="assestitle">Incident Commander</h6>
+                                        <div class="borderCard mb-4" id="div_CreateMCR">
+                                            <h6 class="assesSubtitle">Create MCR</h6>
+                                            <div class="form-group" id="div_Assignee">
+                                                <label>Assignee <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="assignId">
+                                                    <option value="" selected>Select User</option>
+                                                    @foreach (var item in Model.UserList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group" id="div_Status">
+                                                <label>Status <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="status" disabled>
+                                                    <option value="" selected>Select Status</option>
+                                                    @foreach (var item in Model.StatusList)
+                                                    {
+                                                        @if (item.Text == "Not Started")
+                                                        {
+                                                            <option value="@item.Value" selected>@item.Text</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="borderCard mb-4" id="div_NotifyclaimAndEngineering">
+                                            <h6 class="assesSubtitle">Notify claim & Engineering</h6>
+                                            <div class="form-group" id="div_Assignee">
+                                                <label>Assignee <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="assignId">
+                                                    <option value="" selected>Select User</option>
+                                                    @foreach (var item in Model.UserList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group" id="div_Status">
+                                                <label>Status <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="status" disabled>
+                                                    <option value="" selected>Select Status</option>
+                                                    @foreach (var item in Model.StatusList)
+                                                    {
+                                                        @if (item.Text == "Not Started")
+                                                        {
+                                                            <option value="@item.Value" selected>@item.Text</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="borderCard mb-4" id="div_EstablishICP">
+                                            <h6 class="assesSubtitle">Establish ICP</h6>
+                                            <div class="form-group" id="div_Assignee">
+                                                <label>Assignee <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="assignId">
+                                                    <option value="" selected>Select User</option>
+                                                    @foreach (var item in Model.UserList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group" id="div_Status">
+                                                <label>Status <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="status" disabled>
+                                                    <option value="" selected>Select Status</option>
+                                                    @foreach (var item in Model.StatusList)
+                                                    {
+                                                        @if (item.Text == "Not Started")
+                                                        {
+                                                            <option value="@item.Value" selected>@item.Text</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="borderCard FieldEnvironmentalRepresentative">
+                                        <h6 class="assestitle">Field Environmental Representative</h6>
+                                        <div class="borderCard mb-4" id="div_Preparecontainmentarea">
+                                            <h6 class="assesSubtitle"> Prepare containment area (drums/totes/Baker tank)</h6>
+                                            <div class="form-group" id="div_Assignee">
+                                                <label>Assignee <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="assignId">
+                                                    <option value="" selected>Select User</option>
+                                                    @foreach (var item in Model.UserList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group" id="div_Status">
+                                                <label>Status <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="status" disabled>
+                                                    <option value="" selected>Select Status</option>
+                                                    @foreach (var item in Model.StatusList)
+                                                    {
+                                                        @if (item.Text == "Not Started")
+                                                        {
+                                                            <option value="@item.Value" selected>@item.Text</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="borderCard mb-4" id="div_Labelcontainers">
+                                            <h6 class="assesSubtitle">Label containers; log IDs and capacity</h6>
+                                            <div class="form-group" id="div_Assignee">
+                                                <label>Assignee <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="assignId">
+                                                    <option value="" selected>Select User</option>
+                                                    @foreach (var item in Model.UserList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group" id="div_Status">
+                                                <label>Status <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="status" disabled>
+                                                    <option value="" selected>Select Status</option>
+                                                    @foreach (var item in Model.StatusList)
+                                                    {
+                                                        @if (item.Text == "Not Started")
+                                                        {
+                                                            <option value="@item.Value" selected>@item.Text</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="borderCard EngineeringAndGEC">
+                                        <h6 class="assestitle"> Engineering & GEC</h6>
+                                        <div class="borderCard mb-4" id="div_Retrievesystemmaps">
+                                            <h6 class="assesSubtitle">Retrieve system maps (regulators, BO streets, elevations)</h6>
+                                            <div class="form-group" id="div_Assignee">
+                                                <label>Assignee <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="assignId">
+                                                    <option value="" selected>Select User</option>
+                                                    @foreach (var item in Model.UserList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group" id="div_Status">
+                                                <label>Status <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="status" disabled>
+                                                    <option value="" selected>Select Status</option>
+                                                    @foreach (var item in Model.StatusList)
+                                                    {
+                                                        @if (item.Text == "Not Started")
+                                                        {
+                                                            <option value="@item.Value" selected>@item.Text</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="borderCard mb-4" id="div_Marklowpoints">
+                                            <h6 class="assesSubtitle">Mark low points & squeeze points</h6>
+                                            <div class="form-group" id="div_Assignee">
+                                                <label>Assignee <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="assignId">
+                                                    <option value="" selected>Select User</option>
+                                                    @foreach (var item in Model.UserList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group" id="div_Status">
+                                                <label>Status <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="status" disabled>
+                                                    <option value="" selected>Select Status</option>
+                                                    @foreach (var item in Model.StatusList)
+                                                    {
+                                                        @if (item.Text == "Not Started")
+                                                        {
+                                                            <option value="@item.Value" selected>@item.Text</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="borderCard mb-4" id="div_Initiatecosttracking">
+                                            <h6 class="assesSubtitle">Initiate cost tracking (RBA) for vendors</h6>
+                                            <div class="form-group" id="div_Assignee">
+                                                <label>Assignee <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="assignId">
+                                                    <option value="" selected>Select User</option>
+                                                    @foreach (var item in Model.UserList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group" id="div_Status">
+                                                <label>Status <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="status" disabled>
+                                                    <option value="" selected>Select Status</option>
+                                                    @foreach (var item in Model.StatusList)
+                                                    {
+                                                        @if (item.Text == "Not Started")
+                                                        {
+                                                            <option value="@item.Value" selected>@item.Text</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer d-flex justify-content-end">
+                <button type="submit" class="btn btn-success" id="btnAddAssessment">
+                    <i class="fas fa-check"></i> Save
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@* <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        flatpickr("#startedTime", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true });
+        flatpickr("#completedTime", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true });
+    });
+</script>
+ *@

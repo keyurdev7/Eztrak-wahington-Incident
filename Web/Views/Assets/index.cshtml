@@ -1,0 +1,19 @@
+@model ViewModels.CRUD.TabViewModel
+@{
+    ViewBag.Title = "Assets";
+}
+
+@await Html.PartialAsync("~/Views/Shared/Crud/Tabs/_Tabs.cshtml", Model)
+
+<script src="~/js/bundles/datatable.js"></script>
+<script src="~/js/bundles/datatable-buttons.js"></script>
+<script src="~/js/custom/loader/loader.js"></script>
+<script src="~/js/custom/datatable/auto-datatable.js" asp-append-version="true"></script>
+
+
+@section Scripts {
+    <script>
+        function afterTabLoad() {
+        }
+    </script>
+}

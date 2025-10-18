@@ -1,0 +1,50 @@
+﻿@using System.Web
+@using ViewModels
+@model List<UserModifyViewModel>
+
+<table>
+    <thead>
+        <tr>
+            <th>NAME</th>
+            <th>TEAM</th>
+            <th>Company</th>
+            <th>Role</th>
+            <th>EMPLOYEE TYPE</th>
+            <th>CONTACT</th>
+            <th>PIN</th>
+            <th>ACTIONS</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Count > 0)
+        {
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>
+                        <strong>@user.FirstName @user.LastName</strong><br>
+                        @user.Email
+                    </td>
+                    <td><span class="team-badge">@user.TeamName</span></td>
+                    <td><span class="team-badge">@user.CompanyName</span></td>
+                    <td><span class="team-badge">@user.IncidentRoleName</span></td>
+                    <td><span class="team-badge">@user.EmployeeType</span></td>
+                    <td>@user.Telephone</td>
+                    <td>@(new string('*', (user.PinHash?.Length ?? 0)))</td>
+                    <td class="editDeIcons">
+                        <i class="fa-regular fa-edit edituser" id="@user.Id"></i>
+                        <i class="far fa-trash-alt deleteuser" id="@user.Id"></i>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td>
+                    <span>No Users found.</span>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

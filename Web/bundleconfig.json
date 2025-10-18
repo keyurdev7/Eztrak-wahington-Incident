@@ -1,0 +1,122 @@
+[
+    {
+        "outputFileName": "wwwroot/css/bundles/datatable.css",
+        "inputFiles": [
+            //"wwwroot/css/datatable/*.min.css",
+            "wwwroot/css/datatable/fixed-header/fixed_header.min.css",
+            "wwwroot/css/custom/datatable/datatable-custom.css"
+
+        ],
+        "minify": {
+            "enabled": true,
+            "renameLocals": true
+        }
+    },
+    {
+        "outputFileName": "wwwroot/css/bundles/datatable-buttons.css",
+        "inputFiles": [
+            "wwwroot/css/datatable/jquery.dataTables.min.css",
+            "wwwroot/css/datatable/buttons.dataTables.min.css"
+        ],
+        // Optionally specify minification options
+        "minify": {
+            "enabled": true,
+            "renameLocals": true
+        },
+        // Optionally generate .map file
+        "sourceMap": false
+    },
+    {
+        "outputFileName": "wwwroot/js/bundles/masking.js",
+        "inputFiles": [
+            "wwwroot/js/masking/jquery.inputmask.bundle.min.js",
+            "wwwroot/js/masking/mask-number-custom.js"
+        ],
+        // Optionally specify minification options
+        "minify": {
+            "enabled": true,
+            "renameLocals": false
+        },
+        // Optionally generate .map file
+        "sourceMap": false
+    },
+    {
+        "outputFileName": "wwwroot/js/bundles/custom-datatable.js",
+        "inputFiles": [
+            "wwwroot/js/custom/datatable/auto-datatable.js"
+        ],
+        // Optionally specify minification options
+        "minify": {
+            "enabled": false,
+            "renameLocals": false
+        },
+        // Optionally generate .map file
+        "sourceMap": false
+    },
+    {
+        "outputFileName": "wwwroot/js/bundles/datatable-buttons.js",
+        "inputFiles": [
+            "wwwroot/js/datatable-buttons/datatables.button.min.js",
+            "wwwroot/js/datatable-buttons/buttons.flash.min.js",
+            "wwwroot/js/datatable-buttons/jszip.min.js",
+            "wwwroot/js/datatable-buttons/pdfmake.min.js",
+            "wwwroot/js/datatable-buttons/vfs_fonts.js",
+            "wwwroot/js/datatable-buttons/buttons.html5.min.js",
+            "wwwroot/js/datatable-buttons/buttons.print.min.js",
+            "wwwroot/js/datatable-buttons/buttons.colVis.min.js"
+        ],
+        // Optionally specify minification options
+        "minify": {
+            "enabled": true,
+            "renameLocals": false
+        },
+        // Optionally generate .map file
+        "sourceMap": false
+    },
+    {
+        "outputFileName": "wwwroot/js/bundles/datatable.js",
+        "inputFiles": [
+            "wwwroot/themes/limitless/global_assets/js/vendor/tables/datatables/datatables.min.js",
+            "wwwroot/themes/limitless/global_assets/js/vendor/tables/datatables/extensions/responsive.min.js",
+            "wwwroot/js/datatable/datatables_responsive.js",
+            "wwwroot/js/datatable/fixed_header.min.js",
+            "wwwroot/js/datatable/select.min.js"
+        ],
+        // Optionally specify minification options
+        "minify": {
+            "enabled": true,
+            "renameLocals": false
+        },
+        // Optionally generate .map file
+        "sourceMap": false
+    },
+    {
+        "outputFileName": "wwwroot/js/bundles/datepicker.js",
+        "inputFiles": [
+            "wwwroot/js/pickers/pickadate/picker.js",
+            "wwwroot/js/pickers/pickadate/picker.date.js",
+            "wwwroot/js/pickers/datepicker.js"
+        ],
+        "minify": {
+            "enabled": true,
+            "renameLocals": true
+        }
+    },
+    {
+        "outputFileName": "wwwroot/js/bundles/site.js",
+        "inputFiles": [
+            "wwwroot/js/loaders/blockui.min.js",
+            "wwwroot/themes/limitless/global_assets/js/vendor/forms/selects/select2.min.js",
+            "wwwroot/js/custom/site.js"
+        ],
+        // Optionally specify minification options
+        "minify": {
+            "enabled": true,
+            "renameLocals": false
+        },
+        // Optionally generate .map file
+        "sourceMap": false
+    }
+
+
+]

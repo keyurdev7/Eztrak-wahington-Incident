@@ -1,0 +1,58 @@
+﻿@* <style>
+    .work-order-inner-nav .nav-link.active {
+        background: #313955;
+        color: white;
+    }
+
+</style> *@
+<nav class="work-order-inner-nav navbar navbar-expand-lg navbar-light filter-nav mt-2 pb-0">
+    <div class="container-fluid px-0">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul id="work-order-inner-tab" class="navbar-nav mb-2 mb-lg-0 bg-white mr-5 pe-3">
+                @*   <li class="nav-item">
+                <a class="nav-link" href="#">
+                <i class="fa-sharp fa-solid fa-chart-simple"></i>
+                Analytics
+                </a>
+                </li> *@
+                <li class="nav-item">
+                    <button class="nav-link" id="order-grid" data-url="/WorkOrder/Index" type="button" role="tab">
+                        <i class="fa-solid fa-table"></i>
+                        Table
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="gantt-chart" data-url="/WorkOrder/GanttChart" type="button" role="tab">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        Gant Chart
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link active" id="dashboard" data-url="/WorkOrder/Dashboard" type="button" role="tab">
+                        <i class="fa-solid fa-chess-board"></i>
+                        Board
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<script>
+    $(function () {
+        $(".work-order-inner-nav .nav-link").on("click", function (e) {
+            e.preventDefault(); // To prevent default link behavior if it's an anchor
+            let tabId = "#work-order-inner-tab";
+            let tabItemId = "#" + $(this).attr('id'); // Use 'this' to get the clicked element's id
+            let tabContentId = "#work-order-tab-content-Id";
+            let contentUrl = $(this).data('url'); // Use 'this' to get the data-url attribute
+            if (contentUrl) {
+                fetchTabContent(tabContentId, contentUrl, tabId, tabItemId);
+            }
+
+        });
+    });
+</script>

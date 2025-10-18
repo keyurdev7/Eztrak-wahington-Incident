@@ -1,0 +1,53 @@
+﻿@using Enums;
+@using ViewModels;
+@using Web.Extensions
+@model ViewModels.WorkOrderModifyViewModel
+@{
+    Layout = null;
+}
+<div class="nwoStep d-none">
+
+    <div class="step-title d-flex justify-content-between align-items-start gap-3 mb-3">
+        <h5 class="m-0">Material Details</h5>
+        <h6 class="bg-info-subtle text-info-emphasis fw-normal rounded-pill text-nowrap px-3 py-1 m-0 page-number">
+        </h6>
+    </div>
+
+    <div class="col-md-12 mt-3">
+        <div class="form-group material-inputs-container row">
+
+            <span class="material-inventory-td col-md-3">
+                <label class="form-label fw-600">Material<span style="color:red"> *</span></label>
+                @await Html.PartialAsync("~/Views/Shared/Select2/_Inventory.cshtml", new InventoryBriefViewModel(), "Inventory", new ViewDataDictionary(ViewData) { { "HideLabel", true } })
+            </span>
+            <span class="quantity-td col-md-2">
+                <label class="form-label fw-600">Quantity<span style="color:red"> *</span></label>
+                <input type="number" name="quantity" value="" id="quantity" class="form-control quantity cost" placeholder="Quantity" />
+            </span>
+
+            <span class="text-center col-md-2">
+                <label class="form-label fw-600 w-100">Add</label>
+                <button type="button" class="add-material btn-circle btn-sm" style="height: calc(1.5715em + 0.875rem + 2px);"><i class="icon-plus2"></i></button>
+            </span>
+        </div>
+    </div>
+
+    <div class="table-responsive my-3" id="material-table">
+        <table class="table table-striped">
+            <thead>@* class="thead-primary" *@
+                <tr>
+                    <th>Inventory</th>
+                    <th>Quantity</th>
+                    <th class="text-center" style="width: 20px;"><i class="icon-arrow-down12"></i></th>
+                </tr>
+            </thead>
+            <tbody class="material-tbody">
+                @for (var i = 0; i < Model.WorkOrderMaterials.Count(); i++)
+                {
+                    @await Html.PartialAsync("~/Views/WorkOrder/_MaterialSectionRow.cshtml", Model.WorkOrderMaterials[i], new ViewDataDictionary(ViewData) { { "RowNumber", i } })
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

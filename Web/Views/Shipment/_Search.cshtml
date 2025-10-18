@@ -1,0 +1,29 @@
+﻿@using ViewModels;
+@model ShipmentSearchViewModel
+
+
+<div class="col-12 col-sm-3 col-lg-2">
+    <div class="mb-3 form-group">
+        <partial name="~/Views/Shared/Select2/_Location.cshtml" for="Location" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "uom-search-id"} }' />
+    </div>
+</div>
+<div class="col-12 col-sm-3 col-lg-2">
+    <div class="mb-3 form-group">
+        <partial name="~/Views/Shared/Select2/_Supplier.cshtml" for="Supplier" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "manufacturer-search-id"} }' />
+    </div>
+</div>
+<div class="col-12 col-sm-3 col-lg-2">
+    <div class="mb-3 form-group">
+        <partial name="~/Views/Shared/Select2/_Source.cshtml" for="Source" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "condition-search-id"} }' />
+    </div>
+</div>
+<div class="col-12 col-sm-3 col-lg-2">
+    <div class="mb-3 form-group">
+        <partial name="~/Views/Shared/Select2/_UOM.cshtml" for="UOM" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "condition-search-id"} }' />
+    </div>
+</div>
+<div class="col-12 col-sm-3 col-lg-2">
+    <div class="mb-3 form-group">
+        <input asp-for="Search.value" type="search" class="form-control" placeholder="Keyword" aria-controls="crud-list-table" autocomplete="new-password">
+    </div>
+</div>

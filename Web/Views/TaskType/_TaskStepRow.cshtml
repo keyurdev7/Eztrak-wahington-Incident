@@ -1,0 +1,69 @@
+﻿@* @model TaskTypeStepViewModel
+@using ViewModels;
+@using Enums;
+@using System.Globalization;
+@{
+    var isDetailPage = ViewData["IsDetailPage"] != null ? bool.Parse(ViewData["IsDetailPage"].ToString()) : false;
+
+    var collectionType = "Steps";
+    var rowNumber = ViewData["RowNumber"] != null ? int.Parse(ViewData["RowNumber"].ToString()) : 0;
+
+    var rowName = "section-row[" + rowNumber + "]";
+    var rowId = "step-section-row-" + rowNumber;
+
+    var craftSkillId = collectionType + "[" + rowNumber + "].CraftSkill.Id";
+    var craftSkillName = collectionType + "[" + rowNumber + "].CraftSkill.Name";
+    var craftSkillRate = collectionType + "[" + rowNumber + "].CraftSkill.STRate";
+    var stepId = collectionType + "[" + rowNumber + "].Id";
+    var jobTypeName = collectionType + "[" + rowNumber + "].JobType";
+    var menName = collectionType + "[" + rowNumber + "].Men";
+    var hoursName = collectionType + "[" + rowNumber + "].Hours";
+    var materialName = collectionType + "[" + rowNumber + "].Material";
+    var equipmentName = collectionType + "[" + rowNumber + "].Equipment";
+    var hiddenId = collectionType + "[" + rowNumber + "].Id";
+
+}
+
+<tr class="step-section-row" id="@rowId">
+    <td>
+        <span style=" text-align: initial !important;">@Model.JobType</span>
+        <input type="hidden" name="@jobTypeName" value="@Model.JobType" />
+    </td>
+    <td>
+        <span style=" text-align: initial !important;">@Model.CraftSkill.Name</span>
+        <input type="hidden" name="@craftSkillId" value="@Model.CraftSkill.Id" />
+        <input type="hidden" name="@craftSkillName" value="@Model.CraftSkill.Name" />
+        <input type="hidden" name="@craftSkillRate" value="@Model.CraftSkill.STRate" />
+    </td>
+    <td>
+        <span style=" text-align: initial !important;">@Model.Men</span>
+        <input type="hidden" name="@menName" value="@Model.Men" />
+    </td>
+    <td>
+        <span style=" text-align: initial !important;">@Model.Hours</span>
+        <input type="hidden" name="@hoursName" value="@Model.Hours" />
+    </td>
+    <td>
+        <span style=" text-align: initial !important;">@Model.TotalMHS</span>
+    </td>
+    <td>
+        <span style=" text-align: initial !important;">$@Model.Labor</span>
+    </td>
+    <td>
+        <span style=" text-align: initial !important;">$@Model.Material</span>
+        <input type="hidden" name="@materialName" value="@Model.Material" />
+    </td>
+    <td>
+        <span style=" text-align: initial !important;">$@Model.Equipment</span>
+        <input type="hidden" name="@equipmentName" value="@Model.Equipment" />
+    </td>
+    @if (!isDetailPage)
+    {
+        <td>
+            <a href="javascript:void(0)" class="remove-step mx-1 datatable-action btn bg-custom-dark" data-toggle="tooltip" title="Delete Step"><i class="icon-trash"></i></a>
+        </td>
+    }
+
+</tr>
+
+ *@

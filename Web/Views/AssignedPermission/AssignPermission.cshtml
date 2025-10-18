@@ -1,0 +1,171 @@
+﻿@using Enums
+@using ViewModels.AssignedPermissions;
+@using Web.Extensions;
+@model AssignPermissionDataViewModel
+
+@{
+    if (!Model.IsGeneralPermissionsScreen)
+    {
+        Layout = null;
+    }
+
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <span class="validation-invalid-label assign-permission-error"></span>
+
+            @if (!Model.IsGeneralPermissionsScreen)
+            {
+                <input type="hidden" id="modal-title" value="" />
+            }
+            @if (Model.HideEntityDiv)
+            {
+                <div class="col-lg-12 text-center">
+                    <h3 class="mb-3 mt-3">Permissions for @Model.EntityTitle</h3>
+                    <input type="hidden" id="EntityType" value="@Model.EntityType" />
+                    <input type="hidden" id="user-id" value="@Model.User.Id" />
+                    <input type="hidden" id="role-id" value="@Model.Role.Id" />
+                </div>
+            }
+            else
+            {
+                <div class="col-lg-12 text-center">
+                    <h3 class="mb-3 mt-3">Assign Permissions</h3>
+                </div>
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="mb-3 form-group">
+                                <label asp-for="EntityType" class="form-label fw-600"></label>
+                                <select asp-for="EntityType" asp-items="HtmlHelperExtensions.GetEnumSelectListWithStrings<PermissionEntityType>()" class="form-control">
+                                </select>
+                                <span asp-validation-for="EntityType" class="validation-invalid-label"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6" id="user-select2" style="display: none;">
+                            <div class="mb-3 form-group">
+                                <partial name="~/Views/Shared/Select2/_User.cshtml" for="User" view-data='@new ViewDataDictionary(ViewData) { { "Id", "user-id" }}' />
+                            </div>
+                        </div>
+                        <div class="col-lg-6" id="role-select2">
+                            <div class="mb-3 form-group">
+                                <partial name="~/Views/Shared/Select2/_Role.cshtml" for="Role" view-data='@new ViewDataDictionary(ViewData) { { "Id", "role-id" }}' />
+                            </div>
+                        </div>
+                        <div class="col-12 mb-3 text-center">
+                            <button class="btn orange" id="fetch-permissions">Fetch</button>
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+    <div class="card" id="assigned-permission-div">
+
+    </div>
+</div>
+
+<script>
+    var hideEntityData = "@(@Model.HideEntityDiv.ToString().ToLower())" === "true";
+    $(function () {
+        $("body").on("click", "#fetch-permissions", function () {
+            getPermissions();
+        });
+
+        $("body").off("click", "#set-permissions");
+        $("body").on("click", "#set-permissions", function () {
+            var permissions = createJsonFromPermissions();
+            setPermissions(permissions);
+        });
+
+        $("body").on("change", "#EntityType", function () {
+            $("#role-select2").toggle();
+            $("#user-select2").toggle();
+        });
+        if (hideEntityData) {
+            getPermissions();
+        }
+    });
+    function createJsonFromPermissions() {
+        var json = [];
+        $(".assigned-permission-row").each(function (i, v) {
+            var status = $(v).find('.permission-status:checked').val();
+            if (status !== undefined && status !== null && status !== "") {
+                json.push({
+                    "Permission": { Id: $(v).find(".permission-id").val() },
+                    "Status": status
+                });
+            }
+        });
+        return json;
+    }
+
+    function setPermissions(permissions) {
+        var params = getEntityInfo();
+        // Data object to be sent in the POST request
+        var postData = {
+            EntityId: params.entityId,
+            EntityType: params.entityType,
+            Permissions: permissions  // Add your permissions object here
+        };
+
+        // Make the AJAX POST request
+        $.ajax({
+            url: "/AssignedPermission/SetAssignedPermissions",
+            type: "POST",
+            contentType: "application/json", // Specify content type as JSON
+            data: JSON.stringify(postData), // Convert the data object to JSON string
+            success: function (data) {
+                if (data.Status == 'OK') {
+                    if ($("#crudModalPanel").length > 0) {
+                        $("#crudModalPanel").modal("hide");
+                    }
+                    else {
+                        location.reload();
+                    }
+                }
+                else {
+                    $(".assign-permission-error").html(data.Message);
+                }
+                
+                // Handle the successful response
+            },
+            error: function (xhr, status, error) {
+                // Handle errors
+                console.error("Error:", status, error);
+            }
+        });
+    }
+
+    function getPermissions() {
+        var params = getEntityInfo();
+        // Make the AJAX GET request
+        $.ajax({
+            url: "/AssignedPermission/GetPermissions",
+            type: "GET",
+            data: params,
+            success: function (data) {
+                // Handle the successful response
+                $("#assigned-permission-div").html(data);
+            },
+            error: function (xhr, status, error) {
+                // Handle errors
+                console.error("Error:", status, error);
+            }
+        });
+    }
+
+    function getEntityInfo() {
+        var user = hideEntityData ? $("#user-id").val() : $('#user-id').select2('data')[0].id;
+        var role = hideEntityData ? $("#role-id").val() : $('#role-id').select2('data')[0].id;
+        var entityType = hideEntityData ? $("#EntityType").val() : $("#EntityType option:selected").val();
+        // Define the parameters
+        var params = {
+            entityId: entityType == 'Role' ? role : user,
+            entityType: entityType
+        };
+        return params;
+    }</script>

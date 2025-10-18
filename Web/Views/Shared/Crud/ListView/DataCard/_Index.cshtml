@@ -1,0 +1,51 @@
+﻿@using System.Web
+@model ViewModels.CRUD.CrudListViewModel
+@{
+    ViewBag.Title = Model.Title;
+    if (Model.IsLayoutNull)
+    {
+        Layout = null;
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    var createUrl = HttpUtility.UrlDecode(Url.Action(Model.CreateButtonAction ?? "Create", Model.ControllerName));
+    var controllerName = Model.ControllerName;
+}
+<style>
+    .blockUI.blockMsg.blockElement {
+        top: 40vh !important;
+    }
+</style>
+<div class="page-top d-lg-flex justify-content-between align-items-center mb-3">
+    @if (Model.HideTitle == false)
+    {
+        if (!string.IsNullOrEmpty(Model.TitleHtml))
+        {
+            @Html.Raw(Model.TitleHtml)
+        }
+        else
+        {
+            <h3 class="page-title text-site-primary m-md-0">@Model.Title</h3>
+        }
+    }
+    @if (Model.HideCreateButton == false)
+    {
+        <button class="btn btn-primary" onclick="loadCreateModalPanel('@createUrl')" data-bs-target="#newSupModal">
+            <i class="fa-regular fa-square-plus"></i>
+            Add New
+        </button>
+    }
+
+</div>
+<div class="card datatable p-0">
+    <div class="card-body p-0">
+        @await Html.PartialAsync("~/Views/Shared/Crud/ListView/Common/_Search.cshtml", Model)
+        <div class="list-container">
+            @await Html.PartialAsync("~/Views/Shared/Crud/ListView/Common/_Header.cshtml", Model)
+            <div class="card-body list-content">
+            </div>
+        </div>
+    </div>
+</div>

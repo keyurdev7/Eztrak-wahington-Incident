@@ -1,0 +1,203 @@
+﻿@using ViewModels
+@model UserManagementModifyViewModel
+
+<style>
+    #addUserModal::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        background: #0000009e;
+        z-index: -1;
+        border-radius: 10px;
+        height: 100vh;
+    }
+</style>
+
+
+@* <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true"> *@
+<div class="modal fade show" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-modal="true" role="dialog" style="display: block; padding-left: 0px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
+                <button type="button" class="btn-close cancelusermanagement" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form id="NewUserManagementForm">
+                    <input type="hidden" value="@Model.Id" name="Id" id="usermanagement_@Model.Id" />
+                    <div class="form-group">
+                        <label>Full Name *</label>
+                        <input type="text" placeholder="Enter full name" asp-for="FirstName">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <input type="email" placeholder="user@company.com" asp-for="Email">
+                    </div>
+                    <div class="form-group">
+                        <label>Role *</label>
+                        @Html.DropDownListFor(model => model.RoleId,
+                                                (SelectList)ViewBag.Roles,
+                                                "Select role",
+                                                new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <input type="text" placeholder="Department name" asp-for="Department">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="text" placeholder="555-0123" asp-for="PhoneNumber">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select name="ActiveStatus" class="form-control" asp-for="Status">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="permissions-box">
+                        <h3>Role Permissions</h3>
+                        <p>Full access to all functionality and system administration.</p>
+                        <ul id="SystemAdministrator">
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can create incidents</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can edit incidents</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can manage settings</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can assign teams</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can send alerts</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> has desktop access</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can validate incidents</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can view all incidents</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can view settings</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can complete tasks</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can view reports</li>
+                        </ul>
+                        <p>Full access to all functionality and super administration.</p>
+                        <ul id="SuperAdministrator">
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can create incidents</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can edit incidents</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can manage settings</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can assign teams</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can send alerts</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> has desktop access</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can validate incidents</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can view all incidents</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can view settings</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can complete tasks</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can view reports</li>
+                        </ul>
+                        <p>Can create incidents, manage settings, send alerts, desktop access, view all incidents. No settings access.</p>
+                        <ul id="Manager">
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can create incidents</li>
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can edit incidents</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can manage settings</li>
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can assign teams</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can send alerts</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> has desktop access</li>
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can validate incidents</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can view all incidents</li>
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can view settings</li>
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can complete tasks</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can view reports</li>
+                        </ul>
+                        <p>Can only send alerts, view settings, has desktop access and complete tasks. No settings access.</p>
+                        <ul id="Technician">
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can create incidents</li>
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can edit incidents</li>
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can manage settings</li>
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can assign teams</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can send alerts</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> has desktop access</li>
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can validate incidents</li>
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can view all incidents</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can view settings</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can complete tasks</li>
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can view reports</li>
+                        </ul>
+                        <p>Can only view all incidents, view reports and complete tasks. No other settings.</p>
+                        <ul id="Guest">
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can create incidents</li>
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can edit incidents</li>
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can manage settings</li>
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can assign teams</li>
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can send alerts</li>
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> has desktop access</li>
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can validate incidents</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can view all incidents</li>
+                            <li class="denied"><i class="fa-solid fa-xmark"></i> can view settings</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can complete tasks</li>
+                            <li class="allowed"><i class="fa-solid fa-check"></i> can view reports</li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer d-flex justify-content-end">
+                <button type="submit" class="add-btn saveusermanagement"><i class="fas fa-check"></i>Add User</button>
+                <button type="button" class="cancel-btn cancelusermanagement" data-bs-dismiss="modal"><i class="fas fa-times"></i>Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+@* <script>
+        $(document).ready(function () {
+            $(".permissions-box ul").hide();
+        });
+        var selectedRole = "";
+        $("#RoleId").on("change", function () {
+            selectedRole = $(this).find("option:selected").text();
+            $(".permissions-box ul").hide();
+            if (selectedRole) {
+                $("#" + selectedRole.replace(/\s+/g, '')).show();
+            }
+        });
+    $("#RoleId").trigger("change");
+
+        $(document).ready(function () {
+            $(".permissions-box ul").hide();
+
+            function showPermissions() {
+                var selectedRole = $("#RoleId option:selected").text().trim();
+                $(".permissions-box ul").hide();
+                if (selectedRole) {
+                    $("#" + selectedRole.replace(/\s+/g, '')).show();
+                }
+            }
+
+            $("#RoleId").on("change", showPermissions);
+
+            // Call on page load (for pre-selected role from controller)
+            showPermissions();
+        });
+</script> *@
+<script>
+    $(document).ready(function () {
+        function showPermissions() {
+            // Hide all <p> and <ul> inside permissions-box
+            $(".permissions-box p, .permissions-box ul").hide();
+
+            // Get selected role text
+            var selectedRole = $("#RoleId option:selected").text().trim();
+            if (selectedRole) {
+                // Find matching <ul> by ID (remove spaces in role name)
+                var $roleUl = $("#" + selectedRole.replace(/\s+/g, ''));
+
+                // Show the <ul> and the <p> right before it
+                $roleUl.show();
+                $roleUl.prev("p").show();
+            }
+        }
+
+        // Run when dropdown changes
+        $("#RoleId").on("change", showPermissions);
+
+        // Run once on page load
+        showPermissions();
+    });
+</script>

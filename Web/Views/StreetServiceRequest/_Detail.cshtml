@@ -1,0 +1,146 @@
+﻿@using ViewModels
+@model StreetServiceRequestDetailViewModel
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="mb-3  form-group d-flex">
+                    <label asp-for="Name" class="form-label detail-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.Name) ? "-" : Model.Name)</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3  form-group d-flex">
+                    <label asp-for="PhoneNumber" class="form-label detail-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.PhoneNumber) ? "-" : Model.PhoneNumber)</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3  form-group d-flex">
+                    <label asp-for="StreetAddress" class="form-label detail-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.StreetAddress) ? "-" : Model.StreetAddress)</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3  form-group d-flex">
+                    <label asp-for="City" class="form-label detail-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.City) ? "-" : Model.City)</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3  form-group d-flex">
+                    <label asp-for="State" class="form-label detail-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.State) ? "-" : Model.State)</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3  form-group d-flex">
+                    <label asp-for="Zip" class="form-label detail-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.Zip) ? "-" : Model.Zip)</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3  form-group d-flex">
+                    <label asp-for="Email" class="form-label detail-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.Email) ? "-" : Model.Email)</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3  form-group d-flex">
+                    <label asp-for="Name" class="form-label detail-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.Name) ? "-" : Model.Name)</div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="mb-3  form-group d-flex">
+                    <input asp-for="CallMe" id="CallMe" type="checkbox" style="width:40px;" height="40px;" disabled />
+                    <label asp-for="CallMe" class="form-label fw-600"></label>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="mb-3  form-group d-flex">
+                    <input asp-for="EmailMe" id="EmailMe" type="checkbox" style="width:40px;" height="40px;" disabled />
+                    <label asp-for="EmailMe" class="form-label fw-600"></label>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="mb-3  form-group d-flex">
+                    <input asp-for="NoNeedToContact" id="NoNeedToContact" type="checkbox" style="width:40px;" height="40px;" disabled/>
+                    <label asp-for="NoNeedToContact" class="form-label fw-600"></label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="form-label detail-label fw-800 mb-3" style="margin-left:25px;">Type of problem</label>
+            <div class="col-lg-6">
+                <div class="mb-3  form-group d-flex">
+                    <input asp-for="SideWalk" id="SideWalk" type="checkbox" style="width:40px;" height="40px;" disabled />
+                    <label asp-for="SideWalk" class="form-label"></label>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3  form-group d-flex">
+                    <input asp-for="Potholes" id="Potholes" type="checkbox" style="width:40px;" height="40px;" disabled />
+                    <label asp-for="Potholes" class="form-label"></label>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3  form-group d-flex">
+                    <input asp-for="Drainage" id="Drainage" type="checkbox" style="width:40px;" height="40px;" disabled />
+                    <label asp-for="Drainage" class="form-label"></label>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3  form-group d-flex">
+                    <input asp-for="StreetSweeping" id="StreetSweeping" type="checkbox" style="width:40px;" height="40px;" disabled />
+                    <label asp-for="StreetSweeping" class="form-label"></label>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3  form-group d-flex">
+                    <input asp-for="ParkwayTree" id="ParkwayTree" type="checkbox" style="width:40px;" height="40px;" disabled />
+                    <label asp-for="ParkwayTree" class="form-label"></label>
+                 
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3  form-group d-flex">
+                    <input asp-for="Other" id="Other" type="checkbox" style="width:40px;" height="40px;" disabled />
+                    <label asp-for="Other" class="form-label"></label>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="mb-3  form-group d-flex">
+                    <label asp-for="Description" class="form-label detail-label fw-600"></label>
+                    <div class="ellipsis" title="@(string.IsNullOrEmpty(Model.Description) ? "-" : Model.Description)">
+                        @(string.IsNullOrEmpty(Model.Description) ? "-" : Model.Description)
+                    </div>
+                </div>
+            </div>
+        </div>
+       @*  <div class="row">
+            <div class="col-lg-12">
+                <div class="mb-3  form-group d-flex">
+                    <label asp-for="LocationOfProblem" class="form-label detail-label fw-600"></label>
+                    <div class="ellipsis" title="@(string.IsNullOrEmpty(Model.LocationOfProblem) ? "-" : Model.LocationOfProblem)">
+                        @(string.IsNullOrEmpty(Model.LocationOfProblem) ? "-" : Model.LocationOfProblem)
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="mb-3  form-group d-flex">
+                    <label asp-for="DescriptionOfProblem" class="form-label detail-label fw-600"></label>
+                    <div class="ellipsis" title="@(string.IsNullOrEmpty(Model.DescriptionOfProblem) ? "-" : Model.DescriptionOfProblem)">
+                        @(string.IsNullOrEmpty(Model.DescriptionOfProblem) ? "-" : Model.DescriptionOfProblem)
+                    </div>
+                </div>
+            </div>
+        </div> *@
+    </div>
+</div>

@@ -1,0 +1,27 @@
+﻿@using ViewModels
+@model List<AssetTypeModifyViewModel>
+
+@if (Model != null && Model.Count > 0)
+{
+    @foreach (var assetType in Model)
+    {
+
+        <div class="list-item">
+            <div class="item-info">
+                <strong>@assetType.Name</strong>
+                @* <p>@assetType.Color</p> *@
+            </div>
+            <div class="actions">
+                <i class="fa-regular fa-edit edit editAssetType" id="@assetType.Id"></i>
+                <i class="far fa-trash-alt delete deleteAssetType" id="@assetType.Id"></i>
+            </div>
+        </div>
+
+    }
+}
+else
+{
+    <div class="list-item">
+        <span>No Asset Types found.</span>
+    </div>
+}

@@ -1,0 +1,103 @@
+﻿@{
+    ViewBag.Title = "Execute";
+}
+<style>
+    /** Staging Page **************************/
+    .staging-page .box-option {
+        -ms-flex: 0 0 280px;
+        flex: 0 0 280px;
+        max-width: 280px;
+        margin: 10px;
+        border-radius: 5px;
+        background-color: #f2f2f2;
+        transition: all 0.3s;
+    }
+
+        .staging-page .box-option:hover {
+            display: block;
+            cursor: pointer;
+            background-color: #4a5882;
+        }
+
+        .staging-page .box-option a {
+            display: block;
+            width: 100%;
+            padding: 45px 30px;
+            text-align: center;
+        }
+
+        .staging-page .box-option .option-img {
+            width: 75px;
+            height: 75px;
+            padding: 15px;
+            margin: 0 auto;
+            border-radius: 50%;
+            background-color: #fff;
+        }
+
+            .staging-page .box-option .option-img img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                object-position: center;
+            }
+
+        .staging-page .box-option h4 {
+            margin: 0;
+            padding-top: 15px;
+            font-size: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #333;
+            transition: all 0.3s;
+        }
+
+        .staging-page .box-option:hover h4 {
+            color: #fff;
+        }
+    /**/
+    .staging-page .staging-steps {
+        margin: 0 auto;
+        padding: 10px;
+        /*max-width: 600px;*/
+    }
+
+        .staging-page .staging-steps .step-progress {
+            margin: 0 auto 20px auto;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #ff9224;
+        }
+
+            .staging-page .staging-steps .step-progress h5 {
+                font-size: 18px;
+                font-weight: 400;
+                line-height: 80px;
+                color: #fff;
+                text-align: center;
+            }
+
+        .staging-page .staging-steps .step-box .step-card:not(:first-of-type) {
+            display: none;
+        }
+</style>
+<div class="container-fluid staging-page">
+    <div class="pt-md-4">
+        <div class="staging-options">
+            <div class="d-flex flex-wrap justify-content-center">
+                <div class="box-option">
+                    <a href="@Url.Action("ReturnEquipment","ExecuteEquipment")" class="staging-option" data-staging="#returnBox">
+                        <div class="">
+                            <div class="option-img">
+                                <img src="~/img/execute/barcode.png" alt="">
+                            </div>
+                            <h4>Return Order</h4>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

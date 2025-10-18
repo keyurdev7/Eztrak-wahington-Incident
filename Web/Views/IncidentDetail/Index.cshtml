@@ -1,0 +1,3270 @@
+﻿@model ViewModels.Incident.IncidentViewModel
+@using Microsoft.AspNetCore.Html
+@using Microsoft.AspNetCore.Identity
+@using Models;
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<link href="~/css/custom/views/incident/detail.css" rel="stylesheet" />
+<link href="~/css/custom/views/incident/validation-index.css" rel="stylesheet" />
+<link href="~/css/custom/views/incident/validation.css" rel="stylesheet" />
+
+<link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/light/main.css">
+<script src="https://js.arcgis.com/4.27/"></script>
+<script type="module" src="https://js.arcgis.com/embeddable-components/4.33/arcgis-embeddable-components.esm.js"></script>
+@* <link href="~/css/custom/views/incident/validation.css" rel="stylesheet" /> *@
+
+<style>
+    .tab-item.disabled {
+        pointer-events: none; /* disables clicking */
+        opacity: 0.5; /* visually indicate disabled */
+        cursor: not-allowed; /* show disabled cursor */
+    }
+</style>
+<div id="incidentDetailsModal" tabindex="-1" aria-hidden="true">
+    <input type="hidden" id="hdnIncidentID" value="@Model.Id" />
+    <div class="container-fuild">
+        <div id="incidentDetailsContent">
+            <div class="tabHeader">
+                <div class="d-flex align-items-center  titleSec ">
+                    <button type="button" class="backBtn" data-bs-dismiss="modal" id="closeModalBtn"><i class="fa fa-arrow-left-long"></i></button>
+                    <h5 class="modal-title"> @Model.incidentDetailByIdViewModel?.IncidentNumber</h5>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "" : "active")" data-tab="dashboard">
+                        <i class="fa fa-map-marker-alt"></i>Map
+                    </div>
+                    <div class="tab-item" data-tab="overview">
+                        <i class="far fa-file-alt"></i> Overview
+                    </div>
+                    <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "active" : "")" data-tab="validation">
+                        <i class="fas fa-shield-alt"></i> Validation
+                    </div>
+                    <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "disabled" : "")" data-tab="personnel">
+                        <i class="fa-regular fa-user"></i> Personnel
+                    </div>
+                    <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "disabled" : "")" data-tab="assessment">
+                        <i class="fa-solid fa-clipboard-check"></i>Assessment
+                    </div>
+                    <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "disabled" : "")" data-tab="repair">
+                        <i class="fa-solid fa-screwdriver-wrench"></i> Repair
+                    </div>
+                    <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "disabled" : "")" data-tab="restoration">
+                        <i class="fa-solid fa-rotate"></i> Restoration
+                    </div>
+                    <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "disabled" : "")" data-tab="closeout">
+                        <i class="fa-regular fa-circle-check"></i> Closeout
+                    </div>
+
+                    @* <div class="tab-item" data-tab="worksteps">
+                        <i class="fas fa-tasks"></i> Policies
+                    </div>
+
+                    <div class="tab-item" data-tab="communication">
+                        <i class="fas fa-comment-dots"></i> Communication
+                    </div> *@
+                </div>
+            </div>
+            <div class="tabBody">
+                <div id="dashboard" class="tab-content @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "" : "active")">
+                    <div class="row g-4">
+
+                        <!-- Chat & Handoffs -->
+                        <div class="col-lg-3">
+                            <!-- Chat & Handoffs -->
+                            <div class="card shadow-sm border-0 h-100 rounded-4">
+                                <div class="card-header bg-white fw-semibold border-bottom">
+                                    <i class="fa-solid fa-comments me-2 text-warning"></i>Chat & Handoffs
+                                </div>
+
+                                <!-- Chat Messages -->
+                                <div class="card-body chat-body" id="chatMessages">
+                                    @foreach (var item in Model.listIncidentMapChats)
+                                    {
+                                        <div class="handoff-item">
+                                            <span class="badge role-badge">@item.SentBy</span>
+                                            @item.ChatMessage
+                                        </div>
+                                    }
+                                </div>
+
+                                <!-- Input Area -->
+                                <div class="card-body chat-input-area">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="SelectRole">
+                                            <select class="form-select" id="roleSelect">
+                                                <option value="IC" data-role-type="1">IC</option>
+                                                <option value="FER" data-role-type="2">FER</option>
+                                                <option value="GEC" data-role-type="3">GEC</option>
+                                                <option value="EL" data-role-type="4">EL</option>
+                                            </select>
+                                        </div>
+                                        <div class="mesgsend">
+                                            <input type="text" id="messageInput" class="form-control" placeholder="Type a message..." />
+                                        </div>
+                                        <div class="sendBtn">
+                                            <button class="btn btn-send" id="sendBtn">
+                                                <i class="fa-solid fa-paper-plane"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Map View -->
+                        <div class="col-lg-9">
+                            <div class="card shadow-sm border-0 h-100 rounded-4 text-center">
+                                <div class="card-header bg-white fw-semibold border-bottom text-left">
+                                    <i class="fa-solid fa-location-dot me-2 text-warning"></i>Map View
+                                </div>
+                                <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                                    <div id="map" style="height:500px;width:100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <!-- Timeline -->
+                            <div class="card shadow-sm border-0 h-100 rounded-4">
+                                <div class="card-header bg-white fw-semibold border-bottom d-flex justify-content-between align-items-center">
+                                    <div><i class="fa-regular fa-clock me-2 text-warning"></i>Timeline</div>
+                                    <a class="text-decoration-none text-warning small fw-semibold"
+                                       data-bs-toggle="collapse" href="#timelineCollapse" role="button"
+                                       aria-expanded="true" aria-controls="timelineCollapse" id="collapseToggle">
+                                        <i class="fa-solid fa-angle-up me-1"></i>
+                                    </a>
+                                </div>
+                                <div class="collapse show" id="timelineCollapse">
+                                    <div class="card-body">
+                                        <div class="alert alert-warning py-1 px-2 small fw-semibold mb-3 border-0 rounded-3">
+                                            Auto-Log Active
+                                        </div>
+                                        <div class="timeline-item mb-2">
+                                            <span class="badge time-badge">10:15</span> Validation completed by IC
+                                        </div>
+                                        <div class="timeline-item mb-2">
+                                            <span class="badge time-badge">10:21</span> ICP established at Main Gate
+                                        </div>
+                                        <div class="timeline-item mb-2">
+                                            <span class="badge time-badge">10:35</span> FER verified containment setup
+                                        </div>
+                                        <div class="timeline-item mb-2">
+                                            <span class="badge time-badge">10:45</span> Vacuum Truck ETA logged (Vendor A)
+                                        </div>
+                                        <div class="timeline-item mb-0">
+                                            <span class="badge time-badge">10:50</span> Personnel check-in started
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @* <div class="bg-white rounded p-4 shadow-sm border border-gray-200 mb-4">
+                        <div id="map" style="height:800px; width:100%;"></div>
+                    </div> *@
+                </div>
+
+                <div id="overview" class="tab-content">
+
+                    <div class="step-content mt-3" id="step-1">
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="validationCard callerInfo">
+                                    <div class="section-header d-flex align-items-center justify-content-between">
+                                        <h6 class="mb-0">Caller Information</h6>
+                                    </div>
+                                    <div class="section-body">
+                                        <div class="info-item">
+                                            <i class="fa-regular fa-user"></i>
+                                            <span class="info-title">Caller Name</span>
+                                            <span class="info-sub">@Model.IVDetails.CallerName</span>
+                                        </div>
+
+                                        <div class="info-item">
+                                            <i class="fa-solid fa-phone"></i>
+                                            <span class="info-title">@Model.IVDetails.CallerContact</span>
+                                            <span class="info-sub">Primary contact</span>
+                                        </div>
+
+                                        <div class="info-item">
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            <span class="info-title">Caller Address</span>
+                                            <span class="info-sub">@Model.IVDetails.CallerAddress</span>
+                                        </div>
+
+                                        <div class="info-item">
+                                            <i class="fa-regular fa-calendar"></i>
+                                            <span class="info-title">Call Time</span>
+                                            <span class="info-sub">@Model.IVDetails.CallerDateTime</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="validationCard incidentLoc">
+                                    <div class="section-header d-flex align-items-center justify-content-between">
+                                        <h6 class="mb-0">Incident Location</h6>
+                                    </div>
+                                    <div class="section-body">
+                                        <div class="info-item">
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            <span class="info-title">Address</span>
+                                            <span class="info-sub">@Model.IVDetails.IncidentLocation</span>
+                                            <a href="#" class="map-link" onclick="OpenIncidentMap('@Model.Id')"><i class="fa-solid fa-map"></i> View on Map</a>
+                                        </div>
+
+                                        <div class="info-item">
+                                            <i class="fa-solid fa-road"></i>
+                                            <span class="info-title">Nearest Intersection</span>
+                                            <span class="info-sub" @Model.IVDetails.NearestIntersection</span>
+                                        </div>
+
+                                        <div class="info-item">
+                                            <i class="fa-solid fa-cube"></i>
+                                            <span class="info-title">Affected Assets</span>
+                                            <span class="assets info-sub">
+                                                @foreach (var item in Model.IVDetails.AffectedAssets)
+                                                {
+                                                    <span>@item</span>
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="validationCard incidentDetail">
+                                    <div class="section-header d-flex align-items-center justify-content-between">
+                                        <h6 class="mb-0">Incident Details</h6>
+                                    </div>
+                                    <div class="section-body">
+                                        <div class="detailInfoSec d-flex align-items-center gap-2 mb-2">
+                                            <div class="info-sec">
+                                                <span class="info-title">Event Type</span>
+                                            </div>
+                                            <div>@Model.IVDetails.EventType</div>
+                                        </div>
+                                        <div class="detailInfoSec d-flex align-items-center gap-2 mb-2">
+                                            <div class="info-sec">
+                                                <span class="info-title">Reported Severity</span>
+                                            </div>
+                                            <span class="badge orange" style="background-color: @Model.IVDetails.SeverityColor !important">@Model.IVDetails.Severity</span>
+                                        </div>
+                                        <div class="detailInfoSec d-flex align-items-center gap-2 mb-2">
+                                            <div class="info-sec">
+
+                                                <span class="info-title">Current Status</span>
+                                            </div>
+                                            <span class="badge red" style="background-color: @Model.IVDetails.IncidentStatusColor !important">@Model.IVDetails.IncidentStatus</span>
+                                        </div>
+                                        <div class="detailInfoSec">
+                                            <div class="info-sec">
+                                                <span class="info-title mb-2">Description</span>
+                                                <div class="desc-box">
+                                                    @Model.IVDetails.DescriptionIssue
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row safety-supporting-info">
+                            <div class="col-md-6 col-lg-6">
+                                <div class="validationCard safty">
+                                    <div class="section-header d-flex align-items-center justify-content-between">
+                                        <h6 class="mb-0">Safety Assessment</h6>
+                                    </div>
+                                    <div class="section-body">
+                                        <div class="grid">
+                                            @RenderBox("Gas Odor Present", Model.IVDetails.GasPresent)
+                                            @RenderBox("Hissing Sound", Model.IVDetails.HissingPresent)
+                                            @RenderBox("Visible Damage/Fire", Model.IVDetails.VisibleDamagePresent)
+                                            @RenderBox("People Injured", Model.IVDetails.PeopleInjured)
+                                            @RenderBox("Evacuation Required", Model.IVDetails.EvacuationRequired)
+                                            @RenderBox("Water Present", Model.IVDetails.WaterPresent)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-6">
+                                <div class="supporting-information-sec">
+                                    <div class="section-card">
+                                        <div class="section-header d-flex align-items-center justify-content-between">
+                                            <h6 class="mb-0">Supporting Information</h6>
+                                        </div>
+                                        <div class="section-body">
+                                            <!-- Service Notes -->
+                                            <div class="note-title">
+                                                <i class="fa-regular fa-file-lines"></i> Service Representative Notes
+                                            </div>
+                                            <div class="note-box">@Model.incidentSupportingInfoViewModel.Notes</div>
+
+                                            <!-- Photos -->
+                                            <div class="photos-title">
+                                                <i class="fa-regular fa-image"></i> Photos (@Model.incidentSupportingInfoViewModel?.ImageUrls.Count())
+                                            </div>
+                                            <div class="photos-grid">
+                                                @foreach (var imageUrl in Model.incidentSupportingInfoViewModel?.ImageUrls)
+                                                {
+                                                    <div class="photo-item">
+                                                        <img src="@imageUrl" alt="incidentPhoto" />
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                    </div>
+
+                    @*   <!-----------------location and incident information--------------------------->
+                    <div class="section">
+                        <div class="section-card">
+                            <h3>Caller Information</h3>
+                            <div class="section-body">
+                                <div class="info-item d-flex align-items-start">
+                                    <i class="fa-regular fa-user"></i>
+                                    <div>
+                                        <span>@Model.incidentCellerInformation?.CallerName</span>
+                                        <div class="subtext">@Model.incidentCellerInformation?.RelationshipName</div>
+                                    </div>
+                                </div>
+                                <div class="info-item d-flex align-items-start">
+                                    <i class="fa-solid fa-phone"></i>
+                                    <div>
+                                        <strong>@Model.incidentCellerInformation?.CallerPhoneNumber</strong>
+                                        <div class="subtext">Primary contact</div>
+                                    </div>
+                                </div>
+                                <div class="info-item d-flex align-items-start">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <div>
+                                        <span class="info-title">Caller Address</span>
+                                        <div class="subtext">@Model.incidentCellerInformation?.CallerAddress</div>
+                                    </div>
+                                </div>
+                                <div class="info-item d-flex align-items-start">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    <div>
+                                        <span class="info-title">Call Time</span>
+                                        <div class="subtext">@Model.incidentCellerInformation?.CallDateInFormat @Model.incidentCellerInformation?.CallTimeInFormat</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-card">
+                            <h3>Incident Location</h3>
+                            <div class="section-body">
+                                <div class="info-item d-flex align-items-start">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <div>
+                                        <span class="info-title">Address</span>
+                                        <div class="subtext">@Model.incidentiLocation?.Address</div>
+                                    </div>
+                                </div>
+                                <div class="info-item ">
+                                    <span class="info-title">Nearest Intersection</span> <br><span class="subtext">@Model.incidentiLocation?.Landmark</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-title">Service Account</span> <br><span class="subtext">@Model.incidentiLocation?.ServiceAccount</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-title">Affected Assets</span> <br>
+                                    @foreach (var asset in Model.incidentiLocation?.AssetNames)
+                                    {
+                                        <span class="badge">@asset</span>
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-----------------Supporting information--------------------------->
+                    <div class="supporting-information-sec">
+                        <div class="section-card">
+                            <h3>Supporting Information</h3>
+                            <div class="section-body">
+                                <!-- Service Notes -->
+                                <div class="note-title">
+                                    <i class="fa-regular fa-file-lines"></i> Service Representative Notes
+                                </div>
+                                <div class="note-box">@Model.incidentSupportingInfoViewModel.Notes</div>
+
+                                <!-- Photos -->
+                                <div class="photos-title">
+                                    <i class="fa-regular fa-image"></i> Photos (@Model.incidentSupportingInfoViewModel?.ImageUrls.Count())
+                                </div>
+                                <div class="photos-grid">
+                                    @foreach (var imageUrl in Model.incidentSupportingInfoViewModel?.ImageUrls)
+                                    {
+                                        <div class="photo-item">
+                                            <img src="@imageUrl" alt="incidentPhoto" />
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div> *@
+                </div>
+
+                @if (Model.incidentDetailByIdViewModel.StatusLegendId == 1)
+                {
+                    <form id="incident_validation_form">
+                        <div id="validation" class="tab-content active">
+                            <div class="phase-header">
+                                <div>
+                                    <div class="phaseTitle">Phase: <span class="fw-bold">Validation</span></div>
+                                    <div class="phaseTitle">Progress: <span class="phaseTitle fw-bold">80% Complete</span></div>
+                                </div>
+
+                            </div>
+                            <div style="text-align: right;" class="mb-3">
+                                <button type="button" class="btn btn-primary btn-sm" style="height: 48px; width: 100px;" id="saveValidationBtn">
+                                    Validate
+                                </button>
+                            </div>
+
+                            <!-- Top Cards -->
+                            <div class="row g-3">
+                                <!-- Incident Details -->
+                                <div class="col-md-4">
+                                    <div class="card-custom">
+                                        <div class="section-title">Incident Details</div>
+                                        <div class="section-body">
+                                            @* @foreach (var item in Model.IncidentValidationLocations)
+                                        { *@
+
+                                            <div class="info-item">
+                                                <div>
+                                                    <span class="info-title">Severity Level:</span>
+                                                    <select class="form-select" required id="severityLevelId" asp-for="@Model.IVValidation.severityLevelId">
+                                                        <option value="" selected>Select confirmed severity</option>
+                                                        @foreach (var item in Model.severityLevels)
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div>
+                                                    <span class="info-title">Discovery Perimeter:</span>
+                                                    <select class="form-select" required id="RadiusId" asp-for="@Model.IVValidation.RadiusId">
+                                                        <option value="" selected>Select radius</option>
+                                                        <option value="1">1 Mile</option>
+                                                        <option value="2">3 Miles</option>
+                                                        <option value="3">5 Miles</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div>
+                                                    <span class="info-title">ICP Location:</span>
+                                                    <input type="hidden" id="hdnLat" asp-for="@Model.IVValidation.Lat" value="0" />
+                                                    <input type="hidden" id="hdnLon" asp-for="@Model.IVValidation.Long" value="0" />
+                                                    <input type="text" id="ICPLocation" class="form-control mb-2" asp-for="@Model.IVValidation.IncidentLocation" placeholder="123 Main St, City, ST 12345">
+                                                    <ul id="suggestionsICPLocation" class="suggestions-list"></ul>
+                                                </div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div>
+                                                    <span class="info-title">Source:</span>
+                                                    <input type="text" id="Source" asp-for="@Model.IVValidation.Source" class=" form-control mb-2">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div id="map" style="height:250px; width:100%; display:none" class="mapDivClass"></div>
+                                                </div>
+                                            </div>
+                                            <script>
+                                                $(document).ready(function () {
+                                                    initICPLocationAutocomplete();
+                                                });
+                                            </script>
+
+                                            @* } *@
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Assigned Roles -->
+                                <div class="col-md-4">
+                                    <div class="card-custom">
+                                        <div class="section-title">Assigned Roles</div>
+                                        <div class="section-body">
+                                            <div class="info-item">
+                                                <div>
+                                                    <span class="info-title">Incident Commander:</span>
+                                                    <select class="form-select" required id="severityLevelId" asp-for="@Model.IVValidation.assignedRole.IncidentCommanderId">
+                                                        <option value="" selected>Select Incident Commander</option>
+                                                        @foreach (var item in Model.UserList)
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div>
+                                                    <span class="info-title">Field Env. Rep (FER):</span>
+                                                    <select class="form-select" required id="severityLevelId" asp-for="@Model.IVValidation.assignedRole.FieldEnvRepId">
+                                                        <option value="" selected>Select Field Env. Rep</option>
+                                                        @foreach (var item in Model.UserList)
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div>
+                                                    <span class="info-title">GEC Coordinator:</span>
+                                                    <select class="form-select" required id="severityLevelId" asp-for="@Model.IVValidation.assignedRole.GECCoordinatorId">
+                                                        <option value="" selected>Select GEC Coordinator</option>
+                                                        @foreach (var item in Model.UserList)
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div>
+                                                    <span class="info-title">Engineering Lead:</span>
+                                                    <select class="form-select" required id="severityLevelId" asp-for="@Model.IVValidation.assignedRole.EngineeringLeadId">
+                                                        <option value="" selected>Select Engineering Lead</option>
+                                                        @foreach (var item in Model.UserList)
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <!-- Validation Gates -->
+                                <div class="col-md-4">
+                                    <div class="card-custom">
+                                        <div class="section-title">Validation Gates</div>
+                                        <div class="section-body">
+                                            <div class="info-item">
+                                                <div>
+                                                    <span class="info-title"><i class="fa fa-circle-check text-success me-2"></i>Containment Acknowledgment:</span>
+                                                    <div class="selectRadio">
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio" asp-for="@Model.IVValidation.validationGates.ContainmentAcknowledgement"
+                                                                   id="WaterPresentYes" value="1">
+                                                            <label class="form-check-label" for="WaterPresentYes">Yes</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            @if (Model.Id > 0)
+                                                            {
+                                                                <input class="form-check-input" type="radio" asp-for="@Model.IVValidation.validationGates.ContainmentAcknowledgement"
+                                                                       id="WaterPresentNo" value="0">
+                                                            }
+                                                            else
+                                                            {
+                                                                <input class="form-check-input" type="radio" checked asp-for="@Model.IVValidation.validationGates.ContainmentAcknowledgement"
+                                                                       id="WaterPresentNo" value="0">
+                                                            }
+                                                            <label class="form-check-label" for="WaterPresentNo">No</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div>
+                                                    <span class="info-title">Exception Request:</span>
+                                                    <div class="selectRadio">
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio" asp-for="@Model.IVValidation.validationGates.Exception"
+                                                                   id="WaterPresentYes" value="1">
+                                                            <label class="form-check-label" for="WaterPresentYes">Yes</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            @if (Model.Id > 0)
+                                                            {
+                                                                <input class="form-check-input" type="radio" asp-for="@Model.IVValidation.validationGates.Exception"
+                                                                       id="WaterPresentNo" value="0">
+                                                            }
+                                                            else
+                                                            {
+                                                                <input class="form-check-input" type="radio" checked asp-for="@Model.IVValidation.validationGates.Exception"
+                                                                       id="WaterPresentNo" value="0">
+                                                            }
+                                                            <label class="form-check-label" for="WaterPresentNo">No</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio" asp-for="@Model.IVValidation.validationGates.Exception"
+                                                                   id="WaterPresentUnknown" value="2">
+                                                            <label class="form-check-label" for="WaterPresentUnknown">N/A</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div>
+                                                    <span class="info-title">Independent Inspection Required:</span>
+                                                    <div class="selectRadio">
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio" asp-for="@Model.IVValidation.validationGates.IndependentInspection"
+                                                                   id="WaterPresentYes" value="1">
+                                                            <label class="form-check-label" for="WaterPresentYes">Yes</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            @if (Model.Id > 0)
+                                                            {
+                                                                <input class="form-check-input" type="radio" asp-for="@Model.IVValidation.validationGates.IndependentInspection"
+                                                                       id="WaterPresentNo" value="0">
+                                                            }
+                                                            else
+                                                            {
+                                                                <input class="form-check-input" type="radio" checked asp-for="@Model.IVValidation.validationGates.IndependentInspection"
+                                                                       id="WaterPresentNo" value="0">
+                                                            }
+                                                            <label class="form-check-label" for="WaterPresentNo">No</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div>
+                                                    <span class="info-title">Regulatory Notifications:</span>
+                                                    <div class="d-grid gap-2" style="grid-template-columns: repeat(3, 1fr);">
+                                                        <div class="form-check form-check-inline eventCheck">
+                                                            <input class="form-check-input" type="checkbox" id="CPOC" name="IVValidation.validationGates.Regulatory" value="1">
+                                                            <label class="form-check-label" for="eventType_26">
+                                                                CPOC
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline eventCheck">
+                                                            <input class="form-check-input" type="checkbox" id="PHMSA" name="IVValidation.validationGates.Regulatory" value="2">
+                                                            <label class="form-check-label" for="eventType_6">
+                                                                PHMSA
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline eventCheck">
+                                                            <input class="form-check-input" type="checkbox" id="NTSB" name="IVValidation.validationGates.Regulatory" value="3">
+                                                            <label class="form-check-label" for="eventType_7">
+                                                                NTSB
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline eventCheck">
+                                                            <input class="form-check-input" type="checkbox" id="EPA" name="IVValidation.validationGates.Regulatory" value="4">
+                                                            <label class="form-check-label" for="eventType_4">
+                                                                EPA
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline eventCheck">
+                                                            <input class="form-check-input" type="checkbox" id="LFD" name="IVValidation.validationGates.Regulatory" value="5">
+                                                            <label class="form-check-label" for="eventType_11">
+                                                                Local Fire Dept
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline eventCheck">
+                                                            @* <input type="radio" id="IsOtherEvent" class="form-check-input" name="incidentDetails.IsOtherEvent"> *@
+                                                            <input class="form-check-input" type="checkbox" id="IsOtherEventID" asp-for="IVValidation.validationGates.IsOtherEvent">
+                                                            <label class="form-check-label" asp-for="IVValidation.validationGates.IsOtherEvent">Other</label>
+                                                        </div>
+                                                        <div class="mb-3 OtherEventDetail" style="display:none">
+                                                            <input type="text" id="OtherEventDetail" class="form-control" asp-for="IVValidation.validationGates.OtherEventDetail" value="">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Validation Notes -->
+                            <div class="card-custom mt-4 validation-notes">
+                                <div class="section-title">Validation Notes</div>
+                                <div class="section-body" id="validationNotesBody">
+                                    @if (Model.incidentValidationsDetailsViewModel.IncidentValidationNotesList != null && Model.incidentValidationsDetailsViewModel.IncidentValidationNotesList.Any())
+                                    {
+                                        foreach (var n in Model.incidentValidationsDetailsViewModel.IncidentValidationNotesList)
+                                        {
+                                            <div class="note" data-note-id="@n.Id">
+                                                <span class="note-badge">@(!string.IsNullOrEmpty(n.CreatedByName) ? n.CreatedByName.Split(' ').FirstOrDefault()?.ToUpper() : "IC")</span>
+                                                <span class="note-text">@n.Notes</span>
+                                                <div class="note-meta">@n.CreatedOn</div>
+                                            </div>
+                                        }
+                                    }
+
+                                    <textarea class="form-control mt-3" rows="3" id="addNote" placeholder="Add new note..."></textarea>
+                                </div>
+                            </div>
+
+
+                            <!-- Footer -->
+                            <div class="footer-section mt-4">
+                                <div class="d-flex align-items-center">
+                                    @* <div class="validatedBy"><strong>Validated By: </strong> <span>@Model.incidentValidationsDetailsViewModel.IncidentValidationCommunicationHistoriesViewModelList?.FirstOrDefault()?.UserName</span></div> *@
+                                    <div class="validatedBy"><strong>Validated By: </strong> <span>@User.Identity?.Name</span></div>
+
+                                    <div><strong>Date: </strong><span id="validatedDate"></span></div>
+                                </div>
+                                <div>
+                                    <strong>Status:</strong>
+                                    <span class="status-btn">Ready to Launch Assessment</span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <div id="validation" class="tab-content">
+                        <div class="phase-header">
+                            <div>
+                                <div class="phaseTitle">Phase: <span class="fw-bold">Validation</span></div>
+                                <div class="phaseTitle">Progress: <span class="phaseTitle fw-bold">80% Complete</span></div>
+                            </div>
+
+                        </div>
+
+                        <!-- Top Cards -->
+                        <div class="row g-3">
+                            <!-- Incident Details -->
+                            <div class="col-md-4">
+                                <div class="card-custom">
+                                    <div class="section-title">Incident Details</div>
+                                    <div class="section-body">
+                                        @* @foreach (var item in Model.IncidentValidationLocations)
+                                    { *@
+
+                                        <div class="info-item">
+                                            <div>
+                                                <span class="info-title">Severity Level:</span>
+                                                <div class="subtext">@Model.IncidentValidationLocations.SeverityName</div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div>
+                                                <span class="info-title">Discovery Perimeter:</span>
+                                                <div class="subtext">@Model.IncidentValidationLocations.DiscoveryPerimeter</div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div>
+                                                <span class="info-title">ICP Location:</span>
+                                                <div class="subtext">@Model.IncidentValidationLocations.ICPLocation</div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div>
+                                                <span class="info-title">Source:</span>
+                                                <div class="subtext">@Model.IncidentValidationLocations.Source</div>
+                                            </div>
+                                        </div>
+
+
+                                        @* } *@
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Assigned Roles -->
+                            <div class="col-md-4">
+                                <div class="card-custom">
+                                    <div class="section-title">Assigned Roles</div>
+                                    <div class="section-body">
+                                        <div class="info-item">
+                                            <div>
+                                                <span class="info-title">Incident Commander:</span>
+                                                <div class="subtext">@Model.incidentValidationAssignedRolesViewModel.IncidentCommanderName</div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div>
+                                                <span class="info-title">Field Env. Rep (FER):</span>
+                                                <div class="subtext">@Model.incidentValidationAssignedRolesViewModel.FieldEnvRepName</div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div>
+                                                <span class="info-title">GEC Coordinator:</span>
+                                                <div class="subtext">@Model.incidentValidationAssignedRolesViewModel.GEC_CoordinatorName</div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div>
+                                                <span class="info-title">Engineering Lead:</span>
+                                                <div class="subtext">@Model.incidentValidationAssignedRolesViewModel.EngineeringLeadName</div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Validation Gates -->
+                            <div class="col-md-4">
+                                <div class="card-custom">
+                                    <div class="section-title">Validation Gates</div>
+                                    <div class="section-body">
+                                        <div class="info-item">
+                                            <div>
+                                                <span class="info-title"><i class="fa fa-circle-check text-success me-2"></i>Containment Acknowledgment:</span>
+                                                <div class="subtext">@Model.incidentValidationGatesViewModel.ContainmentAcknowledgement</div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div>
+                                                <span class="info-title">Exception Request:</span>
+                                                <div class="subtext">@Model.incidentValidationGatesViewModel.Exception</div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div>
+                                                <span class="info-title">Independent Inspection Required:</span>
+                                                <div class="subtext">@Model.incidentValidationGatesViewModel.IndependentInspection</div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div>
+                                                <span class="info-title">Regulatory Notifications:</span>
+                                                <div class="subtext">@Model.incidentValidationGatesViewModel.Regulatory</div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        @*  <!-- Validation Notes -->
+                    <div class="card-custom mt-4 validation-notes">
+                    <div class="section-title">Validation Notes</div>
+                    <div class="section-body">
+                    <div class="note">
+                    <span class="note-badge">IC</span>
+                    Confirmed incident details imported from CSR at 10:12 AM.
+                    </div>
+
+                    <div class="note">
+                    <span class="note-badge">FER</span>
+                    Verified containment plan; no release risk identified.
+                    </div>
+
+                    <div class="note">
+                    <span class="note-badge">Engineering</span>
+                    Provided topographic overlay for perimeter confirmation.
+                    </div>
+                    <textarea class="form-control mt-3" rows="3" id="addNote" placeholder="Add new note..."></textarea>
+                    </div>
+
+                    </div> *@
+                        <!-- Validation Notes -->
+                        <div class="card-custom mt-4 validation-notes">
+                            <div class="section-title">Validation Notes</div>
+                            <div class="section-body" id="validationNotesBody">
+                                @if (Model.incidentValidationsDetailsViewModel.IncidentValidationNotesList != null && Model.incidentValidationsDetailsViewModel.IncidentValidationNotesList.Any())
+                                {
+                                    foreach (var n in Model.incidentValidationsDetailsViewModel.IncidentValidationNotesList)
+                                    {
+                                        <div class="note" data-note-id="@n.Id">
+                                            <span class="note-badge">@(!string.IsNullOrEmpty(n.CreatedByName) ? n.CreatedByName.Split(' ').FirstOrDefault()?.ToUpper() : "IC")</span>
+                                            <span class="note-text">@n.Notes</span>
+                                            <div class="note-meta">@n.CreatedOn</div>
+                                        </div>
+                                    }
+                                }
+
+                                <textarea class="form-control mt-3" rows="3" id="addNote" placeholder="Add new note..."></textarea>
+                            </div>
+                        </div>
+
+
+                        <!-- Footer -->
+                        <div class="footer-section mt-4">
+                            <div class="d-flex align-items-center">
+                                @* <div class="validatedBy"><strong>Validated By: </strong> <span>@Model.incidentValidationsDetailsViewModel.IncidentValidationCommunicationHistoriesViewModelList?.FirstOrDefault()?.UserName</span></div> *@
+                                <div class="validatedBy"><strong>Validated By: </strong> <span>@User.Identity?.Name</span></div>
+
+                                <div><strong>Date: </strong><span id="validatedDate"></span></div>
+                            </div>
+                            <div>
+                                <strong>Status:</strong>
+                                <span class="status-btn">Ready to Launch Assessment</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+
+                <div id="personnel" class="tab-content">
+                    <!-- Top Filters -->
+                    <div class="d-flex align-items-center justify-content-between bg-white p-3 rounded shadow-sm mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"><i class="fa-regular fa-calendar"></i></span>
+                                <input type="date" id="reportDate" class="form-control dateFilter" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                            </div>
+                            <div class="form-check ms-2">
+                                <input class="form-check-input" type="checkbox" id="onsite">
+                                <label class="form-check-label">Show currently onsite only</label>
+                            </div>
+                            @Html.DropDownListFor(model => model.IncidentRoleId,
+                            (SelectList)ViewBag.Roles,
+                                                        "Select Role",
+                                                        new { @class = "form-select w-auto roleFilter", id = "RoleFilter" })
+                            @Html.DropDownListFor(model => model.CompanyId,
+                                                        (SelectList)ViewBag.Companies,
+                                                        "Select Company",
+                                                        new { @class = "form-select w-auto roleFilter", id = "CompanyFilter" })
+                        </div>
+                        <div class="d-flex gap-2 mt-3 mt-md-0">
+                            <button class="btn btnAdd text-white btn-common" id="addPerson"><i class="fa-solid fa-user-plus me-2"></i>Add Person</button>
+                            <button class="btn btn-outline-secondary btn-common"><i class="fa-solid fa-download me-2"></i>Export (CSV)</button>
+                            <button class="btn btn-outline-secondary btn-common"><i class="fa-solid fa-print me-2"></i>Print Roster</button>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <!-- Summary Cards -->
+                        <div class="col-lg-9">
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-3">
+                                    <div class="stat-card">
+                                        <h6>Onsite Now</h6>
+                                        <h3 id="onsiteNowCount">@Model.incidentValidationPersonnelsCountViewModel.OnsiteNowCount</h3>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-card">
+                                        <h6>Checked Out Today</h6>
+                                        <h3 class="checkedOutTodayCount">@Model.incidentValidationPersonnelsCountViewModel.CheckedOutTodayCount</h3>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-card">
+                                        <h6>Total Hours (Today)</h6>
+                                        <h3 class="totalHoursToday">@Model.incidentValidationPersonnelsCountViewModel.TotalHoursToday</h3>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-card">
+                                        <h6>Avg Hours / Worker</h6>
+                                        <h3 class="avgHoursWorker">@Model.incidentValidationPersonnelsCountViewModel.AvgHoursWorker</h3>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Table -->
+                            <div class="card mb-4">
+                                <div class="card-body p-0 onSiteTable">
+                                    <div class="d-flex justify-content-between align-items-center mb-0 p-3">
+                                        <h6 class="fw-bold mb-0">Currently Onsite (Live)</h6>
+                                        @* <span class="small text-muted">Auto-refresh: 60s</span> *@
+                                        <button id="savePerson" class="btn btn-success mb-2" style="display:none;">Save Person</button>
+                                    </div>
+                                    <div class="table-responsive table-rounded custom-scroll">
+                                        <table class="table align-middle text-left">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Role</th>
+                                                    <th>Company</th>
+                                                    <th>Type</th>
+                                                    <th>Shift</th>
+                                                    <th>Time In</th>
+                                                    <th>Hours So Far</th>
+                                                    <th>Supervisor</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="personnelTableBody">
+                                                @if (Model.incidentValidationPersonnelsViewModel != null && Model.incidentValidationPersonnelsViewModel.Count > 0)
+                                                {
+                                                    foreach (var personnels in Model.incidentValidationPersonnelsViewModel)
+                                                    {
+                                                        var hoursSoFar = personnels.TimeIn.HasValue
+                                                        ? (DateTime.Now - personnels.TimeIn.Value).TotalHours
+                                                        : 0;
+
+                                                        <tr>
+                                                            <td>@personnels.Name</td>
+                                                            <td>@personnels.Role</td>
+                                                            <td>@personnels.Company</td>
+                                                            <td>@personnels.Type</td>
+                                                            <td>@personnels.Shift</td>
+                                                            <td class="timeIn" data-id="@personnels.IncidentValidationPersonnelsId">
+                                                                @(personnels.TimeIn?.ToString("HH.mm") ?? "00.00")
+                                                            </td>
+                                                            <td>@hoursSoFar.ToString("0.00")</td>
+                                                            <td class="supervisor"
+                                                                data-UserId="@personnels.UserId"
+                                                                data-CompanyId="@personnels.CompanyId"
+                                                                data-id="@personnels.IncidentValidationPersonnelsId">
+                                                                @(string.IsNullOrEmpty(personnels.Supervisor) ? "Select" : personnels.Supervisor)
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <tr class="no-records"><td colspan="8" class="text-center">No Data found.</td></tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Supervisor Note -->
+                            <div class="alert alert-warning d-flex align-items-center justify-content-between SupervisorNote">
+                                <div class=" d-flex align-items-start">
+                                    <i class="fa-solid fa-user-shield me-2 mt-1"></i>
+                                    <div>
+                                        <strong>Supervisor On Duty:</strong> J. Martinez<br>
+                                        <small>Next Shift: 18:00 (Night)</small>
+                                    </div>
+                                </div>
+                                <div class="noteAlert d-flex align-items-center">
+                                    <i class="fa-solid fa-circle me-2"></i>
+                                    <span>Notes: High-priority staffing for extraction ops overnight.</span>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+
+                        <!-- Daily Summary -->
+                        <div class="col-lg-3 dailySummaryRight">
+                            <div class="card shadow-sm border-0 rounded-4 mb-4 DailysummaryContent">
+                                <div class="card-header rounded-top-4 ">
+                                    <h5 class="mb-0"><i class="fa-solid fa-chart-line me-2"></i>Daily Summary</h5>
+                                    (<span id="summaryDate">@DateTime.Now.ToString("MMM d, yyyy")</span>)
+                                </div>
+                                <div class="card-body">
+                                    <div class="totalSec">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <p class="text-muted mb-0">Total Onsite Today</p>
+                                            <h4 class="fw-bold mb-0 checkedOutTodayCount">@Model.incidentValidationPersonnelsCountViewModel.CheckedOutTodayCount</h4>
+                                        </div>
+                                        <div class="d-flex align-items-center justify-content-between">
+
+                                            <p class="text-muted mb-0">Total Hours Today</p>
+                                            <h4 class="fw-bold mb-0 totalHoursToday">@Model.incidentValidationPersonnelsCountViewModel.TotalHoursToday</h4>
+                                        </div>
+                                        <div class="d-flex align-items-center justify-content-between">
+
+                                            <p class="text-muted mb-0">Avg Hours / Worker</p>
+                                            <h4 class="fw-bold mb-0 avgHoursWorker">@Model.incidentValidationPersonnelsCountViewModel.AvgHoursWorker</h4>
+                                        </div>
+                                    </div>
+
+                                    <div class="durationsec">
+                                        <div class="shiftDur">
+                                            <h6 class="fw-semibold mb-2">Shift Distribution</h6>
+                                            <div class="d-flex justify-content-between">
+                                                <span>Day Shift</span>
+                                                <span class="fw-semibold" id="totalDayShift">@Model.incidentValidationPersonnelsCountViewModel.TotalDayShift</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <span>Night Shift</span>
+                                                <span class="fw-semibold" id="totalNightShift">@Model.incidentValidationPersonnelsCountViewModel.TotalNightShift</span>
+                                            </div>
+                                        </div>
+                                        <div class="WorkforceSec">
+                                            <h6 class="fw-semibold mb-2">Workforce Type</h6>
+                                            <div class="d-flex justify-content-between">
+                                                <span>Employees</span>
+                                                <span class="fw-semibold" id="totalEmployees">@Model.incidentValidationPersonnelsCountViewModel.TotalEmployees</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <span>Contractors</span>
+                                                <span class="fw-semibold" id="totalContractors">@Model.incidentValidationPersonnelsCountViewModel.TotalContractors</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Top Contributors Section -->
+                            <div class="card shadow-sm border-0 rounded-4 topContributors">
+                                <div class="card-header bg-light fw-semibold">
+                                    <i class="fa-regular fa-clock me-2"></i>Top Contributors (Hours Today)
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group list-group-flush">
+                                        @if (Model.incidentValidationPersonnelsTopContributorsViewModel != null && Model.incidentValidationPersonnelsTopContributorsViewModel.Count > 0)
+                                        {
+                                            var counter = 1;
+                                            @foreach (var contributors in Model.incidentValidationPersonnelsTopContributorsViewModel)
+                                            {
+                                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <div><span class="badge me-2">@counter</span>@contributors.Name</div>
+                                                    <span class="fw-semibold text-muted">@contributors.TotalHoursToday hrs</span>
+                                                </div>
+                                                counter++;
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="assessment" class="tab-content">
+                    <div class="topCard mb-3">
+                        <div class="row g-3">
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Open Tasks:</div>
+                                    <div><span class="info-value" id="openTaskCount">@Model.IncidentAssessmentDetails?.OpenTaskCount</span></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Completed:</div>
+                                    <div><span class="info-value" id="completedTaskCount">@Model.IncidentAssessmentDetails?.CompletedTaskCount</span></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Containment Ready:</div>
+                                    <div class="text-green info-value">Yes (FER)</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">ICP Sites:</div>
+
+                                    <div><span class="info-value">@Model.IncidentAssessmentDetails?.ICPLocationCount (@Model.IncidentAssessmentDetails?.PrimaryLocationCount primary, @Model.IncidentAssessmentDetails?.AdditionalLocationCount staging)</span></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <!-- Left Section -->
+                        <div class="col-lg-8">
+
+                            <div class="section-card">
+                                <div class="d-flex align-items-center justify-content-between section-title">
+                                    <h6 class="mb-0 fw-semibold ">All Steps (Assessment Checklist)</h6>
+                                    @if (Model.IncidentAssessmentDetails?.incidentCommanderDetailViewslist.Count == 0)
+                                    {
+                                        <button class="btn btn-add btnAddAssessmentPopup" onclick="AddAssessmentDetails();"><i class="fa-solid fa-plus me-2"></i>Add Assestment</button>
+                                    }
+                                </div>
+                                <div class="card-body">
+                                    <!-- Filters -->
+                                    <div class="d-flex align-items-center w-100 p-3">
+                                        <div class="d-flex align-items-center justify-content-start  flex-wrap gap-2 w-100">
+                                            <input type="text" class="form-control" id="global_search_value" placeholder="Search steps..." style="max-width:180px;">
+                                            <select class="form-select" style="max-width:150px;" id="ddlOwner">
+                                                <option value="">All owners</option>
+                                                @if (Model.IncidentAssessmentDetails != null)
+                                                {
+                                                    @foreach (var item in Model.IncidentAssessmentDetails.OwenerTypes)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                }
+                                            </select>
+                                            <select class="form-select" style="max-width:150px;" id="ddlStatus">
+                                                <option value="">Status: All</option>
+                                                @if (Model.IncidentAssessmentDetails != null)
+                                                {
+                                                    @foreach (var item in Model.IncidentAssessmentDetails.Status)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                }
+                                            </select>
+                                            <button class="btn btn-light border">Bulk actions</button>
+                                        </div>
+                                        <div class="filter-link">Filter</div>
+                                    </div>
+                                    <div id="div_assestment_details">
+                                        @await Html.PartialAsync("_IncidentAssessmentDetailsPartial", Model.IncidentAssessmentDetails)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Section -->
+                        <div class="col-lg-4">
+                            <div class="updates d-flex flex-column justify-content-between mb-3">
+                                @{
+                                    Model.IncidentViewPostType = 3; // assessment
+                                }
+                                @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
+
+                            </div>
+                            <div class="card">
+                                <div class="card-header bg-white fw-semibold" style="display:none">
+                                    <i class="fa fa-map-location-dot text-warning me-2"></i>Mini Map
+                                </div>
+                                <div class="card-body text-center" style="display:none">
+                                    <p class="small text-muted mb-3">Shows ICP and newly marked low/squeeze points.</p>
+                                    <div class="mini-map-icon mb-2">
+                                        <i class="fa fa-location-dot"></i>
+                                    </div>
+                                    <p class="text-muted small mb-0">Mini Map View</p>
+                                </div>
+                                <div class="card-body attachments">
+                                    <h6 class="fw-semibold small mb-2">Attachments</h6>
+
+                                    <div id="div_Attachments">
+                                        @await Html.PartialAsync("_ViewAttachmentAssestmentPartial", Model.incidentViewAssessmentAttachmentView)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="repair" class="tab-content">
+                    <div class="topCard mb-3">
+                        <div class="row g-3">
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Purge Points:</div>
+                                    <div><span class="info-value">6</span> <span class="info-sub">Active</span></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Extraction Volume:</div>
+                                    <div><span class="info-value">9,800</span> <span class="info-sub">gal</span></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Vacuum Trucks:</div>
+                                    <div><span class="info-value">2</span> <span class="info-sub">On Site</span></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Containment Verified:</div>
+                                    <div class="text-green"><i class="fa-regular fa-circle-check info-icon"></i>(FER)</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="LeftSection">
+                                <!-- Pre-Operation Setup -->
+                                <div class="card mb-4">
+                                    <div class="card-body p-0">
+                                        <h6 class="fw-bold mb-0 p-3">Pre-Operation Setup</h6>
+                                        <div class="table-responsive table-rounded custom-scroll">
+                                            <div id="div_repair_details">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Extraction & Purge Log -->
+                                <div class="card mb-4">
+                                    <div class="card-body p-0">
+                                        <div class="d-flex justify-content-between align-items-center mb-0 p-3">
+                                            <h6 class="fw-bold mb-0">Extraction & Purge Log</h6>
+                                            <button class="btn btn-add"><i class="fa-solid fa-plus me-2"></i>Add Purge Point</button>
+                                        </div>
+                                        <div class="table-responsive table-rounded custom-scroll">
+                                            <table class="table align-middle text-left">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Purge ID</th>
+                                                        <th>Location / ICP</th>
+                                                        <th>Start Time</th>
+                                                        <th>End Time</th>
+                                                        <th>Volume (gal)</th>
+                                                        <th>Truck / Vendor</th>
+                                                        <th>FER Verified</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="fw-semibold">PRG-001</td>
+                                                        <td>ICP-1 / Main Gate</td>
+                                                        <td>11:05</td>
+                                                        <td>11:42</td>
+                                                        <td>2,800</td>
+                                                        <td>VacTruck A</td>
+                                                        <td><i class="fa-regular fa-circle-check fa-lg text-success"></i></td>
+                                                        <td><span class="badge badge-status badge-complete">Complete</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-semibold">PRG-002</td>
+                                                        <td>ICP-2 / South Yard</td>
+                                                        <td>12:00</td>
+                                                        <td>12:45</td>
+                                                        <td>3,200</td>
+                                                        <td>VacTruck B</td>
+                                                        <td><i class="fa-regular fa-circle-check fa-lg text-success"></i></td>
+                                                        <td><span class="badge badge-status badge-complete">Complete</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-semibold">PRG-003</td>
+                                                        <td>ICP-3 / East Staging</td>
+                                                        <td>1:10</td>
+                                                        <td>--</td>
+                                                        <td>--</td>
+                                                        <td>VacTruck A</td>
+                                                        <td>--</td>
+                                                        <td><span class="badge badge-status badge-progress">In Progress</span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3  mb-3 bottomCard">
+
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="info-card text-center text-md-start">
+                                            <div class="info-title">Total Extracted (to-date):</div>
+                                            <div><span class="info-value">9,800</span> <span class="info-sub">gal</span></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="info-card text-center text-md-start">
+                                            <div class="info-title">Containers Used:</div>
+                                            <div><span class="info-value">12</span> <span class="info-sub">(drums/totes)</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="info-card text-center text-md-start">
+                                            <div class="info-title">FER Verified:</div>
+                                            <div class="text-green">100%</div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="info-card text-center text-md-start">
+                                            <div class="info-title">Next Action:</div>
+                                            <div><span class="info-value">Pressure Test & Verify Dry Lines</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <!-- Timeline -->
+                                <div class="col-md-12">
+                                    <div class="timeline">
+                                        <h6 class="Timelineheader fw-bold mb-0">Timeline (Auto-Log)</h6>
+                                        <ul>
+                                            <li><span>[10:50]</span> Leak source checklist completed (Engineering)</li>
+                                            <li><span>[11:00]</span> Purge locations identified by ENG</li>
+                                            <li><span>[11:05]</span> Verified fittings available for VacTruck A/B</li>
+                                            <li><span>[11:05]</span> PRG-001 started (VacTruck A)</li>
+                                            <li><span>[11:42]</span> PRG-001 completed – 2,800 gal</li>
+                                            <li><span>[12:00]</span> PRG-002 started (VacTruck B)</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="RightSection">
+                                <!-- Updates -->
+                                <div class="updates d-flex flex-column justify-content-between h-100">
+                                    @{
+                                        Model.IncidentViewPostType = 1; // Repair
+                                    }
+                                    @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="restoration" class="tab-content">
+                    <div class="topCard mb-3">
+                        <div class="row g-3">
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Pressure Tests:</div>
+                                    <div><span class="info-value">2</span> <span class="info-sub">of 4 Complete</span></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Customers Restored:</div>
+                                    <div><span class="info-value">65</span> <span class="info-sub"> / 120</span></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Meters/Regulators Verified:</div>
+                                    <div><span class="info-value">32</span></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Relights Remaining:</div>
+                                    <div><span class="info-value">18</span></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="LeftSection">
+
+                                <div id="div_restoration_checklist">
+                                    @await Html.PartialAsync("_RestorationChecklistPartial", Model.IncidentViewTaskViewModel)
+                                </div>
+
+
+                                <div class="row g-3  mb-3 bottomCard">
+
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="info-card text-center text-md-start">
+                                            <div class="info-title">Total Customers Restored:</div>
+                                            <div><span class="info-value">65</span> <span class="info-sub"> / 120</span></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="info-card text-center text-md-start">
+                                            <div class="info-title">Pressure Tests Passed:</div>
+                                            <div><span class="info-value">2</span> <span class="info-sub"> / 4</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="info-card text-center text-md-start">
+                                            <div class="info-title">Lines Verified Dry:</div>
+                                            <div class="text-green">100%</div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="info-card text-center text-md-start">
+                                            <div class="info-title">Next Action:</div>
+                                            <div><span class="info-value">Complete relight and finalize reports</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <!-- Timeline -->
+                                <div class="col-md-12">
+                                    <div class="timeline">
+                                        <h6 class="Timelineheader fw-bold mb-0">Timeline (Auto-Log)</h6>
+                                        <ul>
+                                            <li><span>[10:50]</span> Segment A pressure test initiated</li>
+                                            <li><span>[11:00]</span> Segment A pressure test passed</li>
+                                            <li><span>[11:05]</span> Segment B pressure test started</li>
+                                            <li><span>[11:42]</span> Regulator reinstall begun</li>
+                                            <li><span>[12:00]</span> Customer Service notified for relights</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="RightSection">
+                                <!-- Updates -->
+                                <div class="updates d-flex flex-column justify-content-between h-100 mb-3">
+                                    @{
+                                        Model.IncidentViewPostType = 4; // restoration
+                                    }
+                                    @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
+                                </div>
+                                <div class="card-custom signoffs">
+                                    <h6>Customer Notifications</h6>
+
+                                    <div class="p-3 signoffContent">
+                                        <p class="mb-0">Residential area relight letters distributed 3:30 PM.Commercial accounts scheduled for 6:00 PM.</p>
+                                    </div>
+
+
+
+                                    <div class="file-section">
+                                        <strong>Attachments</strong>
+                                        <div id="div_RestorationAttachments">
+                                            @await Html.PartialAsync("_ViewAttachmentAssestmentPartial", Model.incidentViewRestorationAttachmentView)
+                                        </div>
+
+                                        @* <strong>Attachments</strong>
+                                        <ul class="attachments mt-2">
+                                            <li><i class="fa-solid fa-circle"></i>mcr_final.pdf</li>
+                                            <li><i class="fa-solid fa-circle"></i>cpucreport_draft.docx</li>
+                                            <li><i class="fa-solid fa-circle"></i>disposal_manifest.pdf</li>
+                                            <li><i class="fa-solid fa-circle"></i>cost_summary.xlsx</li>
+                                        </ul> *@
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="closeout" class="tab-content">
+                    <div class="topCard mb-3">
+                        <div class="row g-3">
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Total Duration:</div>
+                                    <div><span class="info-value">2 Days, 8 Hours</span></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Total Cost:</div>
+                                    <div><span class="info-value">$38,450</span> <span class="info-sub"> / 120</span></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Personnel Involved:</div>
+                                    <div><span class="info-value">@Model.IncidentViewCloseoutViewModel.PersonnelInvolved</span></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Reports Completed:</div>
+                                    <div><span class="info-value">@Model.TotalCompletedCloseOut</span> <span class="info-sub"> / @Model.IncidentViewCloseoutViewModel.TotalCloseOut</span></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="LeftSection">
+
+                                <div class="card mb-4">
+                                    <div class="card-body p-0">
+                                        <div class="d-flex justify-content-between align-items-center mb-0 p-3">
+                                            <h6 class="fw-bold mb-0">Closeout & Reporting Tasks</h6>
+                                            <button class="btn btn-add" onclick="OpenAddCloseOutTaskModal()"><i class="fa-solid fa-plus me-2"></i>Add Report</button>
+                                        </div>
+                                        <div class="table-responsive table-rounded custom-scroll">
+
+                                            <div id="div_closeout_details">
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="card-custom position-relative mb-3 lessonsCard">
+                                    <h5>Lessons Learned & Comments</h5>
+                                    <small>Capture operational insights and recommendations for future incidents.</small>
+
+                                    <div class="mt-3">
+                                        <textarea class="form-control" placeholder="Enter lessons learned, process improvements, or recommendations..."></textarea>
+                                        <div class="comment-icon">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-end mt-3">
+                                        <button class="btn btn-submit"><i class="fa-solid fa-paper-plane me-2"></i>Submit Report</button>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3  mb-3 bottomCard">
+
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="info-card text-center text-md-start">
+                                            <div class="info-title">Incident Duration:</div>
+                                            <div><span class="info-value">56 Hours</span></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="info-card text-center text-md-start">
+                                            <div class="info-title">Total Cost:</div>
+                                            <div><span class="info-value">$38,450</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="info-card text-center text-md-start">
+                                            <div class="info-title">Documents Uploaded:</div>
+                                            <div class="text-green" id="closeoutUploadedDocCount">@Model.incidentViewCloseOutAttachmentView.Image.Count</div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="info-card text-center text-md-start">
+                                            <div class="info-title">Status:</div>
+                                            <div><span class="info-value text-success">Ready to Archive</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="RightSection">
+                                <!-- Updates -->
+                                <div class="updates d-flex flex-column justify-content-between h-100 mb-3">
+                                    @{
+                                        Model.IncidentViewPostType = 2; // Close out
+                                    }
+                                    @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
+                                </div>
+
+
+                                <div class="card-custom signoffs">
+                                    <h6>Management Sign-Offs</h6>
+
+                                    <div class="signoffContent">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span>Incident Commander:</span>
+                                            <span class="status signed"><i class="fa-solid fa-check-circle"></i>Signed 5:20 PM</span>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span>Field Env. Rep (FER):</span>
+                                            <span class="status signed"><i class="fa-solid fa-check-circle"></i>Signed 5:25 PM</span>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span>Engineering:</span>
+                                            <span class="status pending"><i class="fa-solid fa-triangle-exclamation"></i>Pending</span>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span>GEC / Compliance:</span>
+                                            <span class="status pending"><i class="fa-solid fa-triangle-exclamation"></i>Pending</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="file-section">
+                                        <strong>Attachments</strong>
+
+                                        <div id="div_Attachments_Closeout">
+                                            @await Html.PartialAsync("_ViewAttachmentAssestmentPartial", Model.incidentViewCloseOutAttachmentView)
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div id="imgPreviewModal" class="modal">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="previewImg" src="~/img/banner.jpg">
+</div>
+<div class="modal fade" id="timeInModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content p-3">
+            <div class="modal-header">
+                <h6 class="modal-title">Select Time In</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <label>Hour:</label>
+                <select id="hourSelect" class="form-select form-select-sm d-inline w-auto mx-1">
+                    @for (int h = 0; h < 24; h++)
+                    {
+                        <option value="@h">@h.ToString("00")</option>
+                    }
+                </select>
+
+                <label>Min:</label>
+                <select id="minuteSelect" class="form-select form-select-sm d-inline w-auto mx-1">
+                    @for (int m = 0; m < 60; m += 5)
+                    {
+                        <option value="@m">@m.ToString("00")</option>
+                    }
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-sm" id="saveTimeBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="AddPersonModal" tabindex="-1" aria-labelledby="AddPersonModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-3">
+            <div class="modal-header">
+                <h5 class="modal-title" id="AddPersonModalLabel">Add Person</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="AddPersonForm">
+                    <input type="hidden" id="incidentId" value="@Model.incidentValidationPersonnelsCountViewModel.IncidentId" />
+                    <input type="hidden" id="incidentValidationId" value="@Model.incidentValidationsDetailsViewModel.IncidentValidationId" />
+                    <div class="form-group" id="div_NameofUser">
+                        <label>Name of User <span style="color:red">*</span></label>
+                        <select class="form-select" required id="userId" onchange="getCompanyAndRole($(this))">
+                            <option value="" selected>Select User</option>
+                            @foreach (var item in Model.UserList)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group" id="div_CompanyName">
+                        <label>Company Name <span style="color:red">*</span></label>
+                        <select class="form-select" required id="companyId" disabled>
+                            <option value="" selected>Select Company</option>
+                            @foreach (var item in Model.CompanyList)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group" id="div_Role">
+                        <label>Select Role <span style="color:red">*</span></label>
+                        <select class="form-select" required id="roleId" disabled>
+                            <option value="" selected>Select Role</option>
+                            @foreach (var item in Model.RoleList)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group" id="div_Shift">
+                        <label>Select Shift <span style="color:red">*</span></label>
+                        <select class="form-select" required id="shiftId">
+                            <option value="" selected>Select Shift</option>
+                            @foreach (var item in Model.ShiftsList)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="savePerson">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="div_assestment_modal">
+</div>
+<div id="div_assestment_view_modal">
+</div>
+<div id="incidentMapContainer">
+</div>
+<div id="div_Add_assestment_modal">
+</div>
+<div id="div_restoration_modal">
+</div>
+<div id="div_restoration_view_modal">
+</div>
+<div id="div_Add_restoration_modal">
+</div>
+<div id="div_closeout_modal">
+</div>
+<div id="div_closeout_view_modal">
+</div>
+<div id="div_Add_assestment_modal">
+    // Find this and then below code replace
+</div>
+<div id="div_repair_modal">
+</div>
+@functions {
+    string GetBoxClass(string value)
+    {
+        return value == "Yes" ? "red" :
+               value == "No" ? "green" :
+                                "gray";
+    }
+
+    IHtmlContent RenderBox(string label, string value)
+    {
+        var boxClass = GetBoxClass(value);
+        return new HtmlString($@"
+            <div class='box {boxClass}' style='text-align:left'>
+                <span class='label'>{label}</span>
+                <span class='value'>{value}</span>
+            </div>");
+    }
+}
+
+<script>
+    document.getElementById("closeModalBtn").addEventListener("click", function () {
+        window.location.href = "/Incidents";
+    });
+
+    // Tab click handler
+    document.querySelectorAll(".tab-item").forEach(tab => {
+      tab.addEventListener("click", function () {
+        // Remove active from all tabs
+        document.querySelectorAll(".tab-item").forEach(el => el.classList.remove("active"));
+        this.classList.add("active");
+
+        // Hide all contents
+        document.querySelectorAll(".tab-content").forEach(content => content.classList.remove("active"));
+
+        // Show selected content
+        const tabId = this.getAttribute("data-tab");
+        document.getElementById(tabId).classList.add("active");
+      });
+    });
+
+    let selectedRowId = null;
+    let selectedCell = null;
+    $(document).on("click", ".timeIn", function () {
+        selectedCell = $(this);
+        selectedRowId = $(this).data("id");
+
+        const currentTime = $(this).text().trim();
+        if (currentTime) {
+            const [hour, minute] = currentTime.split(":");
+            $("#hourSelect").val(parseInt(hour));
+            $("#minuteSelect").val(parseInt(minute));
+        }
+
+        $("#timeInModal").modal("show");
+    });
+
+    $("#saveTimeBtn").on("click", function () {
+        const hour = $("#hourSelect").val().padStart(2, "0");
+        const minute = $("#minuteSelect").val().padStart(2, "0");
+        const newTime = `${hour}:${minute}`;
+
+        // Update in UI
+        selectedCell.text(newTime);
+        $("#timeInModal").modal("hide");
+
+        // Send update to backend
+        $.ajax({
+                url: '/IncidentDetail/UpdateTimeIn',
+            type: 'POST',
+            data: { id: selectedRowId, timeIn: newTime },
+            success: function (res) {
+                if (res.success) {
+                    if (res.data) {
+                    $("#onsiteNowCount").text(res.data.OnsiteNowCount);
+                    $(".checkedOutTodayCount").text(res.data.CheckedOutTodayCount);
+                    $(".totalHoursToday").text(res.data.TotalHoursToday);
+                    $(".avgHoursWorker").text(res.data.AvgHoursWorker);
+                    $("#totalDayShift").text(res.data.TotalDayShift);
+                    $("#totalNightShift").text(res.data.TotalNightShift);
+                    $("#totalEmployees").text(res.data.TotalEmployees);
+                    $("#totalContractors").text(res.data.TotalContractors);
+                }
+                var selectedRoleId = $('#RoleFilter').val();
+                var selectedCompanyId= $('#CompanyFilter').val();
+                var selectedOnsite= $('#onsite').val();
+                var incidentId = $('#hdnIncidentID').val();
+        $.ajax({
+                url: '/IncidentDetail/FilterByRole',
+                type: 'GET',
+                data: { incidentId: incidentId,roleId: selectedRoleId,companyid: selectedCompanyId,onsite:selectedOnsite},
+                success: function (response) {
+                    var tbody = $('#personnelTableBody');
+                    tbody.empty();
+                    var data = response.Result || response;
+                    if (data && data.length > 0) {
+                        $.each(data, function (index, personnels) {
+                            var timeIn = personnels.TimeIn
+                                ? new Date(personnels.TimeIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                : "00.00";
+
+                            var hoursSoFar = personnels.TimeIn
+                                ? ((new Date() - new Date(personnels.TimeIn)) / (1000 * 60 * 60)).toFixed(2)
+                                : "0.00";
+
+                            var supervisor = personnels.Supervisor || "";
+
+                            var row = `<tr>
+                                <td>${personnels.Name}</td>
+                                <td>${personnels.Role}</td>
+                                <td>${personnels.Company}</td>
+                                <td>${personnels.Type}</td>
+                                <td>${personnels.Shift}</td>
+                                <td class="timeIn" data-id="${personnels.IncidentValidationPersonnelsId}">${timeIn}</td>
+                                <td>${hoursSoFar}</td>
+                                    <td class="supervisor" data-userid="${personnels.UserId}" data-companyid="${personnels.CompanyId}" data-id="${personnels.IncidentValidationPersonnelsId}">${supervisor && supervisor.trim() !== "" ? supervisor : "Select"}</td>
+                            </tr>`;
+
+                            tbody.append(row);
+                        });
+                    } else {
+                        tbody.append('<tr><td colspan="8" class="text-center">No Data found.</td></tr>');
+                    }
+                },
+                error: function () {
+                    alert('Error loading data.');
+                }
+            });
+                    console.log("Time updated successfully");
+                } else {
+                    alert("Failed to update time.");
+                }
+            },
+            error: function () {
+                alert("Error saving time to database.");
+            }
+        });
+    });
+
+
+        function getCompanyAndRole($this) {
+        var userId = $this.val();
+        $.getJSON('/Settings/GetCompanyAndRole', { userId: userId }, function (data) {
+            if (data && data.userId > 0) {
+                $('#savePerson').show();
+                $('#companyId').val(data.companyId > 0 ? data.companyId : '');
+                $('#roleId').val(data.roleId > 0 ? data.roleId : '');
+            } else {
+                $('#companyId').val('');
+                $('#roleId').val('');
+            }
+        }).fail(function () {
+            alert("Error fetching company and role details.");
+        });
+    }
+
+        $(document).on('click', 'td.supervisor', function () {
+        var td = $(this);
+        var row = td.closest('tr');
+        var personnelId = td.data("id");
+        var companyId = td.data("companyid");
+        var userId = td.data("userid");
+
+        // Prevent multiple dropdowns
+        if (td.find('select').length > 0) return;
+
+        // 🔹 Show loader while fetching supervisors
+        showLoader($(".main-content"));
+
+        // Fetch supervisors list
+        $.get('/IncidentDetail/GetSupervisors', { companyId: companyId, userId: userId })
+            .done(function (data) {
+                hideLoader($(".main-content")); // 🔹 Hide loader once dropdown data loaded
+
+                var select = $('<select class="form-select form-select-sm"></select>');
+                select.append('<option value="">Select</option>');
+
+                $.each(data.Result, function (i, user) {
+                    select.append('<option value="' + user.UsersId + '">' + user.UsersName + '</option>');
+                });
+
+                td.html(select);
+                select.focus();
+
+                // 🔹 When user selects supervisor
+                select.on('change', function () {
+                    var supervisorId = $(this).val();
+                    var supervisorName = $(this).find("option:selected").text();
+
+                    if (!supervisorId) {
+                        td.text("Select");
+                        return;
+                    }
+
+                    // Show loader before saving
+                    showLoader($(".main-content"));
+
+                    $.post('/IncidentDetail/UpdateSupervisor',
+                        { personnelId: personnelId, supervisorId: supervisorId },
+                        function (response) {
+                            hideLoader($(".main-content")); // 🔹 Hide loader after update
+                            if (response.success) {
+                                td.text(supervisorName);
+                            } else {
+                                alert('Failed to update supervisor.');
+                                td.text("Select");
+                            }
+                        })
+                        .fail(function () {
+                            hideLoader($(".main-content")); // 🔹 Ensure loader hides even on failure
+                            alert("Error updating supervisor.");
+                            td.text("Select");
+                        });
+                });
+
+                // Optional: revert text if focus lost without selection
+                // select.on('blur', function () {
+                //     if (!td.text().trim()) {
+                //         td.text("Select");
+                //     }
+                // });
+            })
+            .fail(function () {
+                hideLoader($(".main-content")); // 🔹 Hide loader on failure
+                alert("Error loading supervisors list.");
+            });
+    });
+</script>
+<script>
+        document.querySelectorAll('.photo-thumb').forEach(link => {
+
+      link.addEventListener('click', function (e) {
+        e.preventDefault(); // prevent normal link behavior
+        const modal = document.getElementById("imgPreviewModal");
+        const modalImg = document.getElementById("previewImg");
+        modal.style.display = "block";
+        modalImg.src = $(this).find('img').attr('src'); // show clicked image
+      });
+    });
+
+    // Close modal on click of X
+    document.querySelector('.close').onclick = function () {
+      document.getElementById("imgPreviewModal").style.display = "none";
+    };
+
+    // Close modal when clicking outside the image
+    window.onclick = function (event) {
+      const modal = document.getElementById("imgPreviewModal");
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    };
+
+
+        document.querySelectorAll('input[name="msgType"]').forEach(radio => {
+      radio.addEventListener("change", function() {
+        document.querySelector(".team-message-box").style.display =
+          this.value === "team" ? "block" : "none";
+        document.querySelector(".internal-note-box").style.display =
+          this.value === "note" ? "block" : "none";
+      });
+    });
+</script>
+<script>
+    const fileInput = document.getElementById("fileInput");
+    const previewContainer = document.getElementById("previewContainer");
+
+    fileInput.addEventListener("change", function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          previewContainer.innerHTML = `
+            <div class="preview">
+              <img src="${e.target.result}" alt="Image Preview">
+
+            </div>
+          `;
+        };
+
+        reader.readAsDataURL(file);
+      } else {
+        previewContainer.innerHTML = "";
+      }
+    });
+
+    function sendMessage() {
+        const messageText = document.getElementById('messageText').value.trim();
+        const fileInput = document.getElementById('fileInput');
+
+        if (!messageText) {
+            alert('Please enter a message.');
+            return;
+        }
+
+
+
+        const formData = new FormData();
+        formData.append('IncidentId', @(Model.Id ?? 0));
+        formData.append('IncidentValidationId', @(Model.incidentValidationsDetailsViewModel?.IncidentValidationId ?? 0));
+        formData.append('Message', messageText);
+        formData.append('MessageType', 1);
+
+        for (let i = 0; i < fileInput.files.length; i++) {
+            formData.append('File', fileInput.files[i]);
+        }
+
+        fetch('/Incidents/SaveCommunicationMessage', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Get filename if file was uploaded
+                const fileName = fileInput.files.length > 0 ? fileInput.files[0].name : '';
+
+                // Clear the form
+                document.getElementById('messageText').value = '';
+                document.getElementById('previewContainer').innerHTML = '';
+                fileInput.value = '';
+                     const now = new Date();
+                const formattedTime = now.toLocaleString("en-US", {
+                    month: "short",   // "Sep"
+                    day: "numeric",   // "16"
+                    hour: "2-digit",  // "05"
+                    minute: "2-digit",// "20"
+                    hour12: true      // "PM"
+                });
+
+                addMessageToUI(messageText, formattedTime, fileName);
+
+                // Update message count
+                updateMessageCount();
+            } else {
+                alert('Failed to send message: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while sending the message.');
+        });
+    }
+
+    function addMessageToUI(message, timestamp, attachmentUrl = '') {
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageCount = messagesContainer.children.length;
+        const isEven = messageCount % 2 === 0;
+
+        const attachmentHtml = attachmentUrl ? `
+            <div class="attachments">
+                <strong>Attachments:</strong>
+                <i class="fas fa-paperclip"></i>
+                <a href="#">${attachmentUrl}</a>
+            </div>
+        ` : '';
+
+        const messageHtml = `
+            <div class="chat-message ${isEven ? 'bg-yellow' : 'bg-blue'}">
+                <div class="avatar"><i class="fa-regular fa-user"></i></div>
+                <div class="message-box">
+                    <div class="message-header">
+                        <strong>Administrator</strong>
+                    </div>
+                    <div class="message-text">${message}</div>
+                    ${attachmentHtml}
+                    <div class="timestamp">${timestamp}</div>
+                </div>
+            </div>
+        `;
+
+        messagesContainer.insertAdjacentHTML('afterbegin', messageHtml);
+    }
+
+    function updateMessageCount() {
+        const messageCount = document.getElementById('messagesContainer').children.length;
+        const countElement = document.querySelector('.messages-count');
+        if (countElement) {
+            countElement.innerHTML = `<i class="fa fa-user"></i> ${messageCount} messages`;
+        }
+    }
+
+</script>
+
+<script>
+    require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/Graphic",
+        "esri/layers/GraphicsLayer",
+        "esri/geometry/Circle"
+    ], function (Map, MapView, Graphic, GraphicsLayer, Circle) {
+
+        // make available globally
+        window.Graphic = Graphic;
+        window.Circle = Circle;
+
+        console.log("ArcGIS modules loaded ✔");
+
+        var map = new Map({
+            basemap: "streets-navigation-vector"
+        });
+
+        var incidents = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ListIncidentLocationMapViewModel));
+        var firstObj = incidents[0];
+
+        window.view = new MapView({
+            container: "map",
+            map: map,
+            center: [firstObj.lon, firstObj.lat],
+            zoom: 6
+        });
+
+        var graphicsLayer = new GraphicsLayer();
+        window.graphicsLayer = graphicsLayer;
+        map.add(graphicsLayer);
+
+        // Store reference circles for each incident
+        var incidentCircles = {};
+
+        incidents.forEach(function (incident) {
+
+            var point = {
+                type: "point",
+                longitude: incident.lon,
+                latitude: incident.lat
+            };
+
+            var symbol = {
+                type: "simple-marker",
+                path: "M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z",
+                color: incident.color,
+                outline: { color: "black", width: 1 },
+                size: "20px"
+            };
+
+            // Build image HTML if images exist
+            // let imageHtml = "";
+            // if (incident.images && incident.images.length > 0) {
+            //     imageHtml = incident.images.map(img =>
+            //         `<img src="${img}" style="max-width:120px;max-height:120px;margin:5px;border:1px solid #ccc;border-radius:6px;" />`
+            //     ).join("");
+            // } else {
+            //     imageHtml = "<i>No images available</i>";
+            // }
+            // //Images: imageHtml
+
+            var attributes = {
+                Severity: incident.severity,
+                IncidentID: incident.incidentid,
+                Location: incident.incidentloc,
+                CallerName: incident.callername,
+                CallerPhone: incident.callerphone,
+                CallerAddress: incident.calleraddress,
+                EventType: incident.eventtype,
+                AssetType: incident.assettype,
+                Description: incident.description,
+                Intersection: incident.intersection,
+                Perimeter: incident.perimeter
+            };
+
+            var popupTemplate = {
+                title: "Incident Details:",
+                content: `
+                    <b>Incident Number:</b> {IncidentID}<br>
+                    <b>Severity:</b> {Severity}<br>
+                    <b>Event Type:</b> {EventType}<br>
+                    <b>Asset Type:</b> {AssetType}<br>
+                    <b>Description:</b> {Description}<br>
+                    <b>Intersection:</b> {Intersection}<br>
+                    <b>Location:</b> {Location}<br>
+                    <b>Images:</b><br>
+                    <b>Perimeter :</b> {Perimeter}<br>
+                `
+            };
+
+            var graphic = new Graphic({
+                geometry: point,
+                symbol: symbol,
+                attributes: attributes,
+                popupTemplate: popupTemplate
+            });
+            graphicsLayer.add(graphic);
+
+            var circle = new Circle({
+                center: point,
+                radius: incident.perimeter !== '' ? parseInt(incident.perimeter) : 0,
+                radiusUnit: "miles" // unit: MILES
+            });
+
+            var circleGraphic = new Graphic({
+                geometry: circle,
+                symbol: {
+                    type: "simple-fill",
+                    color: [255, 0, 0, 0.1], // semi-transparent fill
+                    outline: {
+                        color: incident.color,
+                        width: 2
+                    }
+                }
+            });
+
+            graphicsLayer.add(circleGraphic);
+
+            // store circle reference by incident id
+            incidentCircles[incident.incidentid] = circle;
+        });
+
+        // Fit map to all graphics initially
+        view.when(function () {
+            if (graphicsLayer.graphics.length > 0) {
+                view.goTo(graphicsLayer.graphics);
+            }
+        });
+
+        // Zoom to circle when clicking on marker
+        view.on("click", function (event) {
+            view.hitTest(event).then(function (response) {
+                if (response.results.length > 0) {
+                    var g = response.results[0].graphic;
+                    if (g.geometry.type === "point") {
+                        var incId = g.attributes.IncidentID;
+                        var circle = incidentCircles[incId];
+                        if (circle) {
+                            // Expand extent so it's not too zoomed-in
+                            view.goTo(circle.extent.expand(1.5));
+                        }
+                    }
+                }
+            });
+        });
+
+    });
+</script>
+<script>
+    const toggleLink = document.getElementById("collapseToggle");
+    const timelineCollapse = document.getElementById("timelineCollapse");
+
+    timelineCollapse.addEventListener("hidden.bs.collapse", function () {
+      toggleLink.innerHTML = '<i class="fa-solid fa-angle-down me-1"></i>';
+    });
+
+    timelineCollapse.addEventListener("shown.bs.collapse", function () {
+      toggleLink.innerHTML = '<i class="fa-solid fa-angle-up me-1"></i>';
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const today = new Date();
+        const formattedDate = today.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit'
+        });
+        document.getElementById("validatedDate").textContent = formattedDate;
+    });
+</script>
+<script>
+       const sendBtn = document.getElementById('sendBtn');
+       const messageInput = document.getElementById('messageInput');
+       const roleSelect = document.getElementById('roleSelect');
+       const chatMessages = document.getElementById('chatMessages');
+
+    // Handle Send button click
+    sendBtn.addEventListener('click', async () => {
+      const role = roleSelect.value.trim();
+      const message = messageInput.value.trim();
+      const id = @(Model.Id ?? 0);
+
+      if (message === '') return; // ignore empty input
+
+      showLoader($("#chatMessages"));
+
+      const payload = { IncidentId: id, ChatMessage: message, SentBy: role };
+
+      try {
+        const res = await fetch("/IncidentDetail/AddMapChat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const json = await res.json();
+
+        if (json.success) {
+          // Create new chat message element
+          const newMsg = document.createElement('div');
+          newMsg.classList.add('handoff-item');
+          newMsg.innerHTML = `<span class="badge role-badge">${role}</span> ${message}`;
+
+          // Append to chat section
+          chatMessages.appendChild(newMsg);
+
+          // Scroll to bottom
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+
+          // Clear input
+          messageInput.value = '';
+
+        }
+         hideLoader($("#chatMessages"));
+      } catch (error) {
+        console.error("Error sending chat message:", error);
+        hideLoader($("#chatMessages"));
+      }
+    });
+
+    // Also allow pressing Enter key to send
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendBtn.click();
+      }
+    });
+
+</script>
+<script>
+    document.getElementById("reportDate").addEventListener("change", function () {
+        const dateInput = this.value; // e.g. "2025-10-09"
+        const selectedDate = new Date(dateInput);
+        const formattedDate = selectedDate.toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        }); // e.g. "Oct 9, 2025"
+
+        // Update Daily Summary date
+        document.getElementById("summaryDate").textContent = formattedDate;
+         });
+</script>
+<script>
+    $(document).ready(function () {
+        // $('.roleFilter').on('change', function () {
+        $(document).on('change', '#RoleFilter, #CompanyFilter, #onsite', function () {
+            var selectedRoleId = $('#RoleFilter').val();
+            var selectedCompanyId= $('#CompanyFilter').val();
+            var selectedOnsite = $('#onsite').is(':checked');
+            var incidentId = '@Model.Id';
+
+            $.ajax({
+                url: '/IncidentDetail/FilterByRole',
+                type: 'GET',
+                data: { incidentId: incidentId,roleId: selectedRoleId,companyid: selectedCompanyId,onsite:selectedOnsite},
+                success: function (response) {
+                    var tbody = $('#personnelTableBody');
+                    tbody.empty();
+                    var data = response.Result || response;
+                    if (data && data.length > 0) {
+                        $.each(data, function (index, personnels) {
+                            var timeIn = personnels.TimeIn
+                                ? new Date(personnels.TimeIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                : "00.00";
+
+                            var hoursSoFar = personnels.TimeIn
+                                ? ((new Date() - new Date(personnels.TimeIn)) / (1000 * 60 * 60)).toFixed(2)
+                                : "0.00";
+
+                            var supervisor = personnels.Supervisor || "";
+
+                            var row = `<tr>
+                                <td>${personnels.Name}</td>
+                                <td>${personnels.Role}</td>
+                                <td>${personnels.Company}</td>
+                                <td>${personnels.Type}</td>
+                                <td>${personnels.Shift}</td>
+                                <td class="timeIn" data-id="${personnels.IncidentValidationPersonnelsId}">${timeIn}</td>
+                                <td>${hoursSoFar}</td>
+                                <td>${supervisor}</td>
+                            </tr>`;
+
+                            tbody.append(row);
+                        });
+                    } else {
+                        tbody.append('<tr><td colspan="8" class="text-center">No Data found.</td></tr>');
+                    }
+                },
+                error: function () {
+                    alert('Error loading data.');
+                }
+            });
+        });
+    });
+</script>
+<script>
+    (function () {
+        const textarea = document.getElementById('addNote');
+        const notesBody = document.getElementById('validationNotesBody');
+
+        // Press Enter (no shift) to submit
+        textarea.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                saveNote();
+            }
+        });
+
+        async function saveNote() {
+            const text = textarea.value.trim();
+            if (!text) return;
+
+            const payload = {
+                IncidentId: '@Model.Id',
+                IncidentValidationId: @Model.incidentValidationsDetailsViewModel?.IncidentValidationId ?? 0,
+                Notes: text
+            };
+
+            try {
+                const res = await fetch('@Url.Action("SaveValidationNote", "IncidentDetail")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const json = await res.json();
+                if (json && json.success) {
+                    // build note HTML (mirrors server rendered HTML)
+                    const noteEl = document.createElement('div');
+                    noteEl.className = 'note';
+                    noteEl.setAttribute('data-note-id', json.id || '');
+
+                    const badge = document.createElement('span');
+                    badge.className = 'note-badge';
+                    badge.textContent = 'IC'; // or compute from current user if you want
+
+                    const txt = document.createElement('span');
+                    txt.className = 'note-text';
+                    txt.textContent = text;
+
+                    const meta = document.createElement('div');
+                    meta.className = 'note-meta';
+                    const now = new Date();
+                    meta.textContent = now.toLocaleString('en-US', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+
+                    noteEl.appendChild(badge);
+                    noteEl.appendChild(txt);
+                    noteEl.appendChild(meta);
+
+                    // insert at top
+                    notesBody.insertBefore(noteEl, notesBody.firstChild);
+
+                    textarea.value = '';
+                } else {
+                    alert(json.message || 'Failed to save note.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error saving note.');
+            }
+        }
+    })();
+</script>
+<script>
+
+    function initICPLocationAutocomplete() {
+        var $input = $(`#ICPLocation`);
+        var $suggestionList = $(`#suggestionsICPLocation`);
+
+        if ($input.length === 0 || $suggestionList.length === 0) return;
+
+        $input.on('input', function () {
+            var query = $(this).val().trim();
+
+            if (query.length > 2) {
+                $.getJSON('/Incidents/Suggest', { text: query }, function (data) {
+                    $suggestionList.empty().show();
+
+                    $.each(data, function (i, item) {
+                        // Escape single quotes in text
+                        var safeText = item.text.replace(/'/g, "\\'");
+                        var $li = $(`<li>${safeText}</li>`);
+                        $li.on('click', function () {
+                            selectICPLocation(item.text, item.magicKey);
+                        });
+                        $suggestionList.append($li);
+                    });
+                });
+            }
+            else {
+                $suggestionList.hide();
+                $(`#map`).hide();
+                $(`#hdnLat`).val(0);
+                $(`#hdnLon`).val(0);
+            }
+        });
+    }
+
+    function selectICPLocation(address, magicKey) {
+        $(`#map`).show();
+        showLoader($(`#map`));
+
+        var $input = $(`#ICPLocation`);
+        var $suggestionList = $(`#suggestionsICPLocation`);
+
+        $input.val(address);
+        $suggestionList.empty().hide();
+
+        $(`#hdnLat`).val(0);
+        $(`#hdnLon`).val(0);
+
+
+        $.getJSON('/Incidents/Resolve', { magicKey: magicKey }, function (data) {
+            if (!data || !data.lat || !data.lon) {
+                console.error("No coordinates found.");
+                hideLoader($(`#map`));
+                return;
+            }
+
+            $(`#hdnLat`).val(data.lat);
+            $(`#hdnLon`).val(data.lon);
+
+            require([
+                "esri/Map",
+                "esri/views/MapView",
+                "esri/Graphic",
+                "esri/layers/GraphicsLayer"
+            ], function (Map, MapView, Graphic, GraphicsLayer) {
+                hideLoader($(`#map`));
+                console.log("ArcGIS map loaded ✔");
+
+                const map = new Map({
+                    basemap: "streets-navigation-vector"
+                });
+
+                const view = new MapView({
+                    container: `map`,
+                    map: map,
+                    center: [data.lon, data.lat],
+                    zoom: 15
+                });
+
+                const graphicsLayer = new GraphicsLayer();
+                map.add(graphicsLayer);
+
+                // ✅ Single marker
+                const point = {
+                    type: "point",
+                    longitude: data.lon,
+                    latitude: data.lat
+                };
+
+                const markerSymbol = {
+                    type: "simple-marker",
+                    style: "circle",
+                    color: "red",
+                    outline: { color: "white", width: 2 },
+                    size: "18px"
+                };
+
+                const popupTemplate = {
+                    title: "Selected Location",
+                    content: `
+                                <b>Address:</b> ${data.text}<br>
+                                <b>Latitude:</b> ${data.lat}<br>
+                                <b>Longitude:</b> ${data.lon}
+                            `
+                };
+
+                const pointGraphic = new Graphic({
+                    geometry: point,
+                    symbol: markerSymbol,
+                    popupTemplate: popupTemplate
+                });
+
+                graphicsLayer.add(pointGraphic);
+
+                // ✅ Center and zoom to marker
+                view.when(() => {
+                    view.goTo(pointGraphic);
+                });
+
+                // ✅ Show popup only on marker click
+                view.on("click", function (event) {
+                    view.hitTest(event).then(function (response) {
+                        const result = response.results[0];
+                        if (result && result.graphic === pointGraphic) {
+                            view.popup.open({
+                                features: [pointGraphic],
+                                location: point
+                            });
+                        }
+                    });
+                });
+            });
+        }).fail(function (xhr) {
+            console.error("Error fetching coordinates:", xhr.responseText);
+            hideLoader($(`#map`));
+            $(`#map`).hide();
+            $(`#hdnLat`).val(0);
+            $(`#hdnLon`).val(0);
+        });
+    }
+    $("#IsOtherEventID").change(function () {
+        if ($("#IsOtherEventID").is(":checked")) {
+            $(".OtherEventDetail").show();
+        } else {
+            $(".OtherEventDetail").hide();
+            $("#OtherEventDetail").val(""); // optional: clear value
+        }
+    });
+    async function EditRepairDetails(id, mainstepId) {
+        //alert(id+ "-"+ mainstepId)
+        // try {
+        //     showLoader($("#div_assestment_details"));
+
+        //     // Send ID as query string
+        //     const response = await fetch(`/IncidentDetail/EditRepairDetails?id=${id}&mainstepId=${mainstepId}&substepId=${substepId}`, {
+        //         method: "GET",
+        //         headers: {
+        //             "Accept": "text/html"
+        //         }
+        //     });
+
+        //     if (!response.ok) throw new Error("Failed to load incident details");
+
+        //     const content = await response.text();
+        //     $("#div_assestment_modal").empty().html(content);
+        //     $("#updateIncidentAssestmentModal").modal("show");
+
+        // } catch (error) {
+        //     console.error("Error loading incident details:", error);
+        // } finally {
+        //     hideLoader($("#div_assestment_details"));
+        // }
+
+    }
+
+    async function SaveIncidentValidation() {
+        try {
+            let form = [];
+            let formData = new FormData();
+            let obj = $("#incident_validation_form")[0];
+
+            // Serialize other fields
+            let params = $(obj).serializeArray();
+            var ValidationLocationData = [];
+            var Regulatory = [];
+
+            @* $("#step-2 .right-panel").each(function () {
+
+                var loc = $(this).attr("data-add-loc");
+                var severityID = $(`#divaddloc_Severity_${loc}`).find('#severityLevelId').val();
+                var discoveryPerimeter = $(`#divaddloc_DiscoveryPerimeter_${loc}`).find("#RadiusId").val();
+                var icpLocation = $(`#divaddloc_ICP_${loc}`).find(`#ICPLocation_${loc}`).val();
+                var source = $(`#divaddloc_Source_${loc}`).find("#Source").val();
+                var lat = $(`#hdnLat_${loc}`).val();
+                var lon = $(`#hdnLon_${loc}`).val();
+
+                // push object
+                ValidationLocationData.push({
+                    LocationId: loc,
+                    SeverityID: severityID,
+                    DiscoveryPerimeter: discoveryPerimeter,
+                    ICPLocation: icpLocation,
+                    Source: source,
+                    Lat: lat,
+                    Lon: lon
+                });
+            }); *@
+
+                formData.append("Id", $("#hdnIncidentID").val());
+            $.each(params, function (i, val) {
+                if (val.name === "IVValidation.severityLevelId") {
+                    formData.append("ConfirmedSeverityLevelId", val.value);
+                    form.push({ name: val.name, value: val.value });
+                }
+                else if (val.name === "IVValidation.RadiusId") {
+                    formData.append("DiscoveryPerimeterId", val.value);
+                    form.push({ name: val.name, value: val.value });
+                }
+                else if (val.name === "IVValidation.ValidationNotes") {
+                    formData.append("ValidationNotes", val.value);
+                    form.push({ name: val.name, value: val.value });
+                }
+                else if (val.name === "IVValidation.IncidentLocation") {
+                    formData.append("IncidentLocation", val.value);
+                    form.push({ name: val.name, value: val.value });
+                }
+                else if (val.name === "IVValidation.Source") {
+                    formData.append("Source", val.value);
+                    form.push({ name: val.name, value: val.value });
+                }
+                else if (val.name.startsWith("IVValidation.assignedRole.")) {
+                    const roleName = val.name.replace("IVValidation.assignedRole.", "");
+
+                    formData.append("assignedRole." + roleName, val.value);
+                    form.push({ name: val.name, value: val.value });
+                }
+                else if (val.name.startsWith("IVValidation.validationGates.")) {
+                    const fieldName = val.name.replace("IVValidation.validationGates.", "");
+
+                    // Convert value to true/false if it's 0 or 1
+                    let fieldValue = val.value;
+                    if (fieldValue === "1" || fieldValue === 1) fieldValue = true;
+                    else if (fieldValue === "0" || fieldValue === 0) fieldValue = false;
+
+                    if (val.name === "IVValidation.validationGates.Regulatory") {
+                        Regulatory.push(val.value);
+                        form.push({ name: val.name, value: val.value });
+                    }
+                    else {
+                        formData.append("validationGates." + fieldName, fieldValue);
+                        form.push({ name: "validationGates." + fieldName, value: fieldValue });
+                    }
+                }
+            });
+            const textarea = document.getElementById('addNote');
+            const text = textarea.value.trim();
+            formData.append("ValidationNotes", text);
+
+            if (Regulatory.length > 0) {
+                formData.append("validationGates.Regulatory", Regulatory.join(","));
+            }
+            formData.append("Id", $("#hdn_Id").val());
+
+            if (ValidationLocationData.length > 0) {
+                formData.append("listValidationLocationVM", JSON.stringify(ValidationLocationData));
+            }
+
+
+            showLoader($(".main-content"));
+
+            //console.log(formData);
+            console.log(form);
+
+            // Send request
+            let response = await fetch("/Validation/SaveIncidentValidation", {
+                method: "POST",
+                body: formData
+            });
+
+            let result = await response.json();
+
+            if (result.success) {
+                SwalSuccessAlert(result.data);
+
+                setTimeout(function () {
+                    window.location = '/Incidents';
+                }, 1000);
+
+            } else {
+                SwalErrorAlert(result.message || "Failed to Save Incident Validation.");
+            }
+        } catch (error) {
+            SwalErrorAlert("Error while Save Incident Validation!");
+            console.error(error);
+        } finally {
+            hideLoader($(".main-content"));
+        }
+    }
+</script>
+@{
+    ViewBag.CurrentIncidentId = Model.Id;
+    ViewBag.CurrentIncidentValidationId = Model.incidentValidationsDetailsViewModel?.IncidentValidationId ?? 0;
+    // ensure ViewBag.Roles and ViewBag.Statuses set in Index action
+}
+@Html.Partial("_AddTaskPartial", new ViewModels.Incident.IncidentViewTaskListViewModel())
+@Html.Partial("_AddCloseOutTaskPartial", new ViewModels.Incident.IncidentViewTaskListViewModel())
+
+<script>
+
+    function OpenAddTaskModal() {
+        // show modal - using bootstrap 5
+        var $modal = $("#addTaskModal");
+        $modal.show(); // simpler; if using Bootstrap modal: $('#addTaskModal').modal('show');
+        $("body").append('<div class="modal-backdrop fade show"></div>');
+    }
+    // submit via AJAX
+        $("#formAddTask").on("submit", function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            var formData = $form.serialize();
+
+            $("#btnSaveAddTask").prop("disabled", true);
+
+            $.ajax({
+                url: '@Url.Action("SaveTask", "IncidentDetail")',
+                method: 'POST',
+                data: formData,
+                success: function (res) {
+                    $("#btnSaveAddTask").prop("disabled", false);
+                    if (res && res.success) {
+
+                         $("#formAddTask")[0].reset();
+                         $("#addTaskModal").hide();
+                         $(".modal-backdrop").remove();
+
+                       GetRestorationDetails();
+                    } else {
+                        alert(res?.message || "Save failed");
+                    }
+                },
+                error: function (xhr) {
+                    $("#btnSaveAddTask").prop("disabled", false);
+                    alert("Error saving task");
+                }
+            });
+        });
+
+        // close modal
+        $("#btnCancelAddTask, #btnCloseAddTask").on("click", function () {
+            $("#addTaskModal").hide();
+            $(".modal-backdrop").remove();
+        });
+
+       $("#saveValidationBtn").on("click", function () {
+           SaveIncidentValidation();
+       });
+
+</script>
+
+<script>
+    $(document).ready(function () {
+        //var incidentId = '@Html.Raw(Model.Id)';
+
+          var incidentId = @Model.Id ?? 0;
+          var incidentValidationId = @Model.incidentValidationsDetailsViewModel?.IncidentValidationId ?? 0;
+          // var incidentId = @Model.incidentValidationPersonnelsCountViewModel.IncidentId;
+          // var incidentValidationId= @Model.incidentValidationsDetailsViewModel.IncidentValidationId ?? 0;
+
+        // ➕ Add new row
+        $('#addPerson').on('click', function () {
+            var tableBody = $('#personnelTableBody');
+
+            // ✅ Remove "No Data found" row if it exists
+            if (tableBody.find('.no-records').length > 0) {
+                tableBody.find('.no-records').remove();
+            }
+
+            // ✅ Add new editable row
+            var newRow = `
+                <tr class="new-person">
+                    <td>
+                        <select class="form-select userId" required onchange="getCompanyAndRole1($(this))">
+                            <option value="" selected>Select User</option>
+    @foreach (var item in (List<SelectListItem>)ViewBag.UsersDrop)
+    {
+                                                                                <option value="@item.Value">@item.Text</option>
+    }
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-select companyId" required disabled>
+                            <option value="" selected>Select Company</option>
+    @foreach (var item in (List<SelectListItem>)ViewBag.CompaniesDrop)
+    {
+                                                                                <option value="@item.Value">@item.Text</option>
+    }
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-select roleId" required disabled>
+                            <option value="" selected>Select Role</option>
+    @foreach (var item in (List<SelectListItem>)ViewBag.RolesDrop)
+    {
+                                                                                <option value="@item.Value">@item.Text</option>
+    }
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-select shiftId" required>
+                            <option value="" selected>Select Shift</option>
+    @foreach (var item in (List<SelectListItem>)ViewBag.ShiftsDrop)
+    {
+                                                                                <option value="@item.Value">@item.Text</option>
+    }
+                        </select>
+                    </td>
+                    <td colspan="4"></td>
+                </tr>`;
+
+            tableBody.prepend(newRow);
+            $('#savePerson').show();
+        });
+
+        // 💾 Save all new persons
+        $('#savePerson').on('click', function () {
+        var userId = $('.userId').val();
+        var companyId = $('.companyId').val();
+        var roleId = $('.roleId').val();
+        var shiftId = $('.shiftId').val();
+        var incidentId = $('#hdnIncidentID').val();
+        var incidentValidationId = @Model.incidentValidationsDetailsViewModel?.IncidentValidationId;
+
+    // if (!userId || !companyId || !roleId || !shiftId) {
+    //     alert('Please fill all required fields.');
+    //     return;
+    // }
+
+    $.post('/IncidentDetail/AddPerson', {
+        userId: userId,
+        companyId: companyId,
+        roleId: roleId,
+        shiftId: shiftId,
+        incidentId:incidentId,
+        incidentValidationId:incidentValidationId
+    }, function (response) {
+        if (response.success) {
+            $('#savePerson').hide();
+            if (response.data) {
+                    $("#onsiteNowCount").text(response.data.OnsiteNowCount);
+                    $(".checkedOutTodayCount").text(response.data.CheckedOutTodayCount);
+                    $(".totalHoursToday").text(response.data.TotalHoursToday);
+                    $(".avgHoursWorker").text(response.data.AvgHoursWorker);
+                    $("#totalDayShift").text(response.data.TotalDayShift);
+                    $("#totalNightShift").text(response.data.TotalNightShift);
+                    $("#totalEmployees").text(response.data.TotalEmployees);
+                    $("#totalContractors").text(response.data.TotalContractors);
+                }
+            var selectedRoleId = $('#RoleFilter').val();
+            var selectedCompanyId= $('#CompanyFilter').val();
+            var selectedOnsite= $('#onsite').val();
+                $.ajax({
+                        url: '/IncidentDetail/FilterByRole',
+                        type: 'GET',
+                        data: { incidentId: incidentId,roleId: selectedRoleId,companyid: selectedCompanyId,onsite:selectedOnsite},
+                        success: function (response) {
+                            var tbody = $('#personnelTableBody');
+                            tbody.empty();
+                            var data = response.Result || response;
+                            if (data && data.length > 0) {
+                                $.each(data, function (index, personnels) {
+                                    var timeIn = personnels.TimeIn
+                                        ? new Date(personnels.TimeIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                        : "00.00";
+
+                                    var hoursSoFar = personnels.TimeIn
+                                        ? ((new Date() - new Date(personnels.TimeIn)) / (1000 * 60 * 60)).toFixed(2)
+                                        : "0.00";
+
+                                    var supervisor = personnels.Supervisor || "";
+
+                                    var row = `<tr>
+                                        <td>${personnels.Name}</td>
+                                        <td>${personnels.Role}</td>
+                                        <td>${personnels.Company}</td>
+                                        <td>${personnels.Type}</td>
+                                        <td>${personnels.Shift}</td>
+                                        <td class="timeIn" data-id="${personnels.IncidentValidationPersonnelsId}">${timeIn}</td>
+                                        <td>${hoursSoFar}</td>
+                                            <td class="supervisor" data-userid="${personnels.UserId}" data-companyid="${personnels.CompanyId}" data-id="${personnels.IncidentValidationPersonnelsId}">${supervisor && supervisor.trim() !== "" ? supervisor : "Select"}</td>
+                                    </tr>`;
+
+                                    tbody.append(row);
+                                });
+                            } else {
+                                tbody.append('<tr><td colspan="8" class="text-center">No Data found.</td></tr>');
+                            }
+                        },
+                        error: function () {
+                            alert('Error loading data.');
+                        }
+                    });
+        } else {
+            alert('Failed to add person.');
+        }
+    });
+    });
+    });
+
+    // ✅ Fetch Company & Role dynamically
+    function getCompanyAndRole1($select) {
+        var row = $select.closest('tr');
+        var userId = $select.val();
+
+        if (!userId) {
+            row.find('.companyId, .roleId').val('').prop('disabled', true);
+            return;
+        }
+
+        $.getJSON('/Settings/GetCompanyAndRole', { userId: userId }, function (data) {
+            if (data && data.companyId > 0 && data.roleId > 0) {
+                row.find('.companyId').val(data.companyId).prop('disabled', true);
+                row.find('.roleId').val(data.roleId).prop('disabled', true);
+            } else {
+                row.find('.companyId, .roleId').val('').prop('disabled', true);
+            }
+        }).fail(function () {
+            alert("Error fetching company and role details.");
+        });
+    }
+</script>
+
+<script>
+
+    $(document).ready(function() {
+        initMultiselect();
+        initMultiselectCloseout();
+    });
+
+    function initMultiselect() {
+      $("#addTaskModal").find('.multiselect-dropdown').each(function () {
+          var $dropdown = $(this);
+          var $btn = $dropdown.find('.dropdown-btn');
+          var $list = $dropdown.find('.dropdown-list');
+          var $hidden = $dropdown.find('input[type="hidden"]'); // your hidden input
+
+          // 🔽 Toggle dropdown open/close
+          $btn.on('click', function (e) {
+              e.stopPropagation();
+              $('.dropdown-list').not($list).hide();
+              $list.toggle();
+          });
+
+          // ✅ Handle checkbox changes (event delegation)
+          $list.on('change', 'input[type="checkbox"]', function () {
+              var $checkboxes = $list.find('input[type="checkbox"]');
+
+              // Get selected items (id + name)
+              var selected = $checkboxes
+                  .filter(':checked')
+                  .map(function () {
+                      return {
+                          id: $(this).val(),
+                          name: $(this).data('name') || $(this).parent().text().trim()
+                      };
+                  })
+                  .get();
+
+              // Update button text
+              var selectedNames = selected.map(function (s) { return s.name; });
+              $btn.text(selectedNames.length ? selectedNames.join(', ') : 'Choose roles');
+
+              var dropdownId = $dropdown.attr('id'); // e.g., chk_VTFResponsibleRole
+              var hiddenId = dropdownId.replace('chk_', 'hdn_'); // => hdn_VTFResponsibleRole
+              var $hidden = $('#' + hiddenId);
+
+              // 🟢 Update hidden input value
+              if ($hidden.length) {
+                  $hidden.val(selected.map(function (s) { return s.id; }).join(','));
+              }
+          });
+
+          // 🧩 Hide dropdown when clicking outside
+          $(document).on('click', function (e) {
+              if (!$dropdown.is(e.target) && $dropdown.has(e.target).length === 0) {
+                  $list.hide();
+              }
+          });
+      });
+      }
+
+    function initMultiselectCloseout() {
+      $("#addTaskCloseOutModal").find('.multiselect-dropdown').each(function () {
+          var $dropdown = $(this);
+          var $btn = $dropdown.find('.dropdown-btn');
+          var $list = $dropdown.find('.dropdown-list');
+          var $hidden = $dropdown.find('input[type="hidden"]'); // your hidden input
+
+          // 🔽 Toggle dropdown open/close
+          $btn.on('click', function (e) {
+              e.stopPropagation();
+              $('.dropdown-list').not($list).hide();
+              $list.toggle();
+          });
+
+          // ✅ Handle checkbox changes (event delegation)
+          $list.on('change', 'input[type="checkbox"]', function () {
+              var $checkboxes = $list.find('input[type="checkbox"]');
+
+              // Get selected items (id + name)
+              var selected = $checkboxes
+                  .filter(':checked')
+                  .map(function () {
+                      return {
+                          id: $(this).val(),
+                          name: $(this).data('name') || $(this).parent().text().trim()
+                      };
+                  })
+                  .get();
+
+              // Update button text
+              var selectedNames = selected.map(function (s) { return s.name; });
+              $btn.text(selectedNames.length ? selectedNames.join(', ') : 'Choose roles');
+
+              var dropdownId = $dropdown.attr('id'); // e.g., chk_VTFResponsibleRole
+              var hiddenId = dropdownId.replace('chk_', 'hdn_'); // => hdn_VTFResponsibleRole
+              var $hidden = $('#' + hiddenId);
+
+              // 🟢 Update hidden input value
+              if ($hidden.length) {
+                  $hidden.val(selected.map(function (s) { return s.id; }).join(','));
+              }
+          });
+
+          // 🧩 Hide dropdown when clicking outside
+          $(document).on('click', function (e) {
+              if (!$dropdown.is(e.target) && $dropdown.has(e.target).length === 0) {
+                  $list.hide();
+              }
+          });
+      });
+      }
+</script>
+
+
+<script>
+
+    function OpenAddCloseOutTaskModal() {
+        // show modal - using bootstrap 5
+        var $modal = $("#addTaskCloseOutModal");
+        $modal.show(); // simpler; if using Bootstrap modal: $('#addTaskCloseOutModal').modal('show');
+        $("body").append('<div class="modal-backdrop fade show"></div>');
+    }
+    // submit via AJAX
+        $("#formAddTaskCloseOut").on("submit", function (e) {
+            e.preventDefault();
+            var $form = $(this);
+            var formData = $form.serialize();
+
+            $("#btnSaveAddCloseOutTask").prop("disabled", true);
+
+            $.ajax({
+                url: '@Url.Action("SaveClouseOutTask", "IncidentDetail")',
+                method: 'POST',
+                data: formData,
+                success: function (res) {
+                    $("#btnSaveAddCloseOutTask").prop("disabled", false);
+                    if (res && res.success) {
+
+                         $("#formAddTaskCloseOut")[0].reset();
+                         $("#addTaskCloseOutModal").hide();
+                         $(".modal-backdrop").remove();
+
+                        GetCloseOutDetails();
+
+                    } else {
+                        alert(res?.message || "Save failed");
+                    }
+                },
+                error: function (xhr) {
+                    $("#btnSaveAddCloseOutTask").prop("disabled", false);
+                    alert("Error saving task");
+                }
+            });
+        });
+
+        // close modal
+        $("#btnCancelAddCloseOutTask, #btnCloseAddCloseOutTask").on("click", function () {
+            $("#addTaskCloseOutModal").hide();
+            $(".modal-backdrop").remove();
+        });
+
+</script>
+
+<script src="~/js/custom/loader/loader.js"></script>
+<script src="~/js/views/incident/incident-detail.js"></script>

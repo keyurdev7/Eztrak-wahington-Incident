@@ -1,0 +1,75 @@
+﻿@using Helpers.Extensions
+@using ViewModels.Ticket
+
+@model List<TicketHistoryDetailViewModel>
+
+@{
+    Layout = null;
+}
+
+<div class="tickets-support">
+  
+    <div class="container-fluid">
+        <div class="Order-report-table table-responsive" role="grid">
+            <table id="grd_SupportTicket_History" class="table datatable-basic dataTable">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Status</th>
+                        <th>Ticket No.</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>IT Response</th>
+                        <th>Date Submitted</th>
+                        <th>Submitted By</th>
+                        <th>Updated By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @item.Status
+                                    </td>
+                                    <td>
+                                        @item.TicketNo
+                                    </td>
+                                    <td>
+                                        @item.Category.GetDisplayName()
+                                    </td>
+                                    <td>
+                                        @item.Description
+                                    </td>
+                                    <td>
+                                        @item.ITResponse
+                                    </td>
+                                    <td>
+                                        @item.FormattedSubmittedOn
+                                    </td>
+                                    <td>
+                                        @item.CreatedBy
+                                    </td>
+                                    <td>
+                                        @item.UpdatedBy
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8"> No Records found.</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<input type="hidden" id="modal-title" value="Ticket History" />

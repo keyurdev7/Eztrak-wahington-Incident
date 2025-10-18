@@ -1,0 +1,50 @@
+.staging-page .staging-steps {
+    margin: 0 auto;
+    padding: 10px;
+    /*max-width: 600px;*/
+}
+
+    .staging-page .staging-steps .step-progress {
+        margin: 0 auto 20px auto;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: #ff9224;
+    }
+
+        .staging-page .staging-steps .step-progress h5 {
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 80px;
+            color: #fff;
+            text-align: center;
+        }
+
+    .staging-page .staging-steps .step-box .step-card:not(:first-of-type) {
+        display: none;
+    }
+
+.text-site-primary {
+    color: #4f8896 !important;
+}
+
+.staging-page .staging-steps .step-progress {
+    background-color: #4f8896 !important
+}
+
+.btn-site-primary {
+    border-color: #4f8896 !important;
+    background-color: #4f8896 !important;
+    color: #f8f9fa !important;
+}
+
+    .btn-site-primary:hover {
+        border-color: #4f8896 !important;
+        background-color: #fff !important;
+        color: #4f8896 !important;
+    }
+
+#inventory-table-container .thead-primary th {
+    background-color: #4f8896 !important;
+    color: white;
+}

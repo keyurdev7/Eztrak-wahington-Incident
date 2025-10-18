@@ -1,0 +1,68 @@
+﻿@model ViewModels.Incident.IncidentHistoryViewModel
+
+<div class="modal fade" id="historyIncidentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">History: @Model.IncidentNumber</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="card p-3">
+                            <h4>Activity Summary</h4>
+                            <p><span>Status Changes:</span> @Model.StatusChangeCount</p>
+                            <p><span>Notes Added:</span> @Model.NotesCount</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card p-3">
+                            <h4>Time Metrics</h4>
+                            <p><span>Created:</span> @Model.CreatedOn.ToString("dd MMM yyyy hh:mm tt")</p>
+                            <p><span>Last Updated:</span> @Model.UpdatedOn.ToString("dd MMM yyyy hh:mm tt")</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive incident-table historyModalTable">
+                    <table class="table align-middle text-left">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Status</th>
+                                <th>Location</th>
+                                <th>Intersection</th>
+                                <th>Type of Event</th>
+                                <th>Severity</th>
+                                <th>Description</th>
+                                <th>ES Indicators</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var record in Model.HistoryRecords)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="badge rounded-pill px-3 py-2" style="background:@record.StatusColor">
+                                            @record.StatusName
+                                        </span>
+                                    </td>
+                                    <td><i class="fa fa-map-marker"></i> @record.Location</td>
+                                    <td>@record.Intersection</td>
+                                    <td>@record.EventType</td>
+                                    <td>
+                                        <span class="badge rounded-pill px-3 py-2" style="background:@record.SeverityColor">
+                                            @record.Severity
+                                        </span>
+                                    </td>
+                                    <td>@record.Description</td>
+                                    <td>@record.EsIndicators</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

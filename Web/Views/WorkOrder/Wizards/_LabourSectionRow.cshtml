@@ -1,0 +1,63 @@
+﻿@model ViewModels.WorkOrderLaborModifyViewModel;
+@using Enums;
+@using System.Globalization;
+@{
+    var isDetailPage = ViewData["IsDetailPage"] != null ? bool.Parse(ViewData["IsDetailPage"].ToString()) : false;
+    var collectionType = "WorkOrderLabors";
+    var rowNumber = ViewData["RowNumber"] != null ? int.Parse(ViewData["RowNumber"].ToString()) : 0;
+
+
+    var rowName = "section-row[" + rowNumber + "]";
+    var rowId = "labour-section-row-" + rowNumber;
+
+    var overrideType = collectionType + "[" + rowNumber + "].Type";
+    var craftId = collectionType + "[" + rowNumber + "].Craft.Id";
+    var craftName = collectionType + "[" + rowNumber + "].Craft.Name";
+    var overrideHours = collectionType + "[" + rowNumber + "].DU";
+    var headCount = collectionType + "[" + rowNumber + "].MN";
+    var hiddenId = collectionType + "[" + rowNumber + "].Id";
+    var hiddenRate = collectionType + "[" + rowNumber + "].Rate";
+    var hiddenLaborRate = collectionType + "[" + rowNumber + "].LaborRate";
+    var hiddenEstimate = collectionType + "[" + rowNumber + "].Estimate";
+    var hiddenLaborEstimate = collectionType + "[" + rowNumber + "].LaborEstimate";
+
+}
+
+<tr class="labour-section-row" id="@rowId">
+    <td>
+        <span style="text-align: initial !important;">@Model.Type</span>
+        <input type="hidden" name="@overrideType" value="@Model.Type" />
+    </td>
+    <td>
+        <span style=" text-align: initial !important;">@Model.Craft.Name</span>
+        <input type="hidden" name="@craftId" value="@Model.Craft.Id" />
+        <input type="hidden" name="@craftName" value="@Model.Craft.Name" />
+    </td>
+    <td>
+        <span style="text-align: initial !important;">@Model.MN</span>
+        <input type="hidden" name="@headCount" value="@Model.MN" />
+    </td>
+    <td>
+        <span style=" text-align: initial !important;">@Model.DU</span>
+        <input type="hidden" name="@overrideHours" value="@Model.DU" />
+    </td>
+    <td>
+        <span style=" text-align: initial !important;">$@Model.Rate</span>
+    </td>
+
+    <td>
+        <span style=" text-align: initial !important;">$@Model.Estimate</span>
+    </td>
+    @if (!isDetailPage)
+    {
+        <td>
+            <a href="javascript:void(0)" class="remove-cost mx-1 datatable-action btn bg-custom-dark" data-toggle="tooltip" title="Delete Labor"><i class="icon-trash"></i></a>
+        </td>
+    }
+
+    <input type="hidden" class="hidden-id tItem-range-hidden-fields" name="@hiddenRate" value="@Model.Rate" />
+    <input type="hidden" class="hidden-id tItem-range-hidden-fields" name="@hiddenLaborRate" value="@Model.Rate" />
+    <input type="hidden" class="hidden-id tItem-range-hidden-fields labour-estimate" name="@hiddenEstimate" value="@Model.Estimate" />
+    <input type="hidden" class="hidden-id tItem-range-hidden-fields labour-estimate" name="@hiddenLaborEstimate" value="@Model.Estimate" />
+</tr>
+

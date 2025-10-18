@@ -1,0 +1,10 @@
+﻿@{ 
+    //var currentValue = DateTime.Parse(@ViewData["Value"].ToString());
+    var currentValue = DateTime.Now;
+}
+<div class="input-group">
+    <span class="input-group-prepend">
+        <span class="input-group-text"><i class="icon-calendar5"></i></span>
+    </span>
+    <input name="@ViewData["Key"]" value="@currentValue.ToString("dddd, dd MMMM, yyyy")" asp-format="dddd, dd mmm, yyyy" type="text" class="form-control datepicker pickadate-accessibility" placeholder="Select date&hellip;">
+</div>

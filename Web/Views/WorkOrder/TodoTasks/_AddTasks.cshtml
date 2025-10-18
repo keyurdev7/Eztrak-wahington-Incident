@@ -1,0 +1,75 @@
+﻿@using ViewModels.WorkOrderTasks
+@model WorkOrderTasksModifyViewModel
+
+@{
+    Layout = null;
+}
+<form action="CreateTasks" method="post" id="save-line-items-form">
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="mb-3 form-group">
+                <div class="mb-3 form-group">
+                    <label asp-for="TaskDescription" class="form-label fw-600">Task Description <span class="required">*</span></label>
+                    <input asp-for="TaskDescription" type="text" class="form-control" />
+                    <span asp-validation-for="TaskDescription" class="validation-invalid-label"></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="mb-3 form-group">
+                <div class="mb-3 form-group">
+                    <label asp-for="TaskDueDate" class="form-label fw-600">Task Due Date <span class="required">*</span></label>
+                    <input asp-for="TaskDueDate" type="date" class="form-control" />
+                    <span asp-validation-for="TaskDueDate" class="validation-invalid-label"></span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <input type="hidden" asp-for="Id" value="@Model.Id" />
+    <input type="hidden" asp-for="WorkOrderId" value="@Model.WorkOrderId" />
+
+    <div class="text-center mt-4">
+        <button type="button" id="save-tasks" class="btn btn-primary me-3">Submit</button>
+    </div>
+</form>
+
+<script>
+    $(function () {
+
+        $("body").off("click", "#save-tasks");
+        $("body").on("click", "#save-tasks", function () {
+            let form = $(this).closest("form");
+            $(form).removeData("validator").removeData("unobtrusiveValidation");
+            $.validator.unobtrusive.parse($(form));
+            if ($(form).valid()) {
+                var formData = $(this).closest("form").serialize();
+                CreateTasks(formData);
+            }
+        });
+    });
+
+    function CreateTasks(data) {
+        $.ajax({
+            url: '/WorkOrder/CreateTasks',
+            type: 'Post',
+            data: data,
+            success: function (res) {
+                if (res.status) {
+                    $("#crudModalPanel").modal("hide");
+                }
+                else {
+                    $.each(res.fieldErrors, function (fieldName, errors) {
+                        var errorContainer = $('[data-valmsg-for="' + fieldName + '"]');
+                        errorContainer.removeClass('field-validation-valid').addClass('field-validation-error');
+                        $(errorContainer).html('<span class="" for="' + fieldName + '">' + errors[0] + '</span>');
+                    });
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr);
+            }
+        });
+    }
+</script>

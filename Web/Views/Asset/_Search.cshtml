@@ -1,0 +1,44 @@
+﻿@using ViewModels;
+@model AssetSearchViewModel
+
+@{
+    var assetTypes = ViewBag.AssetTypes as List<AssetTypeDetailViewModel>;
+    var assetTree = ViewBag.AssetTree as List<AssetTypeTreeViewModel>;
+    var index = 0;
+}
+
+<div class="control_field">
+    <input asp-for="Search.value" type="search" class="form-control" placeholder="Keyword" aria-controls="crud-list-table" autocomplete="new-password">
+
+</div>
+
+<div class="control_field" data-filter-id="asset-type-search-container">
+    <partial name="~/Views/Shared/Select2/_AssetType.cshtml" for="AssetType" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "asset-type-search-id"} }' />
+
+</div>
+
+<div class="control_field" data-filter-id="manufacturer-search-container">
+    <partial name="~/Views/Shared/Select2/_Manufacturer.cshtml" for="Manufacturer" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "manufacturer-search-id"} }' />
+</div>
+
+<div class="control_field" data-filter-id="condition-search-container">
+    <partial name="~/Views/Shared/Select2/_Condition.cshtml" for="Condition" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "condition-search-id"} }' />
+
+</div>
+
+
+@* <div class="control_field" data-filter-id="mutcd-search-container">
+    <partial name="~/Views/Shared/Select2/_MUTCD.cshtml" for="MUTCD" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "mutcd-search-id"} }' />
+
+</div>
+ *@
+<div class="control_field custom-search-input-filter">
+    <input style="width: 20px;
+    height: 20px;
+    border: 1px solid #111;" asp-for="ShowOutOfServiceAssets" class="form-check-input m-0" id="ShowOutOfServiceAssets">
+    <label class="form-check-label ms-2" for="ShowOutOfServiceAssets">
+        Show Out Of Service?
+    </label>
+
+</div>
+

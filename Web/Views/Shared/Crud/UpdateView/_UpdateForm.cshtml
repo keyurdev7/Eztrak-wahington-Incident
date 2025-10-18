@@ -1,0 +1,66 @@
+﻿@using System.Web
+@using ViewModels.CRUD
+@model CrudUpdateViewModel
+@{
+    var controllerName = Context.Request.Path.Value.Split("/")[1];
+    ViewData["Title"] = Model.Title;
+    ViewData["Name"] = Model.Name;
+}
+@* <div class="card">
+    <div class="card-body"> *@
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="@Model.FormAction" asp-controller="@Model.FormController" enctype="@Model.FormType" id="@Model.FormId">
+            @if (Model.IsAjaxBased)
+            {
+                <div class="validation-summary-errors text-danger"></div>
+            }
+            else
+            {
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            }
+            <fieldset class="mb-3">
+                @await Html.PartialAsync(Model.UpdateViewPath, Model.UpdateModel, new ViewDataDictionary(ViewData))
+            </fieldset>
+            <div class="form-group">
+                @if (Model.IsAjaxBased)
+                {
+                    <input type="hidden" id="modal-title" value="@Model.Title" />
+
+                    <div class="text-center">
+
+                        @*<button type="button" class="cancel-btn btn btn-dark form-btn" data-bs-dismiss="modal">Cancel</button>*@
+
+                        @if (Model.IsApprovalForm)
+                        {
+                            <button type="button" onclick="rejectRecord(this)" class="btn btn-danger form-btn" id="reject-btn">Reject</button>
+                            <button type="button" onclick="approveRecord(this)" class="btn btn-success form-btn" id="approve-btn">Approve</button>
+                        }
+                        else
+                        {
+                            <button type="button" onclick="@Model.SubmitOnClick" class="btn btn-lg btn-modal-save form-btn btn-primary" id="submit-btn">Save</button>
+                        }
+
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center">
+                        <a asp-action="Index" asp-controller="@controllerName" type="button" class="btn btn-dark">
+                            Cancel
+                            @*<i class="icon-cross3"></i>*@
+                        </a>
+                        <button type="submit" class="btn orange" id="submit-btn">Submit</button>
+                    </div>
+                }
+
+            </div>
+        </form>
+    </div>
+</div>
+@*     </div>
+    </div>
+*@
+<script src="/js/masking/initiate-masking.js"></script>
+<script src="~/js/custom/crud/add_asterik_on_required.js"></script>
+<partial name="_ValidationScriptsPartial" />

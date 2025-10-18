@@ -1,0 +1,1020 @@
+﻿@using ViewModels.Dashboard
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Administrator Dashboard";
+}
+
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+<link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/light/main.css">
+<script src="https://js.arcgis.com/4.27/"></script>
+
+
+
+<script type="module" src="https://js.arcgis.com/embeddable-components/4.33/arcgis-embeddable-components.esm.js"></script>
+
+
+<style>
+    .chart-container {
+        background-color: transparent;
+        @* border: 1px solid #666666 !important; *@
+    }
+
+        .chart-container .card-footer {
+            background-color: #CACACA;
+            color: #666666;
+        }
+
+    .card-header {
+        background: none;
+        font-weight: 600;
+    }
+
+    .dashboard-header {
+        padding: 15px 0px;
+        /* border-bottom: 1px solid #e9ecef; */
+    }
+
+    .dashboard-title {
+        font-weight: 700;
+        font-size: 36px;
+        margin: 0;
+    }
+
+    .header-actions .btn {
+        padding: 16px 18px;
+        display: flex;
+        border-radius: 12px;
+    }
+
+    .search-container i,
+    .header-actions i {
+        font-size: 20px;
+    }
+    /*****************dhara******************/
+    #dashboardTabs .nav-item .nav-link {
+        background: transparent;
+        color: #374151;
+        font-size: 16px;
+        line-height: 1.25rem;
+        margin-right: 14px;
+        border-radius: 0;
+        border-top: none;
+        border-left: 0;
+        border-right: 0;
+    }
+
+    #dashboardTabs .nav-item {
+        margin: 0;
+    }
+
+        #dashboardTabs .nav-item .nav-link.active {
+            background: transparent;
+            color: #f54e00;
+            border-color: #f54e00;
+        }
+
+    #dashboardTabs {
+        border-top: none;
+        border-left: none;
+        border-right: none;
+    }
+
+    .stat-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px;
+        border-radius: 10px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        margin-bottom: 15px;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: #374151;
+    }
+
+    .stat-value {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .icon-box {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .icon-orange {
+        background: #fde68a;
+        color: #f59e0b;
+    }
+
+    .icon-red {
+        background: #fecaca;
+        color: #ef4444;
+    }
+
+    .icon-green {
+        background: #bbf7d0;
+        color: #22c55e;
+    }
+
+    .icon-chart {
+        background: #d1fae5;
+        color: #059669;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 260px;
+        width: 260px;
+        margin: auto;
+    }
+
+    .chart-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-weight: bold;
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .chart-legend li {
+        list-style: none;
+        margin-bottom: 5px;
+        font-size: 14px;
+    }
+
+    .legend-dot {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 6px;
+    }
+
+    #severityChart, .chart-container {
+        width: 180px !important;
+        height: 180px !important;
+    }
+
+    #statusChart {
+        width: 180px !important;
+        height: 180px !important;
+    }
+
+    #dashboardTabs .nav-item .nav-link i.fa {
+        margin-right: 8px;
+    }
+    /*****************Header style***************************/
+    .header {
+        background: #ffffff;
+        padding: 16px;
+        box-shadow: 0px 0px 14px #efefef;
+    }
+
+    .logo-section .title h2 {
+        font-weight: 800;
+        font-size: 28px;
+        margin-bottom: 0;
+        line-height: normal;
+        color: #494949;
+    }
+
+    .logo-section .title span {
+        color: darkgrey;
+    }
+
+    .profile .sidebar-account.dropdown-toggle::before {
+        display: none;
+    }
+
+    .icon {
+        position: relative;
+        font-size: 18px;
+        color: #666;
+        cursor: pointer;
+        margin-right: 16px;
+    }
+
+    .notification-dot {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        width: 8px;
+        height: 8px;
+        background-color: red;
+        border-radius: 50%;
+    }
+
+    .profile {
+        width: 34px;
+        height: 34px;
+        background: #f54e00;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+        .profile i.fa {
+            color: #ffffff;
+        }
+
+    .header .logo {
+        background-color: #ededed;
+        color: #f54e00;
+        border-radius: 12px;
+        padding: 10px;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+    }
+
+    .header .dropdown-toggle::before {
+        display: none;
+    }
+
+    .DashboardHeader {
+        padding-top: 16px;
+    }
+
+        .DashboardHeader h4 {
+            font-weight: 800;
+            font-size: 24px;
+        }
+
+    .anakyticsTitle {
+        margin-bottom: 0;
+    }
+
+    #chartsTab .card {
+        border: 1px solid #e5e7eb !important;
+    }
+
+    .chartTitle {
+        margin-bottom: 16px;
+    }
+    /****************map style*********************/
+    .titleLocation {
+        font-size: 20px;
+        line-height: normal;
+        font-weight: 700;
+    }
+
+    .titleDescription {
+        font-size: 16px;
+        line-height: normal;
+        margin-top: 6px;
+    }
+
+    .incident-locations {
+        background: white;
+        border-radius: 10px;
+        padding: 16px;
+        margin: 16px 0;
+        border: 1px solid #e0e0e0;
+    }
+
+    .statusLegendInfo {
+        font-size: 16px;
+        font-weight: 700;
+        line-height: normal;
+    }
+
+        .statusLegendInfo i.fa {
+            margin-right: 6px;
+        }
+
+    .status-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin-top: 6px;
+    }
+
+        .legend-item i {
+            font-size: 10px;
+            margin-right: 8px;
+        }
+
+        .legend-item span {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+    .fa-circle {
+        color: #ccc;
+    }
+
+    .submitted {
+        color: #dc2626;
+    }
+
+
+    .dispatched {
+        color: #facc15;
+    }
+
+    .started {
+        color: #FFA500;
+    }
+
+    .completed {
+        color: #003300;
+    }
+
+    .cancelled {
+        color: #6b7280;
+    }
+    /**************incident card ******************/
+    .incident-card {
+        background: white;
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 20px;
+        border: 1px solid #e0e0e0;
+    }
+
+        .incident-card .status-badge {
+            color: white;
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            float: right;
+        }
+
+        .incident-card .started {
+            background-color: #3b82f6;
+        }
+
+        .incident-card .submitted {
+            background-color: #dc2626;
+        }
+
+        .incident-card .dispatched {
+            background-color: #facc15;
+        }
+
+        .incident-card .completed {
+            background-color: #003300;
+        }
+
+        .incident-card .cancelled {
+            background-color: #6b7280;
+        }
+
+        .incident-card h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 800;
+            line-height: normal;
+        }
+
+        .incident-card p {
+            margin: 4px 0;
+            color: #4b5563;
+            font-size: 14px;
+            line-height: normal;
+        }
+
+    .incident-list {
+        background: white;
+        border-radius: 10px;
+        padding: 16px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .recentList {
+       
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 20px;
+    }
+    .ListHeight{
+        height: 250px;
+        overflow: auto;
+    }
+
+    .incident-list h3 {
+        font-size: 18px;
+        margin-bottom: 10px;
+        line-height: normal;
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 16px;
+    }
+
+    .incident-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f7f7f7;
+        padding: 12px;
+        border: 1px solid #eee;
+        /* margin-right: 16px; */
+        border-radius: 8px;
+    }
+
+        .incident-item:last-child {
+            border-bottom: none;
+        }
+
+    .incident-details {
+        display: flex;
+        align-items: center;
+    }
+
+    .incident-icon {
+        font-size: 14px;
+        margin-right: 10px;
+    }
+
+    .incident-info h4 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+        line-height: normal;
+    }
+
+    .incident-info p {
+        color: #4b5563;
+        font-size: 14px;
+        line-height: normal;
+        margin-bottom: 0;
+    }
+
+    .incident-severity {
+        font-size: 14px;
+        color: #777;
+    }
+</style>
+
+<header class="header dashboard-header d-flex align-items-center justify-content-between">
+    <!-- Left section -->
+    <div class="logo-section d-flex align-items-center">
+        <div class="logo"><i class="fa-solid fa-home"></i></div>
+        <div class="title">
+            <h2>Dashboard</h2>
+            <span>Quick overview, smarter incident management</span>
+        </div>
+    </div>
+
+    <!-- Right section -->
+    <div class="right-section d-flex align-items-center">
+
+        <div class="icon">
+            <i class="fa-regular fa-bell"></i>
+            <span class="notification-dot"></span>
+        </div>
+        <a class="icon" href="/Settings"><i class="fa fa-gear"></i></a>
+        <div class="profile">
+            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle pl-3 " id="dropdownUser2"
+               data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-user"></i>
+
+            </a>
+            <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser3"
+                style="background-color: white;">
+                <li class="dropdown-item">
+                    <a class="nav-link d-flex align-items-center" href="/Identity/Account/Manage/ChangePassword">
+                        <i class="fa fa-lock"></i>
+                        <span class="menu-text">Change Password</span>
+                    </a>
+                </li>
+
+                <li class="dropdown-item">
+                    <a class="nav-link d-flex align-items-center" href="/Identity/Account/Logout">
+                        <i class="fa fa-user"></i>
+                        <span class="menu-text">Log Out</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>
+
+<div class="dashboard">
+    <div class="container-fluid ">
+        <div class="DashboardHeader">
+            <h4 class="fw-bold" style="display:none">Map & Analytics</h4>
+            <p class="text-muted" style="display:none">Visual representation of incident data and analytics</p>
+        </div>
+
+        <div class="bg-white rounded p-4 shadow-sm border border-gray-200 mb-4">
+            <div class="tabsSec">
+                <ul class="nav nav-tabs CustomTab" id="dashboardTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="map-tab" data-bs-toggle="tab" data-bs-target="#mapTab" type="button" role="tab">
+                            <i class="fa fa-map"></i>Map View
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="charts-tab" data-bs-toggle="tab" data-bs-target="#chartsTab" type="button" role="tab">
+                            <i class="fa fa-chart-bar"></i>Charts & Analytics
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content mt-3">
+                    <!-- Map Tab -->
+                    <div class="tab-pane fade show active" id="mapTab" role="tabpanel">
+                        @*  <h3 class="titleLocation">Incident Locations</h3>
+                        <p class="titleDescription">Interactive map showing all incident locations with status indicators</p> *@
+                        <div class="incident-locations">
+                            <div class="statusLegendInfo">
+                                <i class="fa fa-layer-group"></i>Status Legend
+                            </div>
+                            <div class="status-legend">
+                                <div class="legend-item"><i class="fa-solid fa-circle submitted"></i><span>Submitted (@Model.IncidentDashboard.TotalSubmittedCount)</span></div>
+                                <div class="legend-item"><i class="fa-solid fa-circle started"></i><span>Validated (@Model.IncidentDashboard.TotalValidatedCount)</span></div>
+                                @* <div class="legend-item"><i class="fa-solid fa-circle dispatched"></i><span>Dispatched (@Model.IncidentDashboard.TotalDispatchedCount)</span></div> *@
+                                <div class="legend-item"><i class="fa-solid fa-circle completed"></i><span>Completed (@Model.IncidentDashboard.TotalCompletedCount)</span></div>
+                                <div class="legend-item"><i class="fa-solid fa-circle cancelled"></i><span>Cancelled (@Model.IncidentDashboard.TotalCancelledCount)</span></div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded p-4 shadow-sm border border-gray-200 mb-4">
+                            <div id="map" style="height:600px; width:100%;">
+                                <!-- Add custom element to <body> of your page -->
+                                @*  <arcgis-embedded-map style="height:600px;width:1750px;" item-id="8a4533b464d041ac9a50279ab8717767" theme="light"
+                                                       center="-118.1107272296462,33.967678536918406" scale="36111.909643"
+                                                       portal-url="https://pmm-jason.maps.arcgis.com"></arcgis-embedded-map> *@
+                            </div>
+                        </div>
+
+                        <!-- Recent Incidents List -->
+                        <div class="incident-list">
+                            <h3>Recent Incidents on Map</h3>
+                            <div class="ListHeight">
+                                <div class="recentList">
+                                @if (Model.IncidentDashboard.ListIncidentRecentViewModel.Count > 0)
+                                {
+                                    @foreach (var item in Model.IncidentDashboard.ListIncidentRecentViewModel)
+                                    {
+                                        <div class="incident-item focusMap" data-lat="@item.lat"
+                                             data-lon="@item.lon"
+                                             data-description="@item.description"
+                                             data-intersection="@item.intersection"
+                                             data-incidentId="@item.incidentId"
+                                             data-eventtype="@item.eventtype"
+                                             data-severity="@item.severity"
+                                             data-assettype="@item.assettype"
+                                             data-loc="@item.incidentloc"
+                                             data-radius="@(!string.IsNullOrWhiteSpace(item.perimeter) ? item.perimeter : "0")"
+                                             data-incidentstatusColor="@item.incidentstatusColor"
+                                             style="cursor:pointer">
+                                            <div class="incident-details">
+                                                <span class="dot" style="width: 12px;height: 12px;border-radius: 50%;display: inline-block;background-color:@item.incidentstatusColor"></span>
+                                                <div class="incident-info" style="margin-left: 10px;">
+                                                    <h4>@item.incidentId</h4>
+                                                    <p>@item.incidentloc</p>
+                                                    <p>@item.eventtype</p>
+                                                </div>
+                                            </div>
+                                            <div class="incident-severity">@item.severity</div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="incident-item">
+                                        <div class="incident-details">
+                                            No recent incident found.
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <!-- Charts Tab -->
+                    <div class="tab-pane fade" id="chartsTab" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold anakyticsTitle">Incident Analytics</h6>
+                            <span class="text-muted small" style="display:none"><i class="fa fa-arrow-trend-up"></i>(@Model.IncidentDashboard.TotalIncidentCount) total incidents analyzed</span>
+                        </div>
+                        <p class="text-muted" style="display:none">Visual breakdown of incident data and trends</p>
+                        <div class="row">
+                            @foreach (var item in Model.IncidentDashboard.ListIncidentDashboardSeverityReportViewModel)
+                            {
+                                <div class="col-md-3">
+                                    <div class="stat-box">
+                                        <div>
+                                            <div class="stat-label">@item.name</div>
+                                            <div class="stat-value">@item.count</div>
+                                        </div>
+                                        <div class="icon-box icon-orange"></div>
+                                    </div>
+                                </div>
+                            }
+                            <div class="col-md-3">
+                                <div class="stat-box">
+                                    <div>
+                                        <div class="stat-label">Total Incidents</div>
+                                        <div class="stat-value text-success">@Model.IncidentDashboard.TotalIncidentCount</div>
+                                    </div>
+                                    <div class="icon-box icon-chart"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts -->
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card p-4">
+                                    <h6 class="fw-bold chartTitle">Active Incidents by Severity</h6>
+                                    <div class="chart-container">
+                                        <canvas id="severityChart" width="180" height="180"></canvas>
+                                        <div class="chart-center">
+                                            <div>@Model.IncidentDashboard.TotalSeverityCount</div>
+                                            <small>Total</small>
+                                        </div>
+                                    </div>
+                                    <ul class="chart-legend p-0 mt-2">
+                                        @foreach (var item in Model.IncidentDashboard.ListIncidentDashboardSeverityReportViewModel)
+                                        {
+                                            <li class="d-flex align-items-center justify-content-between InfoCount">
+                                                <div class="dot-name">
+                                                    <div class="legend-dot" style="background:@item.color"></div> @item.name
+                                                </div>
+                                                <div class="count">@item.count (@item.SeverityPercentage %)</div>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card p-4">
+                                    <h6 class="fw-bold chartTitle">Incidents by Status</h6>
+                                    <div class="chart-container">
+                                        <canvas id="statusChart" width="180" height="180"></canvas>
+                                        <div class="chart-center">
+                                            <div>@Model.IncidentDashboard.TotalStatusLegendCount</div>
+                                            <small>Total</small>
+                                        </div>
+                                    </div>
+                                    <ul class="chart-legend p-0 mt-2">
+                                        @foreach (var item in Model.IncidentDashboard.ListIncidentDashboardStatusReport)
+                                        {
+
+                                            <li class="d-flex align-items-center justify-content-between InfoCount">
+                                                <div class="dot-name">
+                                                    <div class="legend-dot" style="background:@item.color"></div>
+                                                    @item.name
+                                                </div>
+                                                <div class="count">@item.count (@item.StatusPercentage%)</div>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card p-4">
+                                    <h6 class="fw-bold chartTitle">Active Incidents by Asset Type</h6>
+                                    <div class="chart-container">
+                                        <canvas id="asseTypeChart" width="180" height="180"></canvas>
+                                        <div class="chart-center">
+                                            <div>@Model.IncidentDashboard.TotalAssetTypeCount</div>
+                                            <small>Total</small>
+                                        </div>
+                                    </div>
+                                    <ul class="chart-legend p-0 mt-2">
+                                        @foreach (var item in Model.IncidentDashboard.ListIncidentDashboardAssetTypeReportViewModel)
+                                        {
+                                            <li class="d-flex align-items-center justify-content-between InfoCount">
+                                                <div class="dot-name">
+                                                    <div class="legend-dot" style="background:@item.color"></div> @item.name
+                                                </div>
+                                                <div class="count">@item.count (@item.AssetTypePercentage %)</div>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card p-4">
+                                    <h6 class="fw-bold chartTitle">Incidents by Event Type</h6>
+                                    <div class="chart-container">
+                                        <canvas id="eventTypeChart" width="180" height="180"></canvas>
+                                        <div class="chart-center">
+                                            <div>@Model.IncidentDashboard.TotalEventTypeCount</div>
+                                            <small>Total</small>
+                                        </div>
+                                    </div>
+                                    <ul class="chart-legend p-0 mt-2">
+                                        @foreach (var item in Model.IncidentDashboard.ListIncidentDashboardEventTypeReportViewModel)
+                                        {
+
+                                            <li class="d-flex align-items-center justify-content-between InfoCount">
+                                                <div class="dot-name">
+                                                    <div class="legend-dot" style="background:@item.color"></div>
+                                                    @item.name
+                                                </div>
+                                                <div class="count">@item.count (@item.EventTypePercentage%)</div>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Convert server-side model into JS object
+            var severityData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.IncidentDashboard.ListIncidentDashboardSeverityReportViewModel));
+            var statusData   = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.IncidentDashboard.ListIncidentDashboardStatusReport));
+            var assetTypeData   = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.IncidentDashboard.ListIncidentDashboardAssetTypeReportViewModel));
+            var eventData   = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.IncidentDashboard.ListIncidentDashboardEventTypeReportViewModel));
+
+            // Helper function to render a doughnut chart
+            function renderDoughnutChart(canvasId, chartData) {
+                var ctx = document.getElementById(canvasId);
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: chartData.map(x => x.name),
+                        datasets: [{
+                            data: chartData.map(x => x.count),
+                            backgroundColor: chartData.map(x => x.color),
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        cutout: '70%',
+                        width: 180,
+                        height: 180,
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+
+            // Build both charts from model
+            renderDoughnutChart("severityChart", severityData);
+            renderDoughnutChart("statusChart", statusData);
+            renderDoughnutChart("asseTypeChart", assetTypeData);
+            renderDoughnutChart("eventTypeChart", eventData);
+        });
+    </script>
+
+    <script>
+        require([
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/Graphic",
+            "esri/layers/GraphicsLayer",
+            "esri/geometry/Circle"
+        ], function (Map, MapView, Graphic, GraphicsLayer, Circle) {
+
+                 // make available globally
+            window.Graphic = Graphic;
+            window.Circle = Circle;
+
+            console.log("ArcGIS modules loaded ✔");
+
+            var map = new Map({
+                basemap: "streets-navigation-vector"
+            });
+
+            var incidents = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.IncidentDashboard.ListIncidentLocationMapViewModel));
+            //var firstObj = incidents[0];
+
+            window.view = new MapView({
+                container: "map",
+                map: map,
+                center: [-119.4179, 36.7783], // California center (Lon, Lat)
+                zoom: 6
+            });
+
+            var graphicsLayer = new GraphicsLayer();
+            window.graphicsLayer = graphicsLayer;
+            map.add(graphicsLayer);
+
+            incidents.forEach(function (incident) {
+
+           var point = {
+                            type: "point",
+                            longitude: incident.lon,
+                            latitude: incident.lat
+                       };
+
+         var symbol =   {
+                            type: "simple-marker",
+                            path: "M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z",
+                            color: incident.color,
+                            outline: { color: "black", width: 1 },
+                            size: "20px"
+                        };
+
+                var attributes = {
+                    Severity: incident.severity,
+                    IncidentID: incident.incidentid,
+                    Location: incident.incidentloc,
+                    CallerName: incident.callername,
+                    CallerPhone: incident.callerphone,
+                    CallerAddress: incident.calleraddress,
+                    EventType:incident.eventtype,
+                    AssetType:incident.assettype,
+                    Description:incident.description,
+                    Intersection:incident.intersection,
+                    Perimeter:incident.perimeter,
+                };
+
+            var popupTemplate = {
+                title: "Incident Details:",
+                content: `
+                    <b>Incident Number:</b> {IncidentID}<br>
+                    <b>Severity:</b> {Severity}<br>
+                    <b>Event Type:</b> {EventType}<br>
+                    <b>Asset Type:</b> {AssetType}<br>
+                    <b>Description:</b> {Description}<br>
+                    <b>Intersection:</b> {Intersection}<br>
+                    <b>Location:</b> {Location}<br>
+                    <b>Images:</b> <br>
+                    <b>Perimeter :</b> {Perimeter}<br>
+                `
+                };
+
+                var graphic = new Graphic({
+                    geometry: point,
+                    symbol: symbol,
+                    attributes: attributes,
+                    popupTemplate: popupTemplate
+                });
+                graphicsLayer.add(graphic);
+
+                var circle = new Circle({
+                    center: point,
+                    radius: incident.perimeter!='' ? parseInt(incident.perimeter) : 0,
+                    radiusUnit: "miles" // unit: MILES
+                });
+
+                var circleGraphic = new Graphic({
+                    geometry: circle,
+                    symbol: {
+                        type: "simple-fill",
+                        color: [255, 0, 0, 0.1], // semi-transparent fill
+                        outline: {
+                            color: incident.color,
+                            width: 2
+                        }
+                    }
+                });
+
+                graphicsLayer.add(circleGraphic);
+            });
+
+        });
+    </script>
+
+    <script>
+        $(function () {
+            var incidents = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.IncidentDashboard.ListIncidentLocationMapViewModel));
+
+            var locations = incidents.map(x => ({
+                label: x.incidentloc,
+                value: x.incidentloc,
+                lat: x.lat,
+                lon: x.lon
+            }));
+
+            $("#addressInput").autocomplete({
+                source: locations,
+                select: function (event, ui) {
+                    $("#addressInput").data("selectedIncident", ui.item);
+                }
+            });
+
+       $(".focusMap").click(function () {
+            var incidentLoc = $(this).data("loc");
+            var hdn_lat = $(this).data("lat");
+            var hdn_lon = $(this).data("lon");
+            var hdn_radius = $(this).data("radius");
+            var hdn_incidentstatusColor = $(this).data("incidentstatuscolor");
+
+            if (incidentLoc) {
+                // ✅ Clear old graphics (circle + marker)
+                if (window.graphicsLayer) {
+                    window.graphicsLayer.removeAll();
+                }
+
+                // Create point
+                var point = {
+                    type: "point",
+                    longitude: hdn_lon,
+                    latitude: hdn_lat
+                };
+
+                // Marker symbol
+                var markerSymbol = {
+                    type: "simple-marker",
+                    path: "M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z",
+                    color: hdn_incidentstatusColor,
+                    outline: { color: "black", width: 1 },
+                    size: "20px"
+                };
+
+                // Popup content
+                var popupTemplate = {
+                    title: "Incident Details",
+                    content: `
+                        <b>Incident Number:</b> {IncidentID}<br>
+                        <b>Severity:</b> {Severity}<br>
+                        <b>Event Type:</b> {EventType}<br>
+                        <b>Asset Type:</b> {AssetType}<br>
+                        <b>Description:</b> {Description}<br>
+                        <b>Intersection:</b> {Intersection}<br>
+                        <b>Location:</b> {Location}<br>
+                        <b>Images:</b> <br>
+                        <b>Perimeter:</b> {Perimeter}<br>
+                    `
+                };
+
+                // Attributes for popup
+                var attributes = {
+                    IncidentID: $(this).data("incidentid") || "",
+                    Severity: $(this).data("severity") || "",
+                    EventType: $(this).data("eventtype") || "",
+                    AssetType: $(this).data("assettype") || "",
+                    Description: $(this).data("description") || "",
+                    Intersection: $(this).data("intersection") || "",
+                    Location: incidentLoc,
+                    Perimeter: hdn_radius || "N/A"
+                };
+
+                // Marker with popup
+                var markerGraphic = new Graphic({
+                    geometry: point,
+                    symbol: markerSymbol,
+                    attributes: attributes,
+                    popupTemplate: popupTemplate
+                });
+
+                // Circle radius (default 0 if not provided)
+                var circle = new Circle({
+                    center: [hdn_lon, hdn_lat],
+                    radius: hdn_radius && hdn_radius !== '' ? parseInt(hdn_radius) : 0,
+                    radiusUnit: "miles"
+                });
+
+                var circleGraphic = new Graphic({
+                    geometry: circle,
+                    symbol: {
+                        type: "simple-fill",
+                        color: [255, 0, 0, 0.1], // transparent red
+                        outline: { color: hdn_incidentstatusColor, width: 2 }
+                    }
+                });
+
+                // Add fresh graphics
+                window.graphicsLayer.addMany([markerGraphic, circleGraphic]);
+
+                // Zoom to circle extent
+                window.view.goTo(circle.extent.expand(1));
+
+            } else {
+                if (window.graphicsLayer) {
+                    window.view.goTo(window.graphicsLayer.graphics);
+                }
+            }
+        });
+
+   });
+    </script>
+}

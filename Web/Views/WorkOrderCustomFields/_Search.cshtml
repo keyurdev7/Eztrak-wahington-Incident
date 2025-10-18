@@ -1,0 +1,16 @@
+﻿@using ViewModels;
+@using Enums;
+@using Web.Extensions;
+@model DynamicColumnSearchViewModel
+@{
+    Layout = null;
+}
+    <div class="control_field">
+        <input asp-for="Search.value" type="search" class="form-control" placeholder="Keyword" aria-controls="crud-list-table" autocomplete="new-password">
+    </div>
+    <div class="control_field">
+        <select asp-for="Type" class="form-select" asp-items="@HtmlHelperExtensions.GetEnumSelectListWithStrings<DynamicColumnType>()" placeholder="Column Type">
+            <option>None</option>
+        </select>
+    </div>
+<input type="hidden" asp-for="EntityType" />

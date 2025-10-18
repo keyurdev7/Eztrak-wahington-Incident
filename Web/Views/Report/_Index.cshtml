@@ -1,0 +1,35 @@
+﻿@model ViewModels.CRUD.CrudListViewModel
+@{
+    Layout = null;
+}
+@* <style>
+    .text-site-primary {
+        color: #832d20 !important;
+    }
+
+
+    .btn-site-primary {
+        border-color: #832d20 !important;
+        background-color: #832d20 !important;
+        color: #f8f9fa !important;
+    }
+
+        .btn-site-primary:hover {
+            border-color: #832d20 !important;
+            background-color: #fff !important;
+            color: #832d20 !important;
+        }
+
+    .btn-primary {
+        border-color: #832d20 !important;
+        background-color: #832d20 !important;
+    }
+
+    .footer-logo img, .navbar-brand img {
+        background: #f8f9fa !important;
+    }
+
+
+
+</style> *@
+@await Html.PartialAsync("~/Views/Shared/Crud/ListView/DataTable/_Index.cshtml", Model)

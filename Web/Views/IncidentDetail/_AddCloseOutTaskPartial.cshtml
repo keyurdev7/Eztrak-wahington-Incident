@@ -1,0 +1,121 @@
+﻿@model ViewModels.Incident.IncidentViewTaskListViewModel
+<style>
+    /* Start Multiple dropdown list for Repair */
+    .multiselect-dropdown {
+        position: relative;
+        width: 100%;
+    }
+
+        .multiselect-dropdown .dropdown-btn {
+            background: #fff;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            padding: 6px 10px;
+            text-align: left;
+            width: 100%;
+            cursor: pointer;
+        }
+
+            .multiselect-dropdown .dropdown-btn:after {
+                content: "▼";
+                float: right;
+                font-size: 10px;
+                margin-top: 6px;
+                color: #999;
+            }
+
+        .multiselect-dropdown .dropdown-list {
+            display: none;
+            position: absolute;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-top: 2px;
+            z-index: 10;
+            width: 100%;
+            max-height: 180px;
+            overflow-y: auto;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+            .multiselect-dropdown .dropdown-list label {
+                display: block;
+                padding: 6px 10px;
+                cursor: pointer;
+            }
+
+                .multiselect-dropdown .dropdown-list label:hover {
+                    background-color: #f1f1f1;
+                }
+    /* End Multiple dropdown list for Repair */
+</style>
+<div id="addTaskCloseOutModal" class="modal" tabindex="-1" role="dialog" style="display:none;">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form id="formAddTaskCloseOut">
+                <div class="modal-header">
+                    <h5 class="modal-title">Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnCloseAddCloseOutTask"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" name="IncidentId" value="@ViewBag.CurrentIncidentId" />
+                    <input type="hidden" name="IncidentValidationId" value="@ViewBag.CurrentIncidentValidationId" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Task Description <span class="text-danger">*</span></label>
+                        <textarea name="Task" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Responsible Role (Multiple)</label>
+                        <input type="hidden" id="hdn_UpcomingResponsibleRole" name="RoleIds" />
+
+                        <div class="multiselect-dropdown" id="chk_UpcomingResponsibleRole">
+                            <div class="dropdown-btn">Choose roles</div>
+                            <div class="dropdown-list">
+                                @* Use roles from ViewBag.Roles (IncidentRoleId / IncidentRoleName) *@
+                                @foreach (var r in (IEnumerable<SelectListItem>)ViewBag.Roles)
+                                {
+                                    <label>
+                                        <input class="form-check-input" type="checkbox" value="@r.Value" data-name="@r.Text">
+                                        @r.Text
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select name="StatusId" class="form-select" disabled>
+                            <option value="">Select Status</option>
+                            @foreach (var s in (IEnumerable<SelectListItem>)ViewBag.Statuses ?? new List<SelectListItem>())
+                            {
+                                if (s.Text == "Not Started")
+                                {
+                                    <option value="@s.Value" selected>@s.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@s.Value">@s.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btnCancelAddCloseOutTask">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btnSaveAddCloseOutTask">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+}

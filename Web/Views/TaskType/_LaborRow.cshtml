@@ -1,0 +1,38 @@
+﻿@using ViewModels
+@using Web.Extensions
+@model TaskLaborViewModel
+@{
+    var collectionType = "TaskLabors";
+    var rowNumber = ViewData["RowNumber"] != null ? int.Parse(ViewData["RowNumber"].ToString()) : 0;
+    var rowId = rowNumber;
+
+    var rateName = collectionType + "[" + rowNumber + "].Rate";
+    var totalName = collectionType + "[" + rowNumber + "].Total";
+    var hoursName = collectionType + "[" + rowNumber + "].Hours";
+    var craftSkillId = "craft-skill-id-" + rowNumber;
+    var craftSkill = collectionType + "[" + rowNumber + "].CraftSkill";
+}
+
+<tr class="labor-row" id="@rowId">
+
+    <td>
+        @await Html.PartialAsync("~/Views/Shared/Select2/CraftSkill/_CraftSkillHtml.cshtml", Model.CraftSkill, craftSkill, new ViewDataDictionary(ViewData) { { "HideLabel", true }, { "Id", craftSkillId }, { "Class", "craft-skill" } })
+    </td>
+    <td>
+        <input type="text" name="@hoursName" value="@Model.Hours" class="form-control hour" />
+    </td>
+    <td>
+        <input type="text" name="@rateName" value="@Model.Rate" class="form-control input-currency rate" readonly />
+    </td>
+    <td>
+        <input type="text" name="@totalName" value="@Model.Total" class="form-control input-currency total cost total-labor" readonly />
+    </td>
+    <td>
+        <a href="javascript:void(0)" class="remove-labor mx-1 datatable-action btn bg-custom-dark" data-toggle="tooltip" title="Delete Labor"><i class="icon-trash"></i></a>
+    </td>
+</tr>
+<script>
+    $(function () {
+        SetCraftSkillSelect2('#@craftSkillId');
+    });
+</script>

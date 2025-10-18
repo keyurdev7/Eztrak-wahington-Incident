@@ -1,0 +1,89 @@
+﻿@using ViewModels.Authentication;
+@model ChangePinCodeVM;
+@{
+    Layout = null;
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-12">
+                <form asp-action="ResetPinCode" enctype="multipart/form-data" id="reset-pin-code-form">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="mb-3 form-group">
+                                <label asp-for="PinCode" class="form-label fw-600"></label>
+                                <input asp-for="PinCode" type="text" class="form-control" placeholder="xxxx" />
+                                <span asp-validation-for="PinCode" class="validation-invalid-label"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3 form-group">
+                                <label asp-for="ConfirmPinCode" class="form-label fw-600"></label>
+                                <input asp-for="ConfirmPinCode" type="text" class="form-control" placeholder="xxxx" />
+                                <span asp-validation-for="ConfirmPinCode" class="validation-invalid-label"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="text-center">
+                            <button type="button" data-bs-dismiss="modal" class="btn btn-dark">Cancel</button>
+                            <button type="button" class="btn orange" id="submit-btn">Submit</button>
+                        </div>
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="CurrentPinCode" />
+                        <input type="hidden" id="modal-title" value="Reset PinCode" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<script src="~/js/custom/crud/add_asterik_on_required.js"></script>
+<script src="~/js/validation/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/js/validation/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#submit-btn').on('click', function (event) {
+            $.ajax({
+                url: $("#reset-pin-code-form").attr('action'),
+                type: 'POST',
+                data: $("#reset-pin-code-form").serialize(),
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        window.location.reload();
+                    } else {
+                        // Handle error response
+                        var errors = response.errors;
+                        $.each(errors, function (key, value) {
+                            var field = $("#reset-pin-code-form").find('[name="' + key + '"]');
+                            var errorContainer = field.parent().find(".validation-invalid-label");
+                            errorContainer.html(value);
+                        });
+                    }
+
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    // Handle error response
+                    var errorMessage = xhr.responseText; // Get error message from response
+                    $('#error-message').text(errorMessage); // Display error message in a div with id="error-message"
+                }
+            });
+        });
+    });</script>
+
+
+
+
+
+
+
+

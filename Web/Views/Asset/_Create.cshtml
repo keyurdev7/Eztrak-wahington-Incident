@@ -1,0 +1,106 @@
+﻿@using Enums
+@using ViewModels;
+@model AssetModifyViewModel
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <partial name="~/Views/Shared/Select2/_AssetType.cshtml" for="AssetType" />
+                </div>
+            </div>
+           @*  <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <partial name="~/Views/Shared/Select2/_MUTCD.cshtml" for="MUTCD" />
+                </div>
+            </div> *@
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Description" class="form-label fw-600"></label>
+                    <input asp-for="Description" type="text" class="form-control" />
+                    <span asp-validation-for="Description" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <partial name="~/Views/Shared/Select2/_Manufacturer.cshtml" for="Manufacturer" />
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <partial name="~/Views/Shared/Select2/_Condition.cshtml" for="Condition" />
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Value" class="form-label fw-600"></label>
+                    <input asp-for="Value" type="text" class="form-control input-currency" />
+                    <span asp-validation-for="Value" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Intersection" class="form-label fw-600"></label>
+                    <input asp-for="Intersection" type="text" class="form-control" />
+                    <span asp-validation-for="Intersection" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Latitude" class="form-label fw-600"></label>
+                    <input asp-for="Latitude" type="number" class="form-control" />
+                    <span asp-validation-for="Latitude" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Longitude" class="form-label fw-600"></label>
+                    <input asp-for="Longitude" type="number" class="form-control" />
+                    <span asp-validation-for="Longitude" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="InstalledDate" class="form-label fw-600"></label>
+                    <input asp-for="InstalledDate" type="date" class="form-control" />
+                    <span asp-validation-for="InstalledDate" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="ReplacementYear" class="form-label fw-600"></label>
+                    <select asp-for="ReplacementYear" class="form-select" asp-items="@Html.GetEnumSelectList<ReplacementCycleCatalog>()">
+                        <option value="">Select Year</option>
+                    </select>
+                    <span asp-validation-for="ReplacementYear" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="NextMaintenanceYear" class="form-label fw-600"></label>
+                    <select asp-for="NextMaintenanceYear" class="form-select" asp-items="@Html.GetEnumSelectList<MaintenanceCycleCatalog>()">
+                        <option value="">Select Maintenance Year</option>
+                    </select>
+                    <span asp-validation-for="NextMaintenanceYear" class="validation-invalid-label"></span>
+                </div>
+            </div>
+
+            @await Html.PartialAsync("~/Views/AssetCustomFields/_ShowDynamicColumns.cshtml", Model)
+        </div>
+
+        <div class="row" id="asset-type-level-radio">
+        </div>
+
+
+        <div class="row">
+            @await Html.PartialAsync("~/Views/Shared/Crud/DropZoneView/_Upload.cshtml", Model.ImagesList)
+        </div>
+    </div>
+</div>
+<script src="~/js/views/assets/assets-script.js"></script>

@@ -1,0 +1,29 @@
+﻿@using ViewModels
+@using Web.Extensions
+@model TaskMaterialViewModel
+@{
+    var collectionType = "TaskMaterials";
+    var rowNumber = ViewData["RowNumber"] != null ? int.Parse(ViewData["RowNumber"].ToString()) : 0;
+    var rowName = "material-row[" + rowNumber + "]";
+    var rowId = rowNumber;
+
+    var costName = collectionType + "[" + rowNumber + "].Cost";
+    var materialId = "material-id-" + rowNumber;
+    var material = collectionType + "[" + rowNumber + "].Material";
+    var materialName = collectionType + "[" + rowNumber + "].MaterialName";
+}
+
+<tr class="material-row" id="@rowId">
+
+    <td>
+        <input type="text" name="@materialName" value="@Model.MaterialName" class="form-control" />
+        @* @await Html.PartialAsync("~/Views/Shared/Select2/_Inventory.cshtml", Model.Material, material, new ViewDataDictionary(ViewData) { { "HideLabel", true }, { "Id", materialId } }) *@
+    </td>
+    <td>
+        <input type="text" name="@costName" value="@Model.Cost" class="form-control input-currency cost material-cost" />
+    </td>
+    <td>
+        <a href="javascript:void(0)" class="remove-material mx-1 datatable-action btn bg-custom-dark" data-toggle="tooltip" title="Delete Material"><i class="icon-trash"></i></a>
+    </td>
+</tr>
+

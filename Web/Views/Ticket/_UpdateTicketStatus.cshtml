@@ -1,0 +1,76 @@
+﻿@using Enums
+@using ViewModels;
+@model TicketStatusUpdateViewModel
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+            <form enctype="multipart/form-data" method="post" novalidate="novalidate" id="ticket-status-form">
+                <div class="mb-3 form-group">
+                    <label id="ticket-status" asp-for="Status" class="form-label fw-600"></label>
+                    <select asp-for="Status" class="form-select"
+                            asp-items="@Html.GetEnumSelectList<TicketStatus>()">
+                        <option value="">-- Select --</option>
+                            </select>
+                    <span asp-validation-for="Status" class="validation-invalid-label c"></span>
+                </div>
+                <div class="mb-3 form-group">
+                    <label asp-for="ITResponse" class="form-label fw-600"></label>
+                    <textarea id="ticket-itresponse" asp-for="ITResponse" class="form-control"></textarea>
+                    <span asp-validation-for="ITResponse" class="text-danger ticket-itresponse-errors"></span>
+                </div>
+                <div class="text-center mt-4">
+                    <button type="button" class="btn orange" id="update-ticket-btn">Submit</button>
+                </div>
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" id="modal-title" value="Update Ticket" />
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/js/custom/crud/add_asterik_on_required.js"></script>
+<partial name="_ValidationScriptsPartial" />
+<script>
+    $(function () {
+        $("body").off("click", "#update-ticket-btn");
+        $("body").on("click", "#update-ticket-btn", function () {
+            let form = $(this).closest("form");
+            $(form).removeData("validator").removeData("unobtrusiveValidation");
+            $.validator.unobtrusive.parse($(form));
+            if ($(form).valid()) {
+                var formData = $(this).closest("form").serialize();
+                SendAjax(formData);
+            }
+        });
+
+
+        function SendAjax(model) {
+            $.ajax({
+                url: "/Ticket/UpdateTicketStatus",
+                type: 'Post',
+                data: model,
+                success: function (res) {
+                    if (res.status) {
+                        $("#crudModalPanel").modal("hide");
+                        ReInitializeDataTables();
+                    }
+                    else {
+                        $.each(res.fieldErrors, function (fieldName, errors) {
+                            var errorContainer = $('[data-valmsg-for="' + fieldName + '"]');
+                            errorContainer.removeClass('field-validation-valid').addClass('field-validation-error');
+                            $(errorContainer).html('<span class="" for="' + fieldName + '">' + errors[0] + '</span>');
+                        });
+                    }
+
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                }
+            });
+        }
+    });
+</script>

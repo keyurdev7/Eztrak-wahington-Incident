@@ -1,0 +1,61 @@
+﻿@using Enums
+@using ViewModels;
+@using Web.Extensions;
+@model AssetDetailViewModel
+<div class="row">
+    <div class="row col-md-6 col-sm-12">
+        <div class="col-12">
+            <div class="form-group d-flex">
+                <label asp-for="SystemGeneratedId" class="form-label detail-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.SystemGeneratedId) ? "-" : Model.SystemGeneratedId)</div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group d-flex">
+                <label asp-for="AssetType" class="form-label detail-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.AssetType?.Name) ? "-" : Model.AssetType?.Name)</div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group d-flex">
+                <label asp-for="MUTCD" class="form-label detail-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.MUTCD?.Name) ? "-" : Model.MUTCD?.Name)</div>
+
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group d-flex">
+                <label asp-for="InstalledDate" class="form-label detail-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.FormattedInstalledDate) ? "-" : Model.FormattedInstalledDate)</div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group d-flex">
+                <label asp-for="NextMaintenanceDate" class="form-label detail-label fw-600">Next Maintenance Date</label>
+                <div>@(string.IsNullOrEmpty(Model.FormattedNextMaintenanceDate) ? "-" : Model.FormattedNextMaintenanceDate)</div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group d-flex">
+                <label asp-for="ReplacementDate" class="form-label detail-label fw-600">Replacement Date</label>
+                <div>@(Model.FormattedReplacementDate ?? "-")</div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group d-flex">
+                <label asp-for="UpdatedOn" class="form-label detail-label fw-600"></label>
+                <div>@(Model.FormattedUpdatedOn ?? "-")</div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group d-flex">
+                <label asp-for="Description" class="form-label detail-label fw-600"></label>
+                <div>@(Model.Description ?? "-")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-sm-12">
+        @await Html.PartialAsync("~/Views/Shared/Crud/DropZoneView/_View.cshtml", Model.ImagesList)
+    </div>
+</div>
+

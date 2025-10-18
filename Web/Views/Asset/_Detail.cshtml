@@ -1,0 +1,192 @@
+﻿@using ViewModels
+@model AssetDetailViewModel
+@{
+    Layout = null;
+    var editUrl = "/Asset/Update/" + Model.Id;
+    var deleteUrl = "/Asset/Delete/" + Model.Id;
+}
+
+<div id="asset-detail-container">
+    <div class="row">
+        <div class="col-12 col-lg-9">
+            <div class="row">
+                @*<div class="col-lg-6">
+                <div class="mb-3 form-group">
+                <label asp-for="AssetType" class="form-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.AssetType.Name) ? "-" : Model.AssetType.Name)</div>
+                </div>
+                </div>
+                <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                <label asp-for="AssetId" class="form-label fw-600"></label>
+                <div>@Model.AssetId</div>
+                </div>
+                </div>
+                <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                <label asp-for="MUTCD" class="form-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.MUTCD.Name) ? "-" : Model.MUTCD.Name)</div>
+                </div>
+                </div>
+                <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                <label asp-for="Description" class="form-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.Description) ? "-" : Model.Description)</div>
+                </div>
+                </div> *@
+
+                <div class="col-lg-6">
+                    <div class="mb-3 form-group">
+                        <label asp-for="Manufacturer" class="form-label fw-600"></label>
+                        <div>@(string.IsNullOrEmpty(Model.Manufacturer.Name) ? "-" : Model.Manufacturer.Name)</div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="mb-3 form-group">
+                        <label asp-for="Intersection" class="form-label fw-600"></label>
+                        <div>@(string.IsNullOrEmpty(Model.Intersection) ? "-" : Model.Intersection)</div>
+                    </div>
+                </div>
+                @*  <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                <label asp-for="Condition" class="form-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.Condition.Name) ? "-" : Model.Condition.Name)</div>
+                </div>
+                </div> *@
+                <div class="col-lg-6">
+                    <div class="mb-3 form-group">
+                        <label asp-for="Value" class="form-label fw-600"></label>
+                        <div>@Model.Value.ToString("C")</div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="mb-3 form-group">
+                        <label asp-for="MaintenanceCost" class="form-label fw-600"></label>
+                        <div>@Model.MaintenanceCost.ToString("C")</div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="mb-3 form-group">
+                        <label asp-for="Latitude" class="form-label fw-600"></label>
+                        <div>@Model.Latitude</div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="mb-3 form-group">
+                        <label asp-for="Longitude" class="form-label fw-600"></label>
+                        <div>@Model.Longitude</div>
+                    </div>
+                </div>
+                @*  <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                <label asp-for="AssetClass" class="form-label fw-600"></label>
+                <div>@Model.AssetClass</div>
+                </div>
+                </div> *@
+                <div class="col-lg-6">
+                    <div class="mb-3 form-group">
+                        <label asp-for="InstalledDate" class="form-label fw-600"></label>
+                        <div>@(string.IsNullOrEmpty(Model.FormattedInstalledDate) ? "-" : Model.FormattedInstalledDate)</div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="mb-3 form-group">
+                        <label asp-for="ReplacementDate" class="form-label fw-600"></label>
+                        <div>@(string.IsNullOrEmpty(Model.FormattedReplacementDate) ? "-" : Model.FormattedReplacementDate)</div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="mb-3 form-group">
+                        <label asp-for="NextMaintenanceDate" class="form-label fw-600"></label>
+                        <div>@(string.IsNullOrEmpty(Model.FormattedNextMaintenanceDate) ? "-" : Model.FormattedNextMaintenanceDate)</div>
+                    </div>
+                </div>
+                @foreach (var field in Model.DynamicColumns)
+                {
+                    <div class="col-lg-6">
+                        <div class="mb-3 form-group">
+                            <label class="form-label fw-600">@field.DynamicColumn.Title</label>
+                            <div>@(string.IsNullOrEmpty(field.Value) ? "-" : field.Value)</div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="row" id="asset-type-level-radio">
+            </div>
+
+            <div class="row">
+                @await Html.PartialAsync("~/Views/Shared/Crud/DropZoneView/_View.cshtml", Model.ImagesList)
+                <input type="hidden" asp-for="Id" id="asset-id" />
+                <input type="hidden" asp-for="AssetType.Id" id="asset-type-id" />
+
+            </div>
+        </div>
+        <div class="col-12 col-lg-3">
+            <button class="btn btn-primary" onclick="loadEdit('@editUrl' )" data-bs-target="#newSupModal">
+                <i class="icon-pencil5"></i>
+                Edit
+            </button>
+
+            <a href="@deleteUrl" class="btn btn-danger delete">
+                <i class="icon-trash"></i>
+                Delete
+            </a>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        // loadAssetDetailRadios();
+        $(document).off("click", '.detail-imgbadge')
+        $(document).on("click", '.detail-imgbadge', function () {
+            var id = @Model.Id;
+            var attachmentCount = parseInt($(this).html().split("+")[1]);
+            if (attachmentCount > 0) {
+                $("#attachment-detail-modal").modal("show");
+                ViewAttachmentGrid(id, "/Asset/_GetAttachmentView");
+            }
+            else {
+                GetAttachmentUrl(id, "/Asset/_GetAttachmentUrl");
+            }
+        });
+    })
+
+    function loadEdit(url) {
+        if ($(".modal.show").length > 0) {
+            $(".modal-backdrop").remove();
+        }
+        $("#crudModalPanel").modal("hide");
+        setTimeout(function () {
+            loadUpdateAndDetailModalPanel(url);
+        }, 1000);
+    }
+
+    function loadAssetDetailRadios() {
+        var assetTypeId = $("#asset-type-id").val();
+        var assetId = $("#asset-id").val();
+        $.ajax({
+            type: "GET",
+            url: `/Asset/GetAssetTypeHtml?assetTypeId=${assetTypeId}&assetId=${assetId}`,
+            dataType: "html",
+            success: function (content) {
+                $("#asset-type-level-radio").empty();
+                $("#asset-type-level-radio").html(content);
+                $("#asset-detail-container .asset-type-association-radio").each(function (i, v) { $(v).prop('disabled', true); })
+            },
+            error: function (e) { }
+        });
+    }
+    function onDeleteSuccess(recordId) {
+        $("#crudModalPanel").modal("hide");
+        // For Map
+        const assetDeletedEvent = new CustomEvent('assetDeleted', {
+            detail: recordId
+        });
+        window.dispatchEvent(assetDeletedEvent);
+    }
+
+</script>

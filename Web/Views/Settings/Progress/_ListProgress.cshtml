@@ -1,0 +1,23 @@
+﻿@using System.Web
+@using ViewModels
+@model List<ProgressModifyViewModel>
+
+@if (Model != null && Model.Count > 0)
+{
+    @foreach (var progress in Model)
+    {
+        <div class="list-item">
+            <span>@progress.Name</span>
+            <div class="actions">
+                <i class="fa-regular fa-edit edit editProgress" id="@progress.Id"></i>
+                <i class="far fa-trash-alt delete deleteProgress" id="@progress.Id"></i>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="list-item">
+        <span>No Progress found.</span>
+    </div>
+}

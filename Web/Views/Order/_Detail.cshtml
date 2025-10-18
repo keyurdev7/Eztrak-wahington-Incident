@@ -1,0 +1,153 @@
+﻿@using ViewModels
+@using Enums;
+@using Helpers.Extensions;
+
+@model OrderDetailViewModel
+@{
+    Layout = null;
+    var orders = Model.OrderItems.ToList();
+    var isUserTechnician = User.IsInRole("Technician");
+}
+<style>
+    table .thead-primary th {
+        background: #6c757d !important;
+        color: white !important;
+    }
+
+</style>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Status" class="form-label fw-600"></label>
+                    <div class="p-2 d-flex">
+                        <span class="badge @Model.Status m-1"> </span>
+                        <span class="stat-name">@Model.Status</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="OrderNumber" class="form-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.OrderNumber) ? "-" : Model.OrderNumber)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <table id="reservation-table" class="table table-bordered dataTable  table-striped">
+            <thead>@* class="thead-primary" *@
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Manufacturer</th>
+                    <th>Uom</th>
+                    <th>QTY</th>
+                    <th>Issued QTY</th>
+                    @*<th>PO #</th>
+                    <th>Sources</th>*@
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < orders.Count; i++)
+                {
+                    var item = orders[i];
+                    @if (item.Inventory.Id > 0)
+                    {
+                        <tr>
+                            <td>@item.Inventory.Description</td>
+                            <td>Inventory</td>
+                            <td>@item.Inventory.Manufacturer.Name</td>
+                            <td>@item.Inventory.UOM.Name</td>
+                            <td>@item.OHQuantity</td>
+                            <td>@item.Quantity</td>
+                            <td>
+                                @if (!item.IsIssued && !isUserTechnician)
+                                {
+                                    <button class="btn btn-site-primary btnIssue" onclick="fnShowOrderIssueInventoryItemDetails(@item.Id,@item.Inventory.Id)" style="">Issue</button>
+                                }
+                                <input type="hidden" value="inventory" class="order-type" />
+                            </td>
+                            @*<td>@item.Inventory</td>*@
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>@item.Equipment.ItemNo</td>
+                            <td>Equipment</td>
+                            <td>@item.Equipment.Manufacturer.Name</td>
+                            <td>@item.Equipment.UOM.Name</td>
+                            <td>@item.OHQuantity</td>
+                            <td>@item.Quantity</td>
+                            <td>
+                                @if (!item.IsIssued && !isUserTechnician)
+                                {
+                                    <button class="btn btn-site-primary btnIssue" onclick="fnShowOrderIssueEquipmentItemDetails(@item.Id,@item.Equipment.Id)" style="">Issue</button>
+                                }
+                                <input type="hidden" value="equipment" class="order-type" />
+                            </td>
+                            @*<td>@item.Inventory</td>*@
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <input type="hidden" id="order-id" value="@Model.Id" />
+
+    @if (Model.OrderItems.All(x => x.IsIssued) && !isUserTechnician
+    //&& Model.Status != OrderStatus.Delivered
+    )
+    {
+        @*  <div class="col-md-12" style="text-align:right;">
+    <button class="btn btn-site-primary submit-order">Submit</button>
+    </div> *@
+    }
+</div>
+
+<div id="issue-material-modal" class="modal fade show" tabindex="-1" style="padding-right: 17px;">
+    <div class="modal-lg modal-dialog" style="max-width: 1150px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="issue-material-modal-body">
+                <div class="col-md-12 row">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $("body").off("click", ".submit-order")
+        $("body").on("click", ".submit-order", function () {
+            var orderId = $("#order-id").val();
+            var orderType = $(".order-type").val();
+            $.ajax({
+                type: "POST",
+                data: { id: orderId, type: orderType },
+                url: "/Order/Submit",
+                success: function (response) {
+                    if (response) {
+                        window.location = "/Inventories?activeTab=orders";
+                    }
+                },
+                error: function (e) {
+                }
+            });
+        })
+    })
+    function fnShowOrderIssueInventoryItemDetails(orderItemId, inventoryId) {
+        loadModalPanel(`/Order/IssueInventoryItem?orderItemId=${orderItemId}&inventoryId=${inventoryId}`, "issue-material-modal", "issue-material-modal-body");
+    }
+    function fnShowOrderIssueEquipmentItemDetails(orderItemId, inventoryId) {
+        loadModalPanel(`/Order/IssueEquipmentItem?orderItemId=${orderItemId}&equipmentId=${inventoryId}`, "issue-material-modal", "issue-material-modal-body");
+    }</script>

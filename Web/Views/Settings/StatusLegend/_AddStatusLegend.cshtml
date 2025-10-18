@@ -1,0 +1,18 @@
+﻿@using System.Web
+@using ViewModels
+@model StatusLegendModifyViewModel
+
+<form id="NewstatusLegendForm">
+    <div class="list-item addItem" id="savestatusLegendDiv">
+        <input type="hidden" value="@Model.Id" name="Id" id="statusLegend_@Model.Id" />
+        <div class="input-container type">
+            <input type="text" placeholder="Enter name" asp-for="Name" />
+            <textarea type="text" placeholder="Enter description" asp-for="Description"></textarea>
+            <input type="text" placeholder="Enter color" asp-for="Color" />
+            <div class="actions">
+                <button class="btn check savestatusLegend"><i class="fa-solid fa-check"></i></button>
+                <button class="btn cancel cancelstatusLegend"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+    </div>
+</form>

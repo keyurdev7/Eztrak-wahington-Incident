@@ -1,0 +1,22 @@
+﻿@model ViewModels.Dashboard.Common.Card.DashboardCardDataViewModel
+@{
+    Layout = null;
+}
+
+@foreach (var card in Model.Cards)
+{
+    var icon = string.IsNullOrEmpty(card.Icon) ? Model.Icon : card.Icon;
+        
+        <div class="icon">
+            <img src="~/img/dashboard/@card.Icon" alt="icon" />
+        </div>
+
+        <div class="text">
+            @card.Title
+        </div>
+ 
+        <div class="amount">
+            @card.Value
+        </div>
+
+}

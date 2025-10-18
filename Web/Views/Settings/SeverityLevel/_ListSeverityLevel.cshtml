@@ -1,0 +1,27 @@
+﻿@using System.Web
+@using ViewModels
+@model List<SeverityLevelModifyViewModel>
+
+@if (Model != null && Model.Count > 0)
+{
+    @foreach (var severityLevel in Model)
+    {
+        <div class="list-item">
+            <div class="item-info">
+                <strong>@severityLevel.Name</strong>
+                <p>@severityLevel.Description</p>
+                <p>@severityLevel.Color</p>
+            </div>
+            <div class="actions">
+                <i class="fa-regular fa-edit edit editSeverityLevel" id="@severityLevel.Id"></i>
+                <i class="far fa-trash-alt delete deleteSeverityLevel" id="@severityLevel.Id"></i>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="list-item">
+        <span>No severity level found.</span>
+    </div>
+}

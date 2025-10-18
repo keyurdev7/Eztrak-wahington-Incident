@@ -1,0 +1,26 @@
+﻿@using System.Web
+@using ViewModels
+@model List<EquipmentFieldsModifyViewModel>
+
+@if (Model != null && Model.Count > 0)
+{
+    @foreach (var equipmentfields in Model)
+    {
+        <div class="list-item">
+            <span>@equipmentfields.EquipmentFieldsID</span>
+            <span>@equipmentfields.Name</span>
+            <span>@equipmentfields.Category</span>
+            <span>@equipmentfields.HourlyRate ($)</span>
+            <div class="actions">
+                <i class="fa-regular fa-edit edit editEquipmentFields" id="@equipmentfields.Id"></i>
+                <i class="far fa-trash-alt delete deleteEquipmentFields" id="@equipmentfields.Id"></i>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="list-item">
+        <span>No Equipment Fields found.</span>
+    </div>
+}

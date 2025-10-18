@@ -1,0 +1,53 @@
+﻿@using Enums
+@using ViewModels;
+@model WorkOrderSearchViewModel
+
+
+<div class="control_field">
+    <input asp-for="Search.value" type="search" class="form-control" placeholder="Keyword" aria-controls="crud-list-table" autocomplete="new-password">
+
+</div>
+
+<div class="control_field" data-filter-id="asset-id-search-container">
+    <input asp-for="AssetId" type="text" class="form-control" />
+
+</div>
+
+
+<div class="control_field" data-filter-id="urgency-search-container">
+    <select asp-for="Urgency" class="form-select"
+            asp-items="@Html.GetEnumSelectList<Urgency>()">
+        <option value="">Select a Urgency</option>
+    </select>
+
+</div>
+
+
+<div class="control_field" data-filter-id="task-search-conatiner">
+    <select id="task" asp-for="Task" class="form-select"
+            asp-items="@Html.GetEnumSelectList<TaskCatalog>()">
+        <option value="">Select a Task</option>
+    </select>
+
+</div>
+
+
+<div class="control_field" data-filter-id="asset-type-search-container">
+    <partial name="~/Views/Shared/Select2/_AssetType.cshtml" for="AssetType" view-data='@new ViewDataDictionary(ViewData) { {"HideLabel" , true}, {"Id", "asset-type-search-id"}}' />
+
+</div>
+<div class="control_field" data-filter-id="manager-search-container">
+    <partial name="~/Views/Shared/Select2/_Manager.cshtml" for="Manager" view-data='@new ViewDataDictionary(ViewData) { {"HideLabel" , true}, {"Id", "manager-search-id"}}' />
+
+</div>
+
+
+<div class="control_field">
+    <input asp-for="FromDate" type="date" class="form-control" />
+
+</div>
+<div class="control_field">
+    <input asp-for="ToDate" type="date" class="form-control" />
+</div>
+
+

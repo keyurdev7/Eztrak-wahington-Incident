@@ -1,0 +1,576 @@
+﻿
+.info-sub.assets {
+    margin-top: 5px;
+}
+
+.IVPolicyList .card {
+    background: #fff;
+    border: 1px solid #ddd !important;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: 0.3s;
+}
+
+    .IVPolicyList .card.highlight {
+        border: 2px solid #93bfab !important;
+        background: #ecfdf5;
+    }
+
+    .IVPolicyList .card h3 {
+        font-size: 16px;
+        font-weight: bold;
+        color: #0073e6;
+        margin-bottom: 15px;
+    }
+
+.IVPolicyList ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 10px 0;
+}
+
+    .IVPolicyList ul li {
+        margin: 8px 0;
+        font-size: 14px;
+    }
+
+        .IVPolicyList ul li input {
+            margin-right: 8px;
+        }
+
+.IVPolicyList .add-step {
+    font-size: 14px;
+    color: #919191;
+    cursor: pointer;
+    font-weight: 500;
+}
+/*************New validation design with multiple location*****************/
+
+
+.left-panel {
+    background: #fff;
+    border-right: 1px solid #dee2e6;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    height: 100%;
+}
+
+.add-location-btn {
+    background-color: #f54e00;
+    color: white;
+    border-radius: 0.4rem;
+    width: 100%;
+    font-weight: 500;
+}
+
+    .add-location-btn:hover {
+        background-color: #f54e00;
+        color: white;
+    }
+
+.location-card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.4rem;
+    padding: 0.7rem;
+    margin-top: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .location-card:hover,
+    .location-card.active {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.2);
+    }
+
+.location-title {
+    font-weight: 500;
+    font-size: 0.95rem;
+    margin-left: 0.4rem;
+}
+
+.badge-status {
+    font-size: 0.7rem;
+    color: #dc3545;
+    background-color: #fff3f3;
+    border-radius: 0.25rem;
+    padding: 0.2rem 0.4rem;
+    display: inline-block;
+    margin-top: 0.2rem;
+}
+
+.badge-primary {
+    font-size: 0.7rem;
+    color: #0d6efd;
+    background-color: #e7f1ff;
+    border-radius: 0.25rem;
+    padding: 0.2rem 0.4rem;
+    margin-right: 0.3rem;
+}
+
+.new-location {
+    background-color: #f1f3f5;
+    border: 1px solid #dee2e6;
+    border-radius: 0.4rem;
+    padding: 0.8rem;
+    margin-top: 1rem;
+}
+
+    .new-location .btn-cancel {
+        background-color: #9f9f9f;
+    }
+
+.right-panel {
+    background: #fff;
+    border-radius: 0.5rem;
+    padding: 1.2rem;
+    min-height: 400px;
+    transition: all 0.3s ease;
+}
+
+.section-title {
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+}
+
+
+.team-section {
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: #fff;
+}
+
+.work-step {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f8f9fa;
+}
+
+.add-step-area {
+    border: 1px solid #cce5ff;
+    background-color: #e9f4ff;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.team-members label {
+    margin-right: 15px;
+}
+
+.delete-btn {
+    float: right;
+    color: #dc3545;
+    cursor: pointer;
+}
+
+.left-panel {
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+
+
+.location-card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .location-card.active {
+        border-color: #0d6efd;
+        background-color: #e7f0ff;
+    }
+
+.badge-primary {
+    background-color: #cfe2ff;
+    color: #084298;
+    border-radius: 5px;
+    padding: 2px 6px;
+    font-size: 12px;
+    margin-right: 5px;
+}
+
+.badge-status {
+    background-color: #ffeeba;
+    color: #856404;
+    border-radius: 5px;
+    padding: 2px 6px;
+    font-size: 12px;
+}
+
+.new-location {
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.right-panel {
+    background: #fff;
+    padding: 0;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.team-section {
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 0;
+    margin-bottom: 10px;
+    background: #fff;
+}
+
+.work-step {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f8f9fa;
+    position: relative;
+}
+
+.delete-btn {
+    color: #dc3545;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+}
+
+.add-step-area {
+    border: 1px solid #cce5ff;
+    background-color: #e9f4ff;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.team-details {
+    background: #f9fafb;
+    border-top: 1px solid #dfdfdf;
+    padding: 12px;
+}
+
+    .team-details .form-check {
+        border: 1px solid #dee2e6;
+        width: 100%;
+        margin: 0;
+        padding: 10px 10px 10px 35px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+    }
+
+.del-workstep {
+    color: #dc3545;
+}
+
+.teamSelect {
+    padding: 10px 15px 10px 36px;
+}
+
+.titleOfteams {
+    font-size: 16px !important;
+}
+
+.validation-card {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 12px;
+    margin-top: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+    .validation-card h6 {
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+.status-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+}
+
+.status-label {
+    color: #374151;
+    background: transparent;
+    padding: 0;
+}
+
+.status-value {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+    .status-value.high {
+        color: #16a34a; /* green */
+        font-weight: 600;
+    }
+
+    .status-value.not-set {
+        color: #9ca3af;
+    }
+
+    .status-value a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+        .status-value a:hover {
+            text-decoration: underline;
+        }
+
+.Locationnotes {
+    margin-top: 16px;
+}
+
+.suggestions-list {
+    background: #fff;
+    border-radius: 6px;
+    margin-top: 2px;
+    padding: 0;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    list-style: none;
+    z-index: 1000;
+}
+
+    .suggestions-list li {
+        padding: 10px 14px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        font-size: 14px;
+    }
+
+        .suggestions-list li:hover {
+            background: #f1f5f9; /* light gray */
+        }
+
+
+.d-flex1 {
+    display: flex !important;
+}
+
+
+/*  .select2-results__option {
+                    padding-left: 25px;
+                    position: relative;
+                }
+
+                    .select2-results__option::before {
+                        content: "";
+                        position: absolute;
+                        left: 5px;
+                        top: 8px;
+                        width: 14px;
+                        height: 14px;
+                        border: 1px solid #aaa;
+                        border-radius: 3px;
+                        background-color: #fff;
+                    }
+
+                    .select2-results__option[aria-selected=true]::before {
+                        background-color: #007bff;
+                        border-color: #007bff;
+                        content: "✔";
+                        color: white;
+                        font-size: 12px;
+                        text-align: center;
+                        line-height: 14px;
+                    }
+             */
+/* Start Multiple dropdown list for Repair */
+.multiselect-dropdown {
+    position: relative;
+    width: 100%;
+}
+
+    .multiselect-dropdown .dropdown-btn {
+        background: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        padding: 6px 10px;
+        text-align: left;
+        width: 100%;
+        cursor: pointer;
+    }
+
+        .multiselect-dropdown .dropdown-btn:after {
+            content: "▼";
+            float: right;
+            font-size: 10px;
+            margin-top: 6px;
+            color: #999;
+        }
+
+    .multiselect-dropdown .dropdown-list {
+        display: none;
+        position: absolute;
+        background: #fff;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-top: 2px;
+        z-index: 10;
+        width: 100%;
+        max-height: 180px;
+        overflow-y: auto;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+        .multiselect-dropdown .dropdown-list label {
+            display: block;
+            padding: 6px 10px;
+            cursor: pointer;
+        }
+
+            .multiselect-dropdown .dropdown-list label:hover {
+                background-color: #f1f1f1;
+            }
+/* End Multiple dropdown list for Repair */
+
+/************New design changes************/
+.tabHeader {
+    background: #ffffff;
+    padding: 16px 26px;
+}
+
+.titleSec {
+    margin-top: 0;
+    padding: 0 0 12px 0;
+}
+
+
+.backBtn {
+    background: transparent;
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    margin-right: 16px;
+    color: #f54e00;
+}
+
+.section-header {
+   
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 12px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+    .section-header h6 {
+        font-size: 22px;
+        font-weight: 600;
+    }
+
+
+.section-body {
+    padding: 16px;
+}
+
+.validationCard {
+    background: #fff;
+    padding: 0;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.form-section {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+    border: 1px solid #eaeaea;
+}
+
+    .form-section h6 {
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+/* Radio and checkbox styling */
+.form-check-input:checked {
+    background-color: #ff7e00;
+    border-color: #ff7e00;
+}
+
+.form-check-label {
+    margin-left: 5px;
+}
+
+/* For spacing between inline radios */
+.form-check-inline {
+    margin-right: 20px;
+}
+
+.form-section h6 {
+    font-size: 16px;
+}
+.clonePersonalDiv .Personnel {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px;
+    width: 32.333333%;
+}
+.cloneTaskDiv .Task,
+.cloneCloseoutTaskDiv .CloseoutTask {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px;
+    width: 32.333333%;
+}
+#div_Shift {
+    margin-bottom: 0;
+}
+.dltPersonnelbtn i,
+.dltCloseoutTaskbtn i,
+.dltTaskbtn i {
+    color: red;
+}
+.borderCard {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px;
+}
+.assestitle{
+    font-size:20px;
+    font-weight:500;
+}
+.assesSubtitle {
+    font-size: 18px;
+    font-weight: 500;
+}
+.indicators h6{
+    margin-bottom:0;
+}
+.indicators .selectRadio{
+    margin-left:16px;
+}
+.callerInfo .section-body .info-item i,
+.incidentLoc .section-body .info-item i {
+    color: #f54e00;
+}
+#step-1 .section-body{
+    min-height:251px;
+}
+#step-1 .section-body .info-title {
+    min-width: 135px;
+}
+.assessmentSec .section-body{
+    padding:0;
+}

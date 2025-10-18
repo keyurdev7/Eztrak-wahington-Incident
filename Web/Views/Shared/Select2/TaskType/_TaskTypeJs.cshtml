@@ -1,0 +1,25 @@
+﻿<script>function SetTaskTypeSelect2(identifier) {
+
+        // Destroy existing Select2 instance if it exists
+        if ($(identifier).hasClass("select2-hidden-accessible")) {
+            $(identifier).select2('destroy');
+        }
+
+        let id = identifier;
+        var pageSize = 10;
+        var url = '/TaskType/Select2';
+        var dataArray = function (params) {
+            params.page = params.page || 1;
+            return {
+                prefix: params.term,
+                pageSize: pageSize,
+                pageNumber: params.page,
+                customParams: JSON.stringify({
+                    "type": $("#work-order-task").val(),
+                    "Category": $("#work-order-task").val()
+                })
+            };
+        };
+        Select2AutoCompleteAjax(id, url, dataArray, pageSize, "Select Task Type");
+
+    }</script>

@@ -1,0 +1,151 @@
+﻿@model ViewModels.OrderModifyViewModel
+
+@{
+    var orderItems = Model.OrderItems.ToList();
+}
+<link href="~/css/bundles/datatable.min.css" rel="stylesheet" />
+<style>
+    /* .text-site-primary {
+            color: #4f8896 !important;
+        }
+
+        table.dataTable thead th, table.dataTable thead td, table.dataTable.fixedHeader-floating thead th, table.dataTable.fixedHeader-floating thead td {
+            background-color: #4f8896 !important;
+        }
+
+
+        .btn-site-primary {
+            border-color: #4f8896 !important;
+            background-color: #4f8896 !important;
+            color: #f8f9fa !important;
+        }
+
+            .btn-site-primary:hover {
+                border-color: #4f8896 !important;
+                background-color: #fff !important;
+                color: #4f8896 !important;
+            }
+
+        .btn-primary {
+            border-color: #4f8896 !important;
+            background-color: #4f8896 !important;
+        }
+
+        .footer-logo img, .navbar-brand img {
+            background: #f8f9fa !important;
+        }
+
+        #grd_Cart .thead-primary th, #grd_Cart .thead-primary td{
+            font-weight: 400 !important;
+            font-size: 1rem;
+            background-color: #4f8896 !important;
+            color: white;
+        } */
+</style>
+<div class="col-lg-12 cart-container container-fluid">
+
+
+    <form class="cart-create-form">
+        @Html.AntiForgeryToken()
+
+        @*@await Html.PartialAsync("_FormFirstStep")
+        @await Html.PartialAsync("_FormSecondStep")*@
+
+
+        <div class="step-title d-flex justify-content-between align-items-start gap-3 mb-3">
+            <h3 class="page-title text-site-primary">Cart</h3>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <partial name="~/Views/Shared/Select2/_WorkOrder.cshtml" for="WorkOrder" />
+                </div>
+            </div>
+        </div>
+        <div id="grd_Cart_Wrapper" class="order-report-table table-responsive" role="grid">
+            <table id="grd_Cart" class="table table-bordered dataTable dataTable table-sm w-100">
+                <thead>
+                    @* class="thead-primary" *@
+                    <tr>
+                        <th>Item # </th>
+                        <th>Description</th>
+                        <th>OH QTY</th>
+                        <th>QTY</th>
+                        <th>UOM</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (orderItems.Count > 0)
+                    {
+                        for (int i = 0; i < orderItems.Count; i++)
+                        {
+                            var item = orderItems[i];
+                            var collectionName = $"OrderItems[{i}].";
+                            var quantityName = collectionName + "Quantity";
+                            @if (item.Inventory.Id > 0)
+                            {
+                                var orderIdName = collectionName + "Inventory.Id";
+
+                                <tr>
+                                    <td>@item.Inventory.ItemNo</td>
+                                    <td>@item.Inventory.Description</td>
+                                    <td>@item.OHQuantity</td>
+                                    <td>
+                                        <input name="@quantityName" class="form-control" type="number" value="@item.Quantity" min="1" max="@item.OHQuantity" />
+                                        <input type="hidden" name="@orderIdName" value="@item.Inventory.Id" />
+                                    </td>
+                                    <td>@item.Inventory.UOM.Name</td>
+                                    <td><a href='#' onclick='deleteInventoryFromCart(@item.Inventory.Id,this);' class='btn btn-danger delete-btn'>Remove</a></td>
+                                </tr>
+                            }
+                            else
+                            {
+                                var orderIdName = collectionName + "Equipment.Id";
+
+                                <tr>
+                                    <td>@item.Equipment.ItemNo</td>
+                                    <td>@item.Equipment.Description</td>
+                                    <td>@item.OHQuantity</td>
+                                    <td>
+                                        <input name="@quantityName" class="form-control" type="number" value="@item.Quantity" min="1" max="@item.OHQuantity" />
+                                        <input type="hidden" name="@orderIdName" value="@item.Equipment.Id" />
+                                    </td>
+                                    <td>@item.Equipment.UOM.Name</td>
+                                    <td><a href='#' onclick='deleteEquipmentFromCart(@item.Equipment.Id,this);' class='btn btn-danger delete-btn'>Remove</a></td>
+                                </tr>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6">No Inventory Selected.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="mb-3 form-group">
+                    <label asp-for="Notes" class="form-label fw-600"></label>
+                    <textarea asp-for="Notes" class="form-control"></textarea>
+                    <span asp-validation-for="Notes" class="validation-invalid-label"></span>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="Type" value="Inventory" />
+
+        <div class="formBtn d-flex justify-content-end pt-4 text-center">
+            <button class="btn btn-secondary d-none" id="nwoBackBtn" type="button">Back</button>
+            <button class="btn btn-primary ms-auto d-none" id="nwoNextBtn" type="button">Next</button>
+            <button type="button" class="btn btn-primary form-btn  submit-cart" id="nwoSaveBtn">Submit</button>
+
+        </div>
+    </form>
+</div>
+
+<partial name="_ValidationScriptsPartial" />
+<script src="~/js/custom/form-wizard.js"></script>
+<script src="~/js/views/cart/cart.js"></script>

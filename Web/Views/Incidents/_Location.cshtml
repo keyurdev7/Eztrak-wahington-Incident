@@ -1,0 +1,146 @@
+﻿@using System.Web
+@using ViewModels.Incident
+@model IncidentViewModel
+
+
+<style>
+    .suggestions-list {
+        background: #fff;
+        /* border: 1px solid #ddd; */
+        border-radius: 6px;
+        margin-top: 2px;
+        padding: 0;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        list-style: none;
+        z-index: 1000;
+    }
+
+        .suggestions-list li {
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            font-size: 14px;
+        }
+
+            .suggestions-list li:hover {
+                background: #f1f5f9; /* light gray */
+            }
+</style>
+
+<div class="shadow-sm border border-gray-200 card-body InfoCard">
+    <h6 class="fw-bold mb-3">Location of Incident</h6>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="mb-3">
+                <label class="form-label" asp-for="incidentiLocation.Address">Address <span class="text-danger">*</span></label>
+                <textarea type="text" class="form-control" id="locAddress" asp-for="incidentiLocation.Address" placeholder="Enter incident address for GIS lookup"></textarea>
+                <ul id="suggestions" class="suggestions-list"></ul>
+
+                <div class="invalid-feedback"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="mb-3">
+                <input type="checkbox" id="isSameCallerAddress" class="form-check-input" asp-for="incidentiLocation.IsSameCallerAddress">
+                <label class="form-check-label" asp-for="incidentiLocation.IsSameCallerAddress">Same as Caller Address</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label">Latitude<span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="Loc1Latitude" placeholder="0.000000" disabled />
+                <div class="invalid-feedback"></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label">Longitude</label>
+                <input type="text" class="form-control" id="Loca1Longitude" placeholder="0.000000" disabled />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label" asp-for="incidentiLocation.Landmark">Intersection / Landmark<span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="landmark" required asp-for="incidentiLocation.Landmark" placeholder="e.g., Main St & Oak Ave" />
+                <div class="invalid-feedback"></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label" asp-for="incidentiLocation.ServiceAccount">Service Account # </label>
+                <input type="text" class="form-control" id="serviceAct" placeholder="Customer accoutn number" asp-for="incidentiLocation.ServiceAccount" />
+
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="checkBoxTitle">Asset Type</div>
+            <div class="row">
+
+                @foreach (var asset in Model.incidentiLocation.AssetsIncidentList)
+                {
+                    var id = "asset_" + asset.Value;
+                    var checkedAttr = Model.incidentiLocation.AssetIDs != null ? (Model.incidentiLocation.AssetIDs.Contains(asset.Value) ? "checked" : "") : "";
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <input name="asset.Id" type="checkbox" class="form-check-input"
+                                   data-val="true" data-val-required="The Asset field is required." @checkedAttr value="@asset.Value" id="@id">
+                            <label class="form-check-label" for="@id">@asset.Text</label>
+                        </div>
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+    <div class="d-flex justify-content-end gap-2 mt-3 addIncidentBtns">
+        <button type="button" class="btn btnBack" id="backButtonToCaller">Back</button>
+        <button type="button" class="btn btn-primary" id="nextToAdditionalLocations">Next</button>
+    </div>
+</div>
+
+<script>
+    $("#locAddress").on("input", function () {
+        let query = $(this).val();
+        if (query.length > 2) {
+            $.getJSON("/Incidents/Suggest", { text: query }, function (data) {
+                let $list = $("#suggestions");
+                $list.empty().show();
+
+                $.each(data, function (i, item) {
+                    $list.append(
+                        `<li onclick="selectAddress('${item.text.replace(/'/g, "\\'")}', '${item.magicKey}')">${item.text}</li>`
+                    );
+                });
+            });
+        }
+        else 
+        {
+            $("#suggestions").hide();
+            $("#Loc1Latitude").val("");
+            $("#Loca1Longitude").val("");
+        }
+    });
+
+    function selectAddress(address, magicKey) {
+
+        $.getJSON("/Incidents/Resolve", { magicKey: magicKey }, function (data) {
+                $("#Loc1Latitude").val(data.lat);
+                $("#Loca1Longitude").val(data.lon);
+        });
+
+        $("#locAddress").val(address);
+        $("#suggestions").empty();
+    }
+</script>

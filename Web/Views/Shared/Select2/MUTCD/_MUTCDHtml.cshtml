@@ -1,0 +1,34 @@
+﻿@model ViewModels.MUTCDBriefViewModel
+
+@{
+    var prefix = ViewData.TemplateInfo.HtmlFieldPrefix ?? "MUTCD";
+    var elementId = ViewData["Id"] != null && !string.IsNullOrEmpty(ViewData["Id"].ToString()) ? ViewData["Id"].ToString() : "mutcd-id";
+    var label = ViewData["Label"] != null && !string.IsNullOrEmpty(ViewData["Label"].ToString()) ? ViewData["Label"].ToString() : "MUTCD";
+    var hideLabel = ViewData["HideLabel"] != null && !string.IsNullOrEmpty(ViewData["HideLabel"].ToString()) ? ViewData["HideLabel"].ToString() : "false";
+}
+
+<div class="form-group">
+    @if (hideLabel != null && hideLabel == "false")
+    {
+        <label class="form-label fw-600">@label</label>
+    }
+
+    @Html.DropDownListFor(model => model.Id, new List<SelectListItem>() {
+    new SelectListItem()
+    {
+    Value = (Model!=null&&Model.Id > 0)?Model.Id.ToString():"",
+    Text = (Model!=null&&Model.Id > 0)?Model.Select2Text:"",
+    Selected = (Model!=null&&Model.Id > 0)?true:false,
+    }},
+            new
+            {
+                @id = elementId,
+                @class = $"form-control customized-select disable-field",
+                data_select2_initialize_function = "SetMUTCDSelect2",
+                data_val_required = Model?.ErrorMessage,
+                data_val = Model?.IsValidationEnabled.ToString().ToLower()
+            })
+    <input type="hidden" data-identifier="@prefix" data-input-name="Name" name="MUTCD.Name" value="@Model.Select2Text" />
+    <input type="hidden" class="mutcd-select2-img" value="@Model.ImageUrl" data-image-url="@Model.ImageUrl" />
+    <span asp-validation-for="Id" class="validation-invalid-label mutcd-error-span"></span>
+</div>

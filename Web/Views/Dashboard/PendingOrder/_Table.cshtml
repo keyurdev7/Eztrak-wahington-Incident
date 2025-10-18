@@ -1,0 +1,33 @@
+﻿@model ViewModels.Dashboard.Common.Table.DashboardTableDataViewModel<ViewModels.Report.PendingOrder.PendingOrderReportViewModel>
+@{
+    Layout = null;
+}
+<thead>
+    <tr>
+        <th scope="col">Manufacturer</th>
+        <th scope="col">Manager</th>
+        @* <th scope="col">Orders</th> *@
+        <th scope="col">Date</th>
+    </tr>
+</thead>
+<tbody>
+    @if (Model.TableData.Any())
+    {
+        @foreach (var data in Model.TableData)
+        {
+            <tr>
+                <td>@data.Manufacturer.Name</td>
+                <td>@data.Manager.Name</td>
+                @* <td>@data.Orders</td> *@
+                <td>@data.Date</td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr class="no-records-found">
+            <td colspan="4" style="text-align: center;">No Records Found</td>
+        </tr>
+    }
+</tbody>
+

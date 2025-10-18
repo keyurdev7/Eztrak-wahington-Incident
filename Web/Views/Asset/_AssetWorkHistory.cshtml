@@ -1,0 +1,64 @@
+﻿@using ViewModels
+@model List<WorkOrderDetailViewModel>
+@{
+    Layout = null;
+    var assetId = ViewBag.AssetId;
+}
+<input type="hidden" id="modal-title" value="Work Order History" />
+<div class="container-fluid">
+    <table id="asset-history-table" class="table table-bordered dataTable dataTable table-sm w-100">
+        <thead>
+            @* class="thead-primary" *@
+            <tr>
+                <th>Status</th>
+                <th>Work Order #</th>
+                <th>Asset Id</th>
+                <th>Asset Type</th>
+                <th>Description</th>
+                <th>Street</th>
+                <th>Work Step</th>
+                <th>Urgency</th>
+                <th>Manager</th>
+                <th>Hours</th>
+                <th>Labor</th>
+                <th>Material</th>
+                <th>Equipment</th>
+                <th>Actual Average</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Count > 0)
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td><span class="badge @item.Status"></span></td>
+                        <td>@item.SystemGeneratedId</td>
+                        <td>@item.Asset.FormattedSystemGeneratedId</td>
+                        <td>@item.AssetTypeName</td>
+                        <td>@item.Description</td>
+                        <td>@item.Intersection</td>
+                        <td>@item.Task</td>
+                        <td>@item.Urgency</td>
+                        <td>@item.Manager.Name</td>
+                        <td>@item.TaskType.BudgetHours</td>
+                        <td>@item.TaskType.Labor.ToString("C")</td>
+                        <td>@item.TaskType.Material.ToString("C")</td>
+                        <td>@item.TaskType.Equipment.ToString("C")</td>
+                        <td>@item.TaskType.BudgetCost?.ToString("C")</td>
+                    </tr>
+                }
+
+            }
+            else
+            {
+                <tr>
+                    <td colspan="14">No records found!</td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+
+

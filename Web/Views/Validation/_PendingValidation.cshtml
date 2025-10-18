@@ -1,0 +1,43 @@
+﻿@using System.Web
+@using ViewModels.Incident
+@model ValidationWorkflowViewModel
+
+<div class="card shadow-sm IncidentList">
+    <div class="card-header bg-white fw-bold">Incidents Pending Validation</div>
+    <div class="list-group list-group-flush">
+
+        @if (Model != null && Model.IVPendingList.Count > 0)
+        {
+            @foreach (var item in Model.IVPendingList)
+            {
+                <div class="list-group-item d-flex justify-content-between align-items-start incident-item">
+                    <div class="list-group-card-info">
+                        <div class="list-group-header mb-1 d-flex align-items-center">
+                            <h4 class="mb-0">@item.IncidentId</h4>
+                            <span class="badge bg-warning text-dark">@item.Severity</span>
+                            <small class="text-muted">@item.IncidentDate</small>
+                        </div>
+                        <div class="mb-1 fw-semibold descri">@item.EventType</div>
+                        <p class="mb-0 text-muted">@item.IncidentLocation</p>
+                        <p class="text-muted mb-0 ">@item.Description</p>
+                    </div>
+                    <button class="btn btn-primary align-self-center validateIncident" data-incident-id="@item.Id">
+                        <i class="fa-regular fa-circle-check"></i> Validate
+                    </button>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+                <div class="p-8 text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle mx-auto h-12 w-12 text-gray-300 mb-4">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <path d="m9 11 3 3L22 4"></path>
+                    </svg><h3 class="text-lg font-medium text-gray-900 mb-2">All Caught Up!</h3>
+                    <p class="text-gray-500">No incidents pendings validation at this time.</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>

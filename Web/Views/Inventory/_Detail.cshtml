@@ -1,0 +1,63 @@
+﻿@using ViewModels
+@model InventoryDetailViewModel
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Category" class="form-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.Category.Name) ? "-" : Model.Category.Name)</div>
+                </div>
+            </div>
+              <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="MUTCD" class="form-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.MUTCD.Name) ? "-" : Model.MUTCD.Name)</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Manufacturer" class="form-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.Manufacturer.Name) ? "-" : Model.Manufacturer.Name)</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Description" class="form-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.Description) ? "-" : Model.Description)</div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="UOM" class="form-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.UOM.Name) ? "-" : Model.UOM.Name)</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="ItemNo" class="form-label fw-600"></label>
+                    <div>@Model.ItemNo</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="MinimumQuantity" class="form-label fw-600"></label>
+                    <div>@Model.MinimumQuantity</div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="mb-3 form-group">
+                    <label class="form-label fw-600">Image</label>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <a href="@Model.ImageUrl" target="_blank" class="rounded detail-images"><img class="photo" src="@Model.ImageUrl" alt="" /></a>
+            </div>
+        </div>
+    </div>
+</div>

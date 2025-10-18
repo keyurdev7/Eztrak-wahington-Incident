@@ -1,0 +1,48 @@
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace DataLibrary.Migrations
+{
+    /// <inheritdoc />
+    public partial class CreateTableIncidentValidationRepair : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.CreateTable(
+                name: "IncidentValidationRepairs",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IncidentId = table.Column<long>(type: "bigint", nullable: false),
+                    IncidentValidationId = table.Column<long>(type: "bigint", nullable: false),
+                    SourceOfLeak = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SourceOfLeakStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PreventFurtherOutage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PreventFurtherOutageStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VacuumTruckFitting = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VacuumTruckFittingStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    ActiveStatus = table.Column<int>(type: "int", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IncidentValidationRepairs", x => x.Id);
+                });
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "IncidentValidationRepairs");
+        }
+    }
+}

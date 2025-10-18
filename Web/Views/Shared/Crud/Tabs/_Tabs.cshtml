@@ -1,0 +1,136 @@
+﻿@model ViewModels.CRUD.TabViewModel
+<div class="custom-tabs-container nav-tab-container d-flex align-items-start @Model.ContainerClassName">
+    <div class="tab-page-header">
+        @if (Model.HideTitle == false)
+        {
+            <h2 class="mb-0">@Model.Title</h2>
+        }
+        @Html.Raw(Model.CustomTitleHtml)
+        @if (Model.HideTopSearchBar == false)
+        {
+            @await Html.PartialAsync("~/Views/Shared/Crud/ListView/Common/_TopSearchBar.cshtml")
+        }
+        <div class="ms-auto d-none">
+            <button type="tab-button" class="btn orange" data-create-url="" data-bs-target="#newSupModal">
+                <i class="fa-regular fa-square-plus"></i>
+                Add New
+            </button>
+        </div>
+    </div>
+
+</div>
+<div class="col nav d-flex align-self-center">
+    <div class="navigations d-flex flex-row justify-content-between w-100">
+        <ul class="nav nav-tabs" id="@Model.Id" role="tablist">
+            @foreach (var tabItem in Model.TabItems)
+            {
+                string activeClass = (tabItem.Id == Model.ActiveTab ? "active" : "");
+                <li class="nav-item" role="presentation">
+                    <button class="@activeClass" id="@tabItem.Id" data-url="@tabItem.Url"
+                            data-hide-top-search-bar="@tabItem.HideTopSearchBar.ToString().ToLower()" type="button"
+                            role="tab">
+                        @Html.Raw(tabItem.Prefix)
+                        @tabItem.Name
+                        @Html.Raw(tabItem.Postfix)
+                    </button>
+                </li>
+            }
+
+        </ul>
+        <ul class="nav-tabs-action-buttons">
+        </ul>
+    </div>
+</div>
+@if (!string.IsNullOrEmpty(Model.CustomPartialContentPath))
+{
+    @await Html.PartialAsync(Model.CustomPartialContentPath)
+}
+<div class="custom-tab tab-content" id="@Model.ContentId">
+    <div id="tab-content-loader" style='display:none'>
+        <button id='loader' type='button' class='btn bg-custom-dark btn-float rounded-round'>
+            <i class='icon-spinner4 spinner'></i>
+        </button>
+        <span>Loading please wait...</span>
+    </div>
+    <div id="tab-content-body"></div>
+</div>
+
+<script>
+    let fetchTabContentCallsCount = 0;
+    $(function () {
+        fetchTabContent("#@Model.ContentId", "@Model.TabItems[Model.SelectedTabIndex].Url", "#@Model.Id", "#@Model.TabItems[Model.SelectedTabIndex].Id", "@Html.Raw(Model.TabItems[Model.SelectedTabIndex].Params)");
+    @foreach (var tabItem in Model.TabItems)
+    {
+        <text>
+
+                $("#@tabItem.Id").on("click", function () {
+                    let tabId = "#@Model.Id";
+                    let tabItemId = "#@tabItem.Id";
+                    let tabContentId = "#@Model.ContentId";
+                    let contentUrl = "@tabItem.Url";
+
+
+                    fetchTabContent(tabContentId, contentUrl, tabId, tabItemId);
+
+                });
+        </text>
+
+    }
+                                                                                                                        });
+    function fetchTabContent(tabContentId, contentUrl, tabId, tabItemId, params) {
+        fetchTabContentCallsCount++
+        $("#tab-content-loader").show();
+        $("#tab-content-body").hide();
+        let url = contentUrl.replace(/&amp;/g, '&');
+
+    @* console.log("🚀 ~ file: _Tabs.cshtml:87 ~ fetchTabContent ~ $(tabItemId).data('hide-top-search-bar'):", $(tabItemId).data('hide-top-search-bar')); *@
+            $(tabItemId).data('hide-top-search-bar') == true ? $(".header-search-wrapper").hide() : $(".header-search-wrapper").show();
+
+        if (fetchTabContentCallsCount == 1 && params != "") {
+            url += params;
+        }
+        $(tabId).find("li button").removeClass("active");
+        $(tabItemId).addClass("active");
+
+        $.ajax({
+            url: url,
+            type: "GET",
+            dataType: "html",
+            success: function (response) {
+                onFetchTabContentSuccess(tabId, tabItemId);
+                $(tabContentId).find("#tab-content-body").html(response);
+                afterTabLoad();
+                $("#tab-content-loader").hide();
+                $("#tab-content-body").show();
+
+                const tempButtonsHtml = document.querySelector('.temp-nav-tabs-action-buttons');
+                const navButtonHtml = document.querySelector('.nav-tabs-action-buttons');
+
+                if (tempButtonsHtml) {
+                    // Clear the new ul
+                    navButtonHtml.innerHTML = '';
+
+                    // Get the li items from the original ul
+                    const liItems = tempButtonsHtml.children;
+
+                    // Append the li items to the new ul
+                    for (const li of liItems) {
+                        navButtonHtml.appendChild(li.cloneNode(true));
+                    }
+                    tempButtonsHtml.innerHTML = '';
+                } else {
+                    if (navButtonHtml) {
+                        navButtonHtml.innerHTML = '';
+                    }
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
+                $("#tab-content-loader").hide();
+                $("#tab-content-body").show();
+            }
+        });
+    }
+    function onFetchTabContentSuccess(tabId, tabItemId) {
+    }
+</script>

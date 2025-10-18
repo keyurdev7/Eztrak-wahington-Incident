@@ -1,0 +1,37 @@
+﻿@model ViewModels.CRUD.CrudListViewModel
+@{
+    ViewBag.Title = Model.Title;
+    if (Model.IsLayoutNull)
+    {
+        Layout = null;
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+}
+@* <style>
+    .thead-primary th, #technician-table .thead-primary th {
+        background-color: #832d20 !important;
+    }
+
+    .btn-primary {
+        border-color: #832d20 !important;
+        background-color: #832d20 !important;
+        color: #f8f9fa !important;
+    }
+
+        .btn-primary:hover {
+            border-color: #832d20 !important;
+            background-color: #fff !important;
+            color: #832d20 !important;
+        }
+
+
+    .footer-logo img, .navbar-brand img {
+        background: #f8f9fa !important;
+    }
+
+
+</style> *@
+@await Html.PartialAsync("~/Views/Shared/Crud/ListView/DataTable/_Index.cshtml", Model)

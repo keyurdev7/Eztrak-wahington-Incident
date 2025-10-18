@@ -1,0 +1,36 @@
+﻿@model ViewModels.Charts.Shared.ChartViewModel
+
+<div class="card chart-container">
+    @if (!string.IsNullOrEmpty(Model.SearchViewPath))
+    {
+        @await Html.PartialAsync("~/Views/Shared/Charts/_Search.cshtml", Model)
+    }
+    <div class="chart-content-container">
+        @* <div class="card-title d-flex justify-content-between" style="min-height:50px;">
+                @if (Model.DisableSearch == false)
+                {
+                    <div class="chart-selected-filters-container d-flex flex-fill align-items-center mt-2 p-0"></div>
+                    <button type="button" class="btn-circle mb-2 me-1 search-filters-chart" data-toggle="tooltip" title="Search"><i class="icon-filter3 icon-1x"></i></button>
+                }
+            </div> *@
+        <div class="dash-chart">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">@Model.Title</h6>
+                <select class="chart-selection-type form-select form-select-lg fs-6 pe-5 w-auto" aria-label=".form-select-lg example" data-id="@Model.Id">
+                    <option selected value="pie">Pie Chart</option>
+                    <option value="bar">Bar Chart</option>
+                </select>
+            </div>
+            <div class="chart-data-container @Model.CssClass"
+                data-chart-generation-function="@Model.ChartGenerationFunction" data-url="@Model.DataUrl" id="@Model.Id"
+                data-title="@Model.Title">
+            </div>
+        </div>
+    </div>
+    @* @if (Model.ShowTitle)
+    {
+        <div class="card-footer d-flex justify-content-center">
+            @Model.Title
+        </div>
+    } *@
+</div>

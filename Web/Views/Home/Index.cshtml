@@ -1,0 +1,82 @@
+﻿@using ViewModels.Dashboard
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Administrator Dashboard";
+}
+
+<style>
+    .pending-order-container {
+        border: 2px solid #A3D1C6 !important;
+        border: 1px solid #ccc !important;
+    }
+</style>
+<script src="~/js/views/dashboard/dashboard-card.js"></script>
+<script src="~/js/views/dashboard/dashboard-table.js"></script>
+@await Html.PartialAsync("~/Views/Shared/Charts/_Css.cshtml")
+@await Html.PartialAsync("~/Views/Shared/Charts/_Scripts.cshtml")
+<div class="container-fluid">
+
+    <div class="row col-12">
+        <div class="container-fluid row">
+            <div class="col-lg-3 col-3">
+                @await Html.PartialAsync("~/Views/Dashboard/Common/Card/_Index.cshtml", Model.GetAverageLaborCost)
+            </div>
+            <div class="col-lg-3 col-3">
+                @await Html.PartialAsync("~/Views/Dashboard/Common/Card/_Index.cshtml", Model.GetAverageMaterialCost)
+            </div>
+            <div class="col-lg-3 col-3">
+                @await Html.PartialAsync("~/Views/Dashboard/Common/Card/_Index.cshtml", Model.GetAverageEquipmentCost)
+            </div>
+            <div class="col-lg-3 col-3">
+                @await Html.PartialAsync("~/Views/Dashboard/Common/Card/_Index.cshtml", Model.AverageCompletionTime)
+            </div>
+
+            <div class="card pending-order-container mb-3">
+                <div class="card-header">Work Order</div>
+                <div class="card-body">
+                    <div class="row d-flex">
+                        <div class="col-lg-4 col-4">
+                            @await Html.PartialAsync("~/Views/Shared/Charts/Index.cshtml", Model.WorkOrder)
+                        </div>
+                        <div class="col-lg-4 col-4">
+                            @await Html.PartialAsync("~/Views/Shared/Charts/Index.cshtml", Model.WorkOrderByAssetType)
+                        </div>
+                        <div class="col-lg-4 col-4">
+                            @await Html.PartialAsync("~/Views/Shared/Charts/Index.cshtml", Model.WorkOrderByRepairType)
+                        </div>
+                        <div class="col-lg-4 col-4">
+                            @await Html.PartialAsync("~/Views/Shared/Charts/Index.cshtml", Model.WorkOrderByTechnician)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="card pending-order-container mb-3">
+                <div class="card-header">Asset</div>
+                <div class="card-body">
+                    <div class="row d-flex">
+                        <div class="col-lg-4 col-4">
+                            @await Html.PartialAsync("~/Views/Shared/Charts/Index.cshtml", Model.AssetByCondition)
+                        </div>
+                        <div class="col-lg-4 col-4">
+                            @await Html.PartialAsync("~/Views/Shared/Charts/Index.cshtml", Model.AssetMaintenanceDue)
+                        </div>
+                        <div class="col-lg-4 col-4">
+                            @await Html.PartialAsync("~/Views/Shared/Charts/Index.cshtml", Model.AssetReplacementDue)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="card pending-order-container mb-3">
+                <div class="card-header">Cost Tracking</div>
+                <div class="card-body">
+                    <div class="row d-flex">
+                        <div class="col-lg-4 col-4">
+                            @await Html.PartialAsync("~/Views/Shared/Charts/Index.cshtml", Model.GetCostAccuracy)
+                        </div>
+                    </div>
+                </div>
+            </div>

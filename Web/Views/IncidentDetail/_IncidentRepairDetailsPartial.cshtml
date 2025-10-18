@@ -1,0 +1,63 @@
+﻿@using System.Web
+@using ViewModels.Incident
+@model IncidentViewRepairViewModel
+
+@if (Model != null)
+{
+    <div class="table-responsive table-rounded custom-scroll">
+        <table class="table align-middle text-left">
+            <thead class="table-light">
+                <tr>
+                    <th>Step</th>
+                    <th>Responsible Party</th>
+                    <th>Status</th>
+                    <th>Attachments / Notes</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.listIncidentViewRepairViewModel != null)
+                {
+                    @foreach (var repair in Model.listIncidentViewRepairViewModel)
+                    {
+                        <tr>
+                            <td>@repair.FieldType</td>
+                            <td>@repair.FieldValue</td>
+                            <td><span class="badge badge-status badge-pending">@repair.FieldStatus</span></td>
+                            <td><i class="fa-solid fa-file-pdf me-2"></i> - </td>
+                            <td><button class="btn btn-update btn-sm" onclick="EditRepairDetails('0','@repair.Id',@repair.FieldTypeId,@repair.IncidentId,@repair.IncidentValidationId)">Update</button></td>
+
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7"></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="table-responsive table-rounded custom-scroll">
+        <table class="table align-middle text-left">
+            <thead class="table-light">
+                <tr>
+                    <th>Step</th>
+                    <th>Responsible Party</th>
+                    <th>Status</th>
+                    <th>Attachments / Notes</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="5" style="text-align:center">No records found</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+}

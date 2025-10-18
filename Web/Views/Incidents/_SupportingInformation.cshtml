@@ -1,0 +1,61 @@
+﻿@using System.Web
+@using ViewModels.Incident
+@model IncidentViewModel
+
+
+<div class="shadow-sm border border-gray-200 card-body InfoCard">
+    <h6 class="fw-bold mb-3">Supporting Information</h6>
+
+    <div class="mb-3">
+        <div class="form-group">
+            <label class="col-sm-12 form-label fw-600">Upload Image</label>
+            <div class="col-sm-12">
+                <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                    <input asp-for="incidentSupportingInfoViewModel.File" multiple="true" class="form-control" placeholder="Upload Image" id="Image" onchange="ShowImage(this)" />
+                    <span> <a href="javascript:void(0)" class="input-group-addon btn btn-default fileinput-exists" 
+                        onclick='RemoveImage()' data-dismiss="fileinput">Remove</a></span>
+                </div>
+            </div>
+        </div>
+       @*  <div class="col-sm-12 mt-2">
+            <img class="img-responsive image-thumbnail" src="@Model.incidentSupportingInfoViewModel.ImageUrl" id="image-thumbnail" alt="" style="max-width:120px;">
+            <input type="hidden" asp-for="incidentSupportingInfoViewModel.ImageUrl" value="@Model.incidentSupportingInfoViewModel.ImageUrl" id="hidden-image-url" />
+        </div> *@
+
+        <div class="col-sm-12 mt-2">
+            <div id="image-thumbnails" class="d-flex flex-wrap">
+                @if (!string.IsNullOrEmpty(Model.incidentSupportingInfoViewModel.ImageUrl))
+                {
+                    var urls = Model.incidentSupportingInfoViewModel.ImageUrl.Split(','); // assuming "," separated
+                    foreach (var url in urls)
+                    {
+                        <img class="img-responsive img-thumbnail me-2 mb-2"
+                             src="@url"
+                             style="max-width:120px; max-height:120px;">
+                    }
+                }
+            </div>
+
+            <input type="hidden" asp-for="incidentSupportingInfoViewModel.ImageUrl"
+                   value="@Model.incidentSupportingInfoViewModel.ImageUrl"
+                   id="hidden-image-url" />
+        </div>
+
+
+    </div>
+
+    <!-- Preview -->
+    <div class="mb-3" style="display:none">
+        <label class="form-label d-block">Preview:</label>
+        <img id="photoPreview" src="" alt="No image selected"
+             class="img-thumbnail d-none" style="max-width: 300px;">
+    </div>
+    <div class="mb-3">
+        <label class="form-label" asp-for="incidentSupportingInfoViewModel.Notes">Notes by Service Rep<span class="text-danger">*</span></label>
+        <textarea type="text" class="form-control" rows="4" placeholder="Add any additional notes, observations, or context about this incident..." id="notes" required asp-for="incidentSupportingInfoViewModel.Notes"></textarea>
+    </div>
+    <div class="d-flex justify-content-end gap-2 mt-3 addIncidentBtns">
+        <button type="button" class="btn btnBack" id="backButtonToEnvironmental">Back</button>
+        <button type="button" class="btn btn-success" id="btn_Incident_Save">Submit</button>
+    </div>
+</div>

@@ -1,0 +1,40 @@
+﻿@using Enums
+@using ViewModels;
+@model AssetSearchViewModel
+@{
+    Layout = null;
+}
+
+<div class="control_field">
+    <input asp-for="Search.value" type="search" class="form-control" placeholder="Keyword" aria-controls="crud-list-table" autocomplete="new-password">
+
+</div>
+
+<div class="control_field" data-filter-id="asset-type-search-container">
+    <partial name="~/Views/Shared/Select2/_AssetType.cshtml" for="AssetType" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "asset-type-search-id"} }' />
+
+</div>
+
+<div class="control_field" data-filter-id="manufacturer-search-container">
+    <partial name="~/Views/Shared/Select2/_Manufacturer.cshtml" for="Manufacturer" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "manufacturer-search-id"} }' />
+
+</div>
+
+<div class="control_field" data-filter-id="condition-search-container">
+    <partial name="~/Views/Shared/Select2/_Condition.cshtml" for="Condition" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "condition-search-id"} }' />
+
+</div>
+
+<div class="control_field" data-filter-id="mutcd-search-container">
+    <partial name="~/Views/Shared/Select2/_MUTCD.cshtml" for="MUTCD" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "mutcd-search-id"} }' />
+
+</div>
+<div class="control_field">
+    <partial name="~/Views/Shared/Select2/_UserSearchSetting.cshtml" for="UserSearchSetting" view-data='@new ViewDataDictionary(ViewData) { {"HideLabel" , true}, {"ReportType", SearchFilterTypeCatalog.ReplacementReport}}' />
+
+</div>
+<input type="hidden" asp-for="Type" value="@SearchFilterTypeCatalog.ReplacementReport" />
+<input type="hidden" class="search-view-model" value="@typeof(AssetSearchViewModel)" />
+<input type="hidden" class="search-view-path" value="~/Views/Report/Replacement/_Search.cshtml" />
+
+

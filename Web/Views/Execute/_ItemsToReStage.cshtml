@@ -1,0 +1,48 @@
+﻿@using ViewModels;
+@model ReStageViewModel
+
+<table class="table table-striped">
+    <thead>@* class="thead-primary" *@
+        <tr>
+            <th></th> <!-- Empty header for the checkbox column -->
+            <th>Item</th>
+            <th>Purchase Order</th>
+            <th>Source</th>
+            <th>Supplier</th>
+            <th>Rate</th>
+            <th>Location</th>
+            <th>New Location</th>
+            <th>OH Quantity</th>
+            <th>Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var (transaction, index) in Model.Transactions.Select((value, i) => (value, i)))
+        {
+            var locationId = "location-id-" + index;
+
+            <tr>
+                <td>
+                    <input type="checkbox" class="transactions-checkbox" />
+                    <input type="hidden" name="Transactions[@index].LotNO" value="@Model.Transactions[index].LotNO">
+                    <input type="hidden" name="Transactions[@index].Quantity" value="@Model.Transactions[index].Quantity">
+                    <input type="hidden" name="Transactions[@index].ItemPrice" value="@Model.Transactions[index].ItemPrice">
+                    <input type="hidden" name="Transactions[@index].Source.Id" value="@Model.Transactions[index].Source.Id">
+                    <input type="hidden" name="Transactions[@index].Supplier.Id" value="@Model.Transactions[index].Supplier.Id">
+                    <input type="hidden" name="Transactions[@index].Location.Id" value="@Model.Transactions[index].Location.Id">
+                    <input type="hidden" name="Transactions[@index].Inventory.Id" value="@Model.Transactions[index].Inventory.Id">
+                </td>
+
+                <td>@transaction.Inventory.Description</td>
+                <td>@transaction.LotNO</td>
+                <td>@transaction.Source.Name</td>
+                <td>@transaction.Supplier.Name</td>
+                <td>@transaction.ItemPrice.ToString("C")</td>
+                <td>@transaction.Location.Name</td>
+                <td> <partial name="~/Views/Shared/Select2/Location/_LocationHtml.cshtml" for="@Model.Transactions[index].NewLocation" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", locationId }   }' /></td>
+                <td>@transaction.Quantity</td>
+                <td><input type="number" class="form-control" max="@Model.Transactions[index].Quantity" name="Transactions[@index].NewQuantity" /></td>
+            </tr>
+        }
+    </tbody>
+</table>

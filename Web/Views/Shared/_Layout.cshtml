@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="~/img/favicon.ico" />
+
+
+    @* <link href="~/themes/limitless/global_assets/icons/fontawesome/styles.min.css" rel="stylesheet" /> *@
+    <link href="~/themes/limitless/global_assets/icons/icomoon/styles.min.css" rel="stylesheet" />
+    <link href="~/themes/limitless/global_assets/icons/phosphor/styles.min.css" rel="stylesheet" />
+    <link href="~/css/custom/select2.css" rel="stylesheet" />
+    @* <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css"> *@
+    @* <link href="~/themes/limitless/layout6_assets/css/ltr/all.min.css" rel="stylesheet" /> *@
+    <!-- /global stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" integrity="sha512-jnSuA4Ss2PkkikSOLtYs8BlYIeeIK1h99ty4YfvRPAlzr377vr3CXDb7sb7eEEBYjDtcYj+AjBH3FLv5uSJuXg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    @* <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" /> *@
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css">
+    <link href="~/themes/limitless/global_assets/css/sweetalert.css" rel="stylesheet" />
+    <!-- Custom stylesheets -->
+    <link href="~/css/custom/style.css" rel="stylesheet" />
+    @*<link href="~/css/custom/newStyles.css" rel="stylesheet" />*@
+    <!-- /Custom stylesheets -->
+    <!-- Core JS files -->
+    <!-- JavaScript -->
+    <script src="~/themes/limitless/global_assets/js/jquery/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js" integrity="sha512-7Pi/otdlbbCR+LnW+F7PwFcSDJOuUJB3OxtEHbg4vSMvzvJjde4Po1v4BR9Gdc9aXNUNFVUY+SK51wWT8WF0Gg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="~/themes/limitless/global_assets/js/vendor/ui/moment/moment.min.js"></script>
+    <script src="~/themes/limitless/global_assets/js/vendor/pickers/daterangepicker.js"></script>
+    <script src="~/themes/limitless/layout6_assets/js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
+    <script src="~/js/sweet-alert/sweetalert.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- /core JS files -->
+    <!-- Custom JS files -->
+    <script src="~/js/bundles/masking.js"></script>
+    <script src="~/js/bundles/site.js"></script>
+    <script src="~/js/sweet-alert/custom-swal.js"></script>
+    <!-- /Custom JS files -->
+    <script src="~/js/custom/global-search.js" asp-append-version="true"></script>
+
+</head>
+<body>
+    <div class="site_wrap">
+        <!-- Nav -->
+        <partial name="_Navbar" />
+
+        <!-- Main -->
+        
+            <div class="main-content">
+                @RenderBody()
+            </div>
+
+
+    </div>
+
+    <div class="modal fade modal-right" id="crudModalPanel">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title"></h4>
+                    <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+                </div>
+                <div id="crudModalPanelBody" class="modal-body">
+                    Modal body..
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/js/script.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        function setNavigation() {
+            var path = window.location.pathname;
+            //console.log('current path:', path);
+            path = path.replace(/\/$/, "");
+            path = decodeURIComponent(path);
+            $(".btn.btn-nav-line").removeClass('active');
+            $(".btn.btn-nav-line ,.nav-dropdown-item").each(function () {
+                var href = $(this).attr('href');
+                if (href === '/') {
+                    if (path === '') {
+                        $(this).addClass('active');
+                    }
+                } else {
+                    if (path === href || (href.length > 0 && path.substring(0, href.length) === href && path.charAt(href.length) === '/')) {
+                        if ($(this).hasClass("nav-dropdown-item")) {
+                            var parent = $(this).attr("attr-parent");
+                            $("." + parent).addClass('active');
+                        }
+                        else
+                            $(this).addClass('active');
+                    }
+                }
+            });
+        }
+
+        $(function () {
+            setNavigation();
+        });
+
+        $(document).ready(function() {
+            // This ensures the modal has the right-side behavior
+            $("#crudModalPanel").on('show.bs.modal', function () {
+            $(this).addClass('modal-right');
+            });
+        });
+    </script>
+        
+</body>
+</html>

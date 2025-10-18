@@ -1,0 +1,52 @@
+﻿@using ViewModels
+@model ShipmentDetailViewModel
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="LotNO" class="form-label fw-600"></label>
+                    <div>@Model.LotNO</div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Source" class="form-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.Source.Name) ? "-" : Model.Source.Name)</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Location" class="form-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.Location.Name) ? "-" : Model.Location.Name)</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="ItemPrice" class="form-label fw-600"></label>
+                    <div>@Model.ItemPrice</div>
+                </div>
+            </div>
+            
+            @* <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="UOM" class="form-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.UOM.Name) ? "-" : Model.UOM.Name)</div>
+                </div>
+            </div> *@
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Quantity" class="form-label fw-600"></label>
+                    <div>@Model.Quantity</div>
+                </div>
+            </div>
+           
+      
+        </div>
+    </div>
+</div>

@@ -1,0 +1,14 @@
+﻿@using ViewModels.Role;
+@model RoleSearchViewModel
+
+@using Enums;
+@using Web.Extensions
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <label asp-for="Name" class="control-label form-label fw-600"></label>
+            <input asp-for="Name" type="search" class="form-control" placeholder="Search Name" />
+        </div>
+    </div>
+</div>

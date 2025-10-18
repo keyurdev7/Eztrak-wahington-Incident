@@ -1,0 +1,23 @@
+﻿@using ViewModels
+@using ViewModels.Shared.Notes
+@model List<INotesViewModel>
+
+@{
+    Layout = null;
+    var assetId = ViewBag.AssetId;
+}
+
+@await Html.PartialAsync("~/Views/Shared/Notes/_NotesPartialView.cshtml", Model, new ViewDataDictionary(ViewData) { { "ParentId", assetId }, { "ParentName", "AssetId" } })
+
+<script src="~/js/views/notes/notes.js"></script>
+<script>
+    $(function () {
+        notesUrl = "/Asset/SaveNotes";
+        closeNotesModalOnSubmit = false;
+    });
+    function getNotesList() {
+        $.get("/Asset/GetNotesListPartialView/" + @assetId, function (response) {
+            $("#notes-list-container").html(response);
+        });
+    }
+</script>

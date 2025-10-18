@@ -1,0 +1,29 @@
+﻿@using ViewModels
+@using Web.Extensions
+@model TaskEquipmentViewModel
+@{
+    var collectionType = "TaskEquipments";
+    var rowNumber = ViewData["RowNumber"] != null ? int.Parse(ViewData["RowNumber"].ToString()) : 0;
+    var rowName = "equipment-row[" + rowNumber + "]";
+    var rowId = rowNumber;
+
+    var costName = collectionType + "[" + rowNumber + "].Cost";
+    var equipmentId = "equipment-id-" + rowNumber;
+    var equipment = collectionType + "[" + rowNumber + "].Equipment";
+    var equipmentName = collectionType + "[" + rowNumber + "].EquipmentName";
+}
+
+<tr class="equipment-row" id="@rowId">
+
+    <td>
+        <input type="text" name="@equipmentName" value="@Model.EquipmentName" class="form-control" />
+        @* @await Html.PartialAsync("~/Views/Shared/Select2/_Equipment.cshtml", Model.Equipment, equipment, new ViewDataDictionary(ViewData) { { "HideLabel", true }, { "Id", equipmentId } }) *@
+    </td>
+    <td>
+        <input type="text" name="@costName" value="@Model.Cost" class="form-control input-currency cost equipment-cost" />
+    </td>
+    <td>
+        <a href="javascript:void(0)" class="remove-equipment mx-1 datatable-action btn bg-custom-dark" data-toggle="tooltip" title="Delete Equipment"><i class="icon-trash"></i></a>
+    </td>
+</tr>
+

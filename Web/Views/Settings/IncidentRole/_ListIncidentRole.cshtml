@@ -1,0 +1,23 @@
+﻿@using ViewModels
+@model List<IncidentRoleModifyViewModel>
+
+<div class="incident-role-list">
+    @foreach (var item in Model)
+    {
+        <div class="list-item" id="IncidentRoleItem_@item.Id">
+            <input type="hidden" name="Id" value="@item.Id" />
+            <div class="meta">
+                <strong>@item.Name</strong>
+                <p>@item.Description</p>
+            </div>
+            <div class="actions">
+                <a class="btn editIncidentRole" id="@item.Id" href="javascript:void(0);">
+                    <i class="fa-solid fa-pen"></i>
+                </a>
+                <a class="btn deleteIncidentRole" id="@item.Id" href="javascript:void(0);">
+                    <i class="fa-solid fa-trash"></i>
+                </a>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,31 @@
+﻿@using Enums
+@using ViewModels;
+@model AssetSearchViewModel
+@{
+    Layout = null;
+}
+
+    <div class="control_field">
+        <input asp-for="Search.value" type="search" class="form-control" placeholder="Keyword" aria-controls="crud-list-table" autocomplete="new-password">
+   
+</div>
+
+    <div class="control_field">
+        <partial name="~/Views/Shared/Select2/_AssetType.cshtml" for="AssetType" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "asset-raw-asset-type-search-id"} }' />
+   
+</div>
+
+    <div class="control_field">
+        <partial name="~/Views/Shared/Select2/_MUTCD.cshtml" for="MUTCD" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "asset-raw-mutcd-search-id"} }' />
+   
+</div>
+
+    <div class="control_field">
+        <partial name="~/Views/Shared/Select2/_UserSearchSetting.cshtml" for="UserSearchSetting" view-data='@new ViewDataDictionary(ViewData) { {"HideLabel" , true}, {"ReportType", SearchFilterTypeCatalog.AssetRaw}}' />
+   
+</div>
+<input type="hidden" asp-for="Type" value="@SearchFilterTypeCatalog.AssetRaw" />
+<input type="hidden" class="search-view-model" value="@typeof(AssetSearchViewModel)" />
+<input type="hidden" class="search-view-path" value="~/Views/Report/AssetRaw/_Search.cshtml" />
+
+

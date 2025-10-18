@@ -1,0 +1,23 @@
+﻿@using System.Web
+@using ViewModels
+@model List<AssetIdModifyViewModel>
+
+@if (Model != null && Model.Count > 0)
+{
+    @foreach (var assetid in Model)
+    {
+        <div class="list-item">
+            <span>@assetid.Name</span>
+            <div class="actions">
+                <i class="fa-regular fa-edit edit editAsset" id="@assetid.Id"></i>
+                <i class="far fa-trash-alt delete deleteAsset" id="@assetid.Id"></i>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="list-item">
+        <span>No Source found.</span>
+    </div>
+}

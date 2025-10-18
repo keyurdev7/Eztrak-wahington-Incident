@@ -1,0 +1,31 @@
+﻿@using ViewModels.WorkOrder.CostPerformance
+@model CostPerformanceEquipmentViewModel
+@{
+    var isDetailPage = ViewData["IsDetailPage"] != null ? bool.Parse(ViewData["IsDetailPage"].ToString()) : false;
+    var hideEstimatedCost = ViewData["HideEstimatedCost"] != null ? bool.Parse(ViewData["HideEstimatedCost"].ToString()) : false;
+
+    var collectionType = "TaskEquipments";
+    var rowNumber = ViewData["RowNumber"] != null ? int.Parse(ViewData["RowNumber"].ToString()) : 0;
+
+    var rowName = "section-row[" + rowNumber + "]";
+    var rowId = "step-section-row-" + rowNumber;
+
+    var titleName = collectionType + "[" + rowNumber + "].Title";
+    var costName = collectionType + "[" + rowNumber + "].Cost";
+}
+
+<tr>
+    <td>
+        <div>@Model.Equipment.Name</div>
+    </td>
+    @if (!hideEstimatedCost)
+    {
+        <td>
+            <div>@Model.Cost.ToString("C")</div>
+        </td>
+    }
+    <td>
+        <div>@Model.ActualCost.ToString("C")</div>
+    </td>
+</tr>
+

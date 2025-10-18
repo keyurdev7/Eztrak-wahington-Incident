@@ -1,0 +1,24 @@
+﻿@using ViewModels;
+@model IDynamicColumns
+@{
+}
+
+@for (int i = 0; i < Model.DynamicColumns.Count; i++)
+{
+    <div class="col-lg-6">
+        <div class="mb-3 form-group">
+            <label class="form-label fw-600">@Model.DynamicColumns[i].DynamicColumn.Title</label>
+            <input type="@Model.DynamicColumns[i].DynamicColumn.Type.ToString().ToLower()" name="DynamicColumns[@i].Value" class="form-control" value="@Model.DynamicColumns[i].Value" />
+            @*<span asp-validation-for="Name" class="validation-invalid-label"></span>*@
+            <input type="hidden" name="DynamicColumns[@i].Id" value="@Model.DynamicColumns[i].Id" />
+            <input type="hidden" name="DynamicColumns[@i].EntityId" value="@Model.DynamicColumns[i].EntityId" />
+            <input type="hidden" name="DynamicColumns[@i].DynamicColumn.Id" value="@Model.DynamicColumns[i].DynamicColumn.Id" />
+            <input type="hidden" name="DynamicColumns[@i].DynamicColumn.Title" value="@Model.DynamicColumns[i].DynamicColumn.Title" />
+            <input type="hidden" name="DynamicColumns[@i].DynamicColumn.Name" value="@Model.DynamicColumns[i].DynamicColumn.Name" />
+            <input type="hidden" name="DynamicColumns[@i].DynamicColumn.Regex" value="@Model.DynamicColumns[i].DynamicColumn.Regex" />
+            <input type="hidden" name="DynamicColumns[@i].DynamicColumn.Type" value="@Model.DynamicColumns[i].DynamicColumn.Type" />
+            <input type="hidden" name="DynamicColumns[@i].DynamicColumn.EntityType" value="@Model.DynamicColumns[i].DynamicColumn.EntityType" />
+
+        </div>
+    </div>
+}

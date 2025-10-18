@@ -1,0 +1,14 @@
+﻿@model ViewModels.CRUD.CrudListViewModel
+@{
+    Layout = null;
+}
+@await Html.PartialAsync("~/Views/Shared/Crud/ListView/DataCard/_Index.cshtml", Model)
+<script src="~/js/custom/crud/ajaxCrud.js"></script>
+<script src="~/js/custom/loader/loader.js"></script>
+<script src="~/js/datacards/auto-datacards.js"></script>
+<partial name="_ValidationScriptsPartial" />
+<script>
+    $(function () {
+        InitializeDataCards();
+    });
+</script>

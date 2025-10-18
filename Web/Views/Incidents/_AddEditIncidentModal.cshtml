@@ -1,0 +1,231 @@
+﻿@using System.Web
+@using ViewModels.Incident
+@model IncidentViewModel
+<style>
+    .location-card {
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        padding: 1.2rem 1.5rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+        .location-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .location-icon {
+        color: #f25c2a;
+        font-size: 1.1rem;
+        margin-right: 0.5rem;
+    }
+
+    .card-title {
+        font-weight: 600;
+        font-size: 1.05rem;
+    }
+
+    .action-icons {
+        display: flex;
+        gap: 0.8rem;
+    }
+
+        .action-icons i {
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+            .action-icons i.fa-plus {
+                color: #0d6efd;
+            }
+
+            .action-icons i.fa-trash-alt {
+                color: #dc3545;
+            }
+
+            .action-icons i:hover {
+                opacity: 0.8;
+            }
+
+    .info-text {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    .location-section {
+        margin-bottom: 30px;
+    }
+
+    .add-location-box {
+        border: 2px dashed #d1d5db;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        color: #6b7280;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+        .add-location-box:hover {
+            background-color: #f9fafb;
+        }
+
+    .add-location-form {
+        background-color: #fff8f1;
+        border: 1px solid #fcd8b6;
+        border-radius: 10px;
+        padding: 25px;
+        margin-top:20px;
+        display: none;
+    }
+
+    .form-control {
+        border-radius: 6px;
+    }
+
+    .btn-orange {
+        background-color: #eb6619;
+        color: white;
+        border: none;
+    }
+
+        .btn-orange:hover {
+            background-color: #d35510;
+            color: white;
+        }
+
+    .perimeter-type .btn {
+        width: 100%;
+    }
+</style>
+<div class="modal fade" id="addIncidentModal" tabindex="-1" aria-labelledby="addIncidentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addIncidentModalModalLabel">Add Incident</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="NewIncidentForm">
+
+                    <input type="hidden" value="@Model.Id" asp-for="Id"/>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="newAddFormSidebar">
+                                <ul class="nav nav-pills incidentFilter CustomTab" id="pills-tab" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="pills-caller-tab" data-bs-toggle="pill"
+                                                data-bs-target="#pills-caller" type="button" role="tab">
+                                            <i class="fa fa-user"></i>Caller / Source Information
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link " id="pills-location-tab" data-bs-toggle="pill"
+                                                data-bs-target="#pills-location" type="button" role="tab">
+                                            <i class="fa fa-map-pin"></i>Location of Incident
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="pills-additional-tab" data-bs-toggle="pill"
+                                                data-bs-target="#pills-additionallocation" type="button" role="tab">
+                                            <i class="fa fa-map-pin"></i>Additional Locations
+                                    </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link " id="pills-detail-tab" data-bs-toggle="pill"
+                                                data-bs-target="#pills-detail" type="button" role="tab">
+                                            <i class="fa fa-list-check"></i>Incident Details
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link " id="pills-description-tab" data-bs-toggle="pill"
+                                                data-bs-target="#pills-description" type="button" role="tab">
+                                            <i class="fa  fa-address-card"></i>Description
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation" style="display:none !important">
+                                        <button class="nav-link " id="pills-severity-tab" data-bs-toggle="pill"
+                                                data-bs-target="#pills-severity" type="button" role="tab">
+                                            <i class="fa fa-thermometer-full"></i>Severity
+                                        </button>
+                                    </li>
+
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link " id="pills-safety-tab" data-bs-toggle="pill"
+                                                data-bs-target="#pills-safety" type="button" role="tab">
+                                            <i class="fa fa-shield"></i>Environmental / Safety Indicators
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link " id="pills-support-tab" data-bs-toggle="pill"
+                                                data-bs-target="#pills-support" type="button" role="tab">
+                                            <i class="fa fa-info-circle"></i>Supporting Information
+                                        </button>
+                                    </li>
+
+
+
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="tab-content" id="newIncidentTabContent">
+                                <div class="tab-pane fade show active" id="pills-caller" role="tabpanel" aria-labelledby="caller-tab">
+                                    @await Html.PartialAsync("~/Views/Incidents/_CallerInformation.cshtml", Model)
+                                </div>
+                                <div class="tab-pane fade" id="pills-location" role="tabpanel" aria-labelledby="location-tab">
+                                    @await Html.PartialAsync("~/Views/Incidents/_Location.cshtml", Model)
+                                </div>
+                                <div class="tab-pane fade" id="pills-additionallocation" role="tabpanel" aria-labelledby="location-tab">
+                                    @await Html.PartialAsync("~/Views/Incidents/_AdditionalLocations.cshtml", Model)
+                                </div>
+                                <div class="tab-pane fade" id="pills-detail" role="tabpanel" aria-labelledby="detail-tab">
+                                    @await Html.PartialAsync("~/Views/Incidents/_IncidentDetails.cshtml", Model)
+                                </div>
+                                <div class="tab-pane fade" id="pills-description" role="tabpanel" aria-labelledby="description-tab">
+                                    @await Html.PartialAsync("~/Views/Incidents/_DescriptionIssue.cshtml", Model)
+                                </div>
+                                <div class="tab-pane fade" id="pills-severity" role="tabpanel" aria-labelledby="severity-tab" style="display:none !important">
+                                    @await Html.PartialAsync("~/Views/Incidents/_Severity.cshtml", Model)
+                                </div>
+                                <div class="tab-pane fade" id="pills-safety" role="tabpanel" aria-labelledby="safety-tab">
+                                    @await Html.PartialAsync("~/Views/Incidents/_Environmental.cshtml", Model)
+                                </div>
+                                <div class="tab-pane fade" id="pills-support" role="tabpanel" aria-labelledby="support-tab">
+                                    @await Html.PartialAsync("~/Views/Incidents/_SupportingInformation.cshtml", Model)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // const addBtn = document.getElementById('addLocationBtn');
+    // const form = document.getElementById('locationForm');
+    // const cancel = document.getElementById('cancelForm');
+
+    // addBtn.addEventListener('click', () => {
+    //   form.style.display = 'block';
+    //   addBtn.style.display = 'none';
+    // });
+
+    // cancel.addEventListener('click', () => {
+    //   form.style.display = 'none';
+    //   addBtn.style.display = 'block';
+    // });
+
+    $(document).on('click', '#addLocationBtn', function () {
+        $('#locationForm').show();
+        $(this).hide();
+    });
+
+    $(document).on('click', '#cancelForm', function () {
+        $('#locationForm').hide();
+        $('#addLocationBtn').show();
+    });
+</script>

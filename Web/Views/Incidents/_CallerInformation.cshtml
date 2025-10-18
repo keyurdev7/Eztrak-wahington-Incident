@@ -1,0 +1,92 @@
+﻿@using System.Web
+@using ViewModels.Incident
+@model IncidentViewModel
+
+
+<div class="shadow-sm border border-gray-200 card-body InfoCard">
+    <input type="hidden" class="form-control" id="hdnmagicKey" />
+    @* <input type="hidden" class="form-control" id="hdnLng" /> *@
+
+    <h6 class="fw-bold mb-3">Caller / Source Information</h6>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label" asp-for="incidentCellerInformation.CallerName">Caller Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="callerName" required asp-for="incidentCellerInformation.CallerName" placeholder="Enter caller's full name'" />
+                <div class="invalid-feedback"></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label" asp-for="incidentCellerInformation.CallerPhoneNumber">Caller Phone Number <span class="text-danger">*</span></label>
+                <input class="form-control input-telephone" id="callerPhoneNumber" placeholder="XXX-XXX-XXXX" asp-for="incidentCellerInformation.CallerPhoneNumber" />
+                <div class="invalid-feedback"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="mb-3">
+                <label class="form-label" asp-for="incidentCellerInformation.CallerAddress">Caller Address <span class="text-danger">*</span></label>
+                <textarea type="number" class="form-control" asp-for="incidentCellerInformation.CallerAddress" id="callerAddress" placeholder="Street address, City, State, ZIP"></textarea>
+                <div class="invalid-feedback"></div>
+                <ul id="suggestionsCallAdd" class="suggestions-list"></ul>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label">Source <span class="text-danger">*</span></label>
+                <select class="form-select" id="relationaship" required asp-for="incidentCellerInformation.RelationshipId">
+                    <option value="">Select Source</option>
+                    @foreach (var item in Model.incidentCellerInformation.Relationships)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+                <div class="invalid-feedback"></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label" asp-for="incidentCellerInformation.CallTime">Caller Date & Time <span class="text-danger">*</span></label>
+                <input type="datetime-local" disabled id="CallTimedatetime" value="@(Model.Id > 0 ? Model.incidentCellerInformation.CallTime.ToString("yyyy-MM-ddTHH:mm") : DateTime.Now.ToString("yyyy-MM-ddTHH:mm"))"
+                       class="form-control" asp-for="incidentCellerInformation.CallTime" />
+                <input type="hidden" id="hdnCallTimedatetime" name="incidentCellerInformation.CallTime"
+                       value="@(Model.Id > 0 ? Model.incidentCellerInformation.CallTime.ToString("yyyy-MM-ddTHH:mm") : DateTime.Now.ToString("yyyy-MM-ddTHH:mm"))" />
+                <div class="invalid-feedback"></div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end gap-2 mt-3 addIncidentBtns">
+        <button type="button" class="btn btn-primary" id="nextToIncidentLocation">Next</button>
+    </div>
+</div>
+
+<script>
+        $("#callerAddress").on("input", function () {
+        let query = $(this).val();
+        if (query.length > 2) {
+            $.getJSON("/Incidents/Suggest", { text: query }, function (data) {
+                let $list = $("#suggestionsCallAdd");
+                $list.empty().show();
+
+                $.each(data, function (i, item) {
+                    $list.append(
+                        `<li onclick="selectcallerAddressAddress('${item.text.replace(/'/g, "\\'")}', '${item.magicKey}')">${item.text}</li>`
+                    );
+                });
+            });
+        } else {
+            $("#suggestionsCallAdd").hide();
+        }
+    });
+
+    function selectcallerAddressAddress(address, magicKey) {
+        $("#hdnmagicKey").val(magicKey);
+        $("#callerAddress").val(address);
+        $("#suggestionsCallAdd").empty();
+    }
+</script>

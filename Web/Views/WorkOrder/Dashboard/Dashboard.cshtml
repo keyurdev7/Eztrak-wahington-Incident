@@ -1,0 +1,180 @@
+﻿@model List<ViewModels.Report.WorkOrder.WorkOrderDashboardViewModel>
+@{
+    Layout = null;
+    ViewBag.Title = "Work Order Dashboard";
+}
+<style>
+    /* General Reset */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Parent Container */
+    .dash-box {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        /* Adjust gap between columns */
+    }
+
+    /* Columns */
+    .dash-column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+
+    /* Work Orders */
+    .dash-list {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        /* Gap between work orders */
+    }
+
+
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .dash-box {
+            flex-direction: column;
+        }
+    }
+
+    .desk_list .col.item .block_title {
+        color: #000;
+        border-radius: 25px;
+        margin-bottom: 45px;
+        text-align: center;
+        font-weight: 300;
+        line-height: initial;
+        padding: 10px 18px;
+        display: inline-block;
+    }
+
+    .column-Open .block_title {
+        background: #ffe0e2;
+    }
+
+    .column-OnHold .block_title {
+        background: #F8E2AA;
+    }
+
+    .column-Working .block_title {
+        background: #eaffe9;
+    }
+
+    .column-Complete .block_title {
+        background: #DFE8F2;
+    }
+
+    .column-Approved .block_title {
+        background: #aee0f6;
+    }
+
+    .dash-card .card-box {
+        display: grid;
+        grid-template-columns: auto 60px 1fr;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .dash-card .card-img {
+        aspect-ratio: 1 / 1;
+    }
+
+    .status-badge p i {
+        padding-right: 4px;
+    }
+
+    .badge-Open i {
+        color: red;
+    }
+
+    .badge-OnHold i {
+        color: red;
+    }
+
+    .badge-Working i {
+        color: green;
+    }
+
+    .badge-Complete i {
+        color: orange;
+    }
+
+    .badge-Approved i {
+        color: #4792bf;
+    }
+
+    .dash-list {
+        cursor: pointer;
+    }
+
+    .border-High {
+        border: 1px solid #dc3545 !important;
+    }
+
+    .border-Medium {
+        border: 1px solid #ffc107 !important;
+    }
+
+    .border-Low {
+        border: 1px solid #0dcaf0 !important;
+    }
+
+    .bg-High {
+        background-color: #dc3545 !important;
+    }
+
+    .bg-Medium {
+        background-color: #ffc107 !important;
+    }
+
+    .bg-Low {
+        background-color: #0dcaf0 !important;
+    }
+</style>
+
+<div id="work-order-dashboard-container">
+    @await Html.PartialAsync("~/Views/WorkOrder/Dashboard/_DashboardContent.cshtml", Model)
+</div>
+
+<partial name="_ValidationScriptsPartial" />
+<script src="~/js/custom/crud/ajaxCrud.js"></script>
+<script>
+    $(function () {
+        $('.dash-list').off('click');
+        $('.dash-list').on('click', function () {
+            var workOrderId = $(this).attr('id').split('-')[2];
+            var currentStatus = $(this).attr('attr-status');
+
+            if (currentStatus == 'Approved') {
+                SwalErrorAlert('Once the work order is approved, you cannot change the status.');
+            }
+            else {
+                loadModalPanel('/WorkOrder/UpdateStatus/' + workOrderId, "crudModalPanel", "crudModalPanelBody")
+            }
+        });
+    });
+    function processAfterUpdateStatus() {
+        $.get("/WorkOrder/Dashboard", function (response) {
+            $("#work-order-dashboard-container").html(response);
+        });
+    }
+    function onFetchTabContentSuccess(tabId, tabItemId) {
+        if (tabId != "#work-order-inner-tab") {
+            if (tabItemId == "#dashboard") {
+                $("#navbarSupportedContent").addClass('navbar-collapse').removeClass("d-none");
+            }
+            else {
+                $("#navbarSupportedContent").removeClass('navbar-collapse').addClass("d-none");
+            }
+        }
+
+    }
+</script>

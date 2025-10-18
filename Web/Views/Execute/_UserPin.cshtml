@@ -1,0 +1,14 @@
+﻿<fieldset class="step-card">
+    <div class="form-group">
+        <label>User Pin</label>
+        <input type="password" class="form-control" id="userPinCode" autocomplete="new-password" />
+        <span class="field-validation-valid text-danger" id="spnRecipientBadge"></span>
+        <input type="hidden" id="recipbadge" />
+    </div>
+    <div class="step-btns d-flex justify-content-between pt-3">
+        <a href="@Url.Action("Index", "Execute")" class="back-option main-btn btn-secondary btn mr-2">Back</a>
+
+        <button type="button" id="btnNextLotNumber" onclick="fnCheckUserPin()" class="btn-site-primary btn ml-2">Next</button>
+    </div>
+    <script src="~/js/views/execute/user-pin.js"></script>
+</fieldset>

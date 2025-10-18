@@ -1,0 +1,18 @@
+﻿@using ViewModels;
+@model EquipmentSearchViewModel
+@* <div class="control_field">
+    <input asp-for="Search.value" type="search" class="form-control" placeholder="Keyword" aria-controls="crud-list-table" autocomplete="new-password">
+</div> *@
+<div class="control_field">
+    <input asp-for="Search.value" type="search" class="form-control" placeholder="Keyword" aria-controls="crud-list-table" autocomplete="new-password">
+</div>
+<div class="control_field" data-filter-id="categoryId">
+    <partial name="~/Views/Shared/Select2/_Category.cshtml" for="Category" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "uom-search-id"} }' />
+</div>
+
+<div class="control_field" data-filter-id="manufacturerId">
+    <partial name="~/Views/Shared/Select2/_Manufacturer.cshtml" for="Manufacturer" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "manufacturer-search-id"} }' />
+</div>
+<div class="control_field" data-filter-id="uomId">
+    <partial name="~/Views/Shared/Select2/_UOM.cshtml" for="UOM" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "condition-search-id"} }' />
+</div>

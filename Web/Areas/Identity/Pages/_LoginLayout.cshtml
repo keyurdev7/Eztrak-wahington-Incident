@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to EZTRAK</title>
+
+    <link rel="icon" type="image/png" sizes="32x32" href="~/img/favicon.ico" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    @* <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" /> *@
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link href="~/css/custom/style.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- Login Page -->
+    <div class="wrapper login-page">
+        <div class="container-fluid d-flex flex-column justify-content-between">
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <img src="~/img/logo.png" alt="EZTRAK" />
+                </div>
+            </nav>
+
+            <div class="login-box">
+                @RenderBody()
+            </div>
+
+
+            <footer class="">
+                <p class="footer-text text-center m-0">Copyright © @DateTime.Now.Year EZTRAK Software, LLC. All Rights Reserved.</p>
+            </footer>
+        </div>
+    </div>
+    <!-- JavaScript -->
+    <script src="~/themes/limitless/global_assets/js/jquery/jquery.min.js"></script>
+    <script src="~/themes/limitless/global_assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="~/js/script.js"></script>
+    <script src="~/js/validation/jquery.unobtrusive-ajax.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,35 @@
+﻿@model List<ViewModels.Shared.AttachmentVM>
+<div class="col-12 mb-3">
+    <div class="mb-3">
+        <label class="form-label fw-600">Images</label>
+    </div>
+</div>
+<div class="col-12 mb-5" id="drawingFileList">
+    <div class="upload-img-container">
+        @if (((Model != null) && Model.Any()))
+        {
+            foreach (var model in Model)
+            {
+                <div class="file-link new mx-1">
+                    <div class="actions">
+                        <div data-file-id="@(model.Id)" class="delete-side">
+                            <i class="fas fa-trash-alt"></i>
+                        </div>
+                        <div class="zoom-side">
+                            <i class="fas fa-search-plus"></i>
+                        </div>
+                    </div>
+                    <img src="@(model.Url)" class="img-thumbnail" width="100" height="100">
+                    <input type="hidden" class="uploaded-file-name" value="@(model.Name)" />
+                </div>
+            }
+        }
+    </div>
+</div>
+<div class="col-12 mb-5">
+    <div class="mb-3 attachment-box">
+        <input type="file" id="uploadDrawingBtn" multiple name="Images" />
+    </div>
+</div>
+<div class="col-12 m-1" id="drawingFileListDrop" style="width:auto"> Drop your file here for Images.</div>
+<script src="~/js/custom/dropzone.js"></script>

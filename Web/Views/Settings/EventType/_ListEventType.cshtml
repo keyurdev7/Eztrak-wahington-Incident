@@ -1,0 +1,26 @@
+﻿@using System.Web
+@using ViewModels
+@model List<EventTypeModifyViewModel>
+
+@if (Model != null && Model.Count > 0)
+{
+    @foreach (var eventType in Model)
+    {
+        <div class="list-item">
+            <div class="item-info">
+                <strong>@eventType.Name</strong>
+                <p>@eventType.Description</p>
+            </div>
+            <div class="actions">
+                <i class="fa-regular fa-edit edit editEventType" id="@eventType.Id"></i>
+                <i class="far fa-trash-alt delete deleteEventType" id="@eventType.Id"></i>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="list-item">
+        <span>No event type found.</span>
+    </div>
+}

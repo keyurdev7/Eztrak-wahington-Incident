@@ -1,0 +1,349 @@
+﻿@* @model List<ViewModels.InventoryViewModel> *@
+@using System.Web
+@using ViewModels.Incident
+@model IncidentViewModel
+
+    <div class="location-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">Additional Locations</h5>
+            <span class="text-muted small">0 location(s)</span>
+        </div>
+
+        <div class="add-location-box" id="addLocationBtn">
+            <i class="fa-solid fa-plus me-2"></i>
+            Add Additional Location
+        </div>
+    </div>
+ <div id="listanotherlocationdata">
+    @*    <div class="location-card d-flex justify-content-between align-items-start">
+        <div>
+            <div class="d-flex align-items-center mb-1">
+                <i class="fa-solid fa-location-dot location-icon"></i>
+                <span class="card-title">test</span>
+            </div>
+
+            <div class="info-text">GPS: 455.000000, 464654.000000</div>
+            <div class="info-text">Near: sdfsd</div>
+            <div class="info-text">Assets: Pipeline, Compressor, Station</div>
+        </div>
+
+        <div class="action-icons">
+            <i class="fa-solid fa-plus"></i>
+            <i class="far fa-trash-alt "></i>
+        </div>
+    </div> *@
+</div> 
+
+
+<!---------add form----------->
+<div class="add-location-form" id="locationForm">
+    <h6 class="fw-bold mb-3">Add New Location</h6>
+
+    <form id="addLocationForm" >
+        <input type="hidden" value="0" id="hdnaddLocationID" asp-for="additionalLocation.Id" />
+        <input type="hidden" value="0" id="hdnEditLocationID"  />
+        <div class="mb-3">
+            @* <label class="form-label">Location Address <span class="text-danger">*</span></label> *@
+            @* <input type="text" class="form-control" id="locAdd" placeholder="Enter location address..."> *@
+            <label class="form-label" asp-for="additionalLocation.LocationAddress" >Location Address <span class="text-danger">*</span></label>
+            @* <input type="text" class="form-control" id="addlocAddress" asp-for="additionalLocation.LocationAddress" placeholder="Enter location address..."></input> *@
+            <textarea type="text" class="form-control" id="addlocAddress" asp-for="additionalLocation.LocationAddress" placeholder="Enter location address..."></textarea>
+            <ul id="addsuggestions" class="suggestions-list" style="display:none;"></ul>
+            <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                @* <label class="form-label">Latitude</label> *@
+                @* <input type="text" id="Loc2Latitude" class="form-control" placeholder="Latitude"> *@
+                <label class="form-label" asp-for="additionalLocation.Latitude">Latitude</label>
+                <input type="text" class="form-control" id="addLatitude" asp-for="additionalLocation.Latitude" disabled />
+            </div>
+            <div class="col-md-6 mb-3">
+                @* <label class="form-label">Longitude</label>
+                <input type="text" id="Loc2Longitude" class="form-control" placeholder="Longitude"> *@ 
+                <label class="form-label" asp-for="additionalLocation.Longitude">Longitude</label>
+                <input type="text" class="form-control" id="addLongitude" asp-for="additionalLocation.Longitude" disabled />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                @* <label class="form-label">Nearest Intersection</label>
+                <input type="text" class="form-control" id="Loc2Intersection" placeholder="e.g., Main St & Oak Ave"> *@
+                <label class="form-label" asp-for="additionalLocation.NearestIntersection">Nearest Intersection</label>
+                <input type="text" class="form-control" id="addNearestIntersection" asp-for="additionalLocation.NearestIntersection" placeholder="e.g., Main St & Oak Ave" />
+            </div>
+            <div class="col-md-6 mb-3">
+                @* <label class="form-label">Service Account</label>
+                <input type="text" class="form-control" id="acct2" placeholder="Account number"> *@
+                <label class="form-label" asp-for="additionalLocation.ServiceAccount">Service Account # </label>
+                <input type="text" class="form-control" id="addserviceAct" placeholder="Customer accoutn number" asp-for="additionalLocation.ServiceAccount" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="checkBoxTitle">Affected Assets</div>
+                <div class="row">
+
+                    @foreach (var asset in Model.incidentiLocation.AssetsIncidentList)
+                    {
+                        var id = "asset_" + asset.Value;
+                        var checkedAttr = Model.incidentiLocation.AssetIDs != null ? (Model.incidentiLocation.AssetIDs.Contains(asset.Value) ? "checked" : "") : "";
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <input name="A_asset.Id" type="checkbox" class="form-check-input"
+                                       data-val="true" data-val-required="The Asset field is required." @checkedAttr value="@asset.Value" id="@id">
+                                <label class="form-check-label" for="@id">@asset.Text</label>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <button type="button" class="btn btn-orange px-4" id="submitLocationBtn">Add Location</button>
+            @* <button type="button" class="btn btn-secondary px-4" id="cancelModalBtn">Cancel</button> *@
+            <button type="button" class="btn btn-secondary px-4" id="cancelForm">Cancel</button>
+        </div>
+        
+    </form>
+    
+</div>
+<div class="d-flex justify-content-end gap-2 mt-3 addIncidentBtns">
+    <button type="button" class="btn btnBack" id="backButtonToIncidentLoc">Back</button>
+    <button type="button" class="btn btn-primary" id="nextToIncidentDetials">Next</button>
+</div>
+
+<script>
+    $(document).ready(function () {
+        function togglePerimeterTypeDigit() {
+            if ($("#addPerimeterType1").is(":checked")) {
+                $("#addperimetertypedigit").show();
+            } else {
+                $("#addperimetertypedigit").hide();
+            }
+        }
+
+        togglePerimeterTypeDigit();
+        renderAdditionalLocations();
+
+        $("#addPerimeterType1, #addPerimeterType2").on("change", togglePerimeterTypeDigit);
+
+        // Attach delete handler after rendering
+        $("#listanotherlocationdata").on("click", ".delete-location-btn", function () {
+            const idx = $(this).data("idx");
+            deleteLocation(idx);
+        });
+        $("#listanotherlocationdata").on("click", ".edit-location-btn", function () {
+            const idx = $(this).data("idx");
+            editLocation(idx);
+        });
+    });
+
+    $("#addLocationBtn").on("click", function () {
+        $("#addLocationForm").toggle();
+    });
+
+    $("#addlocAddress").on("input", function () {
+
+        let query = $(this).val();
+        if (query.length > 2) {
+            $.getJSON("/Incidents/Suggest", { text: query }, function (data) {
+                let $list = $("#addsuggestions");
+                $list.empty().show();
+                $.each(data, function (i, item) {
+                    // $list.append(
+                    //     `<li onclick="selectAdAddress('${item.replace(/'/g, "\\'")}')">${item}</li>`
+                    // );
+                    $list.append(
+                        `<li onclick="selectAdAddress('${item.text.replace(/'/g, "\\'")}', '${item.magicKey}')">${item.text}</li>`
+                    );
+                });
+                // debugger;
+                // $.each(data, function (i, item) {
+                //     let text = item.address; // <-- access property
+                //     $list.append(
+                //         `<li onclick="selectAdAddress('${text.replace(/'/g, "\\'")}')">${text}</li>`
+                //     );
+                // });
+            });
+        } else {
+            $("#addsuggestions").hide();
+        }
+    });
+
+    function renderAdditionalLocations() {
+        const data = sessionStorage.getItem("addLocationFormDataList");
+        let $list = $("#listanotherlocationdata");
+        $list.empty();
+        if (data) {
+            const locations = JSON.parse(data);
+            locations.forEach(function (loc, idx) {
+                let assets = Array.isArray(loc.AssetNames) ? loc.AssetNames.join(", ") : "";
+                //let assets = Array.isArray(loc.AssetIDs) ? loc.AssetIDs.join(", ") : "";
+
+                // <div class="card mb-2 p-2 position-relative">
+                //     <button type="button" class="btn btn-link text-danger position-absolute top-0 end-0 delete-location-btn" data-idx="${idx}" title="Delete" style="font-size:1.2rem;">
+                //         <i class="fa fa-trash"></i>
+                //     </button>
+                //     <div><strong>Address:</strong> ${loc.LocationAddress || ""}</div>
+                //     <div><strong>Latitude:</strong> ${loc.Latitude || ""}</div>
+                //     <div><strong>Longitude:</strong> ${loc.Longitude || ""}</div>
+                //     <div><strong>Nearest:</strong> ${loc.NearestIntersection || ""}</div>
+                //     <div><strong>Assets:</strong> ${assets}</div>
+                // </div>
+                $list.append(`
+                        <div class="location-card d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="d-flex align-items-center mb-1">
+                                    <i class="fa-solid fa-location-dot location-icon"></i>
+                                    <span class="card-title">${loc.LocationAddress || ""}</span>
+                                </div>
+                                <div class="info-text">GPS: ${loc.Latitude || ""}, ${loc.Longitude || ""}</div>
+                                    <div class="info-text">Near: ${loc.NearestIntersection || ""}</div>
+                                    <div class="info-text">Assets: ${assets}</div>
+                                </div>
+                                <div class="action-icons">
+                                        <i class="fa-solid fa-plus edit-location-btn" data-idx="${idx}"></i>
+                                    <i class="far fa-trash-alt delete-location-btn" data-idx="${idx}"></i>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+
+            });
+        }
+    }
+
+    function selectAdAddress(address, magicKey) {
+
+        $.getJSON("/Incidents/Resolve", { magicKey: magicKey }, function (data) {
+            $("#addLatitude").val(data.lat);
+            $("#addLongitude").val(data.lon);
+        });
+
+        $("#addlocAddress").val(address);
+        $("#addsuggestions").empty();
+    }
+    // function selectAdAddress(address) {
+    //     $.getJSON("/Incidents/GetLatLong", { text: address }, function (data) {
+    //         $("#addLatitude").val(data[0].Item2);
+    //         $("#addLongitude").val(data[0].Item3);
+    //     }).fail(function () {
+    //         $("#addLatitude").val("");
+    //         $("#addLongitude").val("");
+    //     });
+
+    //     $("#addlocAddress").val(address);
+    //     $("#addsuggestions").hide();
+    // }
+
+    function deleteLocation(idx) {
+        const data = sessionStorage.getItem("addLocationFormDataList");
+        if (!data) return;
+        let locations = JSON.parse(data);
+        locations.splice(idx, 1);
+        sessionStorage.setItem("addLocationFormDataList", JSON.stringify(locations));
+        renderAdditionalLocations();
+    }
+    function editLocation(idx) {
+        const data = sessionStorage.getItem("addLocationFormDataList");
+        if (!data) return;
+        let locations = JSON.parse(data);
+        const record = locations[idx];
+        $("#addlocAddress").val(record.LocationAddress);
+        $("#addLatitude").val(record.Latitude);
+        $("#addLongitude").val(record.Longitude);
+        $("#addNearestIntersection").val(record.NearestIntersection);
+        $("#addserviceAct").val(record.ServiceAccount);
+
+        let assets = Array.isArray(record.AssetIDs) ? record.AssetIDs.join(",") : "";
+        let idArray = assets.split(",");
+
+        $("input[name='A_asset.Id']").each(function () {
+            let value = $(this).val().trim(); // normalize both sides
+            if (idArray.includes(value)) {
+                $(this).prop("checked", true);
+            } else {
+                $(this).prop("checked", false);
+            }
+        });
+
+        //record.AssetIDs
+        $("#hdnEditLocationID").val(idx+1)
+        $("#locationForm").show();
+
+        // sessionStorage.setItem("addLocationFormDataList", JSON.stringify(locations));
+        // renderAdditionalLocations();
+    }
+
+    $("#submitLocationBtn").on("click", function (e) {
+        e.preventDefault();
+
+        var isValid = true;
+        if ($("#locationForm").is(":visible")) {
+            if ($("#addlocAddress").val() === "") {
+                showError12($("#addlocAddress"));
+                isValid = false;
+            }
+            else {
+                if (parseInt($("#hdnEditLocationID").val()) > 0) {
+                    deleteLocation(parseInt($("#hdnEditLocationID").val()) - 1);
+                    $("#hdnEditLocationID").val(0);
+                }
+
+                // Gather form data
+                const formData = {
+                    Id: parseInt($("#hdnaddLocationID").val()) + 1,
+                    LocationAddress: $("#addlocAddress").val(),
+                    Latitude: $("#addLatitude").val(),
+                    Longitude: $("#addLongitude").val(),
+                    NearestIntersection: $("#addNearestIntersection").val(),
+                    ServiceAccount: $("#addserviceAct").val(),
+                    PerimeterType: $("input[name='additionalLocation.PerimeterType']:checked").val(),
+                    PerimeterTypeDigit: $("#addperimetertypedigit").val(),
+                    AssetIDs: $("input[name='A_asset.Id']:checked").map(function () { return $(this).val(); }).get(),
+                    AssetNames: $("input[name='A_asset.Id']:checked").map(function () { return $("label[for='" + this.id + "']").first().text().trim(); }).get()
+                };
+                $("#hdnaddLocationID").val(formData.Id);
+
+                //AssetNames = $("input[name='asset.Id']:checked").map(function () { return $("label[for='" + this.id + "']").text().trim(); }).get()
+                // Get existing list or create new
+                let locations = [];
+                const data = sessionStorage.getItem("addLocationFormDataList");
+                if (data) {
+                    locations = JSON.parse(data);
+                }
+                locations.push(formData);
+                sessionStorage.setItem("addLocationFormDataList", JSON.stringify(locations));
+
+
+                // Clear form
+                $("#addlocAddress").val("");
+                $("#addLatitude").val("");
+                $("#addLongitude").val("");
+                $("#addNearestIntersection").val("");
+                $("#addserviceAct").val("");
+                $("input[name='additionalLocation.PerimeterType']").prop("checked", false);
+                $("#addperimetertypedigit").val("");
+                $("#addperimetertypedigit").hide();
+                $("input[name='A_asset.Id']").prop("checked", false);
+                $("#addsuggestions").hide();
+                $("#locationForm").hide();
+                $("#addLocationBtn").show();
+
+                renderAdditionalLocations();
+            }
+        }
+        
+        
+    });
+
+    function showError12($field) {
+        $field.css("border", "1px solid red");
+    }
+</script>

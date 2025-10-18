@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\AssignedPermissionService\" />
+    <Folder Include="Users\" />
+    <Folder Include="Users\Interface\" />
+    <Folder Include="Services\Order\" />
+    <Folder Include="Services\Equipment\" />
+    <Folder Include="Services\UserSearchSetting\" />
+    <Folder Include="Services\DynamicColumn\" />
+    <Folder Include="Services\TimesheetService\Interface\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataLibrary\DataLibrary.csproj" />
+    <ProjectReference Include="..\Enums\Enums.csproj" />
+    <ProjectReference Include="..\Models\Models.csproj" />
+    <ProjectReference Include="..\Pagination\Pagination.csproj" />
+    <ProjectReference Include="..\ViewModels\ViewModels.csproj" />
+    <ProjectReference Include="..\ResponseHelpers\ResponseHelpers.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="automapper" Version="12.0.1" />
+    <PackageReference Include="ClosedXML" Version="0.102.2" />
+    <PackageReference Include="microsoft.extensions.logging" Version="7.0.0" />
+    <PackageReference Include="MimeKit" Version="4.3.0" />
+    <PackageReference Include="NETCore.MailKit" Version="2.1.0" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.3.14" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Services\Example\" />
+    <None Remove="Services\AssignedPermissionService\" />
+    <None Remove="Users\" />
+    <None Remove="Users\Interface\" />
+    <None Remove="Shared\EmailService\" />
+    <None Remove="Services\SupplierInvitation\" />
+    <None Remove="Services\Bid\" />
+    <None Remove="Services\BidFAQ\" />
+    <None Remove="Services\BidLineItem\" />
+    <None Remove="Services\BidResponse\" />
+    <None Remove="Services\Order\" />
+    <None Remove="Services\Equipment\" />
+    <None Remove="Services\UserSearchSetting\" />
+    <None Remove="Services\DynamicColumn\" />
+    <None Remove="Services\TimesheetService\Interface\" />
+  </ItemGroup>
+</Project>

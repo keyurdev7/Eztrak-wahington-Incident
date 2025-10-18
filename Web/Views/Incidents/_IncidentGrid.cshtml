@@ -1,0 +1,170 @@
+﻿@using System.Web
+@using Enums
+@using ViewModels.Incident
+@model IncidentViewModel
+
+<style>
+    .map i.fa {
+        color: darkslategrey;
+    }
+
+    .description {
+        white-space: normal; /* allow text to wrap */
+        word-wrap: break-word; /* break long words */
+        word-break: break-word; /* ensure wrapping in all browsers */
+        max-width: 300px; /* set a width limit for wrapping */
+    }
+</style>
+<table class="table align-middle text-left" id="tbl_IncidnetGrid">
+    <thead class="table-light">
+        <tr>
+            <th style="display:none">
+                <input type="checkbox" id="selectAll" />
+            </th>
+            <th>Status</th>
+            <th style="display:none">Severity</th>
+            <th>Event Type</th>
+            <th>Source</th>
+            <th>Asset Type</th>
+            <th>Description</th>
+            <th>Intersection</th>
+            <th>Location</th>
+            <th>ES Indicators</th>
+            <th data-sortable="true">
+                Date/Time
+                <i class="fa fa-sort text-secondary ms-1"></i>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @if (Model.incidentGridViewModel.Count > 0)
+        {
+            @foreach (var item in Model.incidentGridViewModel)
+            {
+                @* @if (!string.IsNullOrEmpty(item.StatusLegend) && item.StatusLegend == StatusLegendEnum.Validated.ToString())
+        { *@
+                <tr id="@item.Id" onclick="window.location.href='@Url.Action("Index", "IncidentDetail", new { id = item.Id })'" style="cursor:pointer">
+                    <td style="display:none">
+                        @if (item.StatusLegend == StatusLegendEnum.Submitted.ToString())
+                        {
+                            <input type="checkbox" class="rowCheckbox" value="@item.Id" />
+                        }
+                    </td>
+                    <td style="text-align:center !important">
+                        <span class="dot" style="width: 12px;height: 12px;border-radius: 50%;display: inline-block;background-color:@item.StatusLegendColor"></span>
+                    </td>
+                    <td style="display:none">
+                        @if (item.Severity == SeverityEnum.Low.ToString())
+                        {
+                            <span class="badge rounded-pill badge-low px-3 py-2">Low</span>
+                        }
+                        else if (item.Severity == SeverityEnum.Moderate.ToString())
+                        {
+                            <span class="badge rounded-pill badge-medium px-3 py-2">Moderate</span>
+                        }
+                        else if (item.Severity == SeverityEnum.High.ToString())
+                        {
+                            <span class="badge rounded-pill badge-high px-3 py-2">High</span>
+                        }
+                        else
+                        {
+                            <span class="badge rounded-pill badge-unknown px-3 py-2">Unknown</span>
+                        }
+                    </td>
+
+                    <td style="text-wrap:auto">@item.EventTypeId</td>
+                    <td>
+                        <div class="event-type">
+                            @item.RelationShipName
+                        </div>
+                    </td>
+                    <td>
+                        <div class="event-type">
+                            @item.AssetId
+                        </div>
+                    </td>
+                    <td class="description">@item.DescriptionIssue</td>
+                    <td>@item.Intersection</td>
+                    <td>
+                        <div class="map" style="display:flex; align-items:center; gap:8px;">
+                            <i class="fa fa-map-marker-alt" style="cursor:pointer" onclick="OpenIncidentMap('@item.Id')"></i>
+
+                            @*  @if (item.AdditionalLocationCount > 0)
+                    {
+                    <a href="javascript:void(0);" class="ms-2 more-locations-link" data-incident-id="@item.Id" style="font-size:.9rem;">
+                    +@item.AdditionalLocationCount more
+                    </a>
+                    } *@
+                        </div>
+                    </td>
+
+                    <td>@item.GasESIndicator</td>
+                    <td>
+                        <div class="date-time-sec">
+                            <p class="date">@item.CallDate </p>
+                            <p class="time">@item.CallTime</p>
+                        </div>
+                    </td>
+                    @* <td>
+            <!-- Action Icons -->
+            <a href="/IncidentDetail/Index/@item.Id"
+            class="btnIcon eyeIcon view-incident"
+            data-id="@item.Id"
+            title="View Details">
+            <i class="fa-regular fa-eye"></i>
+            </a>
+
+
+            @if (item.StatusLegend == StatusLegendEnum.Submitted.ToString())
+            {
+
+            <a href="/Validation/Index/@item.Id"
+            class="btnIcon validateIcon validate-incident"
+            title="Validate Incident" data-incident-id="@item.Id">
+            <i class="fa-regular fa-circle-check"></i>
+            </a>
+
+            }
+            @if (item.StatusLegend == StatusLegendEnum.Validated.ToString())
+            {
+            <a href="/IncidentProgress/Index/@item.Id"
+            class="viewProgress"
+            data-id="@item.Id"
+            title="View Progress">
+            <i class="fa fa-bar-chart"></i>
+            </a>
+            }
+            </td> *@
+                </tr>
+                @* } *@
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="12" class="text-center">No records found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        document.getElementById("selectAll").addEventListener("change", function () {
+            let checkboxes = document.querySelectorAll(".rowCheckbox");
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+
+        // Optional: If all row checkboxes are checked manually, update header checkbox
+        document.querySelectorAll(".rowCheckbox").forEach(cb => {
+            cb.addEventListener("change", function () {
+                let all = document.querySelectorAll(".rowCheckbox").length;
+                let checked = document.querySelectorAll(".rowCheckbox:checked").length;
+                document.getElementById("selectAll").checked = (all === checked);
+            });
+        });
+    </script>
+
+
+}

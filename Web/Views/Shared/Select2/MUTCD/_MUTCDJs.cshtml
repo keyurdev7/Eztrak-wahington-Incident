@@ -1,0 +1,47 @@
+﻿<script>
+    function SetMUTCDSelect2(identifier) {
+        let id = identifier;
+        let pageSize = 10;
+        let url = '/MUTCD/Select2';
+        let dataArray = function (params) {
+            params.page = params.page || 1;
+            return {
+                prefix: params.term,
+                pageSize: pageSize,
+                pageNumber: params.page,
+            };
+        };
+        Select2AutoCompleteAjax(id, url, dataArray, pageSize, "Select MUTCD", 0, false, false, () => { }, () => { }, 150, {
+            formatOption: customMUTCDFormatOption,
+            formatSelection: customMUTCDFormatSelection
+        });
+        function customMUTCDFormatOption(option, element) {
+            if (!option.id) {
+                return option.text;
+            }
+            return getFormattedOption(option, element);
+        };
+
+        function customMUTCDFormatSelection(option, element) {
+            if (!option.id) {
+                return option.text;
+            }
+            return getFormattedOption(option, element);
+        }
+
+        function getFormattedOption(option, element) {
+            let imageUrl = "";
+            if (option?.additionalAttributesModel != null && option?.additionalAttributesModel != undefined) {
+                imageUrl = option?.additionalAttributesModel?.ImageUrl;
+            }
+            else {// First Time Render. In case of update
+                imageUrl = $(element).closest(".form-group").find(".mutcd-select2-img").val();
+            }
+            let $option = $(
+                '<span><img src="' + imageUrl + '" class="select2-img me-1" />' + option.text + '</span>'
+            )
+            return $option;
+        }
+    }
+
+</script>

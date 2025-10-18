@@ -1,0 +1,715 @@
+﻿@import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700&display=swap");
+
+body {
+    font-family: "Poppins", sans-serif !important;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+/**/
+label {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.status-filter .stat-square {
+    display: inline-block;
+    width: 25px;
+    height: 15px;
+    /*border-radius: 50%;*/
+    margin-right: 4px;
+    background-color: #000;
+    vertical-align: middle;
+}
+
+.form-control,
+.custom-select {
+    font-size: 14px;
+    border-radius: 2px;
+}
+
+.input-group .form-control {
+    position: unset !important;
+    z-index: 2;
+    float: left;
+    /*width: 100%;*/
+    margin-bottom: 0;
+}
+
+.input-group-btn {
+    position: sticky !important;
+    font-size: 0;
+    white-space: nowrap;
+}
+
+.btn {
+    border-radius: 2px;
+    box-shadow: none;
+    transition: all 0.3s;
+}
+
+.btn-main {
+    padding: 6px 14px;
+    border: 1px solid transparent;
+    font-size: 14px;
+    color: #fff;
+    transition: all 0.3s;
+}
+
+    .btn-main:hover {
+        background-color: transparent;
+    }
+
+.btn-gray {
+    border-color: #808080;
+    background-color: #808080;
+}
+
+    .btn-gray:hover {
+        color: #808080;
+    }
+
+.btn-site-primary {
+    border-color: #fe870b;
+    background-color: #fe870b;
+}
+
+    .btn-site-primary:hover {
+        color: #fe870b;
+    }
+
+.btn-blue {
+    border-color: #5b9bd5;
+    background-color: #5b9bd5;
+}
+
+    .btn-blue:hover {
+        color: #5b9bd5;
+    }
+
+.mandatory-field {
+    color: #f00;
+}
+
+/** Login Page ************/
+.login-page {
+    width: 100%;
+    min-height: 100vh;
+    background: #20325f;
+    /*background-image: url('../img/banner.jpg');*/
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+    .login-page .container-fluid {
+        min-height: 100vh;
+    }
+
+    .login-page .navbar-brand img {
+        height: 70px;
+        width: auto;
+    }
+    /**/
+    .login-page .login-box .login-form {
+        width: 100%;
+        max-width: 400px;
+        margin: 30px auto;
+        padding: 20px;
+        border-radius: 5px;
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .login-page .login-form h2 {
+        margin: 0 0 20px 0;
+        color: #fff;
+        text-align: center;
+    }
+
+    .login-page .login-form .form-group {
+        margin-bottom: 20px;
+    }
+
+    .login-page .login-form .form-control {
+        height: 40px;
+    }
+
+    .login-page .login-form .input-group .input-group-prepend .input-group-text {
+        background-color: #fff;
+        height: 40px;
+        border-radius: unset;
+    }
+
+    .login-page .login-form .form-check label {
+        font-size: 14px;
+        color: #fff;
+    }
+
+    .login-page .login-form .forgot-pass {
+        border-bottom: 1px solid transparent;
+        font-size: 14px;
+        color: #ccc;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+
+        .login-page .login-form .forgot-pass:hover {
+            border-bottom: 1px solid #ccc;
+        }
+
+    .login-page .login-form .btn {
+        height: 40px;
+        width: 100px;
+        padding: 6px 15px;
+        background-color: #5b9bd5;
+        border: 2px solid #5b9bd5;
+        box-shadow: none;
+        font-size: 16px;
+        font-weight: 600;
+        color: #fff;
+        transition: all 0.3s;
+    }
+
+        .login-page .login-form .btn:hover {
+            background-color: transparent;
+            color: #5b9bd5;
+        }
+    /**/
+    .login-page footer {
+        padding: 20px 0;
+    }
+
+        .login-page footer p {
+            margin: 0;
+            text-align: center;
+            color: #fff;
+            text-shadow: 0px 0px 4px rgba(0, 0, 0, 1);
+        }
+
+/** Landing Page *********************/
+.header {
+    padding: 10px 0;
+}
+
+    .header .navbar-logo {
+        width: 63.6px;
+        margin-right: 10px;
+    }
+
+    .header .nav-items {
+        flex: 1;
+        min-height: 42px;
+        padding: 4px 16px;
+        border-radius: 3px;
+        background-color: #e9ecef;
+    }
+
+    .header .breadcrumb-nav .breadcrumb {
+        margin: 0 20px 0 0;
+        padding: 0;
+    }
+
+    .header .breadcrumb-nav .breadcrumb-item {
+        font-size: 18px;
+        font-weight: 300;
+        color: #5b9bd5;
+    }
+
+        .header .breadcrumb-nav .breadcrumb-item.active {
+            font-weight: 500;
+        }
+
+.breadcrumb-item + .breadcrumb-item::before {
+    font-weight: 400;
+}
+
+.header .breadcrumb-nav .breadcrumb-item a {
+    color: #888;
+    transition: all 0.3s;
+}
+
+    .header .breadcrumb-nav .breadcrumb-item a:hover {
+        color: #333;
+    }
+
+.header .nav-btns {
+    margin: 10px 15px;
+}
+
+/**/
+.footer {
+    padding: 6px 0;
+    background-color: #1e2742;
+}
+
+    .footer .footer-logo {
+        height: 40px;
+        width: auto;
+    }
+
+    .footer .copyright {
+        margin: 0;
+        font-size: 14px;
+        color: #fff;
+    }
+
+/**/
+.main-content {
+    padding: 10px 0 20px;
+    min-height: calc(100vh - 114px);
+}
+
+    .main-content .top-box {
+        padding-bottom: 20px;
+    }
+
+.search-box {
+    width: 100%;
+    max-width: 400px;
+}
+
+    .search-box .form-control {
+        height: 38px;
+    }
+
+    .search-box .btn {
+        border-color: #5b9bd5;
+        background-color: #5b9bd5;
+        color: #fff;
+    }
+
+        .search-box .btn:hover {
+            /*background-color: transparent;*/
+            color: #fff;
+        }
+/**/
+.status-info .stat-title {
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.status-info .list-inline {
+    margin: 0;
+    display: inline-block;
+}
+
+.stat-dot {
+    display: inline-block;
+    margin-right: 4px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+.stat-red {
+    background-color: #f44336;
+}
+
+.stat-orange {
+    background-color: #ff7f27;
+}
+
+.stat-green {
+    background-color: #4caf50;
+}
+
+.stat-blue {
+    background-color: #00a2e8;
+}
+
+.stat-gray {
+    background-color: #c3c3c3;
+}
+
+.status-info .stat-name {
+    font-size: 12px;
+    vertical-align: middle;
+}
+/**/
+.all-projects .project-box > a {
+    display: block;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    color: #333;
+    transition: all 0.3s;
+}
+
+    .all-projects .project-box > a:hover {
+        color: #5b9bd5;
+        box-shadow: 0 3px 4px 2px rgba(0, 0, 0, 0.1);
+    }
+
+.all-projects .project-box .project-name {
+    margin: 10px 0 0 0;
+    font-size: 18px;
+    font-weight: 400;
+    text-align: center;
+}
+
+.all-projects .project-chart {
+    height: 50px;
+    width: 120px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+    .all-projects .project-chart .chart-part {
+        width: 40px;
+        color: transparent;
+    }
+
+    .all-projects .project-chart .chart-open {
+        background-color: #f44336;
+    }
+
+    .all-projects .project-chart .chart-staged {
+        background-color: #ff7f27;
+    }
+
+    .all-projects .project-chart .chart-issued {
+        background-color: #4caf50;
+    }
+
+/** Inventory Page ****************/
+.nav-btns .btn {
+    padding: 4px 14px;
+}
+
+.filter-btns .list-inline {
+    margin: 0;
+}
+
+.filter-btns .btn {
+    padding: 2px 4px;
+    min-width: 50px;
+    background-color: transparent;
+    border-color: transparent;
+    font-size: 13px;
+    color: #666666;
+}
+
+    .filter-btns .btn:hover {
+        border-color: #333;
+        color: #333;
+    }
+
+    .filter-btns .btn i {
+        margin-right: 5px;
+    }
+/**/
+.table th {
+    border-color: #666666;
+    background-color: #666666;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.table td {
+    font-size: 13px;
+    transition: all 0.3s;
+}
+
+.table tr:hover > td {
+    background-color: #ddd;
+}
+
+.table .table-link {
+    margin: 0 3px;
+    padding: 0;
+    box-shadow: none;
+    border: 0;
+    background-color: transparent;
+    font-size: 14px;
+    color: #212529;
+    transition: all 0.3s;
+}
+
+    .table .table-link:hover {
+        color: #5b9bd5;
+    }
+
+.table .edit-inventory {
+    cursor: pointer;
+}
+
+/** Modal ********************/
+/** Inventory Modal **/
+.modal .modal-header {
+    position: relative;
+    padding: 10px 16px;
+    display: block;
+}
+
+.modal-header .modal-title {
+    font-size: 14px;
+}
+
+.modal-header .close {
+    float: none;
+    position: absolute;
+    padding: 0;
+    right: 30px;
+    top: 24px;
+    font-size: 30px;
+    font-weight: 400;
+    z-index: 3;
+}
+/**/
+.row-form .form-group > label {
+    margin: 0;
+    padding-right: 10px;
+    width: 32%;
+    text-align: right;
+}
+
+.row-form .form-group > .form-control,
+.row-form .form-group > .custom-select,
+.row-form .form-group > .custom-file {
+    width: 68%;
+}
+
+.modal .form-group > .custom-file {
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.modal .form-group .custom-file label {
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.modal .uploded-box {
+    margin-bottom: 15px;
+}
+
+    .modal .uploded-box h5 {
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .modal .uploded-box ul li {
+        margin-bottom: 4px;
+        line-height: 1.2;
+        font-size: 12px;
+        font-weight: 400;
+        color: #333;
+    }
+
+    .modal .uploded-box a {
+        font-size: 12px;
+        font-weight: 400;
+        color: #333;
+        transition: all 0.3s;
+    }
+
+        .modal .uploded-box a:hover {
+            color: #5b9bd5;
+        }
+
+.rounded-square {
+    border-radius: 20% !important;
+}
+
+.img-fluid.rounded-square {
+    height: 90px;
+    width: 90px;
+}
+
+/** media query *******************/
+@media screen and (min-width: 576px) {
+    .modal-wide {
+        width: 95%;
+        max-width: 900px;
+    }
+
+    .modal-small {
+        max-width: 400px;
+    }
+}
+
+@media screen and (min-width: 1440px) {
+    .col-xxl-2 {
+        -ms-flex: 0 0 20%;
+        flex: 0 0 20%;
+        max-width: 20%;
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .search-box {
+        margin-bottom: 15px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .container-fluid .set-margin-top {
+        margin-top: 0px;
+    }
+
+    .btn-menu {
+        outline: none;
+        border: 1px solid #fe870b;
+        background-color: #fe870b;
+        color: #fff;
+        border-radius: 2px;
+        font-size: 14px;
+        padding: 3px 15px;
+        font-size: 13px;
+        padding: 6px 15px !important;
+        position: relative !important;
+        top: -1px !important;
+        right: 10px;
+        margin-top: -2px !important;
+    }
+
+    .k-edge .k-widget.k-grid .k-pager-nav + .k-pager-numbers, .k-ff .k-widget.k-grid .k-pager-nav + .k-pager-numbers, .k-ie11 .k-widget.k-grid .k-pager-nav + .k-pager-numbers, .k-safari .k-widget.k-grid .k-pager-nav + .k-pager-numbers, .k-webkit .k-widget.k-grid .k-pager-nav + .k-pager-numbers {
+        margin-top: 0 !important
+    }
+
+    .k-edge .k-pager-wrap .k-pager-numbers .k-current-page .k-link, .k-ff
+    .k-pager-wrap .k-pager-numbers .k-current-page .k-link, .k-ie11 .k-pager-wrap .k-pager-numbers .k-current-page .k-link,
+    .k-safari .k-pager-wrap .k-pager-numbers .k-current-page .k-link, .k-webkit .k-pager-wrap .k-pager-numbers .k-current-page .k-link {
+        width: 3.2em;
+        line-height: 1em;
+        height: 1em;
+        padding: .5em .429em .5em .8em;
+        border-radius: 0;
+        background-image: none;
+        background-position: 50% 50%;
+        background-color: #fff;
+        border: 1px solid #bfbfbf;
+    }
+
+    footer.inner-page-dashboard {
+        background-color: #1e2742;
+        padding: 6px 0;
+        bottom: 0;
+        position: unset !important;
+    }
+
+    .status-hide {
+        display: none !important;
+    }
+
+    .full-width {
+        width: 100% !important;
+    }
+
+    .list-inline > li {
+        display: inline-block;
+        padding-right: 5px;
+        padding-left: 0 !important
+    }
+
+    .header .user-dropdown .dropdown-menu {
+        margin-top: -128px !important;
+        right: 0;
+        left: auto;
+        width: 0 !important
+    }
+
+    .pull-left {
+        float: none !important;
+    }
+
+    .header .breadcrumb-box {
+        width: unset !important;
+        /*margin-left: unset !important;*/
+        margin: 10px 0 0 0 !important;
+    }
+
+    .header .user-dropdown .dropdown-toggle {
+        top: 9px;
+        right: 33px !important;
+    }
+
+    .form-inline {
+        margin: 11px 0 5px 0 !important;
+    }
+
+    .user-dropdown.dropdown {
+        position: unset !important;
+    }
+
+    .header .breadcrumb-item {
+        font-size: 15px;
+    }
+
+    .header .navbar-logo {
+        margin: 0 0 10px 0;
+    }
+
+    .header .breadcrumb-nav,
+    .header .nav-btns,
+    .header .nav-filter {
+        flex: 0 0 100%;
+        width: 100%;
+    }
+
+        /*.header .nav-btns {
+        margin: 0;
+    }*/
+
+        .header .nav-btns .btn {
+            margin: 5px 0;
+        }
+    /**/
+    .row-form .form-group > label {
+        width: auto;
+        margin-bottom: 8px;
+        text-align: left;
+    }
+
+    .row-form .form-group > .form-control,
+    .row-form .form-group > .custom-select,
+    .row-form .form-group > .custom-file {
+        width: 100%;
+    }
+}
+
+/*Generic Bootstrap modal popup*/
+.generic-modal {
+    font-size: 13px;
+}
+
+    .generic-modal .modal-content .modal-body .row.file-section {
+        text-align: left !important;
+    }
+
+    .generic-modal .files .file-link, .download-link .file-link {
+        color: #7b7b7b;
+    }
+
+    .generic-modal .form .upload {
+        width: 100%;
+        display: inline-block;
+        margin-bottom: 5px;
+    }
+
+    .generic-modal .files .btndelete:hover {
+        cursor: pointer;
+    }
+
+    .generic-modal .files .btndelete {
+        color: #808080;
+    }
+
+    .generic-modal .files .file {
+        margin-bottom: 5px;
+    }
+
+.search-box .clear {
+    position: absolute;
+    right: 45px;
+    z-index: 999;
+    font-size: 18px;
+    top: 10px;
+}

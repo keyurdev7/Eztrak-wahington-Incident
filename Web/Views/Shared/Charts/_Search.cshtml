@@ -1,0 +1,30 @@
+﻿@model ViewModels.Charts.Shared.ChartViewModel
+@if (Model.DisableSearch == false)
+{
+    <div class="card chart-search-filter-container" style="display:none;">
+        <div class="card-header p-2 d-flex justify-content-between">
+            <h5 class="card-title">Filters</h5>
+            <div class="header-elements">
+                <button type="button" class="back-to-chart btn-circle" data-toggle="tooltip" title="Back"><i class="fa fa-arrow-left"></i></button>
+            </div>
+        </div>
+
+        <div class="card-body">
+            @using (Html.BeginForm("", "", FormMethod.Post, new { @class = "chart-search-form", data_fouc = true }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-md-12">
+                    <fieldset class="mb-3">
+                        @await Html.PartialAsync(Model.SearchViewPath, Model.Filters)
+                    </fieldset>
+                    <div class="text-right">
+                        <button type="button" class="btn btn-danger clear-chart-form-btn">Clear<i class="icon-cross ms-2"></i></button>
+                        <button type="button" class="btn btn-success search-chart-form-btn">Search <i class="icon-search4 ms-2"></i></button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+

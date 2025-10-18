@@ -1,0 +1,51 @@
+﻿@using Enums
+@using ViewModels;
+@model ShipmentModifyViewModel 
+@{
+    Layout = null;
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="LotNO" class="form-label fw-600"></label>
+                    <input asp-for="LotNO" type="number" class="form-control" />
+                    <span asp-validation-for="LotNO" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="ItemPrice" class="form-label fw-600"></label>
+                    <input asp-for="ItemPrice" type="number" class="form-control" />
+                    <span asp-validation-for="ItemPrice" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label asp-for="Quantity" class="form-label fw-600"></label>
+                    <input asp-for="Quantity" type="number" class="form-control" />
+                    <span asp-validation-for="Quantity" class="validation-invalid-label"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <partial name="~/Views/Shared/Select2/_Location.cshtml" for="Location" />
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <partial name="~/Views/Shared/Select2/_Supplier.cshtml" for="Supplier" />
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <partial name="~/Views/Shared/Select2/_Source.cshtml" for="Source" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" asp-for="Id" value="@Model.Id" />
+<input type="hidden" asp-for="InventoryId" value="@Model.InventoryId"/>

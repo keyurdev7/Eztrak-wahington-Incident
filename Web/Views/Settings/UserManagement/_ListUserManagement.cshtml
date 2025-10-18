@@ -1,0 +1,138 @@
+﻿@using System.Web
+@using ViewModels
+@model List<UserManagementModifyViewModel>
+<style>
+    i.fa-edit{color:darkorange}
+
+    i.fa-trash-alt{
+        color:red;
+    }
+</style>
+
+<div class="row g-3 mb-4 topCard">
+    <div class="col-md-3">
+        <div class="stat-card d-flex align-items-center justify-content-start">
+            <div class="icon total">
+                <i class="fa-regular fa-user"></i>
+            </div>
+            <div>
+                <h4 class="mb-0 fw-bold text-total">@Model.FirstOrDefault()?.totalUserCount</h4>
+                <small class="text-muted">Total Users</small>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card d-flex align-items-center justify-content-start">
+            <div class="icon validated">
+                <i class="fa-regular fa-circle-check"></i>
+            </div>
+            <div>
+                <h4 class="mb-0 fw-bold text-success">@Model.FirstOrDefault()?.activeUserCount</h4>
+                <small class="text-muted">Active Users</small>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card d-flex align-items-center justify-content-start">
+            <div class="icon pending">
+                <i class="fa-regular fa-circle-xmark"></i>
+            </div>
+            <div>
+                <h4 class="mb-0 fw-bold text-danger">@Model.FirstOrDefault()?.inactiveUserCount</h4>
+                <small class="text-muted">Inactive Users</small>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card d-flex align-items-center justify-content-start">
+            <div class="icon priority">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+                <h4 class="mb-0 fw-bold text-warning">@Model.FirstOrDefault()?.adminsCount</h4>
+                <small class="text-muted">Admins</small>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="user-table">
+    <div class="table table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Department</th>
+                    <th>Contact</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Count > 0)
+                {
+                    @foreach (var usermanagement in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
+                                    <div>
+                                        <strong>@usermanagement.FirstName</strong><br>
+                                        <small>@usermanagement.Email</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="role-badge role-admin">
+                                    @{
+                                        string roleName = usermanagement.RoleName;
+                                        string displayRole = roleName;
+
+                                        if (roleName == "SystemAdministrator")
+                                        {
+                                            displayRole = "System Administrator";
+                                        }
+                                        else if (roleName == "SuperAdministrator")
+                                        {
+                                            displayRole = "Super Administrator";
+                                        }
+                                    }
+                                    @displayRole
+                                </span>
+                            </td>
+                            <td>@usermanagement.Department</td>
+                            <td>
+                                <i class="fa-regular fa-envelope"></i>@usermanagement.Email<br>
+                                <i class="fa-solid fa-phone"></i>@usermanagement.PhoneNumber
+                            </td>
+                            <td><span class="status">@usermanagement.Status</span></td>
+                            <td>
+                                <i class="fa-regular fa-calendar"></i>
+                                @(usermanagement.LastLogin == DateTime.MinValue ? " " : usermanagement.LastLogin.ToString("dd-MM-yyyy HH:mm:ss"))
+                            </td>
+                            <td class="actions">
+                                <i class="fa-regular fa-edit editusermanagement" id="@usermanagement.Id"></i>
+                                <i class="far fa-trash-alt  deleteusermanagement" id="@usermanagement.Id"></i>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td>
+                            <span>No User Management found.</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,46 @@
+﻿@using Enums
+@using ViewModels.Timesheet;
+@model TimeSheetBreakdownReportSearchViewModel
+@{
+    Layout = null;
+}
+
+<div class="control_field form-group">
+    <input asp-for="Search.value" type="search" class="form-control" placeholder="Keyword" aria-controls="crud-list-table" autocomplete="new-password">
+</div>
+
+@* <div class="control_field form-group">
+    <input asp-for="From" type="date" class="form-control" />
+</div>
+<div class="control_field form-group">
+    <input asp-for="To" type="date" class="form-control" />
+</div> *@
+<div class="control_field form-group" data-filter-id="date-range-search-container">
+    <input class="form-control dateRange" type="text" asp-for="FormattedDateFilter" />
+</div>
+<div class="control_field form-group" data-filter-id="technician-search-container">
+    <partial name="~/Views/Shared/Select2/_Technician.cshtml" for="Technician" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "technician-search-id"} }' />
+</div>
+<div class="control_field form-group" data-filter-id="work-order-search-container">
+    <partial name="~/Views/Shared/Select2/_WorkOrder.cshtml" for="WorkOrder" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "work-order-search-id"} }' />
+</div>
+<div class="control_field form-group" data-filter-id="craft-search-container">
+    <partial name="~/Views/Shared/Select2/_CraftSkill.cshtml" for="Craft" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "craft-search-id"} }' />
+</div>
+<div class="control_field form-group">
+    <partial name="~/Views/Shared/Select2/_UserSearchSetting.cshtml" for="UserSearchSetting" view-data='@new ViewDataDictionary(ViewData) { {"HideLabel" , true}}' />
+</div>
+<input type="hidden" asp-for="Type" value="@SearchFilterTypeCatalog.TimesheetReport" />
+<input type="hidden" class="search-view-model" value="@typeof(TimeSheetBreakdownReportSearchViewModel)" />
+<input type="hidden" class="search-view-path" value="~/Views/Report/Timesheet/_Search.cshtml" />
+<link href="~/css/timer/timeTo.css" rel="stylesheet" />
+<script src="~/js/timer/jquery.time-to.min.js"></script>
+<script>
+    $(function () {
+        new Litepicker({
+            element: document.getElementById('FormattedDateFilter'),  // or use '#FormattedDateFilter'
+            singleMode: false,
+            format: "MM/DD/YYYY",
+        });
+    });
+</script>

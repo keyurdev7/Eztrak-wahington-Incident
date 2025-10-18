@@ -1,0 +1,79 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Shared\Interfaces\**" />
+    <EmbeddedResource Remove="Shared\Interfaces\**" />
+    <None Remove="Shared\Interfaces\**" />
+    <None Remove="AssignedPermission\" />
+    <None Remove="User\" />
+    <None Remove="BidResponseItem\" />
+    <None Remove="Cart\" />
+    <None Remove="Order\" />
+    <None Remove="Asset\Asset\" />
+    <None Remove="Equipment\" />
+    <None Remove="WorkOrderEquipment\" />
+    <None Remove="WorkOrder\Interface\" />
+    <None Remove="Dashboard\WorkOrder\" />
+    <None Remove="Dashboard\WorkOrderByManager\" />
+    <None Remove="Dashboard\AssetsByCondition\" />
+    <None Remove="Report\Transactions\" />
+    <None Remove="UserSearchSetting\" />
+    <None Remove="DynamicColumn\" />
+    <None Remove="DynamicColumnOption\" />
+    <None Remove="DynamicColumnValue\" />
+    <None Remove="DynamicColumn\Interface\" />
+    <None Remove="WorkOrder\API\" />
+    <None Remove="AssetNotes\API\" />
+    <None Remove="WorkOrderNotes\API\" />
+    <None Remove="AssetTypeLevel2\API\" />
+    <None Remove="AssetTypeLevel1\API\" />
+    <None Remove="Asset\API\" />
+    <None Remove="Approval\" />
+    <None Remove="Report\RawReport\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Enums\Enums.csproj" />
+    <ProjectReference Include="..\Helpers\Helpers.csproj" />
+    <ProjectReference Include="..\Models.Common\Models.Common.csproj" />
+    <ProjectReference Include="..\Models\Models.csproj" />
+    <ProjectReference Include="..\Pagination\Pagination.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Upload\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="AssignedPermission\" />
+    <Folder Include="Cart\" />
+    <Folder Include="Asset\Asset\" />
+    <Folder Include="WorkOrderEquipment\" />
+    <Folder Include="WorkOrder\Interface\" />
+    <Folder Include="Dashboard\WorkOrder\" />
+    <Folder Include="Dashboard\WorkOrderByManager\" />
+    <Folder Include="Dashboard\AssetsByCondition\" />
+    <Folder Include="Report\Transactions\" />
+    <Folder Include="UserSearchSetting\" />
+    <Folder Include="DynamicColumn\" />
+    <Folder Include="DynamicColumnOption\" />
+    <Folder Include="DynamicColumnValue\" />
+    <Folder Include="DynamicColumn\Interface\" />
+    <Folder Include="WorkOrder\API\" />
+    <Folder Include="AssetNotes\API\" />
+    <Folder Include="WorkOrderNotes\API\" />
+    <Folder Include="AssetTypeLevel2\API\" />
+    <Folder Include="AssetTypeLevel1\API\" />
+    <Folder Include="Asset\API\" />
+    <Folder Include="Approval\" />
+  </ItemGroup>
+</Project>

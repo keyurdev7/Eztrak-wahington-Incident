@@ -1,0 +1,28 @@
+﻿@using Enums
+@using ViewModels;
+@model TransactionSearchViewModel
+@{
+    Layout = null;
+}
+
+<div class="control_field form-group">
+    <input asp-for="Search.value" type="search" class="form-control" placeholder="Keyword" aria-controls="crud-list-table" autocomplete="new-password">
+</div>
+
+<div class="control_field form-group" data-filter-id="supplier-search-container">
+    <partial name="~/Views/Shared/Select2/_Supplier.cshtml" for="Supplier" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "supplier-search-id"} }' />
+</div>
+<div class="control_field form-group" data-filter-id="location-search-container">
+    <partial name="~/Views/Shared/Select2/_Location.cshtml" for="Location" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "location-search-id"} }' />
+</div>
+
+<div class="control_field form-group" data-filter-id="uom-search-container">
+    <partial name="~/Views/Shared/Select2/_UOM.cshtml" for="UOM" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "condition-search-id"} }' />
+</div>
+<div class="control_field form-group">
+    <partial name="~/Views/Shared/Select2/_UserSearchSetting.cshtml" for="UserSearchSetting" view-data='@new ViewDataDictionary(ViewData) { {"HideLabel" , true}, {"ReportType", SearchFilterTypeCatalog.TransactionReport}}' />
+</div>
+<input type="hidden" asp-for="Type" value="@SearchFilterTypeCatalog.TransactionReport" />
+<input type="hidden" class="search-view-model" value="@typeof(TransactionSearchViewModel)" />
+<input type="hidden" class="search-view-path" value="~/Views/Report/Transaction/_Search.cshtml" />
+

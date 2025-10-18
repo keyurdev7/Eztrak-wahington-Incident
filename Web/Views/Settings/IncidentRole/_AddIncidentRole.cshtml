@@ -1,0 +1,16 @@
+﻿@using ViewModels
+@model IncidentRoleModifyViewModel
+
+<form id="NewIncidentRoleForm">
+    <div class="list-item addItem" id="saveIncidentRoleDiv">
+        <input type="hidden" value="@Model.Id" name="Id" id="IncidentRole_@Model.Id" />
+        <div class="input-container type">
+            <input type="text" placeholder="Enter name" asp-for="Name" />
+            <textarea placeholder="Enter description" asp-for="Description"></textarea>
+            <div class="actions">
+                <button class="btn check saveIncidentRole"><i class="fa-solid fa-check"></i></button>
+                <button class="btn cancel cancelIncidentRole"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,40 @@
+﻿@using Enums
+@using ViewModels;
+@model WorkOrderSearchViewModel
+@{
+    Layout = null;
+}
+
+<div class="control_field">
+    
+        <input asp-for="Search.value" type="search" class="form-control" placeholder="Keyword" aria-controls="crud-list-table" autocomplete="new-password">
+   
+</div>
+
+<div class="control_field">
+    
+        <select id="task" asp-for="Task" class="form-select" asp-items="@Html.GetEnumSelectList<TaskCatalog>()">
+            <option value="">Select a Task</option>
+        </select>
+   
+</div>
+
+<div class="control_field">
+    
+        <partial name="~/Views/Shared/Select2/_AssetType.cshtml" for="AssetType" view-data='@new ViewDataDictionary(ViewData) { {"HideLabel" , true}}' />
+   
+</div>
+<div class="control_field">
+    
+        <partial name="~/Views/Shared/Select2/_UserSearchSetting.cshtml" for="UserSearchSetting" view-data='@new ViewDataDictionary(ViewData) { {"HideLabel" , true}, {"ReportType", SearchFilterTypeCatalog.WorkOrderReport}}' />
+   
+</div>
+
+<input type="hidden" asp-for="Type" value="@SearchFilterTypeCatalog.WorkOrderReport" />
+<input type="hidden" class="search-view-model" value="@typeof(WorkOrderSearchViewModel)" />
+<input type="hidden" class="search-view-path" value="~/Views/Report/WorkOrder/_Search.cshtml" />
+
+
+
+
+

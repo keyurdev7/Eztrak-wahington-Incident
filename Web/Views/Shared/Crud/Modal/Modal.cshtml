@@ -1,0 +1,27 @@
+﻿@using ViewModels.CRUD
+@model ModalPanelViewModel
+<div class="card-body">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="modal-title fs-5">@Model.Title</h1>
+            <form id="@Model.Title.ToLower()-form" asp-controller="@Model.ControllerName" asp-action="Update">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <fieldset class="mb-3">
+                    @await Html.PartialAsync(Model.UpdateViewPath, Model.UpdateModel)
+                </fieldset>
+                <div class="form-group">
+                    <div class="text-right">
+                        <a data-bs-dismiss="modal" href="#" type="button" class="btn btn-dark">
+                            Cancel
+                            <i class="icon-cross3"></i>
+                        </a>
+                        <button onclick="SubmitModalForm('@Model.Title.ToLower()', '@Model.Select2Id.ToLower()')" class="btn btn-primary" id="@Model.Title.ToLower()-submit">Submit <i class="icon-paperplane ms-2"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/js/masking/initiate-masking.js"></script>
+

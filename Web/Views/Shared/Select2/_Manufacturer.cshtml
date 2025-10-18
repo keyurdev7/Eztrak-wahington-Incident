@@ -1,0 +1,51 @@
+﻿@model ViewModels.BaseSelect2VM
+
+@{
+    var prefix = ViewData.TemplateInfo.HtmlFieldPrefix ?? "Manufacturer";
+    var elementId = ViewData["Id"] != null && !string.IsNullOrEmpty(ViewData["Id"].ToString()) ? ViewData["Id"].ToString() : "manufacturer-id";
+    var label = ViewData["Label"] != null && !string.IsNullOrEmpty(ViewData["Label"].ToString()) ? ViewData["Label"].ToString() : "Manufacturer";
+    var hideLabel = ViewData["HideLabel"] != null && !string.IsNullOrEmpty(ViewData["HideLabel"].ToString()) ? ViewData["HideLabel"].ToString() : "false";
+}
+
+<div class="form-group">
+    @if (hideLabel != null && hideLabel == "false")
+    {
+        <label class="form-label fw-600">@label</label>
+    }
+
+    @Html.DropDownListFor(model => model.Id, new List<SelectListItem>() {
+    new SelectListItem()
+    {
+    Value = (Model!=null&&Model.Id > 0)?Model.Id.ToString():"",
+    Text = (Model!=null&&Model.Id > 0)?Model.Select2Text:"",
+    Selected = (Model!=null&&Model.Id > 0)?true:false,
+    }},
+    new
+    {
+    @id = elementId,
+    @class = "form-control disable-field",
+    data_val_required = Model?.ErrorMessage,
+    data_val = Model?.IsValidationEnabled.ToString().ToLower()
+    })
+    <input type="hidden" data-identifier="@prefix" data-input-name="Name" name="Manufacturer.Name" value="@Model.Select2Text" />
+    <span asp-validation-for="Id" class="validation-invalid-label manufacturer-error-span"></span>
+</div>
+
+<script src="~/js/custom/select2/select2-methods.js"></script>
+<script>
+    $(function () {
+        var id = "#" + "@elementId";
+        var pageSize = 10;
+        var url = '/Manufacturer/Select2';
+
+        var dataArray = function (params) {
+            params.page = params.page || 1;
+            return {
+                prefix: params.term,
+                pageSize: pageSize,
+                pageNumber: params.page,
+            };
+        };
+        Select2AutoCompleteAjax(id, url, dataArray, pageSize, "Select Manufacturer");
+    });
+</script>

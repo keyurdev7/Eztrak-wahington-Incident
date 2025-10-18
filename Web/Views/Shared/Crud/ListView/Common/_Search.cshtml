@@ -1,0 +1,167 @@
+﻿@using ViewModels.CRUD
+@model CrudListViewModel
+@if (Model.DisableSearch == false)
+{
+    <style>
+        .filter_wrap form > div:first-child {
+            @* border-radius: 10px 0 0 10px; *@
+        }
+
+        .filter_wrap form > div {
+            border: 1px solid #8898AA;
+            background: #f5f5f7;
+        }
+
+        .filter_wrap form .actions_field {
+            background: transparent !important;
+        }
+
+        .filter_wrap form .form-group.mb-3 {
+            margin-bottom: 0 !important;
+        }
+    </style>
+    <div class="container-fluid">
+    <div class="filter_wrap setting-page-search">
+        @if (!string.IsNullOrEmpty(Model.SearchBarHtml))
+        {
+            @Html.Raw(Model.SearchBarHtml)
+        }
+        @using (Html.BeginForm("", "", FormMethod.Post, new { id = "filter-form", @class = "filter search-form", data_fouc = true }))
+        {
+            @Html.AntiForgeryToken()
+            @await Html.PartialAsync(Model.SearchViewPath, Model.Filters)
+            <div class="actions_field">
+                <button class="clear btn clear-form-btn border text-primary">
+                    @* <svg width="13" height="14" viewBox="0 0 13 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0.947496 13.386L0.239746 12.6783L5.83975 7.07826L0.239746 1.47826L0.947496 0.770508L6.5475 6.37051L12.1475 0.770508L12.8552 1.47826L7.25525 7.07826L12.8552 12.6783L12.1475 13.386L6.5475 7.78601L0.947496 13.386Z"
+                              fill="white"></path>
+                    </svg> *@
+                    Clear
+                </button>
+                <button type="button" class="btn btn-primary search-form-btn">
+                    Search
+                    @* <i class="icon-search4"></i> *@
+                </button>
+                @if (Model.ShowSearchSaveButton)
+                {
+                    <button type="button" class="btn btn-outline-success save-user-search">
+                        Save
+                    </button>
+                }
+            </div>
+
+        }
+    </div>
+    </div>
+}
+else if (Model.EnableHiddenValueSearch)
+{
+    @using (Html.BeginForm("", "", FormMethod.Post, new { id = "filter-form", @class = "search-form", data_fouc = true }))
+    {
+        @await Html.PartialAsync(Model.SearchViewPath, Model.Filters)
+    }
+}
+
+<script>
+
+    $(function () {
+        $("body").off("click", ".save-user-search")
+        $("body").on("click", ".save-user-search", function () {
+            loadCreateModalPanel("/UserSearchSetting/Create");
+        });
+        $("body").off("change", "#user-search-setting-id")
+        $("body").on("change", "#user-search-setting-id", function () {
+            var _element = $(this);
+            var id = _element.select2('data')[0]?.id;
+            if (id != undefined || id != null || id != "") {
+
+                var controller = dataTableManager.controllerName;
+                var url = `/UserSearchSetting/LoadSearchProfile/${id}`;
+
+                $.ajax({
+                    type: "Get",
+                    url: url,
+                    success: function (result) {
+                        if (result != null && result != undefined) {
+                            var parentDiv = _element.closest('.col-12.col-sm-3.col-lg-2').siblings(".search-actions-container");
+                            parentDiv.prevAll().remove();
+                            $(".search-parent-div").prepend(result);
+                            $(".search-form-btn").click();
+                        }
+
+                    }
+                });
+            }
+        });
+    });
+    function SubmitUserSearchSetting(element) {
+        // Define the data to be sent
+        var formData = $("#filter-form").serialize();
+        // Convert the serialized data to a JSON object
+        var jsonObject = {};
+        formData.split('&').forEach(function (item) {
+            var keyValuePair = item.split('=');
+            var key = decodeURIComponent(keyValuePair[0]);
+            var value = decodeURIComponent(keyValuePair[1]);
+
+            if (key != "__RequestVerificationToken") {
+                var keys = key.split('.');
+                if (keys.length > 1) {
+                    if (!jsonObject[keys[0]]) {
+                        jsonObject[keys[0]] = {};
+                    }
+                    jsonObject[keys[0]][keys[1]] = value;
+                } else {
+                    jsonObject[key] = value;
+                }
+            }
+        });
+        var jsonString = JSON.stringify(jsonObject); // Example JSON string
+
+        var form = element.closest("form")
+        var updateUrl = form.action;
+        var className = $("#filter-form").find(".search-view-model").val();
+        var viewPath = $("#filter-form").find(".search-view-path").val();
+        var type = $("#Type").val();
+        var formData = $(form).serializeFiles();
+        formData.delete('FilterJson');
+        formData.append("FilterJson", jsonString);
+        formData.append("ClassName", className);
+        formData.append("ViewPath", viewPath);
+        formData.append("Type", type);
+        $(form).removeData("validator").removeData("unobtrusiveValidation");
+        consoleFormData(formData);
+        $.validator.unobtrusive.parse($(form));
+        if ($(form).valid()) {
+            clearValidationSummary(form);
+            $.ajax({
+                type: "POST",
+                url: updateUrl,
+                data: formData,
+                processData: false, // Prevent jQuery from automatically processing the data
+                contentType: false, // Prevent jQuery from setting the content type
+                beforeSend: function () {
+                    disableControls(form);
+                },
+                success: function (result) {
+                    enableControls(form);
+                    if (!result.Success) {
+                        createValidationSummary(form, result.Errors);
+                    }
+                    else {
+                        onUpdateRecordSuccess(result.id, "crudModalPanel");
+                    }
+
+                },
+                complete: function () {
+                    enableControls(form);
+                },
+            });
+        }
+        addCurrencyMasking();
+    }
+    function consoleFormData(formData) {
+        for (var pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
+    }</script>

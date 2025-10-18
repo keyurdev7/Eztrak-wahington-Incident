@@ -1,0 +1,39 @@
+﻿@model ViewModels.WorkOrderMaterialModifyViewModel;
+@using Enums;
+@using System.Globalization;
+@{
+    var isDetailPage = ViewData["IsDetailPage"] != null ? bool.Parse(ViewData["IsDetailPage"].ToString()) : false;
+
+    var collectionType = "WorkOrderMaterials";
+    var rowNumber = ViewData["RowNumber"] != null ? int.Parse(ViewData["RowNumber"].ToString()) : 0;
+
+    var rowName = "section-row[" + rowNumber + "]";
+    var rowId = "material-section-row-" + rowNumber;
+
+    var inventoryId = collectionType + "[" + rowNumber + "].Inventory.Id";
+    var inventoryName = collectionType + "[" + rowNumber + "].Inventory.Name";
+    var quantity = collectionType + "[" + rowNumber + "].Quantity";
+    var hiddenId = collectionType + "[" + rowNumber + "].Id";
+
+}
+
+<tr class="material-section-row" id="@rowId">
+
+    <td>
+        <span style=" text-align: initial !important;">@Model.Inventory.Name</span>
+        <input type="hidden" name="@inventoryId" value="@Model.Inventory.Id" />
+        <input type="hidden" name="@inventoryName" value="@Model.Inventory.Name" />
+    </td>
+    <td>
+        <span style="text-align: initial !important;">@Model.Quantity</span>
+        <input type="hidden" name="@quantity" value="@Model.Quantity" />
+    </td>
+    @if (!isDetailPage)
+    {
+        <td>
+            <a href="javascript:void(0)" class="remove-material mx-1 datatable-action btn bg-custom-dark" data-toggle="tooltip" title="Delete Material"><i class="icon-trash"></i></a>
+        </td>
+    }
+
+</tr>
+

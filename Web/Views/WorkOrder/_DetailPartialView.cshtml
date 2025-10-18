@@ -1,0 +1,204 @@
+﻿@using ViewModels
+@model WorkOrderDetailViewModel
+@{
+    Layout = null;
+    var totalEstimatedLaborHours = Model.CostPerformance.TaskLabors.Sum(x => x.Hours);
+    var totalActualLaborHours = Model.CostPerformance.LaborsCostPerformance.Sum(x => x.ActualHours);
+    var totalLaborCost = Model.CostPerformance.TaskLabors.Sum(x => x.Total);
+    var totalLaborActualCost = Model.CostPerformance.LaborsCostPerformance.Sum(x => x.ActualCost);
+    var totalMaterialCost = Model.CostPerformance.MaterialsCostPerformance.Sum(x => x.Cost);
+    var totalMaterialActualCost = Model.CostPerformance.MaterialsCostPerformance.Sum(x => x.ActualCost);
+    var totalEquipmentCost = Model.CostPerformance.EquipmentsCostPerformance.Sum(x => x.Cost);
+    var totalEquipmentActualCost = Model.CostPerformance.EquipmentsCostPerformance.Sum(x => x.ActualCost);
+    var totalEstimatedCost = totalLaborCost + totalMaterialCost + totalEquipmentCost;
+    var totalActualCost = totalLaborActualCost + totalMaterialActualCost + totalEquipmentActualCost;
+}
+<div class="col-12">
+    <div class="row">
+        <div class="col-6">
+            <div class="mb-3 form-group">
+                <label asp-for="SystemGeneratedId" class="form-label fw-600">ID #</label>
+                <div>@(string.IsNullOrEmpty(Model.SystemGeneratedId) ? "-" : Model.SystemGeneratedId)</div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="mb-3 form-group">
+                <label asp-for="Manager" class="form-label fw-600">Requester Name</label>
+                <div>@(string.IsNullOrEmpty(Model.Manager.Name) ? "-" : Model.Manager.Name)</div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="mb-3 form-group">
+                <label asp-for="Manager" class="form-label fw-600">Requester Telephone</label>
+                <div>@(string.IsNullOrEmpty(Model.Manager.Telephone) ? "-" : Model.Manager.Telephone)</div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="mb-3 form-group">
+                <label asp-for="Manager" class="form-label fw-600">Requester Email</label>
+                <div>@(string.IsNullOrEmpty(Model.Manager.Email) ? "-" : Model.Manager.Email)</div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="mb-3 form-group">
+                <label asp-for="Intersection" class="form-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.Intersection) ? "-" : Model.Intersection)</div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="mb-3 form-group">
+                <label asp-for="Description" class="form-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.Description) ? "-" : Model.Description)</div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="mb-3 form-group">
+                <label asp-for="AssetTypeName" class="form-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.AssetTypeName) ? "-" : Model.AssetTypeName)</div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="mb-3 form-group">
+                <label asp-for="Asset.SystemGeneratedId" class="form-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.Asset.FormattedSystemGeneratedId) ? "-" : Model.Asset.FormattedSystemGeneratedId)</div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="mb-3 form-group">
+                <label asp-for="Urgency" class="form-label fw-600"></label>
+                <div>@Model.Urgency</div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="mb-3 form-group">
+                <label asp-for="DueDate" class="form-label fw-600"></label>
+                <div>@Model.FormattedDueDate</div>
+            </div>
+        </div>
+
+        @foreach (var field in Model.DynamicColumns)
+        {
+            <div class="col-lg-6">
+                <div class="mb-3 form-group">
+                    <label class="form-label fw-600">@field.DynamicColumn.Title</label>
+                    <div>@(string.IsNullOrEmpty(field.Value) ? "-" : field.Value)</div>
+                </div>
+            </div>
+        }
+
+        <div class="col-lg-12">
+            <div class="mb-3 form-group">
+                <label class="form-label fw-600">Image</label>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <a href="@Model.DefaultImageUrl" target="_blank" class="rounded detail-images"><img class="photo" src="@Model.DefaultImageUrl" alt="" /></a>
+        </div>
+
+        @await Html.PartialAsync("~/Views/Shared/Crud/DropZoneView/_View.cshtml", Model.ImagesList)
+    </div>
+    <div class="row">
+        <label class="form-label fw-600 mt-4">Technicians</label>
+        <div class="table-responsive my-3" id="technician-table">
+            <table class="table table-bordered dataTable">
+                <thead>@* class="thead-primary" *@
+                    <tr>
+                        <th>Technician</th>
+                        <th>Craft</th>
+                    </tr>
+                </thead>
+                <tbody class="technician-tbody">
+                    @if (Model.WorkOrderTechnicians.Count > 0)
+                    {
+                        for (var i = 0; i < Model.WorkOrderTechnicians.Count(); i++)
+                        {
+                            @await Html.PartialAsync("~/Views/WorkOrder/_TechnicianSectionRow.cshtml", Model.WorkOrderTechnicians[i], new ViewDataDictionary(ViewData) { { "RowNumber", i }, { "IsDetailPage", true } })
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="2">No Records Added.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row comments-container">
+        <label class="form-label fw-600 mt-4">Comments</label>
+        @await Html.PartialAsync("_Comments", Model.Comments)
+    </div>
+    <div class="row">
+        @* <h4>Cost Performance</h4> *@
+        <table class="table dataTable" id="cost-table">
+            <thead></thead>
+            <tbody>
+                <tr>
+                    <td colspan="2">
+                        @await Html.PartialAsync("~/Views/WorkOrder/CostPerformance/_TaskLabor.cshtml", Model.CostPerformance)
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        @await Html.PartialAsync("~/Views/WorkOrder/CostPerformance/_TaskMaterial.cshtml", Model.CostPerformance)
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        @await Html.PartialAsync("~/Views/WorkOrder/CostPerformance/_TaskEquipment.cshtml", Model.CostPerformance)
+
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2" style="">
+                        <h6 class="summary-header">Summary</h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-end"><label class="form-label fw-600">Estimated Hours</label></td>
+                    <td class="text-end"><label class="form-label fw-600">@totalEstimatedLaborHours</label></td>
+                </tr>
+                <tr>
+                    <td class="text-end"><label class="form-label fw-600">Actual Hours</label></td>
+                    <td class="text-end"><label class="form-label fw-600">@totalActualLaborHours</label></td>
+                </tr>
+                <tr>
+                    <td class="text-end"><label class="form-label fw-600">Estimated Cost</label></td>
+                    <td class="text-end"><label class="form-label fw-600">@totalEstimatedCost.ToString("C")</label></td>
+                </tr>
+                <tr>
+                    <td class="text-end"><label class="form-label fw-600">Actual Cost</label></td>
+                    <td class="text-end"><label class="form-label fw-600">@totalActualCost.ToString("C")</label></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $(document).off("click", '.detail-imgbadge')
+        $(document).on("click", '.detail-imgbadge', function () {
+            var id = @Model.Id;
+            var attachmentCount = parseInt($(this).html().split("+")[1]);
+            if (attachmentCount > 0) {
+                $("#attachment-detail-modal").modal("show");
+                ViewAttachmentGrid(id, "/WorkOrder/_GetAttachmentView");
+            }
+            else {
+                GetAttachmentUrl(id, "/WorkOrder/_GetAttachmentUrl");
+            }
+        });
+    })
+</script>

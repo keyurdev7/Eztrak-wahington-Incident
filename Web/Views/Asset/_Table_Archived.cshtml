@@ -1,0 +1,198 @@
+﻿@using System.Web
+@using ViewModels
+@using ViewModels.DataTable
+@model ViewModels.CRUD.CrudListViewModel
+@{
+    var assetTypes = ViewBag.AssetTypes as List<AssetTypeDetailViewModel>;
+    var assetTypesJson = Json.Serialize(assetTypes);
+    var assetTree = ViewBag.AssetTree as List<AssetTypeTreeViewModel>;
+    var assetTreeJson = Json.Serialize(assetTree);
+    var assetDataTableColumns = Json.Serialize(ViewBag.AssetsDatatableColumns as Dictionary<long, List<DataTableViewModel>>);
+}
+<style>
+/*     .btn-primary {
+    border-color: #ee7d00 !important;
+    background-color: #ee7d00 !important;
+} */
+</style>
+<div class="card datatable p-0">
+    <div class="card-body p-0">
+        @await Html.PartialAsync("~/Views/Shared/Crud/ListView/Common/_Search.cshtml", Model)
+        <div class="list-container">
+            @await Html.PartialAsync("~/Views/Shared/Crud/ListView/Common/_Header.cshtml", Model)
+            <ul class="nav nav-tabs" id="assetTypeTab" role="tablist">
+    @foreach (var assetType in assetTypes)
+    {
+        <style>
+            #tab-@(assetType.Id) {
+                border-left: 8px solid @assetType.Color;
+                border-radius: 5px 5px 0 0;
+            }
+            #tab-@(assetType.Id) a {
+                color: @assetType.Color;
+            }
+            #crud-list-table-@(assetType.Id)_wrapper .table-sm.crud-list-table th,table.dataTable thead th{
+                background-color:@assetType.Color !important;
+            }
+        </style>
+        <li class="nav-item" id="tab-@(assetType.Id)" style="margin-left:3px;">
+            <a class="nav-link @(assetType == assetTypes.First() ? "active" : "")" id="assetTypeTab-@(assetType.Id)-tab" data-bs-toggle="tab" href="#assetTypeTab-@(assetType.Id)" role="tab" aria-controls="assetTypeTab-@(assetType.Id)" aria-selected="@(assetType == assetTypes.First())">@assetType.Name</a>
+        </li>
+    }
+</ul>
+            <div class="tab-content" id="assetTypeTabContent">
+    @foreach (var assetType in assetTypes)
+    {
+        <div class="tab-pane fade @(assetType == assetTypes.First() ? "show active" : "")" id="assetTypeTab-@(assetType.Id)" role="tabpanel" aria-labelledby="assetTypeTab-@(assetType.Id)-tab">
+            <div class="mt-2" id="asset-type-container-@(assetType.Id)">
+                <form id="asset-type-form-@assetType.Id">
+                    <input name="AssetType.Id" value="@assetType.Id" type="hidden" />
+                    <input name="Search.value" class="asset-type-keyword-search" value="" type="hidden" />
+                    <input name="Condition.Id" class="asset-type-condition-search" value="" type="hidden" />
+                    <input name="MUTCD.Id" class="asset-type-mutcd-search" value="" type="hidden" />
+                    <input name="Manufacturer.Id" class="asset-type-manufacturer-search" value="" type="hidden" />
+                    @{
+                        var assetTypeLevel1List = assetTree.Where(x => x.Id == assetType.Id).SelectMany(x => x.AssetTypeLevel1);
+                        if (assetTypeLevel1List.Count() > 0)
+                        {
+                                <div class="row col-12">
+                                    @foreach(var assetTypeLevel1 in assetTypeLevel1List.Select((value, index) => new { Value = value, Index = index }))
+                                {
+                                        <div class="col-md-3 col-sm-12">
+                                            <div class="mb-3 form-group">
+                                                <label class="form-label fw-600">@assetTypeLevel1.Value.Name</label>
+                                                <select name="AssetTypeLevel2[@assetTypeLevel1.Index]" class="form-select">
+                                                    <option value="-1">Select @assetTypeLevel1.Value.Name</option>
+                                                    @foreach(var assetTypeLevel2 in assetTypeLevel1.Value.AssetTypeLevel2)
+                                                {
+                                                        <option value="@assetTypeLevel2.Id">@assetTypeLevel2.Name</option>
+                                                }
+                                                </select>
+                                            </div>
+                                        </div>
+                                }
+                                    <div class="col-md-3 col-sm-12 d-flex align-items-end">
+                                        <div class="mb-3 form-group">
+                                            <button type="button" onclick="filterAssetDatatable(@assetType.Id)" class="btn btn-secondary search-asset-form-btn">Search</button>
+                                            <button type="button" onclick="clearAssetDatatable(@assetType.Id)" class="btn btn-outline-danger clear-asset-form-btn">Clear</button>
+                                        </div>
+                                    </div>
+                                </div>
+                        }
+                    }
+                </form>
+                <div class="table-opp table-responsive">
+                    <div class="dataTables_wrapper dt-bootstrap5 no-footer" style="min-height:300px;">
+                        <div class="datatable-scroll">
+                            <table class="table table-bordered dataTable table-sm crud-list-table datatable-basic dataTable w-100" style="box-sizing: border-box;" id="crud-list-table-@(assetType.Id)" role="grid" aria-describedby="DataTables_Table_0_info">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let dataTables = [];
+    let defaultColumns = @Html.Raw(Model.DatatableColumnsJson);
+    let assetTypes = @Html.Raw(assetTypesJson);
+    let assetTreeJson = @Html.Raw(assetTreeJson);
+    let assetDataTableColumns = @Html.Raw(assetDataTableColumns);
+    class AssetsDataTableManager extends DataTableManager {
+        // Override the searchDataTable function with a custom implementation
+        searchDataTable() {
+            SearchAssetDatatable();
+        }
+    }
+    $(function () {
+        ReInitializeDataTables();
+        $('#assetTypeTab').on('shown.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
+            ReInitializeDataTables();
+            // var selectedTab = $(e.target).attr('href');  // Get the ID of the selected tab content
+            // let assetTypeId=selectedTab.split("#assetTypeTab-")[1]
+            // const datatableInstance = dataTables.filter(entry => entry.id == assetTypeId);
+            // datatableInstance[0].manager.dataTable.columns.adjust()
+        });
+
+    });
+    function ReInitializeDataTables() {
+
+        dataTables = [];
+        // let selectedAssetTypeId = $('#asset-type-search-id').val();
+        let selectedAssetTypeId=$('.nav-link.active').attr('href').split("#assetTypeTab-")[1];
+        assetTypes.forEach(function (assetType) {
+            if (!selectedAssetTypeId || assetType.Id == selectedAssetTypeId) {
+                let formId = 'asset-type-form-' + assetType.Id;
+                let dataTableId = "crud-list-table-" + assetType.Id;
+                let dataTableColumns = assetDataTableColumns[assetType.Id]
+                if ($.fn.DataTable.fnIsDataTable($("#" + dataTableId))) {
+                    $("#" + dataTableId).dataTable().fnDestroy();
+                    $("#crud-list-table").addClass("dataTable");
+                }
+                var assetsDataTableManager = new AssetsDataTableManager();
+                assetsDataTableManager.initialize(
+                    dataTableId,
+                    formId,
+                    dataTableColumns,
+                    '@Model.ShowDatatableButtons',
+                    '@Model.DataUrl',
+                    '@Model.IsPasscodeRequiredForDelete'
+                );
+                dataTables.push({ manager: assetsDataTableManager, id: assetType.Id });
+            }
+        });
+    }
+    function SearchAssetDatatable() {
+        $(".asset-type-condition-search").each(function () {
+            $(this).val($("#condition-search-id").val());
+        });
+        $(".asset-type-manufacturer-search").each(function () {
+            $(this).val($("#manufacturer-search-id").val());
+        });
+        $(".asset-type-mutcd-search").each(function () {
+            $(this).val($("#mutcd-search-id").val());
+        });
+        $(".asset-type-keyword-search").each(function () {
+            $(this).val($("#Search_value").val());
+        });
+        showHideAssetTypeContainers($('#asset-type-search-id').val());
+    }
+
+    function showHideAssetTypeContainers(selectedAssetTypeId) {
+        // let containerId = "#asset-type-container-";
+        let container = "#tab-";
+        // Show all containers if no asset type is selected
+        if (!selectedAssetTypeId) {
+            assetTypes.forEach(function (assetType) {
+                let containerId = container+ assetType.Id;
+                $(containerId).show();
+            });
+            ReInitializeDataTables();
+        } else {
+            // Show only the selected asset type container and hide others
+            assetTypes.forEach(function (assetType) {
+                let containerId = container+ assetType.Id;
+                if (assetType.Id == selectedAssetTypeId) {
+                    $(containerId).show();
+                } else {
+                    $(containerId).hide();
+                }
+            });
+            let containerId = '#assetTypeTab-'+ selectedAssetTypeId+'-tab' ;
+            $(containerId).tab("show");
+        }
+    }
+    function filterAssetDatatable(assetTypeId){
+        const datatableInstance = dataTables.filter(entry => entry.id === assetTypeId);
+        datatableInstance[0].manager.searchDataTable();
+    }
+    function clearAssetDatatable(assetTypeId){
+        const datatableInstance = dataTables.filter(entry => entry.id === assetTypeId);
+        datatableInstance[0].manager.clearDatatableSearch();
+    }
+</script>

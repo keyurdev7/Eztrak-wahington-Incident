@@ -1,0 +1,14 @@
+﻿@model ViewModels.BaseSelect2VM
+
+@{
+    var elementId = ViewData["Id"] != null && !string.IsNullOrEmpty(ViewData["Id"].ToString()) ? ViewData["Id"].ToString() : "supplier-id";
+}
+<partial name="~/Views/Shared/Select2/Supplier/_SupplierHtml.cshtml" model="@Model" />
+<partial name="~/Views/Shared/Select2/Supplier/_SupplierJs.cshtml" model="@Model" />
+<script src="~/js/custom/select2/select2-methods.js"></script>
+<script>
+    $(function () {
+        var id = "#" + "@elementId";
+        SetSupplierSelect2(id);
+    });
+</script>

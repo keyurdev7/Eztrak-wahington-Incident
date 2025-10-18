@@ -1,0 +1,75 @@
+﻿@using ViewModels
+@using ViewModels.CRUD
+@model ViewModels.CRUD.CrudListViewModel
+@{
+    Layout = null;      
+}
+<script>
+    function afterTabLoad(){}
+</script>
+
+@* @await Html.PartialAsync("~/Views/Shared/Crud/Tabs/_Tabs.cshtml", tab) *@
+@await Html.PartialAsync("~/Views/Shared/Crud/ListView/DataTable/_Index.cshtml", Model)
+<div style="display:none;" id="hidden-asset-create-form-div">
+    @{
+        await Html.RenderPartialAsync("~/Views/Asset/CreateFormForCellEdit.cshtml", new AssetModifyViewModel());
+    }
+</div>
+
+<div id="attachment-detail-modal" class="modal fade show" tabindex="-1" style="padding-right: 17px;">
+    <div class="modal-lg modal-dialog modal-dialog-centered" style="max-width: 1150px;">
+        <div class="modal-content" style="border: 1px solid #707070; background-color: #E9EDEF;">
+            <div class="modal-header">
+                <h5 class="modal-title">Images</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12 row" id="attachment-detail-modal-body">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="asset-edit-modal" class="modal fade show" tabindex="-1" style="padding-right: 17px;">
+    <div class="modal-lg modal-dialog modal-dialog-centered" style="max-width: 1150px;">
+        <div class="modal-content" style="border: 1px solid #707070; background-color: #E9EDEF;">
+            <div class="modal-header">
+                <h5 class="modal-title">Images</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12 row" id="asset-edit-modal-modal-body">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="~/js/views/attachments-gallery/attachments-gallery.js"></script>
+<script src="~/js/custom/datatable/editable-datatable-column.js"></script>
+<script>
+    $(function () {
+        $(document).off("click", '.imgbadge')
+        $(document).on("click", '.imgbadge', function () {
+            var id = parseInt($(this).closest("tr").attr("id"));
+            var attachmentCount = parseInt($(this).html().split("+")[1]);
+            if (attachmentCount > 0) {
+                $("#attachment-detail-modal").modal("show");
+                ViewAttachmentGrid(id, "/Asset/_GetAttachmentView");
+            }
+            else {
+                GetAttachmentUrl(id, "/Asset/_GetAttachmentUrl");
+            }
+        });
+    });
+
+    function updateColumnSetting() {
+        dataTables[0].manager.dataTable.columns.adjust();
+    }
+    class AssetsDataTableManager extends DataTableManager {
+    }
+</script>
+

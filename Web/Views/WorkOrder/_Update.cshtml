@@ -1,0 +1,126 @@
+﻿@using ViewModels;
+@using Enums;
+@using Web.Extensions;
+@inject Repositories.Shared.UserInfoServices.Interface.IUserInfoService _userInfo;
+@model WorkOrderTabsModifyViewModel
+@{
+    Layout = null;
+    var modifyModel = Model.CrudUpdateViewModel.UpdateModel as WorkOrderModifyViewModel;
+    var userRole = _userInfo.LoggedInUserRole();
+    var overviewViewData = new ViewDataDictionary(ViewData)
+    {
+        { "CreatedOn", Model.WorkOrderDetailModel.FormattedCreatedOn},
+        { "UpdatedOn", Model.WorkOrderDetailModel.FormattedUpdatedOn }
+    };
+}
+
+@if ("SuperAdministrator, SystemAdministrator, Manager".Contains(userRole))
+{
+    <div class="row">
+        <div class="col-lg-12 update-nav-container">
+            <!-- Nav pills -->
+            <ul class="nav nav-pills mb-3" id="woTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="wo-information-tab" data-bs-toggle="pill" data-bs-target="#wo-information" type="button" role="tab" aria-controls="wo-information" aria-selected="true">Information</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="wo-work-scope-tab" data-bs-toggle="pill" data-bs-target="#wo-work-scope" type="button" role="tab" aria-controls="wo-work-scope" aria-selected="true">Work Scope</button>
+                </li>
+                @if (modifyModel.DynamicColumns.Count > 0)
+                {
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="wo-customized-columns-tab" data-bs-toggle="pill" data-bs-target="#wo-customized-columns" type="button" role="tab" aria-controls="wo-customized-columns" aria-selected="false">Customized Columns</button>
+                    </li>
+                }
+                @if (Model.WorkOrderDetailModel.Asset.Id > 0)
+                {
+                    <li class="nav-item hide-form-save-btn" role="presentation">
+                        <button class="nav-link" id="assets-information-tab" data-bs-toggle="pill" data-bs-target="#assets-information" type="button" role="tab" aria-controls="assets-information" aria-selected="false">Asset Information</button>
+                    </li>
+                }
+                <li class="nav-item hide-form-save-btn" role="presentation">
+                    <button class="nav-link" id="notes-tab" data-bs-toggle="pill" data-bs-target="#notes" type="button" role="tab" aria-controls="notes" aria-selected="false">Notes</button>
+                </li>
+                <li class="nav-item hide-form-save-btn" role="presentation">
+                    <button class="nav-link" id="budget-information-tab" data-bs-toggle="pill" data-bs-target="#budget-information" type="button" role="tab" aria-controls="budget-information" aria-selected="false">Budget</button>
+                </li>
+                <li class="nav-item hide-form-save-btn" role="presentation">
+                    <button class="nav-link" id="actual-information-tab" data-bs-toggle="pill" data-bs-target="#actual-information" type="button" role="tab" aria-controls="actual-information" aria-selected="false">Actual</button>
+                </li>
+                <li class="nav-item hide-form-save-btn" role="presentation">
+                    <button class="nav-link" id="status-history-tab" data-bs-toggle="pill" data-bs-target="#status-history" type="button" role="tab" aria-controls="status-history" aria-selected="false">Status History</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="assetTabContent">
+                <form asp-action="@Model.CrudUpdateViewModel.FormAction" asp-controller="@Model.CrudUpdateViewModel.FormController" enctype="@Model.CrudUpdateViewModel.FormType" id="@Model.CrudUpdateViewModel.FormId">
+                    <div class="validation-summary-errors text-danger"></div>
+                    <fieldset class="mb-3">
+                        <div class="tab-pane fade show active" id="wo-information" role="tabpanel" aria-labelledby="wo-information-tab">
+                            @await Html.PartialAsync("~/Views/WorkOrder/Tabs/_UpdateWorkOrderOverviewTab.cshtml", modifyModel, overviewViewData)
+                        </div>
+                        <div class="tab-pane fade" id="wo-work-scope" role="tabpanel" aria-labelledby="wo-work-scope-tab">
+                            @await Html.PartialAsync("~/Views/WorkOrder/Tabs/_UpdateWorkOrderWorkScopeTab.cshtml", modifyModel)
+                        </div>
+                        <div class="tab-pane fade" id="wo-customized-columns" role="tabpanel" aria-labelledby="wo-customized-columns-tab">
+                            <div class="row">
+                                @await Html.PartialAsync("~/Views/WorkOrderCustomFields/_ShowDynamicColumns.cshtml", modifyModel)
+                            </div>
+                        </div>
+                    </fieldset>
+                    <div class="form-group">
+                        <input type="hidden" id="modal-title" value="@Model.CrudUpdateViewModel.Title" />
+                        <div class="text-center">
+                            <button type="button" onclick="@Model.CrudUpdateViewModel.SubmitOnClick" class="btn btn-lg btn-modal-save form-btn btn-primary" id="submit-btn">Save</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="tab-pane fade" id="assets-information" role="tabpanel" aria-labelledby="assets-information-tab">
+                    <div class="row">
+                        @await Html.PartialAsync("~/Views/WorkOrder/Tabs/_UpdateWorkOrderAssetInformationTab.cshtml", Model.AssetDetailModel)
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
+                    <div class="row">
+                        @await Html.PartialAsync("_Notes", Model.Notes)
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="budget-information" role="tabpanel" aria-labelledby="budget-information-tab">
+                    <div class="row">
+                        @await Html.PartialAsync("~/Views/WorkOrder/Budget/_Budget.cshtml", Model.WorkOrderDetailModel.CostPerformance)
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="actual-information" role="tabpanel" aria-labelledby="actual-information-tab">
+                    <div class="row">
+                        @await Html.PartialAsync("~/Views/WorkOrder/Actual/_Actual.cshtml", Model.WorkOrderDetailModel.CostPerformance)
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="status-history" role="tabpanel" aria-labelledby="status-history-tab">
+                    <div class="row">
+                        @await Html.PartialAsync("_Comments", Model.WorkOrderDetailModel.Comments)
+                    </div>
+                </div>
+                @*  <div class="tab-pane fade" id="approval-work-order-history" role="tabpanel" aria-labelledby="approval-work-order-history-tab">
+            <div class="row">
+            @await Html.PartialAsync("_AssetApprovedWorkHistory", Model.ApprovalWorkOrderHistory)
+            </div>
+            </div> *@
+            </div>
+        </div>
+
+    </div>
+}
+<partial name="_ValidationScriptsPartial" />
+<script src="~/js/custom/form-wizard.js"></script>
+<script src="~/js/views/work-order/work-order.js"></script>
+<script src="~/js/custom/crud/add_asterik_on_required.js"></script>
+<script>
+    $(function () {
+        $('#woTab button[data-bs-toggle="pill"]').on('shown.bs.tab', function (event) {
+            if ($(event.target).parent().hasClass('hide-form-save-btn')) {
+                $('#submit-btn').hide();
+            } else {
+                $('#submit-btn').show();
+            }
+        });
+    });
+</script>

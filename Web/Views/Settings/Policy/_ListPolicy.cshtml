@@ -1,0 +1,288 @@
+﻿@using System.Web
+@using ViewModels
+@model List<PolicyModifyViewModel>
+<style>
+
+    .task-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 20px;
+    }
+
+        .task-list .card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+
+            .task-list .card.highlight {
+               /*  border: 2px solid #ff8800 !important;
+                background: #fff7f0; */
+
+                border: 2px solid #93bfab !important;
+                background: #ecfdf5;
+            }
+
+            .task-list .card h3 {
+                font-size: 16px;
+                font-weight: 700;
+                color: #0073e6;
+                margin-bottom: 5px;
+                line-height: normal;
+            }
+
+        .task-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 10px 0;
+        }
+
+            .task-list ul li {
+                margin: 8px 0;
+                font-size: 14px;
+            }
+
+                .task-list ul li input {
+                    margin-right: 8px;
+                }
+
+        .task-list .add-step {
+            font-size: 14px;
+            color: #919191;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 8px;
+        }
+
+    .title h2{
+        font-size:18px;
+        font-weight:800;
+
+    }
+
+    .btn-primary{
+        background:#f54e00;
+        color:#ffffff;
+        border:1px solid #f54e00;
+    }
+   .btn-cancel{
+        background: #d9d9d9;
+   }
+
+</style>
+<div class="task-list" id="taskList">
+    @if (Model != null && Model.Count > 0)
+    {
+        @foreach (var policy in Model)
+        {
+            @* <div class="task-item  drag-handle">
+                <div class="task-info">
+                    <i class="fa-solid fa-grip-vertical"></i>
+                    <div class="task-text">
+                        <strong>@policy.Name</strong>
+                        <small>@policy.Description</small>
+                    </div>
+                </div>
+                <div class="task-actions">
+                    
+                    <i class="far fa-trash-alt delete deletePolicy" id="@policy.Id"></i>
+                </div> 
+            </div> *@
+
+            <div class="card highlight ">
+                <h3>@policy.Name</h3>
+                <ul>
+                    @if (policy.PolicySteps != null && policy.PolicySteps.Count > 0)
+                    {
+                        foreach (var item in policy.PolicySteps)
+                        {
+                            <li><input type="checkbox" checked> @item</li>
+                        }
+                    }
+                </ul>
+                <div class="add-step" data-policy-id="@policy.Id" data-bs-toggle="modal" data-bs-target="#addStepPopup">+ Add New Step</div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="list-item">
+            <span>No policy found.</span>
+        </div>
+    }
+
+</div>
+
+<div class="modal fade" id="addStepPopup" tabindex="-1" aria-labelledby="addStepPopupModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xs">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="title">
+                    <h2 class="mb-0">Add New Procedure</h2>
+                </div>
+                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close" type="button"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="policyId" />
+
+                <div class="d-flex mb-2">
+                    <input type="text" class="form-control" id="stepText" placeholder="Add Procedure" />
+                    <button id="addStepToListBtn" type="button" class="btn btn-outline-secondary ms-2">Add</button>
+                </div>
+
+                <small class="text-muted">Added procedures (you can remove before saving):</small>
+                <ul id="pendingStepsList" style="list-style:none; padding-left:0; margin-top:8px;"></ul>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-cancel btn" type="button" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-times"></i> Cancel</button>
+                <button id="savePolicyStepsBtn" class="btn-primary btn" type="button"><i class="fa fa-check"></i> Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    $(function () {
+        let pendingSteps = [];
+
+        // open popup: set policy id and reset pending list
+        $(document).on("click", ".add-step", function () {
+            $("#policyId").val($(this).data("policy-id"));
+            $("#stepText").val("");
+            pendingSteps = [];
+            renderPendingList();
+        });
+
+        // Add single step to modal's pending list
+        $(document).on("click", "#addStepToListBtn", function () {
+            const val = $("#stepText").val().trim();
+            if (!val) {
+                alert("Enter a procedure name.");
+                return;
+            }
+
+            // avoid duplicate (case-insensitive)
+            if (!pendingSteps.some(s => s.trim().toLowerCase() === val.toLowerCase())) {
+                pendingSteps.push(val);
+            }
+            $("#stepText").val("");
+            renderPendingList();
+        });
+
+        // add by pressing Enter in input
+        $(document).on("keypress", "#stepText", function (e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                $("#addStepToListBtn").click();
+            }
+        });
+
+        // remove item from pending list (delegated)
+        $(document).on("click", ".removePendingStep", function () {
+            const idx = $(this).data("index");
+            if (idx >= 0) {
+                pendingSteps.splice(idx, 1);
+                renderPendingList();
+            }
+        });
+
+        function renderPendingList() {
+            const ul = $("#pendingStepsList");
+            ul.empty();
+            if (pendingSteps.length === 0) {
+                ul.append("<li class='text-muted'>No procedures added yet.</li>");
+                return;
+            }
+            pendingSteps.forEach((s, i) => {
+                // encode text to avoid XSS
+                const encoded = $('<div/>').text(s).html();
+                ul.append(`<li class="d-flex align-items-center justify-content-between mb-1">
+                    <span>${encoded}</span>
+                    <button data-index="${i}" type="button" class="btn btn-sm btn-link removePendingStep">Remove</button>
+                </li>`);
+            });
+        }
+
+        // Save all pending steps: POST JSON
+        $(document).on("click", "#savePolicyStepsBtn", async function () {
+            const policyId = parseInt($("#policyId").val() || 0, 10);
+
+            if (!policyId) {
+                alert("Invalid policy.");
+                return;
+            }
+
+            // --- NEW: include current typed input into pendingSteps before sending ---
+            const typed = $("#stepText").val().trim();
+            if (typed) {
+                // avoid duplicate (case-insensitive) against pendingSteps
+                if (!pendingSteps.some(s => s.trim().toLowerCase() === typed.toLowerCase())) {
+                    pendingSteps.push(typed);
+                }
+                // clear input after including
+                $("#stepText").val("");
+                renderPendingList();
+            }
+            // --- end new logic ---
+
+            if (pendingSteps.length === 0) {
+                // alert("Add at least one procedure before saving.");
+                return;
+            }
+
+            const $btn = $(this);
+            $btn.prop("disabled", true);
+
+            try {
+                const body = { policyId: policyId, steps: pendingSteps };
+
+                const resp = await fetch("/Settings/AddPolicySteps", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                    body: JSON.stringify(body)
+                });
+
+                const json = await resp.json();
+                if (json && json.success) {
+                    // update UI card for the policy by appending li items
+                    const card = $(".add-step[data-policy-id='" + policyId + "']").closest(".card");
+                    let ul = card.find("ul");
+                    if (ul.length === 0) {
+                        card.prepend("<ul></ul>");
+                        ul = card.find("ul");
+                    }
+                    pendingSteps.forEach(s => {
+                        const encoded = $('<div/>').text(s).html();
+                        ul.append(`<li><input type='checkbox' checked /> ${encoded}</li>`);
+                    });
+
+                    // hide modal and clear
+                    const modalEl = document.getElementById('addStepPopup');
+                    let modal = bootstrap.Modal.getInstance(modalEl);
+                    if (!modal) modal = new bootstrap.Modal(modalEl);
+                    modal.hide();
+
+                    pendingSteps = [];
+                    renderPendingList();
+                } else {
+                    alert(json?.message || "Failed to add procedures.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error while saving procedures.");
+            } finally {
+                $btn.prop("disabled", false);
+            }
+        });
+
+        // initial render
+        renderPendingList();
+    });
+</script>

@@ -1,0 +1,12 @@
+﻿<fieldset class="step-card">
+    <div class="form-group">
+        <label>Scan Serial #</label>
+        @Html.TextBox("ItemNo", "", new { @class = "form-control" })
+        <span class="field-validation-valid text-danger" id="spnItemNo"></span>
+    </div>
+    <div class="step-btns d-flex justify-content-between pt-3">
+        <button type="button" class="previous-step main-btn btn-secondary btn mr-2">Back</button>
+        <button type="button" id="btnNextItemNo" class="next-step btn-site-primary btn ml-2">Next</button>
+    </div>
+    <script src="~/js/views/execute-equipment/item-no.js"></script>
+</fieldset>

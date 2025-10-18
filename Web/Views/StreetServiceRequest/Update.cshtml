@@ -1,0 +1,39 @@
+﻿@using Enums
+@using ViewModels
+@model StreetServiceRequestModifyViewModel
+@{
+
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var allowUpdatePassword = Model.Id == 0;
+    var action = Model.Id == 0 ? "Create" : "Update";
+    var formAction = Model.Id == 0 ? "/StreetServiceRequest/Create" : "/StreetServiceRequest/Update";
+
+}
+
+<div class="card" style="border:0px;">
+    <div class="card-body">
+        @using (Html.BeginForm(action, "StreetServiceRequest", FormMethod.Post, new { @class = "sup-modal-form" }))
+        {
+            @(Html.AntiForgeryToken())
+            <div class="col-md-12">
+                @(Html.ValidationMessageFor(model => model.Id))
+            </div>
+            @await Html.PartialAsync("_Update.cshtml", Model, new ViewDataDictionary(ViewData))
+
+
+            <div class="col-md-12">
+                <div class="text-center">
+                    <button type="submit" id="supplier-form-submit-button" class="btn btn-lg btn-modal-save form-btn">SAVE</button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script src="~/js/custom/crud/add_asterik_on_required.js"></script>
+<script src="/js/masking/initiate-masking.js"></script>
+
+
+

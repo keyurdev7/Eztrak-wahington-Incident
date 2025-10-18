@@ -1,0 +1,20 @@
+﻿@model ViewModels.ApprovalSearchViewModel
+@using Enums
+@using Web.Extensions
+@using ViewModels
+
+<div class="control_field">
+    
+        <partial name="~/Views/Shared/Select2/_WorkOrder.cshtml" for="WorkOrder" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "approval-work-order-search-id"} }' />
+</div>
+
+<script>
+    function afterWorkOrderSelect(recordId, modelPropertyName) {
+        debugger;
+    }
+
+    function afterWorkOrderUnSelect(recordId, modelPropertyName) {
+
+    }
+
+</script>

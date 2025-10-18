@@ -1,0 +1,126 @@
+﻿@model ViewModels.Incident.IncidentNotesModalViewModel
+
+<div class="modal fade" id="noteIncidentModal" tabindex="-1" aria-labelledby="noteIncidentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Notes: @Model.IncidentNumber</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <!-- Left side Communication Log -->
+                    <div class="col-md-8">
+                        <div id="notesLogContainer" class="notes-log">
+                            @await Html.PartialAsync("_IncidentNotesLog", Model.Notes)
+                        </div>
+                    </div>
+
+                    <!-- Right side Add Note -->
+                    <div class="col-md-4">
+                        <div class="card">
+                            <h3>Add Note</h3>
+
+                            <!-- AJAX-enabled form -->
+                            <form id="addNoteForm" enctype="multipart/form-data">
+                                <input type="hidden" name="incidentId" value="@Model.IncidentId" />
+                                <input type="hidden" name="author" value="@User.Identity?.Name" />
+
+                                <div class="form-group mb-2">
+                                    <label>Note Type</label>
+                                    <select name="noteType" class="form-control">
+                                        <option value="Internal">Internal Note</option>
+                                        <option value="External">External Note</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-2">
+                                    <label>Note Content</label>
+                                    <textarea name="content" class="form-control"></textarea>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label>Upload Photo</label>
+                                    <input type="file" name="file" class="form-control" />
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100">+ Add Note</button>
+                            </form>
+                        </div>
+
+                        <div class="card summary mt-3">
+                            <h3>Incident Summary</h3>
+                            <p><span>Status:</span> @Model.Status</p>
+                            <p><span>Type:</span> @Model.IncidentType</p>
+                            <p><span>Severity:</span> @Model.Severity</p>
+                            <p><span>Location:</span> @Model.Location</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Scrollable Communication Log */
+    .notes-log {
+        max-height: 500px; /* Adjust as needed */
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        padding: 10px;
+        background: #fff;
+    }
+
+        /* Optional: nice modern scrollbar for Chrome/Edge/Safari */
+        .notes-log::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .notes-log::-webkit-scrollbar-thumb {
+            background-color: #bbb;
+            border-radius: 4px;
+        }
+
+            .notes-log::-webkit-scrollbar-thumb:hover {
+                background-color: #888;
+            }
+</style>
+
+@section Scripts {
+    <script>
+        // Ajax submit for Add Note
+        $(document).on("submit", "#addNoteForm", function (e) {
+            e.preventDefault();
+
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: '/IncidentNotes/AddNote',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    // Refresh only the notes log section
+                    $("#notesLogContainer").html(data);
+
+                    // Scroll to latest note
+                    var container = $("#notesLogContainer");
+                    container.scrollTop(container.prop("scrollHeight"));
+                },
+                error: function () {
+                    alert("Error adding note.");
+                }
+            });
+        });
+
+        // Auto-scroll when modal opens
+        $('#noteIncidentModal').on('shown.bs.modal', function () {
+            var container = $("#notesLogContainer");
+            container.scrollTop(container.prop("scrollHeight"));
+        });
+    </script>
+}

@@ -1,0 +1,14 @@
+﻿@model ViewModels.BaseSelect2VM
+@{
+    var elementId = ViewData["Id"] != null && !string.IsNullOrEmpty(ViewData["Id"].ToString()) ? ViewData["Id"].ToString() : "task-type-id";
+}
+<partial name="~/Views/Shared/Select2/TaskType/_TaskTypeHtml.cshtml" model="@Model" />
+<partial name="~/Views/Shared/Select2/TaskType/_TaskTypeJs.cshtml" model="@Model" />
+
+<script src="~/js/custom/select2/select2-methods.js"></script>
+<script>
+    $(function () {
+        var id = "#" + "@elementId";
+        SetTaskTypeSelect2(id);
+    });
+</script>

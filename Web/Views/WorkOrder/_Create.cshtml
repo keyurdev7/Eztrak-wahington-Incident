@@ -1,0 +1,222 @@
+﻿@using ViewModels;
+@using Enums;
+@using Web.Extensions;
+@inject Repositories.Shared.UserInfoServices.Interface.IUserInfoService _userInfo;
+@model WorkOrderModifyViewModel
+@{
+    Layout = null;
+    var wo = Model;
+    var title = "";
+    var action = "";
+    if (Model.Id > 0)
+    {
+        title = "Update Work Order";
+        action = "/WorkOrder/Update";
+    }
+    else
+    {
+        title = "Create Work Order";
+        action = "/WorkOrder/Create";
+    }
+    var userRole = _userInfo.LoggedInUserRole();
+}
+
+@if ("SuperAdministrator, SystemAdministrator, Manager".Contains(userRole))
+{
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="row">
+                @if (Model.Asset.Id > 0)
+                {
+                    <div class="col-lg-6">
+                        <div class="mb-3 form-group">
+                            <label asp-for="Asset.SystemGeneratedId" class="form-label fw-600"></label>
+                            <input disabled asp-for="Asset.SystemGeneratedId" type="text" class="form-control" />
+                            <span asp-validation-for="Asset.SystemGeneratedId" class="validation-invalid-label"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="mb-3 form-group">
+                            <label asp-for="Asset.Street" class="form-label fw-600"></label>
+                            <input disabled asp-for="Asset.Street" type="text" class="form-control" />
+                            <span asp-validation-for="Asset.Street" class="validation-invalid-label"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="mb-3 form-group">
+                            <label asp-for="Asset.AssetType" class="form-label fw-600"></label>
+                            <input disabled asp-for="Asset.AssetType" type="text" class="form-control" />
+                            <span asp-validation-for="Asset.AssetType" class="validation-invalid-label"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="mb-3 form-group">
+                            <label asp-for="Asset.Description" class="form-label fw-600"></label>
+                            <textarea asp-for="Asset.Description" class="form-control" disabled></textarea>
+                            <span asp-validation-for="Asset.Description" class="validation-invalid-label"></span>
+                        </div>
+                    </div>
+                    <input type="hidden" asp-for="AssetType.Id" value="@Model.AssetType.Id" />
+                    <input type="hidden" asp-for="Description" value="@Model.Asset.Description" />
+                    <input type="hidden" asp-for="Intersection" value="@Model.Intersection" />
+                }
+                else
+                {
+                    <div class="col-12">
+                        <div class="mb-3 form-group">
+                            <label asp-for="Title" class="form-label fw-600"></label>
+                            <input asp-for="Title" required data-val-required="The Title field is required." type="text" class="form-control" />
+                            <span asp-validation-for="Title" class="validation-invalid-label"></span>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="mb-3 form-group">
+                            <label asp-for="Description" class="form-label fw-600"></label>
+                            <textarea asp-for="Description" data-val-required="The Description field is required." required type="text" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="Description" class="validation-invalid-label"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="mb-3 form-group">
+                            <label asp-for="Intersection" class="form-label fw-600"></label>
+                            <input asp-for="Intersection" type="text" class="form-control" />
+                            <span asp-validation-for="Intersection" class="validation-invalid-label"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="mb-3">
+                            <partial name="~/Views/Shared/Select2/_AssetType.cshtml" for="AssetType" />
+                        </div>
+                    </div>
+                    <input type="hidden" asp-for="StreetServiceRequestId" value="@Model.StreetServiceRequestId" />
+                }
+
+                @if (Model.Id > 0)
+                {
+                    <div class="col-lg-6">
+                        <div class="mb-3 form-group">
+                            <label asp-for="Status" class="form-label fw-600"></label>
+                            <select asp-for="Status" class="form-select"
+                                    asp-items="@HtmlHelperExtensions.GetEnumSelectListWithStrings<WOStatusCatalog>()"></select>
+                            <span asp-validation-for="Status" class="validation-invalid-label"></span>
+                        </div>
+                    </div>
+                }
+                <div class="col-lg-6">
+                    <div class="mb-3 form-group">
+                        <label asp-for="Urgency" class="form-label fw-600"></label>
+                        <select asp-for="Urgency" class="form-select"
+                                asp-items="@HtmlHelperExtensions.GetEnumSelectListWithStrings<Urgency>()">
+                            <option value="">-- Select --</option>
+                        </select>
+                        <span asp-validation-for="Urgency" class="validation-invalid-label"></span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="mb-3 form-group">
+                        <label asp-for="DueDate" class="form-label fw-600"></label>
+                        <input asp-for="DueDate" type="date" class="form-control" />
+                        <span asp-validation-for="DueDate" class="validation-invalid-label"></span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="mb-3 form-group">
+                        <label asp-for="Task" class="form-label fw-600"></label>
+                        <select id="work-order-task" asp-for="Task" class="form-select"
+                                asp-items="@HtmlHelperExtensions.GetEnumSelectListWithStrings<TaskCatalog>()">
+                            <option value="">-- Select --</option>
+                        </select>
+                        <span asp-validation-for="Task" class="validation-invalid-label"></span>
+                    </div>
+                </div>
+
+
+                <div id="replace-select" class="col-lg-6">
+                    <div class="mb-3 form-group">
+                        <partial name="~/Views/Shared/Select2/_TaskType.cshtml" for="TaskType" />
+                    </div>
+                </div>
+                @await Html.PartialAsync("~/Views/WorkOrderCustomFields/_ShowDynamicColumns.cshtml", Model)
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="col-sm-12 form-label fw-600">Upload Default Image</label>
+                        <div class="col-sm-12">
+                            <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                                <input asp-for="File" class="form-control" placeholder="Upload Image" id="Image" onchange="ShowImage(this)" />
+                                <span> <a href="javascript:void(0)" class="input-group-addon btn btn-default fileinput-exists" onclick='RemoveImage()' data-dismiss="fileinput">Remove</a></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 mt-2">
+                        <img class="img-responsive image-thumbnail" src="@Model.DefaultImageUrl" id="image-thumbnail" alt="" style="max-width:120px;">
+                        <input type="hidden" asp-for="DefaultImageUrl" value="@Model.DefaultImageUrl" id="hidden-image-url" />
+                    </div>
+                </div>
+
+                <div class="col-lg-12">
+                    <div class="row">
+                        @await Html.PartialAsync("~/Views/Shared/Crud/DropZoneView/_Upload.cshtml", Model.ImagesList)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="step-title d-flex justify-content-between align-items-start gap-3 mb-3">
+            <h5 class="m-0">Add Technicians</h5>
+        </div>
+
+        <div class="col-md-12 mt-3">
+            <div class="form-group technician-container row">
+                <span class="col-md-3">
+                    <label class="form-label fw-600">Technician<span style="color:red"> *</span></label>
+                    @await Html.PartialAsync("~/Views/Shared/Select2/_Technician.cshtml", new TechnicianBriefViewModel(), "Technician", new ViewDataDictionary(ViewData) { { "HideLabel", true } })
+                </span>
+                <span class="col-md-3">
+                    <label class="form-label fw-600">Craft Skill<span style="color:red"> *</span></label>
+                    @await Html.PartialAsync("~/Views/Shared/Select2/_CraftSkill.cshtml", new CraftSkillBriefViewModel(), "CraftSkill", new ViewDataDictionary(ViewData) { { "HideLabel", true }, { "Id", "craftskill-id" } })
+                </span>
+
+                <span class="text-center col-md-2">
+                    <label class="form-label fw-600 w-100">Add</label>
+                    <button type="button" class="add-technician btn-circle btn-sm" style="height: calc(1.5715em + 0.875rem + 2px);"><i class="icon-plus2"></i></button>
+                </span>
+            </div>
+        </div>
+
+        <div class="table-responsive my-3" id="technician-table">
+            <table class="table table-striped">
+                <thead>@* class="thead-primary" *@
+                    <tr>
+                        <th>Technician</th>
+                        <th>Craft</th>
+                        <th class="text-center" style="width: 20px;"><i class="icon-arrow-down12"></i></th>
+                    </tr>
+                </thead>
+                <tbody class="technician-tbody">
+                    @for (var i = 0; i < Model.WorkOrderTechnicians.Count(); i++)
+                    {
+                        @await Html.PartialAsync("~/Views/WorkOrder/_TechnicianSectionRow.cshtml", Model.WorkOrderTechnicians[i], new ViewDataDictionary(ViewData) { { "RowNumber", i } })
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <input type="hidden" asp-for="Id" value="@Model.Id" />
+        <input type="hidden" asp-for="Asset.Id" value="@Model.Asset.Id" />
+        <input type="hidden" asp-for="Asset.SystemGeneratedId" value="@Model.Asset.SystemGeneratedId" />
+        <input type="hidden" asp-for="Asset.Description" value="@Model.Asset.Description" />
+        <input type="hidden" asp-for="Asset.Street" value="@Model.Asset.Street" />
+        <input type="hidden" asp-for="Asset.AssetType" value="@Model.Asset.AssetType" />
+        <input type="hidden" asp-for="Asset.AssetTypeId" value="@Model.Asset.AssetTypeId" />
+        <input type="hidden" asp-for="Manager.Id" value="@Model.Manager.Id" />
+        <input type="hidden" asp-for="Status" value="@Model.Status" />
+    </div>
+}
+<partial name="_ValidationScriptsPartial" />
+<script src="~/js/custom/form-wizard.js"></script>
+<script src="~/js/views/work-order/work-order.js"></script>
+<script src="~/js/custom/crud/add_asterik_on_required.js"></script>

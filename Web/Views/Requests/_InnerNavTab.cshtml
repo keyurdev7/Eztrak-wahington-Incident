@@ -1,0 +1,127 @@
+﻿<style>
+    .navbar {
+        --bs-navbar-nav-link-padding-x: 0.75rem;
+    }
+    @* .work-order-inner-nav .nav-link.active {
+        background: #313955;
+        color: white;
+    } *@
+    .nav-item{
+        font-weight: 300;
+        margin-bottom: 0;
+    }
+    .navbar-nav .nav-link i{
+        margin-right: 5px;
+    }
+</style>
+<nav class="work-order-inner-nav navbar navbar-expand-lg navbar-light filter-nav">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul id="work-order-inner-tab" class="navbar-nav mb-lg-0 bg-white rounded-3">
+                @* <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fa-sharp fa-solid fa-chart-simple"></i>
+                        Analytics
+                    </a>
+                </li> *@
+                <li class="nav-item">
+                    <button class="nav-link" id="order-grid" data-url="/WorkOrder/Index" type="button" role="tab">
+                        <i class="fa-solid fa-table"></i>
+                        Table
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        Gant Chart
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link active" id="dashboard" data-url="/WorkOrder/Dashboard" type="button" role="tab">
+                        <i class="fa-solid fa-chess-board"></i>
+                        Board
+                    </button>
+                </li>
+                @* show another nav tabItemId width dropdown *@
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        All
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li>
+                            <a class="dropdown-item" href="#">Action</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#">Another action</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav-tabs-action-buttons">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="statusDropdown" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        <i class="fa-solid fa-filter"></i>
+                        Status
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="statusDropdown">
+                        <li>
+                            <a class="dropdown-item" href="#">Status 1</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#">Status 2</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#">Status 3</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="priorityDropdown" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        <i class="fa-solid fa-search"></i>
+                        Priority
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="priorityDropdown">
+                        <li>
+                            <a class="dropdown-item" href="#">Priority 1</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#">Priority 2</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#">Priority 3</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<script>
+    $(function () {
+        $(".work-order-inner-nav .nav-link").on("click", function (e) {
+            e.preventDefault(); // To prevent default link behavior if it's an anchor
+            let tabId = "#work-order-inner-tab";
+            let tabItemId = "#" + $(this).attr('id'); // Use 'this' to get the clicked element's id
+            let tabContentId = "#work-order-tab-content-Id";
+            let contentUrl = $(this).data('url'); // Use 'this' to get the data-url attribute
+            if (contentUrl) {
+                fetchTabContent(tabContentId, contentUrl, tabId, tabItemId);
+            }
+
+        });
+    });
+</script>

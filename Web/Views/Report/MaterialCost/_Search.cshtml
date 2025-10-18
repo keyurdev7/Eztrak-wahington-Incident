@@ -1,0 +1,50 @@
+﻿@using Enums
+@using ViewModels;
+@model InventorySearchViewModel
+@{
+    Layout = null;
+}
+
+<div class="col-12 col-sm-3 col-lg-2">
+    <div class="mb-3 form-group">
+        <input asp-for="Search.value" type="search" class="form-control" placeholder="Keyword" aria-controls="crud-list-table" autocomplete="new-password">
+    </div>
+</div>
+
+<div class="col-12 col-sm-3 col-lg-2">
+    <div class="mb-3 form-group">
+        <partial name="~/Views/Shared/Select2/_Category.cshtml" for="Category" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "uom-search-id"} }' />
+    </div>
+</div>
+<div class="col-12 col-sm-3 col-lg-2">
+    <div class="mb-3 form-group">
+        <partial name="~/Views/Shared/Select2/_Manufacturer.cshtml" for="Manufacturer" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "manufacturer-search-id"} }' />
+    </div>
+</div>
+<div class="w-100"></div>
+<div class="col-12 col-sm-3 col-lg-2">
+    <div class="mb-3 form-group">
+        <partial name="~/Views/Shared/Select2/_UOM.cshtml" for="UOM" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "condition-search-id"} }' />
+    </div>
+</div>
+<div class="col-12 col-sm-3 col-lg-2">
+    <div class="mb-3 form-group">
+        <partial name="~/Views/Shared/Select2/_MUTCD.cshtml" for="MUTCD" view-data='new ViewDataDictionary(ViewData) { {"HideLabel",true}, {"Id", "mutcd-search-id"} }' />
+    </div>
+</div>
+@* <div class="col-12 col-sm-3 col-lg-2">
+    <div class="mb-3 form-group">
+        <input asp-for="ShowZeroQuantityItems" name="ShowZeroQuantityItems" type="checkbox" class="form-check-input" id="ShowZeroQuantityItems">
+        <label class="form-check-label">
+            Show 0 Quantity Items?
+        </label>
+    </div>
+</div> *@
+<div class="col-12 col-sm-3 col-lg-2">
+    <div class="mb-3 form-group">
+        <partial name="~/Views/Shared/Select2/_UserSearchSetting.cshtml" for="UserSearchSetting" view-data='@new ViewDataDictionary(ViewData) { {"HideLabel" , true}, {"ReportType", SearchFilterTypeCatalog.MaterialCostReport} }' />
+    </div>
+</div>
+<input type="hidden" asp-for="Type" value="@SearchFilterTypeCatalog.MaterialCostReport" />
+<input type="hidden" class="search-view-model" value="@typeof(InventorySearchViewModel)" />
+<input type="hidden" class="search-view-path" value="~/Views/Report/MaterialCost/_Search.cshtml" />

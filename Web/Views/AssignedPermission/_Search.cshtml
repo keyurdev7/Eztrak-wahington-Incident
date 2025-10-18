@@ -1,0 +1,16 @@
+﻿@model AssignedPermissionSearchViewModel
+
+@using Enums;
+@using ViewModels.AssignedPermissions;
+@using Web.Extensions
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <div class="form-group">
+                <label class="control-label form-label fw-600">Name</label>
+                <input asp-for="Permission.Name" type="search" class="form-control" placeholder="Search Name" />
+            </div>
+        </div>
+    </div>
+</div>

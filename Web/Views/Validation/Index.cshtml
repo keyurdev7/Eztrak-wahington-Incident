@@ -1,0 +1,130 @@
+﻿@using System.Web
+@using ViewModels.Incident
+@model ValidationWorkflowViewModel
+
+
+<link href="~/css/custom/views/incident/validation-index.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/light/main.css">
+<script src="https://js.arcgis.com/4.27/"></script>
+
+
+
+<input type="hidden" id="hdn_Id" value="@Model.Id" />
+<input type="hidden" id="hdn_user_name" value="@User.Identity.Name" />
+
+@* <div id="div_ValidationList">
+</div> *@
+
+<div id="div_ValidationDtl">
+</div>
+<div id="incidentMapContainer">
+</div>
+<div class="modal fade" id="AlarmModal" tabindex="-1" aria-labelledby="AlarmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="AlarmModalLabel">Mark as False Alarm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div class="false-alarm-card">
+                    <div class="icon">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                    </div>
+                    <h2>Mark as False Alarm</h2>
+                    <p>Please provide details about why this incident is being marked as a false alarm.</p>
+
+                    <div class="form-group">
+                        <label for="details">False Alarm Details *</label>
+                        <textarea id="details" rows="4" placeholder="Explain why this incident is a false alarm (e.g., duplicate report, no actual incident found, caller error, etc.)"></textarea>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+
+                <div class="button-group">
+                    <button class="btn btn-undo" data-bs-dismiss="modal"><i class="fa-solid fa-arrow-left"></i> Undo False Alarm</button>
+                    <button class="btn btn-cancel"><i class="fa-solid fa-xmark"></i> Cancel Incident</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    //image uplaod and preview
+     const fileInput = document.getElementById("fileInput");
+    const fileList = document.getElementById("fileList");
+
+    fileInput.addEventListener("change", () => {
+      fileList.innerHTML = ""; // clear previous files
+
+      Array.from(fileInput.files).forEach((file, index) => {
+        const fileItem = document.createElement("div");
+        fileItem.classList.add("file-item");
+
+        fileItem.innerHTML = `
+          <div class="file-list">${file.name}</div>
+          <button onclick="removeFile(${index})" class="remove-btn">Remove</button>
+        `;
+
+        fileList.appendChild(fileItem);
+      });
+    });
+
+    function removeFile(index) {
+      let dt = new DataTransfer();
+      let files = fileInput.files;
+
+      Array.from(files).forEach((file, i) => {
+        if (i !== index) dt.items.add(file);
+      });
+
+      fileInput.files = dt.files;
+      fileInput.dispatchEvent(new Event("change"));
+    }
+
+
+     async function OpenIncidentMap() {
+            try {
+
+                var id = $("#hdn_Id").val();
+
+                showLoader($(".main-content"));
+
+                const url = `/Incidents/GetIncidentMapDetailsbyId?id=${id}`;
+
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Accept": "text/html"
+                    }
+                });
+
+                if (!response.ok) throw new Error("Failed to load incident map");
+
+                const content = await response.text();
+                $("#incidentMapContainer").empty().html(content); // 👈 replace with your target div
+                $("#MapIncidentModal").modal("show");
+
+            } catch (error) {
+                console.error("Error loading incident map:", error);
+            } finally {
+                hideLoader($(".main-content"));
+            }
+        }
+
+</script>
+
+<script src="~/js/custom/loader/loader.js"></script>
+<script src="~/js/views/incident/incident-validation.js"></script>

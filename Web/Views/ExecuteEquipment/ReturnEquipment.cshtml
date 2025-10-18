@@ -1,0 +1,38 @@
+﻿@{
+    ViewBag.Title = "Return Equipment";
+}
+<link href="~/css/custom/views/execute/steps.css" rel="stylesheet" />
+<div class="container staging-page">
+    <div class="page-title">
+        <h3 class="page-title text-site-primary m-md-0">@ViewBag.Title</h3>
+    </div>
+    <div class="pt-md-4">
+        <div class="staging-steps" id="issueBox">
+            <div class="">
+                <div class="step-progress">
+                    <h5 class="m-0">Step <span class="step-no">1</span></h5>
+                </div>
+                <div class="step-box">
+                    <partial name="_UserPin" />
+                    <partial name="_ItemNo" />
+
+                    <fieldset class="step-card">
+                        <form id="transactionForm" method="post">
+                            <div id="inventory-table-container">
+                            </div>
+                            <div class="step-btns d-flex justify-content-between pt-3">
+                                <button type="button" class="previous-step main-btn btn-secondary btn mr-2">Back</button>
+                                <button type="button" id="btnSaveTransactions" class="btn-site-primary btn ml-2">Save</button>
+                            </div>
+                        </form>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/custom/select2/select2-methods.js"></script>
+    <script src="~/js/views/execute/common.js"></script>
+    <script src="~/js/views/execute-equipment/return-equipment.js"></script>
+}

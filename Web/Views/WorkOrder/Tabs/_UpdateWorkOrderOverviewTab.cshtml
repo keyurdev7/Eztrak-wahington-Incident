@@ -1,0 +1,59 @@
+﻿@using Enums
+@using ViewModels;
+@using Web.Extensions;
+@model WorkOrderModifyViewModel
+<div class="row">
+    <div class="row col-md-6 col-sm-12">
+        <div class="col-12">
+            <div class="mb-3 form-group">
+                <label asp-for="Urgency" class="form-label fw-600"></label>
+                <select asp-for="Urgency" class="form-select"
+                        asp-items="@HtmlHelperExtensions.GetEnumSelectListWithStrings<Urgency>()">
+                    <option value="">-- Select --</option>
+                </select>
+                <span asp-validation-for="Urgency" class="validation-invalid-label"></span>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="mb-3 form-group d-flex">
+                <label asp-for="SystemGeneratedId" class="form-label detail-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.SystemGeneratedId) ? "-" : Model.SystemGeneratedId)</div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="mb-3 form-group d-flex">
+                <label class="form-label detail-label fw-600">Date Created</label>
+                <div>@(ViewData["CreatedOn"]?.ToString() ?? "-")</div>
+
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="mb-3 form-group d-flex">
+                <label asp-for="DueDate" class="form-label detail-label fw-600">Needed By</label>
+                <div>@(string.IsNullOrEmpty(Model.FormattedDueDate) ? "-" : Model.FormattedDueDate)</div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="mb-3 form-group d-flex">
+                <label asp-for="ApprovalDate" class="form-label detail-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.FormattedApprovalDate) ? "-" : Model.FormattedApprovalDate)</div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="mb-3 form-group d-flex">
+                <label asp-for="Manager" class="form-label detail-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.Manager.Name) ? "-" : Model.Manager.Name)</div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="mb-3 form-group d-flex">
+                <label class="form-label detail-label fw-600">Last Updated</label>
+                <div>@(ViewData["UpdatedOn"]?.ToString() ?? "-")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-sm-12">
+        @await Html.PartialAsync("~/Views/Shared/Crud/DropZoneView/_Upload.cshtml", Model.ImagesList)
+    </div>
+</div>
+

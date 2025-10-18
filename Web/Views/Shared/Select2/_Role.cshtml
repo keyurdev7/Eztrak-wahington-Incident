@@ -1,0 +1,45 @@
+﻿@model ViewModels.BaseSelect2VM
+
+@{
+    var prefix = ViewData.TemplateInfo.HtmlFieldPrefix ?? "Role";
+    var elementId = ViewData["Id"] != null && !string.IsNullOrEmpty(ViewData["Id"].ToString()) ? ViewData["Id"].ToString() : "role-id";
+}
+
+<div class="form-group">
+    <label class="form-label fw-600">Role</label>
+    @Html.DropDownListFor(model => model.Id, new List<SelectListItem>() {
+    new SelectListItem()
+    {
+    Value = (Model!=null&&Model.Id > 0)?Model.Id.ToString():"",
+    Text = (Model!=null&&Model.Id > 0)?Model.Select2Text:"",
+    Selected = (Model!=null&&Model.Id > 0)?true:false,
+    }},
+    new
+    {
+    @id = elementId,
+    @class = "form-control disable-field",
+    data_val_required = Model?.ErrorMessage,
+    data_val = Model?.IsValidationEnabled.ToString().ToLower()
+    })
+    <input type="hidden" data-identifier="@prefix" data-input-name="Name" name="Role.Name" value="@Model.Select2Text" />
+    <span asp-validation-for="Id" class="validation-invalid-label role-error-span"></span>
+</div>
+
+<script src="~/js/custom/select2/select2-methods.js"></script>
+<script>
+    $(function() {
+        var id = "#" + "@elementId";
+        var pageSize = 10;
+        var url = '/Role/GetRoles';
+
+        var dataArray = function(params) {
+            params.page = params.page || 1;
+            return {
+                prefix: params.term,
+                pageSize: pageSize,
+                pageNumber: params.page,
+            };
+        };
+        Select2AutoCompleteAjax(id, url, dataArray, pageSize, "Select Role");
+    });
+</script>

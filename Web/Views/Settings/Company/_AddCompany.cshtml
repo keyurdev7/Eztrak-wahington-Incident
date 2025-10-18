@@ -1,0 +1,17 @@
+﻿@using System.Web
+@using ViewModels
+@model CompanyModifyViewModel
+
+<form id="NewCompanyForm">
+    <div class="list-item addItem" id="saveCompanyDiv">
+        <input type="hidden" value="@Model.Id" name="Id" id="company_@Model.Id" />
+        <div class="input-container type">
+            <input type="text" placeholder="Enter company name" asp-for="Name">
+            <textarea type="text" placeholder="Enter company description" asp-for="Description"></textarea>
+            <div class="actions">
+                <button class="btn check saveCompany"><i class="fa-solid fa-check"></i></button>
+                <button class="btn cancel cancelCompany"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+    </div>
+</form>

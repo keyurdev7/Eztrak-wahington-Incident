@@ -1,0 +1,294 @@
+﻿@using ViewModels.Dashboard
+@model List<IncidentLocationMapViewModel>
+
+<div class="modal fade" id="MapIncidentModal" tabindex="-1" aria-labelledby="MapIncidentModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="MapIncidentLbl">
+                    @if (Model != null && Model.Count > 0)
+                    {
+                        @($"{Model[0].incidentid} - {Model[0].incidentloc}")
+                    }
+                </h5>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="bg-white rounded p-4 shadow-sm border border-gray-200 mb-4">
+                    <div id="mapView" style="height:500px; width:100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/Graphic",
+        "esri/layers/GraphicsLayer",
+        "esri/geometry/Circle"
+    ], function (Map, MapView, Graphic, GraphicsLayer, Circle) {
+
+        // make available globally
+        window.Graphic = Graphic;
+        window.Circle = Circle;
+
+        console.log("ArcGIS modules loaded ✔");
+
+        var map = new Map({
+            basemap: "streets-navigation-vector"
+        });
+
+        var incidents = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+        var firstObj = incidents[0];
+
+        window.view = new MapView({
+            container: "mapView",
+            map: map,
+            center: [firstObj.lon, firstObj.lat],
+            zoom: 6
+        });
+
+        var graphicsLayer = new GraphicsLayer();
+        window.graphicsLayer = graphicsLayer;
+        map.add(graphicsLayer);
+
+        // Store reference circles for each incident
+        var incidentCircles = {};
+
+        incidents.forEach(function (incident) {
+
+            var point = {
+                type: "point",
+                longitude: incident.lon,
+                latitude: incident.lat
+            };
+
+            var symbol = {
+                type: "simple-marker",
+                path: "M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z",
+                color: incident.color,
+                outline: { color: "black", width: 1 },
+                size: "20px"
+            };
+
+            // Build image HTML if images exist
+            // let imageHtml = "";
+            // if (incident.images && incident.images.length > 0) {
+            //     imageHtml = incident.images.map(img =>
+            //         `<img src="${img}" style="max-width:120px;max-height:120px;margin:5px;border:1px solid #ccc;border-radius:6px;" />`
+            //     ).join("");
+            // } else {
+            //     imageHtml = "<i>No images available</i>";
+            // }
+            // //Images: imageHtml
+
+            var attributes = {
+                Severity: incident.severity,
+                IncidentID: incident.incidentid,
+                Location: incident.incidentloc,
+                CallerName: incident.callername,
+                CallerPhone: incident.callerphone,
+                CallerAddress: incident.calleraddress,
+                EventType: incident.eventtype,
+                AssetType: incident.assettype,
+                Description: incident.description,
+                Intersection: incident.intersection,
+                Perimeter: incident.perimeter
+            };
+
+            var popupTemplate = {
+                title: "Incident Details:",
+                content: `
+                    <b>Incident Number:</b> {IncidentID}<br>
+                    <b>Severity:</b> {Severity}<br>
+                    <b>Event Type:</b> {EventType}<br>
+                    <b>Asset Type:</b> {AssetType}<br>
+                    <b>Description:</b> {Description}<br>
+                    <b>Intersection:</b> {Intersection}<br>
+                    <b>Location:</b> {Location}<br>
+                    <b>Images:</b><br>
+                    <b>Perimeter :</b> {Perimeter}<br>
+                `
+            };
+
+            var graphic = new Graphic({
+                geometry: point,
+                symbol: symbol,
+                attributes: attributes,
+                popupTemplate: popupTemplate
+            });
+            graphicsLayer.add(graphic);
+
+            var circle = new Circle({
+                center: point,
+                radius: incident.perimeter !== '' ? parseInt(incident.perimeter) : 0,
+                radiusUnit: "miles" // unit: MILES
+            });
+
+            var circleGraphic = new Graphic({
+                geometry: circle,
+                symbol: {
+                    type: "simple-fill",
+                    color: [255, 0, 0, 0.1], // semi-transparent fill
+                    outline: {
+                        color: incident.color,
+                        width: 2
+                    }
+                }
+            });
+
+            graphicsLayer.add(circleGraphic);
+
+            // store circle reference by incident id
+            incidentCircles[incident.incidentid] = circle;
+        });
+
+        // Fit map to all graphics initially
+        view.when(function () {
+            if (graphicsLayer.graphics.length > 0) {
+                view.goTo(graphicsLayer.graphics);
+            }
+        });
+
+        // Zoom to circle when clicking on marker
+        view.on("click", function (event) {
+            view.hitTest(event).then(function (response) {
+                if (response.results.length > 0) {
+                    var g = response.results[0].graphic;
+                    if (g.geometry.type === "point") {
+                        var incId = g.attributes.IncidentID;
+                        var circle = incidentCircles[incId];
+                        if (circle) {
+                            // Expand extent so it's not too zoomed-in
+                            view.goTo(circle.extent.expand(1.5));
+                        }
+                    }
+                }
+            });
+        });
+
+    });
+</script>
+
+
+
+ @* <script>
+   
+     require([
+         "esri/Map",
+         "esri/views/MapView",
+         "esri/Graphic",
+         "esri/layers/GraphicsLayer",
+         "esri/geometry/Circle"
+     ], function (Map, MapView, Graphic, GraphicsLayer, Circle) {
+
+              // make available globally
+         window.Graphic = Graphic;
+         window.Circle = Circle;
+
+         console.log("ArcGIS modules loaded ✔");
+
+         var map = new Map({
+             basemap: "streets-navigation-vector"
+         });
+
+          var incidents = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+          var firstObj = incidents[0];
+
+         window.view = new MapView({
+             container: "map",
+             map: map,
+            center: [firstObj.lon, firstObj.lat],
+             zoom: 6
+         });
+
+         var graphicsLayer = new GraphicsLayer();
+         window.graphicsLayer = graphicsLayer;
+         map.add(graphicsLayer);
+
+         incidents.forEach(function (incident) {
+
+        var point = {
+                         type: "point",
+                         longitude: incident.lon,
+                         latitude: incident.lat
+                    };
+
+      var symbol =   {
+                         type: "simple-marker",
+                         path: "M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z",
+                         color: incident.color,
+                         outline: { color: "black", width: 1 },
+                         size: "20px"
+                     };
+
+             var attributes = {
+                 Severity: incident.severity,
+                 IncidentID: incident.incidentid,
+                 Location: incident.incidentloc,
+                 CallerName: incident.callername,
+                 CallerPhone: incident.callerphone,
+                 CallerAddress: incident.calleraddress,
+                 EventType:incident.eventtype,
+                 AssetType:incident.assettype,
+                 Description:incident.description,
+                 Intersection:incident.intersection,
+                 Perimeter:incident.perimeter,
+             };
+
+         var popupTemplate = {
+             title: "Incident Details:",
+             content: `
+                 <b>Incident Number:</b> {IncidentID}<br>
+                 <b>Severity:</b> {Severity}<br>
+                 <b>Event Type:</b> {EventType}<br>
+                 <b>Asset Type:</b> {AssetType}<br>
+                 <b>Description:</b> {Description}<br>
+                 <b>Intersection:</b> {Intersection}<br>
+                 <b>Location:</b> {Location}<br>
+                 <b>Images:</b> <br>
+                 <b>Perimeter :</b> {Perimeter}<br>
+             `
+             };
+
+             var graphic = new Graphic({
+                 geometry: point,
+                 symbol: symbol,
+                 attributes: attributes,
+                 popupTemplate: popupTemplate
+             });
+             graphicsLayer.add(graphic);
+
+             var circle = new Circle({
+                 center: point,
+                 radius: incident.perimeter!='' ? parseInt(incident.perimeter) : 0,
+                 radiusUnit: "miles" // unit: MILES
+             });
+
+             var circleGraphic = new Graphic({
+                 geometry: circle,
+                 symbol: {
+                     type: "simple-fill",
+                     color: [255, 0, 0, 0.1], // semi-transparent fill
+                     outline: {
+                         color: incident.color,
+                         width: 2
+                     }
+                 }
+             });
+
+          
+
+             graphicsLayer.add(circleGraphic);
+
+             window.view.goTo(circle.extent.expand(1));
+         });
+
+     });
+</script>
+ *@

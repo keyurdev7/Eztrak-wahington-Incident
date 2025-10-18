@@ -1,0 +1,88 @@
+﻿@using System.Web
+@using ViewModels
+@using ViewModels.DataTable
+@model ViewModels.CRUD.CrudListViewModel
+@{
+    var assetTypes = ViewBag.AssetTypes as List<AssetTypeDetailViewModel>;
+    var assetTypesJson = Json.Serialize(assetTypes);
+    var assetTree = ViewBag.AssetTree as List<AssetTypeTreeViewModel>;
+    var assetTreeJson = Json.Serialize(assetTree);
+    var assetDataTableColumns = Json.Serialize(ViewBag.AssetsDatatableColumns as Dictionary<long, List<DataTableViewModel>>);
+    var assetTypeId = assetTypes?.FirstOrDefault()?.Id;
+}
+
+<div class="table_and_filters_wrap">
+    @await Html.PartialAsync("~/Views/Shared/Crud/ListView/Common/_Search.cshtml", Model)
+
+    @await Html.PartialAsync("~/Views/Shared/Crud/ListView/Common/_Header.cshtml", Model)
+    <div class="table_wrap">
+        @foreach (var assetType in assetTypes.Take(1))
+        {
+            <div class="table-opp table-responsive">
+                <div class="dataTables_wrapper dt-bootstrap5 no-footer" style="min-height:300px;">
+                    <div class="datatable-scroll">
+                        <table class="table table-bordered dataTable table-sm crud-list-table datatable-basic dataTable w-100" style="box-sizing: border-box;" id="crud-list-table-@(assetType.Id)" role="grid" aria-describedby="DataTables_Table_0_info">
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+</div>
+
+<script>
+    var dataTables = [];
+    var defaultColumns = @Html.Raw(Model.DatatableColumnsJson);
+    var assetTypes = @Html.Raw(assetTypesJson);
+    var assetTreeJson = @Html.Raw(assetTreeJson);
+    var assetDataTableColumns = @Html.Raw(assetDataTableColumns);
+    // class AssetsDataTableManager extends DataTableManager {
+
+    // }
+    $(function () {
+        ReInitializeDataTables();
+        $('#assetTypeTab').on('shown.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
+            ReInitializeDataTables();
+        });
+
+    });
+    function ReInitializeDataTables() {
+
+        dataTables = [];
+        let selectedAssetTypeId = '@assetTypeId';
+        assetTypes.forEach(function (assetType) {
+            if (!selectedAssetTypeId || assetType.Id == selectedAssetTypeId) {
+                let formId = $(".search-form").attr('id');
+                let dataTableId = "crud-list-table-" + assetType.Id;
+                let dataTableColumns = assetDataTableColumns[assetType.Id]
+                if ($.fn.DataTable.fnIsDataTable($("#" + dataTableId))) {
+                    $("#" + dataTableId).dataTable().fnDestroy();
+                    $("#crud-list-table").addClass("dataTable");
+                }
+                var assetsDataTableManager = new AssetsDataTableManager();
+                assetsDataTableManager.initialize(
+                    dataTableId,
+                    formId,
+                    dataTableColumns,
+                    '@Model.ShowDatatableButtons',
+                    '@Model.DataUrl',
+                    '@Model.IsPasscodeRequiredForDelete'
+                );
+                dataTables.push({ manager: assetsDataTableManager, id: assetType.Id });
+            }
+        });
+    }
+
+
+
+    function filterAssetDatatable(assetTypeId) {
+        const datatableInstance = dataTables.filter(entry => entry.id === assetTypeId);
+        datatableInstance[0].manager.searchDataTable();
+    }
+    function clearAssetDatatable(assetTypeId) {
+        const datatableInstance = dataTables.filter(entry => entry.id === assetTypeId);
+        datatableInstance[0].manager.clearDatatableSearch();
+    }
+
+</script>

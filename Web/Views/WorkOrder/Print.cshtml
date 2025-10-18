@@ -1,0 +1,83 @@
+﻿@using ViewModels
+@model WorkOrderDetailViewModel
+@{
+    Layout = null;
+    var totalEstimatedLaborHours = Model.CostPerformance.TaskLabors.Sum(x => x.Hours);
+    var totalActualLaborHours = Model.CostPerformance.LaborsCostPerformance.Sum(x => x.ActualHours);
+
+    var totalLaborCost = Model.CostPerformance.TaskLabors.Sum(x => x.Total);
+    var totalLaborActualCost = Model.CostPerformance.LaborsCostPerformance.Sum(x => x.ActualCost);
+    var totalMaterialCost = Model.CostPerformance.MaterialsCostPerformance.Sum(x => x.Cost);
+    var totalMaterialActualCost = Model.CostPerformance.MaterialsCostPerformance.Sum(x => x.ActualCost);
+    var totalEquipmentCost = Model.CostPerformance.EquipmentsCostPerformance.Sum(x => x.Cost);
+    var totalEquipmentActualCost = Model.CostPerformance.EquipmentsCostPerformance.Sum(x => x.ActualCost);
+    var totalEstimatedCost = totalLaborCost + totalMaterialCost + totalEquipmentCost;
+    var totalActualCost = totalLaborActualCost + totalMaterialActualCost + totalEquipmentActualCost;
+}
+<link href="~/css/custom/print.css" rel="stylesheet" />
+<div class="col-12">
+    <div class="row">
+        <div class="col-6">
+            <div class="mb-3 form-group">
+                <label asp-for="SystemGeneratedId" class="form-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.SystemGeneratedId) ? "-" : Model.SystemGeneratedId)</div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="mb-3 form-group">
+                <label asp-for="Manager" class="form-label fw-600">Requester Name</label>
+                <div>@(string.IsNullOrEmpty(Model.Manager.Name) ? "-" : Model.Manager.Name)</div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="mb-3 form-group">
+                <label asp-for="Manager" class="form-label fw-600">Requester Telephone</label>
+                <div>@(string.IsNullOrEmpty(Model.Manager.Telephone) ? "-" : Model.Manager.Telephone)</div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="mb-3 form-group">
+                <label asp-for="Manager" class="form-label fw-600">Requester Email</label>
+                <div>@(string.IsNullOrEmpty(Model.Manager.Email) ? "-" : Model.Manager.Email)</div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="mb-3 form-group">
+                <label asp-for="Intersection" class="form-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.Intersection) ? "-" : Model.Intersection)</div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="mb-3 form-group">
+                <label asp-for="Description" class="form-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.Description) ? "-" : Model.Description)</div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="mb-3 form-group">
+                <label asp-for="AssetTypeName" class="form-label fw-600">Asset Type</label>
+                <div>@(string.IsNullOrEmpty(Model.AssetTypeName) ? "-" : Model.AssetTypeName)</div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="mb-3 form-group">
+                <label asp-for="Asset.SystemGeneratedId" class="form-label fw-600"></label>
+                <div>@(string.IsNullOrEmpty(Model.Asset.FormattedSystemGeneratedId) ? "-" : Model.Asset.FormattedSystemGeneratedId)</div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="mb-3 form-group">
+                <label asp-for="Urgency" class="form-label fw-600"></label>
+                <div>@Model.Urgency</div>
+            </div>
+        </div>
+    </div>
+    @await Html.PartialAsync("~/Views/WorkOrder/Actual/_Actual.cshtml", Model.CostPerformance)
+</div>

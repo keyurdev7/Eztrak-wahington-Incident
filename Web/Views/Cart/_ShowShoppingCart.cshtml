@@ -1,0 +1,20 @@
+﻿@model ViewModels.CartViewModel
+<a id="aCartLink" class="cart-btn order-lg-6 position-relative" href="#" onclick="fnRedirectToCart()">
+    <img src="~/img/icons/orders.svg">
+    <span class="name">My Orders</span>
+    @if (Model.TotalItems > 0)
+    {
+        <span class="count">@Model.TotalItems</span>
+    }
+</a>
+<script>
+    function fnRedirectToCart() {
+        var url = '@Url.Action("Index", "Cart", new { area = "" })'
+        if ($('#aCartLink').find('span.count').length > 0) {
+            window.location = url;
+        }
+        else {
+            SwalErrorAlert('Your cart is empty');
+        }
+    }
+</script>

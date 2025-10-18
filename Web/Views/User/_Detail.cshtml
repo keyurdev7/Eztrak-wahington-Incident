@@ -1,0 +1,46 @@
+﻿@using ViewModels.Users;
+@model UserDetailViewModel
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row mb-3">
+            <div class="form-group d-flex">
+                <label class="form-label detail-label fw-600">Profile Image</label>
+                <div class="text-center image-container">
+                    <img class="img-responsive rounded-circle image-thumbnail rounded-image" src="@Model.Image" id="image-thumbnail" alt="" style="max-width:200px;">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="mb-3  form-group d-flex">
+                    <label asp-for="FirstName" class="form-label detail-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.FirstName) ? "-" : Model.FirstName)</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3  form-group d-flex">
+                    <label asp-for="LastName" class="form-label detail-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.LastName) ? "-" : Model.LastName)</div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="mb-3  form-group d-flex">
+                    <label asp-for="Username" class="form-label detail-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.Username) ? "-" : Model.Username)</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3  form-group d-flex">
+                    <label asp-for="PhoneNumber" class="form-label detail-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.PhoneNumber) ? "-" : Model.PhoneNumber)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,1805 @@
+﻿@using System.Web
+@using Microsoft.AspNetCore.Html
+@using ViewModels.Incident
+@model ValidationWorkflowViewModel
+
+<link href="~/css/custom/views/incident/validation.css" rel="stylesheet" />
+
+<div class="validation-center">
+    <div class="workflow">
+        <form id="incident_validation_form">
+
+            <div class="tabHeader">
+                <div class="d-flex align-items-center  titleSec ">
+                    <button type="button" class="backBtn" data-bs-dismiss="modal" id="closeModalBtn"><i class="fa fa-arrow-left-long"></i></button>
+                    <h5 class="modal-title"> @Model.IVDetails.IncidentId</h5>
+                </div>
+                <!-- Step Navigation -->
+                <div class="steps mb-0 d-flex justify-content-between">
+                    <div class="step active" data-step="1">
+                        <div class="step-icon">
+                            <i class="fa-regular fa-file-lines"></i>
+                        </div>
+                        <div class="step-label">Overview</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-icon">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div class="step-label">Validation</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-icon">
+                            <i class="fa-regular fa-user"></i>
+                        </div>
+                        <div class="step-label">Personnel</div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-icon">
+                            <i class="fa-solid fa-clipboard-check"></i>
+                        </div>
+                        <div class="step-label">Assessment</div>
+                    </div>
+
+                    <div class="step" data-step="5">
+                        <div class="step-icon">
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                        </div>
+                        <div class="step-label">Repair</div>
+                    </div>
+                    <div class="step" data-step="6">
+                        <div class="step-icon">
+                            <i class="fa-solid fa-rotate"></i>
+                        </div>
+                        <div class="step-label">Restoration</div>
+                    </div>
+                    <div class="step" data-step="7">
+                        <div class="step-icon">
+                            <i class="fa-regular fa-circle-check"></i>
+                        </div>
+                        <div class="step-label">Closeout</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Header -->
+            @*  <div class="mb-4 titleofWorkflow">
+                    <h3 class="fw-bold">Validation Workflow - @Model.IVDetails.IncidentId</h3>
+                    <p class="text-muted">Manager validation and response coordination</p>
+                </div> *@
+
+
+            <div class="container-fluid">
+                <!-- Navigation Buttons -->
+                <div class="d-flex justify-content-between mt-3">
+                    <button class="btn btn-light btnPrevious" id="prevBtn" type="button"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                    <button class="btn btn-primary btnNext" id="nextBtn" type="button">Next <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+
+                <!-- Step Content -->
+                <div class="step-content mt-3" id="step-1">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="validationCard callerInfo">
+                                <div class="section-header d-flex align-items-center justify-content-between">
+                                    <h6 class="mb-0">Caller Information</h6>
+                                </div>
+                                <div class="section-body">
+                                    <div class="info-item">
+                                        <i class="fa-regular fa-user"></i>
+                                        <span class="info-title">Caller Name</span>
+                                        <span class="info-sub">@Model.IVDetails.CallerName</span>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <i class="fa-solid fa-phone"></i>
+                                        <span class="info-title">@Model.IVDetails.CallerContact</span>
+                                        <span class="info-sub">Primary contact</span>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                        <span class="info-title">Caller Address</span>
+                                        <span class="info-sub">@Model.IVDetails.CallerAddress</span>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <i class="fa-regular fa-calendar"></i>
+                                        <span class="info-title">Call Time</span>
+                                        <span class="info-sub">@Model.IVDetails.CallerDateTime</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="validationCard incidentLoc">
+                                <div class="section-header d-flex align-items-center justify-content-between">
+                                    <h6 class="mb-0">Incident Location</h6>
+                                </div>
+                                <div class="section-body">
+                                    <div class="info-item">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                        <span class="info-title">Address</span>
+                                        <span class="info-sub">@Model.IVDetails.IncidentLocation</span>
+                                        <a href="#" class="map-link" onclick="OpenIncidentMap()"><i class="fa-solid fa-map"></i> View on Map</a>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <i class="fa-solid fa-road"></i>
+                                        <span class="info-title">Nearest Intersection</span>
+                                        <span class="info-sub" @Model.IVDetails.NearestIntersection</span>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <i class="fa-solid fa-cube"></i>
+                                        <span class="info-title">Affected Assets</span>
+                                        <span class="assets info-sub">
+                                            @foreach (var item in Model.IVDetails.AffectedAssets)
+                                            {
+                                                <span>@item</span>
+                                            }
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="validationCard incidentDetail">
+                                <div class="section-header d-flex align-items-center justify-content-between">
+                                    <h6 class="mb-0">Incident Details</h6>
+                                </div>
+                                <div class="section-body">
+                                    <div class="detailInfoSec d-flex align-items-center gap-2 mb-2">
+                                        <div class="info-sec">
+                                            <span class="info-title">Event Type</span>
+                                        </div>
+                                        <div>@Model.IVDetails.EventType</div>
+                                    </div>
+                                    <div class="detailInfoSec d-flex align-items-center gap-2 mb-2">
+                                        <div class="info-sec">
+                                            <span class="info-title">Reported Severity</span>
+                                        </div>
+                                        <span class="badge orange" style="background-color: @Model.IVDetails.SeverityColor !important">@Model.IVDetails.Severity</span>
+                                    </div>
+                                    <div class="detailInfoSec d-flex align-items-center gap-2 mb-2">
+                                        <div class="info-sec">
+
+                                            <span class="info-title">Current Status</span>
+                                        </div>
+                                        <span class="badge red" style="background-color: @Model.IVDetails.IncidentStatusColor !important">@Model.IVDetails.IncidentStatus</span>
+                                    </div>
+                                    <div class="detailInfoSec">
+                                        <div class="info-sec">
+                                            <span class="info-title mb-2">Description</span>
+                                            <div class="desc-box">
+                                                @Model.IVDetails.DescriptionIssue
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="validationCard safty">
+                         <div class="section-header d-flex align-items-center justify-content-between">
+                            <h6 class="mb-0">Safety Assessment</h6>
+                         </div>
+                        <div class="section-body">
+                            <div class="grid">
+                                @RenderBox("Gas Odor Present", Model.IVDetails.GasPresent)
+                                @RenderBox("Hissing Sound", Model.IVDetails.HissingPresent)
+                                @RenderBox("Visible Damage/Fire", Model.IVDetails.VisibleDamagePresent)
+                                @RenderBox("People Injured", Model.IVDetails.PeopleInjured)
+                                @RenderBox("Evacuation Required", Model.IVDetails.EvacuationRequired)
+                                @RenderBox("Water Present", Model.IVDetails.WaterPresent)
+                            </div>
+                        </div>
+                     </div>  
+                </div>
+
+                <div class="step-content mt-3 d-none" id="step-2">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="left-panel">
+                                <button id="addLocationBtn" type="button" class="btn add-location-btn mb-3"><i class="fa fa-plus"></i>Add Location</button>
+
+                                @foreach (var item in Model.IVAdditionalLocations)
+                                {
+                                    if (item.IsPrimaryLocation)
+                                    {
+                                        <div class="location-card active" data-location="@item.Id" data-lat="@item.Lat" data-lng="@item.Long">
+                                            <div class="d-flex align-items-start">
+                                                <div class="ms-2">
+                                                    <div class="location-title fw-semibold">
+                                                        @item.AdditionalLocation
+                                                    </div><span class="badge-primary">Primary</span> <span class="badge-status">In Progress</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="location-card" data-location="@item.Id" data-lat="@item.Lat" data-lng="@item.Long">
+                                            <div class="d-flex align-items-start justify-content-between">
+                                                <div class="ms-2">
+                                                    <div class="location-title fw-semibold">
+                                                        @item.AdditionalLocation
+                                                    </div><span class="badge-status">In Progress</span>
+                                                </div>
+                                                <div class="ms-1">
+                                                    <i class="far fa-trash-alt" id="dltAddLoc"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                <div id="newLocation" class="new-location d-none">
+                                    <label class="form-label small mb-1">New Location Address</label>
+                                    <input type="text" id="newAddress" class="form-control mb-2" placeholder="123 Main St, City, ST 12345">
+                                    <ul id="suggestionsnewAddress" class="suggestions-list"></ul>
+                                    <div class="d-flex gap-2">
+                                        <button id="addBtn" class="btn btn-primary btn-sm w-50">Add</button>
+                                        <button id="cancelBtn" type="button" class="btn btn-dark btn-sm w-50 cancel-location-btn">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-9 loaderDiv">
+                            @foreach (var itemLoc in Model.IVAdditionalLocations)
+                            {
+                                @if (itemLoc.IsPrimaryLocation)
+                                {
+                                    <input type="hidden" id="hdnCloneLocId" value="@itemLoc.Id" />
+                                }
+                                <div id="rightPanel_@itemLoc.Id" data-add-loc="@itemLoc.Id" class="right-panel" style="@(!itemLoc.IsPrimaryLocation ? "display:none" : "display: block")">
+                                    <div class="section-header">
+                                        <h6 class="mb-0">Location Validation</h6>
+                                    </div>
+                                    <div class="section-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group" id="divaddloc_Severity_@itemLoc.Id">
+                                                    <label>Confirmed Severity Level <span style="color:red">*</span></label>
+                                                    <select class="form-select" required id="severityLevelId" asp-for="@Model.IVValidation.severityLevelId">
+                                                        <option value="" selected>Select confirmed severity</option>
+                                                        @foreach (var item in Model.IVValidation.severityLevels)
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    </select>
+                                                    <small>Original severity: <strong>@Model.IVValidation.severityLevel</strong></small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group" id="divaddloc_DiscoveryPerimeter_@itemLoc.Id">
+                                                    <label>Discovery Perimeter <span style="color:red">*</span></label>
+                                                    <select class="form-select" required id="RadiusId" asp-for="@Model.IVValidation.RadiusId">
+                                                        <option value="" selected>Select radius</option>
+                                                        <option value="1">1 Mile</option>
+                                                        <option value="2">3 Miles</option>
+                                                        <option value="3">5 Miles</option>
+                                                    </select>
+                                                    <small>This creates a safety perimeter around the incident location</small>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group" id="divaddloc_ICP_@itemLoc.Id">
+                                                    <label>ICP Location <span style="color:red">*</span></label>
+                                                    <input type="hidden" id="hdnLat_@itemLoc.Id" value="0" />
+                                                    <input type="hidden" id="hdnLon_@itemLoc.Id" value="0" />
+                                                    <input type="text" id="ICPLocation_@itemLoc.Id" class="form-control mb-2" placeholder="123 Main St, City, ST 12345">
+                                                    <ul id="suggestionsICPLocation_@itemLoc.Id" class="suggestions-list"></ul>
+
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group" id="divaddloc_Source_@itemLoc.Id">
+                                                    <label>Source <span style="color:red">*</span></label>
+                                                    <input type="text" id="Source" class="form-control mb-2">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div id="map_@itemLoc.Id" style="height:250px; width:100%; display:none" class="mapDivClass"></div>
+                                            </div>
+                                        </div>
+                                        <script>
+                                            $(document).ready(function () {
+                                                initICPLocationAutocomplete(@itemLoc.Id);
+                                            });
+                                        </script>
+                                        <div style="display:none">
+                                            <h6 class="titleOfteams"><i class="fa-solid fa-users"></i> Response Teams <span class="text-danger">*</span> (Select one or more)</h6>
+
+                                            @foreach (var item in Model.IVIncidentTeamUser)
+                                            {
+                                                <div class="team-section">
+                                                    <div class="form-check teamSelect">
+                                                        <input class="form-check-input team-check" type="checkbox" id="teamAlpha" data-team-id="@item.TeamId">
+                                                        <label class="form-check-label fw-semibold" for="teamAlpha">@item.TeamName</label>
+                                                    </div>
+                                                    <div id="alphaDetails" class="team-details d-none">
+                                                        <div class="team-members">
+                                                            <label class="form-label fw-semibold">Select Team Members <span class="text-danger">*</span>(at least one)</label><br>
+                                                            <div class="row">
+                                                                @foreach (var itemUser in item.Users)
+                                                                {
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-check form-check-inline">
+                                                                            <input class="form-check-input" type="checkbox" id="user_@($"{item.TeamId}_{itemUser.Id}")">
+                                                                            <label class="form-check-label">@($"{itemUser.LastName} {itemUser.FirstName}")</label>
+
+                                                                        </div>
+                                                                    </div>
+                                                                }
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="work-steps mb-3">
+                                                            <label class="form-label fw-semibold"><i class="fa fa-list"></i>Work Steps for Emergency Response Team Alpha</label>
+                                                            <div class="work-step d-flex align-items-start justify-content-between">
+                                                                <div>
+                                                                    <div class="fw-semibold StepName">Gas Step</div>
+                                                                    <div class="StepDescription">This is the test description</div>
+                                                                </div>
+                                                                <div class="del-workstep"><i class="far fa-trash-alt"></i></div>
+                                                            </div>
+
+                                                            <div class="add-step-area mt-2">
+                                                                <input type="text" class="form-control mb-2" placeholder="Step name (e.g., Isolate gas line)..."> <input type="text" class="form-control mb-2" placeholder="Description (optional)..."> <input type="text" class="form-control mb-2" placeholder="Assign to specific person (optional)..."> <button class="btn btn-primary w-100">Add Work Step</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="roles-gates-sec">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="validationCard assignedRoles">
+                                        <div class="section-header">
+                                            <h6 class="mb-0">Assigned Roles</h6>
+                                        </div>
+                                        <div class="section-body">
+                                            <div>
+                                                <div class="form-group">
+                                                    <label>
+                                                        Incident Commander @* <span style="color:red">*</span> *@
+                                                    </label>
+                                                    <select class="form-select" required id="severityLevelId" asp-for="@Model.IVValidation.assignedRole.IncidentCommanderId">
+                                                        <option value="" selected>Select Incident Commander</option>
+                                                        @foreach (var item in Model.IVValidation.UserList)
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="form-group">
+                                                    <label>
+                                                        Field Env. Rep (FER) @* <span style="color:red">*</span> *@
+                                                    </label>
+                                                    <select class="form-select" required id="severityLevelId" asp-for="@Model.IVValidation.assignedRole.FieldEnvRepId">
+                                                        <option value="" selected>Select Field Env. Rep</option>
+                                                        @foreach (var item in Model.IVValidation.UserList)
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="form-group">
+                                                    <label>GEC Coordinator @* <span style="color:red">*</span> *@</label>
+                                                    <select class="form-select" required id="severityLevelId" asp-for="@Model.IVValidation.assignedRole.GECCoordinatorId">
+                                                        <option value="" selected>Select GEC Coordinator</option>
+                                                        @foreach (var item in Model.IVValidation.UserList)
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="form-group">
+                                                    <label>Engineering Lead @* <span style="color:red">*</span> *@</label>
+                                                    <select class="form-select" required id="severityLevelId" asp-for="@Model.IVValidation.assignedRole.EngineeringLeadId">
+                                                        <option value="" selected>Select Engineering Lead</option>
+                                                        @foreach (var item in Model.IVValidation.UserList)
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="validationCard validationGates">
+                                        <div class="section-header">
+                                            <h6 class="mb-0">Validation Gates</h6>
+                                        </div>
+                                        <div class="section-body">
+
+                                            <div class="form-section d-flex align-items-center indicators">
+                                                <h6>Containment Acknowledgement</h6>
+                                                <div class="selectRadio">
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" asp-for="@Model.IVValidation.validationGates.ContainmentAcknowledgement"
+                                                               id="WaterPresentYes" value="1">
+                                                        <label class="form-check-label" for="WaterPresentYes">Yes</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        @if (Model.Id > 0)
+                                                        {
+                                                            <input class="form-check-input" type="radio" asp-for="@Model.IVValidation.validationGates.ContainmentAcknowledgement"
+                                                                   id="WaterPresentNo" value="0">
+                                                        }
+                                                        else
+                                                        {
+                                                            <input class="form-check-input" type="radio" checked asp-for="@Model.IVValidation.validationGates.ContainmentAcknowledgement"
+                                                                   id="WaterPresentNo" value="0">
+                                                        }
+                                                        <label class="form-check-label" for="WaterPresentNo">No</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-section d-flex align-items-center indicators">
+                                                <h6>Exception Request</h6>
+                                                <div class="selectRadio">
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" asp-for="@Model.IVValidation.validationGates.Exception"
+                                                               id="WaterPresentYes" value="1">
+                                                        <label class="form-check-label" for="WaterPresentYes">Yes</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        @if (Model.Id > 0)
+                                                        {
+                                                            <input class="form-check-input" type="radio" asp-for="@Model.IVValidation.validationGates.Exception"
+                                                                   id="WaterPresentNo" value="0">
+                                                        }
+                                                        else
+                                                        {
+                                                            <input class="form-check-input" type="radio" checked asp-for="@Model.IVValidation.validationGates.Exception"
+                                                                   id="WaterPresentNo" value="0">
+                                                        }
+                                                        <label class="form-check-label" for="WaterPresentNo">No</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" asp-for="@Model.IVValidation.validationGates.Exception"
+                                                               id="WaterPresentUnknown" value="2">
+                                                        <label class="form-check-label" for="WaterPresentUnknown">N/A</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-section d-flex align-items-center indicators">
+                                                <h6>Independent Inspection Required</h6>
+                                                <div class="selectRadio">
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" asp-for="@Model.IVValidation.validationGates.IndependentInspection"
+                                                               id="WaterPresentYes" value="1">
+                                                        <label class="form-check-label" for="WaterPresentYes">Yes</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        @if (Model.Id > 0)
+                                                        {
+                                                            <input class="form-check-input" type="radio" asp-for="@Model.IVValidation.validationGates.IndependentInspection"
+                                                                   id="WaterPresentNo" value="0">
+                                                        }
+                                                        else
+                                                        {
+                                                            <input class="form-check-input" type="radio" checked asp-for="@Model.IVValidation.validationGates.IndependentInspection"
+                                                                   id="WaterPresentNo" value="0">
+                                                        }
+                                                        <label class="form-check-label" for="WaterPresentNo">No</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-section indicators">
+                                                <h6>Regulatory Notifications</h6>
+                                                <div class="d-grid gap-2" style="grid-template-columns: repeat(3, 1fr);">
+                                                    <div class="form-check form-check-inline eventCheck">
+                                                        <input class="form-check-input" type="checkbox" id="CPOC" name="IVValidation.validationGates.Regulatory" value="1">
+                                                        <label class="form-check-label" for="eventType_26">
+                                                            CPOC
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline eventCheck">
+                                                        <input class="form-check-input" type="checkbox" id="PHMSA" name="IVValidation.validationGates.Regulatory" value="2">
+                                                        <label class="form-check-label" for="eventType_6">
+                                                            PHMSA
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline eventCheck">
+                                                        <input class="form-check-input" type="checkbox" id="NTSB" name="IVValidation.validationGates.Regulatory" value="3">
+                                                        <label class="form-check-label" for="eventType_7">
+                                                            NTSB
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline eventCheck">
+                                                        <input class="form-check-input" type="checkbox" id="EPA" name="IVValidation.validationGates.Regulatory" value="4">
+                                                        <label class="form-check-label" for="eventType_4">
+                                                            EPA
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline eventCheck">
+                                                        <input class="form-check-input" type="checkbox" id="LFD" name="IVValidation.validationGates.Regulatory" value="5">
+                                                        <label class="form-check-label" for="eventType_11">
+                                                            Local Fire Dept
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline eventCheck">
+                                                        @* <input type="radio" id="IsOtherEvent" class="form-check-input" name="incidentDetails.IsOtherEvent"> *@
+                                                        <input class="form-check-input" type="checkbox" id="IsOtherEventID" asp-for="IVValidation.validationGates.IsOtherEvent">
+                                                        <label class="form-check-label" asp-for="IVValidation.validationGates.IsOtherEvent">Other</label>
+                                                    </div>
+                                                    <div class="mb-3 OtherEventDetail" style="display:none">
+                                                        <input type="text" id="OtherEventDetail" class="form-control" asp-for="IVValidation.validationGates.OtherEventDetail" value="">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-content mt-3 d-none" id="step-3">
+                    <div class="validationCard personnelSec">
+                        <div class="section-header d-flex align-items-center justify-content-between">
+                            <h6 class="mb-0">Personnel</h6>
+                            <button class="btn btn-primary btnNext" id="addPersonal" type="button"><i class="fa-solid fa-plus"></i> Add Personnel</button>
+                        </div>
+                        <div class="section-body">
+                            <div class="row clonePersonalDiv gap-2 justify-content-start">
+                                <div class="col-md-4 Personnel">
+                                        <div class="title-delete  d-flex align-items-center justify-content-between">
+                                            <p class="AddTitle">Personnel</p>
+
+                                            <div class="ms-1 dltPersonnelbtn" style="display:none; cursor:pointer">
+                                                <i class="far fa-trash-alt" id="dltPersonnel" style="float:right"></i>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" id="div_NameofUser">
+                                            <label>Name of User <span style="color:red">*</span></label>
+                                            <select class="form-select" required id="userId" onchange="getCompanyAndRole($(this))">
+                                                <option value="" selected>Select User</option>
+                                                @foreach (var item in Model.IVValidation.UserList)
+                                                {
+                                                    <option value="@item.Value">@item.Text</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="form-group" id="div_CompanyName">
+                                            <label>Company Name <span style="color:red">*</span></label>
+                                            <select class="form-select" required id="companyId" disabled>
+                                                <option value="" selected>Select Company</option>
+                                                @foreach (var item in Model.IVValidation.CompanyList)
+                                                {
+                                                    <option value="@item.Value">@item.Text</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="form-group" id="div_Role">
+                                            <label>Select Role <span style="color:red">*</span></label>
+                                            <select class="form-select" required id="roleId" disabled>
+                                                <option value="" selected>Select Role</option>
+                                                @foreach (var item in Model.IVValidation.RoleList)
+                                                {
+                                                    <option value="@item.Value">@item.Text</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="form-group" id="div_Shift">
+                                            <label>Select Shift <span style="color:red">*</span></label>
+                                            <select class="form-select" required id="shiftId">
+                                                <option value="" selected>Select Shift</option>
+                                                @foreach (var item in Model.IVValidation.ShiftsList)
+                                                {
+                                                    <option value="@item.Value">@item.Text</option>
+                                                }
+                                            </select>
+                                        </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="step-content mt-3 d-none" id="step-4">
+                     <div class="validationCard assessmentSec">
+                        <div class="section-header d-flex align-items-center justify-content-between">
+                            <h6 class="mb-0">Assessment</h6>
+                        </div>
+                        <div class="section-body">
+                            <div class="row"> 
+                                <div class=" col-md-4">
+                                    <div class="borderCard IncidentCommander">
+                                        <h6 class="assestitle">Incident Commander</h6>
+                                        <div class="borderCard mb-4" id="div_CreateMCR">
+                                            <h6 class="assesSubtitle">Create MCR</h6>
+                                            <div class="form-group" id="div_Assignee">
+                                                <label>Assignee <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="assignId">
+                                                    <option value="" selected>Select User</option>
+                                                    @foreach (var item in Model.IVValidation.UserList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group" id="div_Status">
+                                                <label>Status <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="status">
+                                                    <option value="" selected>Select Status</option>
+                                                    @foreach (var item in Model.IVValidation.StatusList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="borderCard mb-4" id="div_NotifyclaimAndEngineering">
+                                            <h6 class="assesSubtitle">Notify claim & Engineering</h6>
+                                            <div class="form-group" id="div_Assignee">
+                                                <label>Assignee <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="assignId">
+                                                    <option value="" selected>Select User</option>
+                                                    @foreach (var item in Model.IVValidation.UserList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group" id="div_Status">
+                                                <label>Status <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="status">
+                                                    <option value="" selected>Select Status</option>
+                                                    @foreach (var item in Model.IVValidation.StatusList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="borderCard mb-4" id="div_EstablishICP">
+                                            <h6 class="assesSubtitle">Establish ICP</h6>
+                                            <div class="form-group" id="div_Assignee">
+                                                <label>Assignee <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="assignId">
+                                                    <option value="" selected>Select User</option>
+                                                    @foreach (var item in Model.IVValidation.UserList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group" id="div_Status">
+                                                <label>Status <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="status">
+                                                    <option value="" selected>Select Status</option>
+                                                    @foreach (var item in Model.IVValidation.StatusList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="borderCard FieldEnvironmentalRepresentative">
+                                        <h6 class="assestitle">Field Environmental Representative</h6>
+                                        <div class="borderCard mb-4" id="div_Preparecontainmentarea">
+                                            <h6 class="assesSubtitle"> Prepare containment area (drums/totes/Baker tank)</h6>
+                                            <div class="form-group" id="div_Assignee">
+                                                <label>Assignee <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="assignId">
+                                                    <option value="" selected>Select User</option>
+                                                    @foreach (var item in Model.IVValidation.UserList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group" id="div_Status">
+                                                <label>Status <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="status">
+                                                    <option value="" selected>Select Status</option>
+                                                    @foreach (var item in Model.IVValidation.StatusList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="borderCard mb-4" id="div_Labelcontainers">
+                                            <h6 class="assesSubtitle">Label containers; log IDs and capacity</h6>
+                                            <div class="form-group" id="div_Assignee">
+                                                <label>Assignee <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="assignId">
+                                                    <option value="" selected>Select User</option>
+                                                    @foreach (var item in Model.IVValidation.UserList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group" id="div_Status">
+                                                <label>Status <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="status">
+                                                    <option value="" selected>Select Status</option>
+                                                    @foreach (var item in Model.IVValidation.StatusList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="borderCard EngineeringAndGEC">
+                                        <h6 class="assestitle"> Engineering & GEC</h6>
+                                        <div class="borderCard mb-4" id="div_Retrievesystemmaps">
+                                            <h6 class="assesSubtitle">Retrieve system maps (regulators, BO streets, elevations)</h6>
+                                            <div class="form-group" id="div_Assignee">
+                                                <label>Assignee <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="assignId">
+                                                    <option value="" selected>Select User</option>
+                                                    @foreach (var item in Model.IVValidation.UserList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group" id="div_Status">
+                                                <label>Status <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="status">
+                                                    <option value="" selected>Select Status</option>
+                                                    @foreach (var item in Model.IVValidation.StatusList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="borderCard mb-4" id="div_Marklowpoints">
+                                            <h6 class="assesSubtitle">Mark low points & squeeze points</h6>
+                                            <div class="form-group" id="div_Assignee">
+                                                <label>Assignee <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="assignId">
+                                                    <option value="" selected>Select User</option>
+                                                    @foreach (var item in Model.IVValidation.UserList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group" id="div_Status">
+                                                <label>Status <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="status">
+                                                    <option value="" selected>Select Status</option>
+                                                    @foreach (var item in Model.IVValidation.StatusList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="borderCard mb-4" id="div_Initiatecosttracking">
+                                            <h6 class="assesSubtitle">Initiate cost tracking (RBA) for vendors</h6>
+                                            <div class="form-group" id="div_Assignee">
+                                                <label>Assignee <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="assignId">
+                                                    <option value="" selected>Select User</option>
+                                                    @foreach (var item in Model.IVValidation.UserList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group" id="div_Status">
+                                                <label>Status <span style="color:red">*</span></label>
+                                                <select class="form-select" required id="status">
+                                                    <option value="" selected>Select Status</option>
+                                                    @foreach (var item in Model.IVValidation.StatusList)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                
+                    </div>
+                </div>
+                <div class="step-content mt-3 d-none" id="step-5">
+                    <div class="validationCard repairSec">
+                        <div class="section-header d-flex align-items-center justify-content-between">
+                            <h6 class="mb-0">Repair</h6>
+                        </div>
+                        <div class="section-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="borderCard">
+                                        <h6 class="assestitle">Per-Operation Setup</h6>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="borderCard SourceOfLeak">
+                                                    <h6 class="assesSubtitle">Use "Identifying Source of Leak" Checklist</h6>
+                                                    <div class="form-group mb-3" id="div_ResponsibleRole">
+                                                        <input type="hidden" id="hdn_SOLResponsibleRole" asp-for="IVValidation.validationRepair.SourceOfLeak" name="IVValidation.validationRepair.SourceOfLeak" />
+                                                        <label>Responsible Role (Multiple)</label>
+                                                        <div class="multiselect-dropdown" id="chk_SOLResponsibleRole">
+                                                            <div class="dropdown-btn">Choose roles</div>
+                                                            <div class="dropdown-list">
+                                                                @foreach (var item in Model.IVValidation.RoleList)
+                                                                {
+                                                                    <label><input class="form-check-input" type="checkbox" value="@item.Value" data-name="@item.Text"> @item.Text</label>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group" id="div_Status">
+                                                        <label>Status <span style="color:red">*</span></label>
+                                                        <select class="form-select" required id="chk_SOLStatus" asp-for="@Model.IVValidation.validationRepair.SourceOfLeakStatus">
+                                                            <option value="" selected>Select Status</option>
+                                                            @foreach (var item in Model.IVValidation.StatusList)
+                                                            {
+                                                                <option value="@item.Value">@item.Text</option>
+                                                            }
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="borderCard PreventFurtherOutage">
+                                                    <h6 class="assesSubtitle">Identify ideal purge locations to prevent further outage (use engineering data)</h6>
+                                                    <div class="form-group mb-3" id="div_ResponsibleRole">
+                                                        <input type="hidden" id="hdn_PFOResponsibleRole" name="IVValidation.validationRepair.PreventFurtherOutage" asp-for="IVValidation.validationRepair.PreventFurtherOutage" />
+                                                        <label>Responsible Role (Multiple)</label>
+                                                        <div class="multiselect-dropdown" id="chk_PFOResponsibleRole">
+                                                            <div class="dropdown-btn">Choose roles</div>
+                                                            <div class="dropdown-list">
+                                                                @foreach (var item in Model.IVValidation.RoleList)
+                                                                {
+                                                                    <label><input class="form-check-input" type="checkbox" value="@item.Value" data-name="@item.Text"> @item.Text</label>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group" id="div_Status">
+                                                        <label>Status <span style="color:red">*</span></label>
+                                                        <select class="form-select" required id="chk_PFOStatus" asp-for="@Model.IVValidation.validationRepair.PreventFurtherOutageStatus">
+                                                            <option value="" selected>Select Status</option>
+                                                            @foreach (var item in Model.IVValidation.StatusList)
+                                                            {
+                                                                <option value="@item.Value">@item.Text</option>
+                                                            }
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="borderCard VacuumTruckFittings">
+                                                    <h6 class="assesSubtitle">Verify vacuum truck fittings (2" cam-lock and 2" → ¾" adaptors available)</h6>
+                                                    <div class="form-group" id="div_ResponsibleRole">
+                                                        <input type="hidden" id="hdn_VTFResponsibleRole" name="IVValidation.validationRepair.VacuumTruckFitting" asp-for="IVValidation.validationRepair.VacuumTruckFitting" />
+
+                                                        <div class="form-group mb-3" id="div_ResponsibleRole">
+                                                            <label>Responsible Role (Multiple)</label>
+                                                            <div class="multiselect-dropdown" id="chk_VTFResponsibleRole">
+                                                                <div class="dropdown-btn">Choose roles</div>
+                                                                <div class="dropdown-list">
+                                                                    @foreach (var item in Model.IVValidation.RoleList)
+                                                                    {
+                                                                        <label><input class="form-check-input" type="checkbox" value="@item.Value" data-name="@item.Text"> @item.Text</label>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group" id="div_Status">
+                                                        <label>Status <span style="color:red">*</span></label>
+                                                        <select class="form-select" required id="chk_VTFStatus" asp-for="@Model.IVValidation.validationRepair.VacuumTruckFittingStatus">
+                                                            <option value="" selected>Select Status</option>
+                                                            @foreach (var item in Model.IVValidation.StatusList)
+                                                            {
+                                                                <option value="@item.Value">@item.Text</option>
+                                                            }
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+
+                    </div>
+                   
+                </div>
+
+                <div class="step-content mt-3 d-none" id="step-6">
+
+                    <div class="validationCard restorationSec">
+                        <div class="section-header d-flex align-items-center justify-content-between">
+                            <h6 class="mb-0">Restoration</h6>
+                            <button class="btn btn-primary btnNext" id="addTask" type="button"><i class="fa-solid fa-plus"></i> Add Task</button>
+                        </div>
+                        <div class="section-body">
+                            <div class="row  cloneTaskDiv gap-2 justify-content-start">
+                                <div class="col-md-4 Task ">
+                                    <div class="title-delete  d-flex align-items-center justify-content-between">
+                                        <p class="AddTitle">Task</p>
+
+                                        <div class="ms-1 dltTaskbtn" style="display:none; cursor:pointer">
+                                            <i class="far fa-trash-alt" id="dltTask" style="float:right"></i>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" id="div_TaskDescription">
+                                        <label>Task Description <span style="color:red">*</span></label>
+                                        <textarea class="form-control" id="taskDescription" rows="3"></textarea>
+                                    </div>
+                                    <div class="form-group" id="div_ResponsibleRole">
+
+                                        <input type="hidden" id="hdn_TaskResponsibleRole" value="" />
+
+                                        <div class="form-group mb-3" id="div_TaskResponsibleRole">
+                                            <label>Responsible Role (Multiple)</label>
+                                            <div class="multiselect-dropdown" id="chk_TaskResponsibleRole">
+                                                <div class="dropdown-btn">Choose roles</div>
+                                                <div class="dropdown-list">
+                                                    @foreach (var item in Model.IVValidation.RoleList)
+                                                    {
+                                                        <label><input class="form-check-input" type="checkbox" value="@item.Value" data-name="@item.Text"> @item.Text</label>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group" id="div_Status">
+                                        <label>Status <span style="color:red">*</span></label>
+                                        <select class="form-select" required id="status">
+                                            <option value="" selected>Select Status</option>
+                                            @foreach (var item in Model.IVValidation.StatusList)
+                                            {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="shadow-sm step-content mt-3 d-none" id="step-7">
+                    <div class="validationCard closeoutSec">
+                        <div class="section-header d-flex align-items-center justify-content-between">
+                            <h6 class="mb-0">Closeout</h6>
+                            <button class="btn btn-primary btnNext" id="addCloseoutTask" type="button"><i class="fa-solid fa-plus"></i> Add Task</button>
+                        </div>
+                        <div class="section-body">
+                            <div class="row  cloneCloseoutTaskDiv gap-2 justify-content-start">
+                                <div class="col-md-4 CloseoutTask ">
+                                    <div class="title-delete  d-flex align-items-center justify-content-between">
+                                        <p class="AddTitle">Task</p>
+                                        <div class="ms-1 dltCloseoutTaskbtn" style="display:none; cursor:pointer">
+                                            <i class="far fa-trash-alt" id="dltCloseoutTask" style="float:right"></i>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" id="div_CloseoutTaskDescription">
+                                        <label>Task Description <span style="color:red">*</span></label>
+                                        <textarea class="form-control" id="CloseouttaskDescription" rows="3"></textarea>
+                                    </div>
+                                    <div class="form-group" id="div_ResponsibleRole">
+
+                                        <input type="hidden" id="hdn_CloseoutTaskResponsibleRole" value="" />
+
+                                        <div class="form-group mb-3" id="div_CloseoutTaskResponsibleRole">
+                                            <label>Responsible Role (Multiple)</label>
+                                            <div class="multiselect-dropdown" id="chk_CloseoutTaskResponsibleRole">
+                                                <div class="dropdown-btn">Choose roles</div>
+                                                <div class="dropdown-list">
+                                                    @foreach (var item in Model.IVValidation.RoleList)
+                                                    {
+                                                        <label><input class="form-check-input" type="checkbox" value="@item.Value" data-name="@item.Text"> @item.Text</label>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group" id="div_Status">
+                                        <label>Status <span style="color:red">*</span></label>
+                                        <select class="form-select" required id="status">
+                                            <option value="" selected>Select Status</option>
+                                            @foreach (var item in Model.IVValidation.StatusList)
+                                            {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                   
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@functions {
+    string GetBoxClass(string value)
+    {
+        return value == "Yes" ? "red" :
+               value == "No" ? "green" :
+                                "gray";
+    }
+
+    IHtmlContent RenderBox(string label, string value)
+    {
+        var boxClass = GetBoxClass(value);
+        return new HtmlString($@"
+            <div class='box {boxClass}'>
+                <span class='label'>{label}</span>
+                <span class='value'>{value}</span>
+            </div>");
+    }
+}
+<script>
+
+    $(document).ready(function() {
+        initMultiselectRepair();
+    });
+
+    $("#IsOtherEventID").change(function () {
+        if ($("#IsOtherEventID").is(":checked")) {
+            $(".OtherEventDetail").show();
+        } else {
+            $(".OtherEventDetail").hide();
+            $("#OtherEventDetail").val(""); // optional: clear value
+        }
+    });
+    // Handle location card click — updates header
+    document.querySelectorAll('.location-card').forEach(card => {
+      card.addEventListener('click', function () {
+        showLoader($(".loaderDiv"));
+        // Remove active class from all cards
+        document.querySelectorAll('.location-card').forEach(c => c.classList.remove('active'));
+
+        // Add active class to current card
+        this.classList.add('active');
+
+        const locid = this.getAttribute('data-location');
+        // const location = this.querySelector('.location-title').textContent;
+
+        // Hide all right panels first
+        document.querySelectorAll('#step-2 .right-panel').forEach(panel => {
+          panel.style.display = 'none';
+        });
+
+        // Show selected right panel by location ID
+        const activePanel = document.querySelector(`#step-2 #rightPanel_${locid}`);
+        if (activePanel) {
+          activePanel.style.display = 'block';
+        }
+
+        setTimeout(function(){
+            hideLoader($(".loaderDiv"));
+        },500)
+
+
+        // ✅ Optional: Update header text if needed
+        // const header = activePanel?.querySelector('h4');
+        // if (header) {
+        //   header.innerHTML = `<i class="fa-solid fa-users"></i> Response Teams for <span class="text-primary">${location}</span>`;
+        // }
+      });
+    });
+
+    function initLocationCardEvents() {
+        document.querySelectorAll('.location-card').forEach(card => {
+            card.removeEventListener('click', onLocationCardClick); // prevent duplicate binding
+            card.addEventListener('click', onLocationCardClick);
+        });
+    }
+
+    function onLocationCardClick() {
+        showLoader($(".loaderDiv"));
+
+        // Remove active class from all cards
+        document.querySelectorAll('.location-card').forEach(c => c.classList.remove('active'));
+
+        // Add active to current
+        this.classList.add('active');
+
+        const locid = this.getAttribute('data-location');
+
+        // Hide all right panels
+        document.querySelectorAll('#step-2 .right-panel').forEach(panel => {
+            panel.style.display = 'none';
+        });
+
+        // Show the selected one
+        const activePanel = document.querySelector(`#step-2 #rightPanel_${locid}`);
+        if (activePanel) activePanel.style.display = 'block';
+
+        // Hide loader after short delay
+        setTimeout(() => hideLoader($(".loaderDiv")), 500);
+    }
+
+    // Universal Team Expand/Collapse logic
+    document.querySelectorAll('.team-check').forEach(check => {
+        check.addEventListener('change', function () {
+            const teamSection = this.closest('.team-section');
+            const details = teamSection.querySelector('.team-details');
+
+            if (details) {
+                details.classList.toggle('d-none', !this.checked);
+            } else if (this.checked) {
+                // if no .team-details found, create a new section dynamically
+                const newDetails = document.createElement('div');
+                newDetails.className = 'team-details ms-4 mt-3';
+                newDetails.innerHTML = `
+                <div class="team-members mb-3">
+                  <label class="form-label fw-semibold">Select Team Members <span class="text-danger">*</span></label><br>
+                  <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" checked><label class="form-check-label">Member A</label></div>
+                  <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" checked><label class="form-check-label">Member B</label></div>
+                  <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" checked><label class="form-check-label">Member C</label></div>
+                </div>
+                <div class="work-steps mb-3">
+                  <label class="form-label fw-semibold"><i class="fa-solid fa-list-check"></i> Work Steps</label>
+                  <div class="work-step">
+                    <span class="fw-semibold">Initial Inspection</span><br><small>Perform quick safety check</small>
+                    <i class="fa-solid fa-trash delete-btn"></i>
+                  </div>
+                  <div class="add-step-area mt-2">
+                    <input type="text" class="form-control mb-2" placeholder="Step name (e.g., Isolate gas line)...">
+                    <input type="text" class="form-control mb-2" placeholder="Description (optional)...">
+                    <input type="text" class="form-control mb-2" placeholder="Assign to specific person (optional)...">
+                    <button class="btn btn-primary w-100"><i class="fa-solid fa-plus"></i> Add Work Step</button>
+                  </div>
+                </div>`;
+                teamSection.appendChild(newDetails);
+            }
+        });
+    });
+
+    // Optional: handle delete button (remove work step)
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('delete-btn')) {
+            e.target.closest('.work-step').remove();
+        }
+    });
+
+    // ---------- ADD LOCATION SHOW / HIDE ----------
+    document.addEventListener('click', function (e) {
+        // When clicking Add Location button
+        if (e.target.matches('.add-location-btn')) {
+            const newLocSection = document.querySelector('.new-location');
+            if (newLocSection) newLocSection.classList.remove('d-none');
+        }
+
+        // When clicking Cancel button inside new location section
+        if (e.target.matches('.cancel-location-btn')) {
+            const newLocSection = document.querySelector('.new-location');
+            if (newLocSection) newLocSection.classList.add('d-none');
+        }
+    });
+
+    $("#newAddress").on("input", function () {
+        let query = $(this).val();
+        if (query.length > 2) {
+            $.getJSON("/Incidents/Suggest", { text: query }, function (data) {
+                let $list = $("#suggestionsnewAddress");
+                $list.empty().show();
+
+                $.each(data, function (i, item) {
+                    $list.append(
+                        `<li onclick="selectnewAddress('${item.text.replace(/'/g, "\\'")}')">${item.text}</li>`
+                    );
+                });
+            });
+        } else {
+            $("#suggestionsnewAddress").hide();
+        }
+    });
+
+    function selectnewAddress(address) {
+        $("#newAddress").val(address);
+        $("#suggestionsnewAddress").empty();
+    }
+
+    function initICPLocationAutocomplete(itemLocId) {
+        var $input = $(`#ICPLocation_${itemLocId}`);
+        var $suggestionList = $(`#suggestionsICPLocation_${itemLocId}`);
+
+        if ($input.length === 0 || $suggestionList.length === 0) return;
+
+        $input.on('input', function () {
+            var query = $(this).val().trim();
+
+            if (query.length > 2) {
+                $.getJSON('/Incidents/Suggest', { text: query }, function (data) {
+                    $suggestionList.empty().show();
+
+                    $.each(data, function (i, item) {
+                        // Escape single quotes in text
+                        var safeText = item.text.replace(/'/g, "\\'");
+                        var $li = $(`<li>${safeText}</li>`);
+                        $li.on('click', function () {
+                            selectICPLocation(itemLocId, item.text, item.magicKey);
+                        });
+                        $suggestionList.append($li);
+                    });
+                });
+            }
+            else {
+                $suggestionList.hide();
+                $(`#map_${itemLocId}`).hide();
+                $(`#hdnLat_${itemLocId}`).val(0);
+                $(`#hdnLon_${itemLocId}`).val(0);
+            }
+        });
+    }
+
+    function selectICPLocation(itemLocId, address, magicKey) {
+        $(`#map_${itemLocId}`).show();
+        showLoader($(`#map_${itemLocId}`));
+
+        var $input = $(`#ICPLocation_${itemLocId}`);
+        var $suggestionList = $(`#suggestionsICPLocation_${itemLocId}`);
+
+        $input.val(address);
+        $suggestionList.empty().hide();
+
+        $(`#hdnLat_${itemLocId}`).val(0);
+        $(`#hdnLon_${itemLocId}`).val(0);
+
+
+        $.getJSON('/Incidents/Resolve', { magicKey: magicKey }, function (data) {
+            if (!data || !data.lat || !data.lon) {
+                console.error("No coordinates found.");
+                hideLoader($(`#map_${itemLocId}`));
+                return;
+            }
+
+            $(`#hdnLat_${itemLocId}`).val(data.lat);
+            $(`#hdnLon_${itemLocId}`).val(data.lon);
+
+            require([
+                "esri/Map",
+                "esri/views/MapView",
+                "esri/Graphic",
+                "esri/layers/GraphicsLayer"
+            ], function (Map, MapView, Graphic, GraphicsLayer) {
+                hideLoader($(`#map_${itemLocId}`));
+                console.log("ArcGIS map loaded ✔");
+
+                const map = new Map({
+                    basemap: "streets-navigation-vector"
+                });
+
+                const view = new MapView({
+                    container: `map_${itemLocId}`,
+                    map: map,
+                    center: [data.lon, data.lat],
+                    zoom: 15
+                });
+
+                const graphicsLayer = new GraphicsLayer();
+                map.add(graphicsLayer);
+
+                // ✅ Single marker
+                const point = {
+                    type: "point",
+                    longitude: data.lon,
+                    latitude: data.lat
+                };
+
+                const markerSymbol = {
+                    type: "simple-marker",
+                    style: "circle",
+                    color: "red",
+                    outline: { color: "white", width: 2 },
+                    size: "18px"
+                };
+
+                const popupTemplate = {
+                    title: "Selected Location",
+                    content: `
+                            <b>Address:</b> ${data.text}<br>
+                            <b>Latitude:</b> ${data.lat}<br>
+                            <b>Longitude:</b> ${data.lon}
+                        `
+                };
+
+                const pointGraphic = new Graphic({
+                    geometry: point,
+                    symbol: markerSymbol,
+                    popupTemplate: popupTemplate
+                });
+
+                graphicsLayer.add(pointGraphic);
+
+                // ✅ Center and zoom to marker
+                view.when(() => {
+                    view.goTo(pointGraphic);
+                });
+
+                // ✅ Show popup only on marker click
+                view.on("click", function (event) {
+                    view.hitTest(event).then(function (response) {
+                        const result = response.results[0];
+                        if (result && result.graphic === pointGraphic) {
+                            view.popup.open({
+                                features: [pointGraphic],
+                                location: point
+                            });
+                        }
+                    });
+                });
+            });
+        }).fail(function (xhr) {
+            console.error("Error fetching coordinates:", xhr.responseText);
+            hideLoader($(`#map_${itemLocId}`));
+            $(`#map_${itemLocId}`).hide();
+            $(`#hdnLat_${itemLocId}`).val(0);
+            $(`#hdnLon_${itemLocId}`).val(0);
+        });
+    }
+
+    $(document).on("click", "#dltAddLoc", async function (e) {
+
+        showLoader($(`.left-panel`));
+        e.preventDefault();
+
+        const $element = $(this).closest(".location-card");
+        const id = $element.attr("data-location");
+        const payload = { incidentId: id };
+
+        const res = await fetch("/Validation/DeleteAdditionalLocation", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const json = await res.json();
+        if (json.success) {
+            $element.remove();
+            $(`#rightPanel_${id}`).remove();
+            document.querySelectorAll('#step-2 .right-panel').forEach(panel => {
+                panel.style.display = 'none';
+            });
+
+            // Show the selected one
+            var primaryLocId = $("#hdnCloneLocId").val();
+            const activePanel = document.querySelector(`#step-2 #rightPanel_${primaryLocId}`);
+            if (activePanel) activePanel.style.display = 'block';
+        }
+        hideLoader($(`.left-panel`));
+    });
+
+    $("#addBtn").on("click", async function (e) {
+        e.preventDefault();
+        const address = $("#newAddress").val()?.trim();
+        if (!address) {
+            alert("Please enter/select an address.");
+            return;
+        }
+
+        showLoader($(`.left-panel`));
+        // Determine incidentId: prefer data attribute on form or fallback to Model value
+        const incidentIdAttr = $("#incident_validation_form").data("incident-id");
+        // const incidentId = incidentIdAttr ? parseInt(incidentIdAttr, 10) : @Model.Id;
+        const incidentId = $("#hdn_Id").val();
+
+        try {
+            const payload = { incidentId: incidentId, address: address };
+            const res = await fetch("/Validation/AddLocation", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const json = await res.json();
+
+            if (json.success) {
+                const item = json.item;
+                // build UI card
+                const leftPanel = $(".left-panel");
+                const newCard = $(`
+                        <div class="location-card" data-location="${item.id}" data-lat="${item.lat}" data-lng="${item.lng}">
+                            <div class="d-flex align-items-start justify-content-between">
+                                <div class="ms-2">
+                                    <div class="location-title fw-semibold">${item.address}</div>
+                                    <span class="badge-status">In Progress</span>
+                                </div>
+                                 <div class="ms-1">
+                                   <i class="far fa-trash-alt dltAddLoc"></i>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+
+                // insert before newLocation div
+                const newLocationDiv = $("#newLocation");
+                if (newLocationDiv.length) {
+                    newCard.insertBefore(newLocationDiv);
+                    newLocationDiv.addClass("d-none");
+                } else {
+                    leftPanel.append(newCard);
+                }
+
+                // clear input
+                $("#newAddress").val("");
+                $("#suggestionsnewAddress").empty().hide();
+
+                cloneRightPanel($("#hdnCloneLocId").val(), item.id);
+
+                // optionally attach click handler to new card (same UX as other cards)
+                newCard.on("click", function () {
+                    $(".location-card").removeClass("active");
+                    $(this).addClass("active");
+                    const location = $(this).find(".location-title").text();
+                    $("#rightPanel h3").text(`Location Validation`);
+                    // update address shown on right panel if you want
+                });
+
+                // bind click event for this card only
+                newCard.find(".dltAddLoc").on("click", async function () {
+
+                    showLoader($(`.left-panel`));
+
+                    const $element = $(this).closest(".location-card");
+                    const id = $element.attr("data-location");
+
+                    const payload = { incidentId: id };
+                    const res = await fetch("/Validation/DeleteAdditionalLocation", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+                    const json = await res.json();
+                    if (json.success) {
+                        $element.remove();
+                        $(`#rightPanel_${id}`).remove();
+
+                        document.querySelectorAll('#step-2 .right-panel').forEach(panel => {
+                            panel.style.display = 'none';
+                        });
+
+                        // Show the selected one
+                        var primaryLocId = $("#hdnCloneLocId").val();
+                        const activePanel = document.querySelector(`#step-2 #rightPanel_${primaryLocId}`);
+                        if (activePanel) activePanel.style.display = 'block';
+
+                    }
+                    hideLoader($(`.left-panel`));
+                });
+
+            } else {
+                alert(json.message || "Failed to add location.");
+            }
+            hideLoader($(`.left-panel`));
+        } catch (err) {
+            console.error(err);
+            alert("Failed to add location (network error).");
+            hideLoader($(`.left-panel`));
+        }
+    });
+
+    function cloneRightPanel(itemLocId, newLocId) {
+
+        // Get the HTML content of the existing right panel
+        var content = $(`#rightPanel_${itemLocId}`).prop('outerHTML');
+
+        // Replace all old IDs with new dynamic ID
+        var updatedContent = content.replaceAll(`_${itemLocId}`, `_${newLocId}`)
+            .replaceAll(`(${itemLocId})`, `(${newLocId})`)
+            .replaceAll(`data-add-loc="${itemLocId}"`, `data-add-loc="${newLocId}"`);
+
+        // Convert string to jQuery element
+        var $newElement = $(updatedContent);
+
+        // Hide it initially if needed
+        $newElement.hide();
+
+        // Append to loaderDiv
+        $(".loaderDiv").append($newElement);
+
+        // Reinitialize location autocomplete/map for the new ID
+        initICPLocationAutocomplete(newLocId);
+
+        // Rebind click events to all location cards (including new ones)
+        initLocationCardEvents();
+    }
+
+
+    $(document).on("click", "#addPersonal", function (e) {
+         showLoader($(`#step-3`).find(".clonePersonalDiv"));
+         e.preventDefault();
+         clonePersonalContent();
+         hideLoader($(`#step-3`).find(".clonePersonalDiv"));
+     })
+
+    $(document).on("click", "#dltPersonnel", function (e) {
+         showLoader($(`#step-3`).find(".Personnel"));
+         e.preventDefault();
+         $(this).closest('.Personnel').remove();
+         hideLoader($(`#step-3`).find(".Personnel"));
+     })
+
+
+    function getCompanyAndRole($this){
+
+        showLoader($(".clonePersonalDiv"));
+
+        $.getJSON('/Settings/GetCompanyAndRole', { userId: $($this).val() }, function (data) {
+
+            var closestClonediv = $($this).closest('.Personnel');
+            var $company = closestClonediv.find('#div_CompanyName');
+            var $role = closestClonediv.find('#div_Role');
+
+            if(data.userId > 0)
+            {
+                $company.find('#companyId').val(data.companyId > 0 ? data.companyId : '');
+                $role.find('#roleId').val(data.roleId > 0 ? data.roleId : '');
+            }
+            else {
+              $company.find('#companyId').val('');
+                $role.find('#roleId').val('');
+            }
+            hideLoader($(".clonePersonalDiv"));
+        });
+    }
+
+    function clonePersonalContent()
+    {
+        // Get the HTML content of the existing right panel
+        var content = $(`#step-3`).find(".Personnel").prop('outerHTML');
+
+         // Convert string to jQuery element
+        var $newElement = $(content);
+
+        $($newElement).find(".dltPersonnelbtn").show();
+
+        $(`#step-3`).find(".clonePersonalDiv").append($newElement);
+    }
+
+    $(document).on("click", "#addTask", function (e) {
+
+         e.preventDefault();
+         showLoader($(`#step-6`).find(".cloneTaskDiv"));
+
+         cloneTaskContent();
+
+         hideLoader($(`#step-6`).find(".cloneTaskDiv"));
+    });
+
+    $(document).on("click", "#dltTask", function (e) {
+         e.preventDefault();
+         $(this).closest('.Task').remove();
+    });
+
+    $(document).on("click", "#addCloseoutTask", function (e) {
+
+         e.preventDefault();
+         showLoader($(`#step-7`).find(".cloneCloseoutTaskDiv"));
+
+        cloneCloseoutTaskContent();
+
+         hideLoader($(`#step-7`).find(".cloneCloseoutTaskDiv"));
+    });
+
+    $(document).on("click", "#dltCloseoutTask", function (e) {
+         e.preventDefault();
+        $(this).closest('.CloseoutTask').remove();
+    });
+
+    function initMultiselectTask(context) {
+        $(context).find(".multiselect-dropdown").each(function () {
+            const $dropdown = $(this);
+            const $btn = $dropdown.find(".dropdown-btn");
+            const $list = $dropdown.find(".dropdown-list");
+            const $hidden = $dropdown.closest("#div_ResponsibleRole").find("#hdn_TaskResponsibleRole");
+
+            // Hide dropdown initially
+            $list.hide();
+
+            // Toggle dropdown open/close
+            $btn.off("click").on("click", function (e) {
+                e.stopPropagation();
+                // Close other dropdowns
+                $(".dropdown-list").not($list).hide();
+                // Toggle current one
+                $list.toggle();
+            });
+
+            // ✅ Keep dropdown open while selecting checkboxes
+            $list.off("click").on("click", function (e) {
+                e.stopPropagation(); // prevent closing dropdown
+            });
+
+            // Handle checkbox changes
+            $list.find("input[type='checkbox']").off("change").on("change", function () {
+                const selected = [];
+                const selectedNames = [];
+
+                $list.find("input[type='checkbox']:checked").each(function () {
+                    selected.push($(this).val());
+                    selectedNames.push($(this).data("name"));
+                });
+
+                $hidden.val(selected.join(",")); // store IDs in hidden field
+                $btn.text(selectedNames.length > 0 ? selectedNames.join(", ") : "Choose roles");
+            });
+        });
+
+        // ✅ Close all dropdowns only when clicking outside
+        $(document).off("click.multiselect").on("click.multiselect", function () {
+            $(".dropdown-list").hide();
+        });
+    }
+
+     function cloneTaskContent() {
+        var content = $("#step-6").find(".Task").first().prop("outerHTML");
+        var $newElement = $(content);
+
+        $newElement.find(".dltTaskbtn").show();
+        $newElement.find("select, textarea, input[type=text], input[type=hidden]").val("");
+        $newElement.find(".form-check-input").prop("checked", false);
+        $newElement.find(".dropdown-btn").text("Choose roles");
+        $newElement.find(".select2").remove();
+
+        $("#step-6").find(".cloneTaskDiv").append($newElement);
+
+        initMultiselectTask($newElement);
+    }
+    function initMultiselectCloseoutTask(context) {
+        $(context).find(".multiselect-dropdown").each(function () {
+            const $dropdown = $(this);
+            const $btn = $dropdown.find(".dropdown-btn");
+            const $list = $dropdown.find(".dropdown-list");
+            const $hidden = $dropdown.closest("#div_ResponsibleRole").find("#hdn_CloseoutTaskResponsibleRole");
+
+            // Hide dropdown initially
+            $list.hide();
+
+            // Toggle dropdown open/close
+            $btn.off("click").on("click", function (e) {
+                e.stopPropagation();
+                // Close other dropdowns
+                $(".dropdown-list").not($list).hide();
+                // Toggle current one
+                $list.toggle();
+            });
+
+            // ✅ Keep dropdown open while selecting checkboxes
+            $list.off("click").on("click", function (e) {
+                e.stopPropagation(); // prevent closing dropdown
+            });
+
+            // Handle checkbox changes
+            $list.find("input[type='checkbox']").off("change").on("change", function () {
+                const selected = [];
+                const selectedNames = [];
+
+                $list.find("input[type='checkbox']:checked").each(function () {
+                    selected.push($(this).val());
+                    selectedNames.push($(this).data("name"));
+                });
+
+                $hidden.val(selected.join(",")); // store IDs in hidden field
+                $btn.text(selectedNames.length > 0 ? selectedNames.join(", ") : "Choose roles");
+            });
+        });
+
+        // ✅ Close all dropdowns only when clicking outside
+        $(document).off("click.multiselect").on("click.multiselect", function () {
+            $(".dropdown-list").hide();
+        });
+    }
+
+    function cloneCloseoutTaskContent() {
+        var content = $("#step-7").find(".CloseoutTask").first().prop("outerHTML");
+        var $newElement = $(content);
+
+        $newElement.find(".dltCloseoutTaskbtn").show();
+        $newElement.find("select, textarea, input[type=text], input[type=hidden]").val("");
+        $newElement.find(".form-check-input").prop("checked", false);
+        $newElement.find(".dropdown-btn").text("Choose roles");
+        $newElement.find(".select2").remove();
+
+        $("#step-7").find(".cloneCloseoutTaskDiv").append($newElement);
+
+        initMultiselectCloseoutTask($newElement);
+    }
+
+    function initMultiselectRepair() {
+        $('.multiselect-dropdown').each(function () {
+            var $dropdown = $(this);
+            var $btn = $dropdown.find('.dropdown-btn');
+            var $list = $dropdown.find('.dropdown-list');
+            var $hidden = $dropdown.find('input[type="hidden"]'); // your hidden input
+
+            // 🔽 Toggle dropdown open/close
+            $btn.on('click', function (e) {
+                e.stopPropagation();
+                $('.dropdown-list').not($list).hide();
+                $list.toggle();
+            });
+
+            // ✅ Handle checkbox changes (event delegation)
+            $list.on('change', 'input[type="checkbox"]', function () {
+                var $checkboxes = $list.find('input[type="checkbox"]');
+
+                // Get selected items (id + name)
+                var selected = $checkboxes
+                    .filter(':checked')
+                    .map(function () {
+                        return {
+                            id: $(this).val(),
+                            name: $(this).data('name') || $(this).parent().text().trim()
+                        };
+                    })
+                    .get();
+
+                // Update button text
+                var selectedNames = selected.map(function (s) { return s.name; });
+                $btn.text(selectedNames.length ? selectedNames.join(', ') : 'Choose roles');
+
+                var dropdownId = $dropdown.attr('id'); // e.g., chk_VTFResponsibleRole
+                var hiddenId = dropdownId.replace('chk_', 'hdn_'); // => hdn_VTFResponsibleRole
+                var $hidden = $('#' + hiddenId);
+
+                // 🟢 Update hidden input value
+                if ($hidden.length) {
+                    $hidden.val(selected.map(function (s) { return s.id; }).join(','));
+                }
+            });
+
+            // 🧩 Hide dropdown when clicking outside
+            $(document).on('click', function (e) {
+                if (!$dropdown.is(e.target) && $dropdown.has(e.target).length === 0) {
+                    $list.hide();
+                }
+            });
+        });
+    }
+
+</script>
+

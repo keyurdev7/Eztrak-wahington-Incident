@@ -1,0 +1,97 @@
+﻿@using ViewModels
+@model TicketDetailViewModel
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="mb-3 form-group d-flex">
+                    <label asp-for="TicketNo" class="form-label detail-label fw-600"></label>
+                    <div>@(Model.TicketNo)</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group d-flex">
+                    <label asp-for="Description" class="form-label detail-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.Description) ? "-" : Model.Description)</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group d-flex">
+                    <label asp-for="ITResponse" class="form-label detail-label fw-600"></label>
+                    <div>@(string.IsNullOrEmpty(Model.ITResponse) ? "-" : Model.ITResponse)</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3 form-group d-flex">
+                    <label asp-for="Status" class="form-label detail-label fw-600"></label>
+                    <div>@(Model.Status)</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="mb-3 attachment-box">
+                <label class="form-label detail-label fw-600">Images</label>
+            </div>
+        </div>
+        <div class="col-lg-12 d-flex flex-wrap">
+            @if (Model.ImagesList != null && Model.ImagesList.Any())
+            {
+                var additionalImagesCount = Model.ImagesList.Count - 3;
+                for (var i = 0; i < Model.ImagesList.Count; i++)
+                {
+                    if (Model.ImagesList[i].Url != "")
+                    {
+                        if (i < 3)
+                        {
+                            <a href="@Model.ImagesList[i].Url" target="_blank" class="rounded detail-images"><img class="photo" src="@Model.ImagesList[i].Url" alt="" /></a>
+                        }
+                        else if (i == 3)
+                        {
+                            <a class="detail-imgbadge">+@additionalImagesCount</a>
+                            break;
+                        }
+                    }
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<div id="attachment-detail-modal" class="modal fade show" tabindex="-1" style="padding-right: 17px;">
+    <div class="modal-lg modal-dialog modal-dialog-centered" style="max-width: 1150px;">
+        <div class="modal-content" style="border: 1px solid #707070; background-color: #E9EDEF;">
+            <div class="modal-header">
+                <h5 class="modal-title">Images</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12 row" id="attachment-detail-modal-body">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="~/js/views/attachments-gallery/attachments-gallery.js"></script>
+
+<script>
+    $(function () {
+        $(document).off("click", '.detail-imgbadge')
+        $(document).on("click", '.detail-imgbadge', function () {
+            var id = @Model.Id;
+            var attachmentCount = parseInt($(this).html().split("+")[1]);
+            if (attachmentCount > 0) {
+                $("#attachment-detail-modal").modal("show");
+                ViewAttachmentGrid(id, "/Ticket/_GetAttachmentView");
+            }
+            else {
+                GetAttachmentUrl(id, "/Ticket/_GetAttachmentUrl");
+            }
+        });
+    })
+</script>

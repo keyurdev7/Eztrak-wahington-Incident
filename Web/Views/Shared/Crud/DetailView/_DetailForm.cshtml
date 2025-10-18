@@ -1,0 +1,26 @@
+﻿@using ViewModels.CRUD
+@model CrudDetailViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = null;
+}
+<div class="row">
+    <div class="col-md-12">
+        @await Html.PartialAsync(Model.DetailViewPath, Model.DetailModel, new ViewDataDictionary(ViewData))
+    </div>
+    @if (Model.IsApprovalForm)
+    {
+        <div class="col-md-12">
+            <div class="form-group">
+                <div class="text-center">
+                    <button type="button" onclick="rejectDetail(this)" class="btn btn-danger form-btn" id="reject-btn">Reject</button>
+                    <button type="button" onclick="approveDetail(this)" class="btn blue-btn form-btn" id="approve-btn">Approve</button>
+                </div>
+            </div>
+        </div>
+    }
+    <input type="hidden" id="modal-title" value="@Model.Title" />
+</div>
+
+
+<script src="/js/masking/initiate-masking.js"></script>

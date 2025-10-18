@@ -1,0 +1,16 @@
+﻿@using System.Web
+@model ViewModels.CRUD.CrudListViewModel
+<div class="container-fluid">
+<div class="table_and_filters_wrap">
+        @await Html.PartialAsync("~/Views/Shared/Crud/ListView/Common/_Search.cshtml", Model)
+            @await Html.PartialAsync("~/Views/Shared/Crud/ListView/Common/_Header.cshtml", Model)
+             <div class="table_wrap">
+                <div class="dataTables_wrapper dt-bootstrap5 no-footer" style="min-height:300px;">
+                    <div class="datatable-scroll">
+                        <table class="table table-bordered dataTable table-sm crud-list-table datatable-basic dataTable w-100" style="box-sizing: border-box;" id="crud-list-table" role="grid" aria-describedby="DataTables_Table_0_info">
+                        </table>
+                    </div>
+                </div>
+            </div>
+</div>
+</div>

@@ -1,0 +1,31 @@
+﻿@model List<TransactionHistoryViewModel>
+@using ViewModels
+<input type="hidden" id="modal-title" value="Inventory History" />
+<div class="row">
+    <div class="col-md-12">
+        <div class="">
+            <table class="table">
+                <tr>
+                    <th>PO #</th>
+                    <th>Type</th>
+                    <th>Location</th>
+                    <th>Qty</th>
+                    <th>User</th>
+                    <th>Added</th>
+                </tr>
+                @foreach (var transaction in Model)
+                {
+                    <tr>
+                        <td>@transaction.LotNO</td>
+                        <td>@transaction.TransactionType</td>
+                        <td>@transaction.Location.Name</td>
+                        <td>@Math.Abs(transaction.Quantity)</td>
+                        <td>@transaction.CreatedBy</td>
+                        <td>@transaction.FormattedCreatedOn</td>
+                    </tr>
+                }
+
+            </table>
+        </div>
+    </div>
+</div>

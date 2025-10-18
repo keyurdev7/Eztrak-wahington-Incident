@@ -1,0 +1,56 @@
+﻿@model ViewModels.WorkOrder.CostPerformance.CostPerformanceViewModel
+@{
+    Layout = null;
+    var totalLaborCost = Model.TaskLabors.Sum(x => x.Total);
+    var totalLaborHours = Model.TaskLabors.Sum(x => x.Hours);
+}
+<h6 class="text-start">Labor</h6>
+<div class="table-responsive my-3" id="laborTable">
+    <table class="table table-bordered dataTable">
+        <thead>@* class="thead-primary" *@
+            <tr>
+                <th>Craft</th>
+                <th>Hours</th>
+                <th>Cost</th>
+            </tr>
+        </thead>
+        <tbody class="task-labor-tbody">
+            @if (Model.TaskLabors.Count > 0)
+            {
+                for (var i = 0; i < Model.TaskLabors.Count(); i++)
+                {
+                    <tr>
+                        <td>
+                            <div>@Model.TaskLabors[i].CraftSkill.Name</div>
+                        </td>
+                        <td>
+                            <div>@Model.TaskLabors[i].Hours</div>
+                        </td>
+                        <td>
+                            <div>@Model.TaskLabors[i].Total.ToString("C")</div>
+                        </td>
+
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center">No Records Added.</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="1"></td>
+                <td colspan="1"><label class="text-end form-label fw-600">Esitmated Cost</label></td>
+                <td colspan="1"><label class="text-end form-label fw-600">@totalLaborCost.ToString("C")</label></td>
+            </tr>
+            <tr>
+                <td colspan="1"></td>
+                <td colspan="1"><label class="text-end form-label fw-600">Esitmated Hours</label></td>
+                <td colspan="1"><label class="text-end form-label fw-600">@totalLaborHours</label></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

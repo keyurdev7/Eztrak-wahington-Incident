@@ -1,0 +1,14 @@
+﻿@model ViewModels.BaseSelect2VM
+@{
+    var elementId = ViewData["Id"] != null && !string.IsNullOrEmpty(ViewData["Id"].ToString()) ? ViewData["Id"].ToString() : "asset-type-id";
+}
+<partial name="~/Views/Shared/Select2/AssetType/_AssetTypeHtml.cshtml" model="@Model" />
+<partial name="~/Views/Shared/Select2/AssetType/_AssetTypeJs.cshtml" />
+
+<script src="~/js/custom/select2/select2-methods.js"></script>
+<script>
+    $(function () {
+        var id = "#" + "@elementId";
+        SetAssetTypeSelect2(id);
+    });
+</script>

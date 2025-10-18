@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunklac=self.webpackChunklac||[]).push([[751],{60751:(e,s,t)=>{t.r(s),t.d(s,{default:()=>p});var a=t(35143),d=t(46053),u=(t(81806),t(76460),t(47249),t(85842)),n=t(15306);let l=class extends n.default{get updateSuspended(){var e;const s=null===(e=this.parent)||void 0===e?void 0:e.dynamicGroupLayerView;return this.suspended&&(!s||!0===s.suspended)}};(0,a._)([(0,d.MZ)()],l.prototype,"updateSuspended",null),l=(0,a._)([(0,u.$)("esri.views.2d.layers.CatalogFootprintLayerView2D")],l);const p=l}}]);
+//# sourceMappingURL=751.ede7ce5d.chunk.js.map
