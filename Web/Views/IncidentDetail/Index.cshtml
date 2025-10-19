@@ -1224,7 +1224,7 @@
                                 @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
 
                             </div>
-                            <div class="card">
+                           @*  <div class="card">
                                 <div class="card-header bg-white fw-semibold" style="display:none">
                                     <i class="fa fa-map-location-dot text-warning me-2"></i>Mini Map
                                 </div>
@@ -1242,7 +1242,7 @@
                                         @await Html.PartialAsync("_ViewAttachmentAssestmentPartial", Model.incidentViewAssessmentAttachmentView)
                                     </div>
                                 </div>
-                            </div>
+                            </div> *@
                         </div>
                     </div>
                 </div>
@@ -1296,7 +1296,7 @@
                                 </div>
 
                                 <!-- Extraction & Purge Log -->
-                                <div class="card mb-4">
+                              @*   <div class="card mb-4">
                                     <div class="card-body p-0">
                                         <div class="d-flex justify-content-between align-items-center mb-0 p-3">
                                             <h6 class="fw-bold mb-0">Extraction & Purge Log</h6>
@@ -1399,7 +1399,7 @@
                                             <li><span>[12:00]</span> PRG-002 started (VacTruck B)</li>
                                         </ul>
                                     </div>
-                                </div>
+                                </div> *@
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -1459,7 +1459,7 @@
                                 </div>
 
 
-                                <div class="row g-3  mb-3 bottomCard">
+                               @*  <div class="row g-3  mb-3 bottomCard">
 
                                     <div class="col-md-3 col-sm-6">
                                         <div class="info-card text-center text-md-start">
@@ -1489,11 +1489,11 @@
                                         </div>
                                     </div>
                                 </div>
-
+ *@
 
 
                                 <!-- Timeline -->
-                                <div class="col-md-12">
+                              @*   <div class="col-md-12">
                                     <div class="timeline">
                                         <h6 class="Timelineheader fw-bold mb-0">Timeline (Auto-Log)</h6>
                                         <ul>
@@ -1504,7 +1504,7 @@
                                             <li><span>[12:00]</span> Customer Service notified for relights</li>
                                         </ul>
                                     </div>
-                                </div>
+                                </div> *@
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -1516,7 +1516,7 @@
                                     }
                                     @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
                                 </div>
-                                <div class="card-custom signoffs">
+                                @* <div class="card-custom signoffs">
                                     <h6>Customer Notifications</h6>
 
                                     <div class="p-3 signoffContent">
@@ -1531,15 +1531,15 @@
                                             @await Html.PartialAsync("_ViewAttachmentAssestmentPartial", Model.incidentViewRestorationAttachmentView)
                                         </div>
 
-                                        @* <strong>Attachments</strong>
+                                        <strong>Attachments</strong>
                                         <ul class="attachments mt-2">
                                             <li><i class="fa-solid fa-circle"></i>mcr_final.pdf</li>
                                             <li><i class="fa-solid fa-circle"></i>cpucreport_draft.docx</li>
                                             <li><i class="fa-solid fa-circle"></i>disposal_manifest.pdf</li>
                                             <li><i class="fa-solid fa-circle"></i>cost_summary.xlsx</li>
-                                        </ul> *@
+                                        </ul> 
                                     </div>
-                                </div>
+                                </div> *@
                             </div>
                         </div>
                     </div>
@@ -1600,7 +1600,7 @@
                                 </div>
 
 
-                                <div class="card-custom position-relative mb-3 lessonsCard">
+                               @*  <div class="card-custom position-relative mb-3 lessonsCard">
                                     <h5>Lessons Learned & Comments</h5>
                                     <small>Capture operational insights and recommendations for future incidents.</small>
 
@@ -1645,7 +1645,7 @@
                                             <div><span class="info-value text-success">Ready to Archive</span></div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> *@
 
                             </div>
                         </div>
@@ -1660,7 +1660,7 @@
                                 </div>
 
 
-                                <div class="card-custom signoffs">
+                               @*  <div class="card-custom signoffs">
                                     <h6>Management Sign-Offs</h6>
 
                                     <div class="signoffContent">
@@ -1692,7 +1692,7 @@
                                             @await Html.PartialAsync("_ViewAttachmentAssestmentPartial", Model.incidentViewCloseOutAttachmentView)
                                         </div>
                                     </div>
-                                </div>
+                                </div> *@
 
                             </div>
                         </div>
@@ -1817,7 +1817,7 @@
 <div id="div_closeout_view_modal">
 </div>
 <div id="div_Add_assestment_modal">
-    // Find this and then below code replace
+   
 </div>
 <div id="div_repair_modal">
 </div>
