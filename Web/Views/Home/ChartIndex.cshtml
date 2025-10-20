@@ -58,7 +58,7 @@
     #dashboardTabs .nav-item .nav-link {
         background: transparent;
         color: #374151;
-        font-size: 16px;
+        font-size: 14px;
         line-height: 1.25rem;
         margin-right: 14px;
         border-radius: 0;
@@ -81,6 +81,7 @@
         border-top: none;
         border-left: none;
         border-right: none;
+        border-bottom: none
     }
 
     .stat-box {
@@ -180,13 +181,16 @@
     /*****************Header style***************************/
     .header {
         background: #ffffff;
-        padding: 16px;
-        box-shadow: 0px 0px 14px #efefef;
+        padding: 12px;
+        border: 1px solid #80808038;
+        box-shadow: 0px 0px 14px #dee2e6;
+        margin: 14px;
+        border-radius: 7px;
     }
 
     .logo-section .title h2 {
         font-weight: 800;
-        font-size: 28px;
+        font-size: 24px;
         margin-bottom: 0;
         line-height: normal;
         color: #494949;
@@ -194,6 +198,7 @@
 
     .logo-section .title span {
         color: darkgrey;
+        font-size: 12px;
     }
 
     .profile .sidebar-account.dropdown-toggle::before {
@@ -236,7 +241,7 @@
         }
 
     .header .logo {
-        background-color: #ededed;
+        background-color: #fff1eb;
         color: #f54e00;
         border-radius: 12px;
         padding: 10px;
@@ -248,7 +253,7 @@
     }
 
     .header .dropdown-toggle::before {
-        display: none;
+         display: none;
     }
 
     .DashboardHeader {
@@ -285,11 +290,27 @@
     }
 
     .incident-locations {
-        background: white;
-        border-radius: 10px;
-        padding: 16px;
-        margin: 16px 0;
-        border: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        gap: 35px;
+        flex-wrap: nowrap;
+        padding: 11px;
+        border: 1px solid #d5d5d5;
+        margin-bottom: 10px;
+        box-shadow: 0px 0px 3px #dee2e6;
+        border-radius: 7px /* keep both divs on a single line */
+    }
+
+    .statusLegendInfo {
+        white-space: nowrap; /* prevent wrapping of the title */
+    }
+
+    .status-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 31px;
+        vertical-align: middle;
+        padding-bottom: 6px;
     }
 
     .statusLegendInfo {
@@ -321,7 +342,6 @@
 
         .legend-item span {
             font-size: 14px;
-            font-weight: 700;
         }
 
     .fa-circle {
@@ -348,6 +368,17 @@
     .cancelled {
         color: #6b7280;
     }
+
+    .btn-col {
+        border: none !important;
+        background-color: #fff1eb;
+        color: #f55308;
+        width: 33px;
+        height: 33px;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
     /**************incident card ******************/
     .incident-card {
         background: white;
@@ -404,25 +435,24 @@
         border-radius: 10px;
         padding: 16px;
         border: 1px solid #e0e0e0;
+        width: 34%;
     }
 
     .recentList {
-       
-        display: grid;
+        display: inline;
         grid-template-columns: repeat(2, 1fr);
         grid-gap: 20px;
+        width: 35%
     }
-    .ListHeight{
-        height: 250px;
+
+    .ListHeight {
+        height: 350px;
         overflow: auto;
     }
 
     .incident-list h3 {
-        font-size: 18px;
-        margin-bottom: 10px;
+        font-size: 15px;
         line-height: normal;
-        border-bottom: 1px solid #e0e0e0;
-        padding-bottom: 16px;
     }
 
     .incident-item {
@@ -431,9 +461,10 @@
         align-items: center;
         background: #f7f7f7;
         padding: 12px;
-        border: 1px solid #eee;
+        border: 1px solid #e1e1e1;
         /* margin-right: 16px; */
         border-radius: 8px;
+        margin: 8px;
     }
 
         .incident-item:last-child {
@@ -450,11 +481,24 @@
         margin-right: 10px;
     }
 
+    /* Put incident id and severity on the same line */
     .incident-info h4 {
-        margin: 0;
-        font-size: 15px;
-        font-weight: 600;
-        line-height: normal;
+        display: inline-block;
+        margin: 0 15px 10px 0;
+        font-size: 12px;
+       
+        line-height: 1.2;
+    }
+
+    .incident-info .incident-severity {
+        display: inline-block;
+        vertical-align: middle;
+        padding: 2px 8px;
+        border-radius: 12px;
+        background: #ffe7db; /* soft background */
+        color: #df0000f7; /* brand color */
+        font-size: 12px;
+        
     }
 
     .incident-info p {
@@ -462,18 +506,59 @@
         font-size: 14px;
         line-height: normal;
         margin-bottom: 0;
+        font-weight: 300;
     }
 
     .incident-severity {
         font-size: 14px;
         color: #777;
     }
+
+    /* Overlay the incident list on the map at top-right */
+    .incident-list.map-overlay {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 360px;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        background: #fff;
+        display: block; /* ensure visible even if a generic .overlay sets display:none */
+        pointer-events: auto; /* capture clicks */
+    }
+        /* Incident list scrollbar theme */
+        .incident-list.map-overlay #incidentListContent {
+            /* Firefox */
+            scrollbar-color: #f54e00 #ffffff; /* thumb, track */
+            scrollbar-width: thin;
+        }
+
+            /* WebKit (Chrome, Edge, Safari) */
+            .incident-list.map-overlay #incidentListContent::-webkit-scrollbar {
+                width: 8px; /* vertical */
+                height: 8px; /* horizontal */
+            }
+
+            .incident-list.map-overlay #incidentListContent::-webkit-scrollbar-track {
+                background: #ffe7db; /* light track */
+                border-radius: 8px;
+            }
+
+            .incident-list.map-overlay #incidentListContent::-webkit-scrollbar-thumb {
+                background-color: #f54e00; /* thumb color */
+                border-radius: 8px;
+                border: 2px solid #ffe7db; /* creates gap from track */
+            }
+
+                .incident-list.map-overlay #incidentListContent::-webkit-scrollbar-thumb:hover {
+                    background-color: #d44600; /* slight darken on hover */
+                }
 </style>
 
 <header class="header dashboard-header d-flex align-items-center justify-content-between">
     <!-- Left section -->
     <div class="logo-section d-flex align-items-center">
-        <div class="logo"><i class="fa-solid fa-home"></i></div>
+        <div class="logo"><i class="fa-regular fa-home"></i></div>
         <div class="title">
             <h2>Dashboard</h2>
             <span>Quick overview, smarter incident management</span>
@@ -526,12 +611,12 @@
                 <ul class="nav nav-tabs CustomTab" id="dashboardTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="map-tab" data-bs-toggle="tab" data-bs-target="#mapTab" type="button" role="tab">
-                            <i class="fa fa-map"></i>Map View
+                            <i class="fa-regular fa-map"></i> Map View
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="charts-tab" data-bs-toggle="tab" data-bs-target="#chartsTab" type="button" role="tab">
-                            <i class="fa fa-chart-bar"></i>Charts & Analytics
+                            <i class="fa-solid fa-chart-simple"></i> Charts & Analytics
                         </button>
                     </li>
                 </ul>
@@ -542,7 +627,7 @@
                         <p class="titleDescription">Interactive map showing all incident locations with status indicators</p> *@
                         <div class="incident-locations">
                             <div class="statusLegendInfo">
-                                <i class="fa fa-layer-group"></i>Status Legend
+                                @* <i class="fa fa-layer-group"></i> *@Status Legend
                             </div>
                             <div class="status-legend">
                                 <div class="legend-item"><i class="fa-solid fa-circle submitted"></i><span>Submitted (@Model.IncidentDashboard.TotalSubmittedCount)</span></div>
@@ -552,60 +637,76 @@
                                 <div class="legend-item"><i class="fa-solid fa-circle cancelled"></i><span>Cancelled (@Model.IncidentDashboard.TotalCancelledCount)</span></div>
                             </div>
                         </div>
-                        <div class="bg-white rounded p-4 shadow-sm border border-gray-200 mb-4">
+                        <div class=" position-relative">
                             <div id="map" style="height:600px; width:100%;">
                                 <!-- Add custom element to <body> of your page -->
                                 @*  <arcgis-embedded-map style="height:600px;width:1750px;" item-id="8a4533b464d041ac9a50279ab8717767" theme="light"
                                                        center="-118.1107272296462,33.967678536918406" scale="36111.909643"
                                                        portal-url="https://pmm-jason.maps.arcgis.com"></arcgis-embedded-map> *@
                             </div>
-                        </div>
 
-                        <!-- Recent Incidents List -->
-                        <div class="incident-list">
-                            <h3>Recent Incidents on Map</h3>
-                            <div class="ListHeight">
-                                <div class="recentList">
-                                @if (Model.IncidentDashboard.ListIncidentRecentViewModel.Count > 0)
-                                {
-                                    @foreach (var item in Model.IncidentDashboard.ListIncidentRecentViewModel)
-                                    {
-                                        <div class="incident-item focusMap" data-lat="@item.lat"
-                                             data-lon="@item.lon"
-                                             data-description="@item.description"
-                                             data-intersection="@item.intersection"
-                                             data-incidentId="@item.incidentId"
-                                             data-eventtype="@item.eventtype"
-                                             data-severity="@item.severity"
-                                             data-assettype="@item.assettype"
-                                             data-loc="@item.incidentloc"
-                                             data-radius="@(!string.IsNullOrWhiteSpace(item.perimeter) ? item.perimeter : "0")"
-                                             data-incidentstatusColor="@item.incidentstatusColor"
-                                             style="cursor:pointer">
-                                            <div class="incident-details">
-                                                <span class="dot" style="width: 12px;height: 12px;border-radius: 50%;display: inline-block;background-color:@item.incidentstatusColor"></span>
-                                                <div class="incident-info" style="margin-left: 10px;">
-                                                    <h4>@item.incidentId</h4>
-                                                    <p>@item.incidentloc</p>
-                                                    <p>@item.eventtype</p>
+                            <!-- Recent Incidents List (overlayed on map, top-right) -->
+                            <div class="incident-list map-overlay">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h3 class="mb-0">Recent Incidents on Map</h3>
+                                    <button id="incidentListToggleBtn"
+                                            type="button"
+                                            class="btn btn-sm btn-light btn-col"
+                                            aria-expanded="true"
+                                            aria-controls="incidentListContent"
+                                            title="Collapse/Expand">
+                                        <i class="fa fa-chevron-up"></i>
+                                    </button>
+                                </div>
+
+                                <div id="incidentListContent" class="ListHeight mt-3">
+                                    <div class="recentList">
+                                        @if (Model.IncidentDashboard.ListIncidentRecentViewModel.Count > 0)
+                                        {
+                                            @foreach (var item in Model.IncidentDashboard.ListIncidentRecentViewModel)
+                                            {
+                                                <div class="incident-item focusMap" data-lat="@item.lat"
+                                                     data-lon="@item.lon"
+                                                     data-description="@item.description"
+                                                     data-intersection="@item.intersection"
+                                                     data-incidentId="@item.incidentId"
+                                                     data-eventtype="@item.eventtype"
+                                                     data-severity="@item.severity"
+                                                     data-assettype="@item.assettype"
+                                                     data-loc="@item.incidentloc"
+                                                     data-radius="@(!string.IsNullOrWhiteSpace(item.perimeter) ? item.perimeter : "0")"
+                                                     data-incidentstatusColor="@item.incidentstatusColor"
+                                                     style="cursor:pointer">
+                                                    <div class="incident-details">
+                                                        <span class="dot" style="width: 12px;height: 12px;min-width: 12px;border-radius: 50%;display: inline-block;background-color:@item.incidentstatusColor"></span>
+                                                        <div class="incident-info" style="margin-left: 20px;">
+                                                            <h4>@item.incidentId</h4>
+                                                           
+                                                            @if(!string.IsNullOrEmpty(item.severity))
+                                                    
+                                                            {
+                                                                <div class="incident-severity">@item.severity</div>
+                                                            }
+                                                            <p>@item.incidentloc</p>
+                                                            <p>@item.eventtype</p>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="incident-item">
+                                                <div class="incident-details">
+                                                    No recent incident found.
                                                 </div>
                                             </div>
-                                            <div class="incident-severity">@item.severity</div>
-                                        </div>
-                                    }
-                                }
-                                else
-                                {
-                                    <div class="incident-item">
-                                        <div class="incident-details">
-                                            No recent incident found.
-                                        </div>
+                                        }
                                     </div>
-                                }
-                            </div>
+                                </div>
                             </div>
                         </div>
-
 
                     </div>
 
@@ -904,117 +1005,143 @@
     </script>
 
     <script>
-        $(function () {
-            var incidents = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.IncidentDashboard.ListIncidentLocationMapViewModel));
+             $(function () {
+                 var incidents = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.IncidentDashboard.ListIncidentLocationMapViewModel));
 
-            var locations = incidents.map(x => ({
-                label: x.incidentloc,
-                value: x.incidentloc,
-                lat: x.lat,
-                lon: x.lon
-            }));
+                 var locations = incidents.map(x => ({
+                     label: x.incidentloc,
+                     value: x.incidentloc,
+                     lat: x.lat,
+                     lon: x.lon
+                 }));
 
-            $("#addressInput").autocomplete({
-                source: locations,
-                select: function (event, ui) {
-                    $("#addressInput").data("selectedIncident", ui.item);
-                }
-            });
+                 $("#addressInput").autocomplete({
+                     source: locations,
+                     select: function (event, ui) {
+                         $("#addressInput").data("selectedIncident", ui.item);
+                     }
+                 });
 
-       $(".focusMap").click(function () {
-            var incidentLoc = $(this).data("loc");
-            var hdn_lat = $(this).data("lat");
-            var hdn_lon = $(this).data("lon");
-            var hdn_radius = $(this).data("radius");
-            var hdn_incidentstatusColor = $(this).data("incidentstatuscolor");
+            $(".focusMap").click(function () {
+                 var incidentLoc = $(this).data("loc");
+                 var hdn_lat = $(this).data("lat");
+                 var hdn_lon = $(this).data("lon");
+                 var hdn_radius = $(this).data("radius");
+                 var hdn_incidentstatusColor = $(this).data("incidentstatuscolor");
 
-            if (incidentLoc) {
-                // ✅ Clear old graphics (circle + marker)
-                if (window.graphicsLayer) {
-                    window.graphicsLayer.removeAll();
-                }
+                 if (incidentLoc) {
+                     // ✅ Clear old graphics (circle + marker)
+                     if (window.graphicsLayer) {
+                         window.graphicsLayer.removeAll();
+                     }
 
-                // Create point
-                var point = {
-                    type: "point",
-                    longitude: hdn_lon,
-                    latitude: hdn_lat
-                };
+                     // Create point
+                     var point = {
+                         type: "point",
+                         longitude: hdn_lon,
+                         latitude: hdn_lat
+                     };
 
-                // Marker symbol
-                var markerSymbol = {
-                    type: "simple-marker",
-                    path: "M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z",
-                    color: hdn_incidentstatusColor,
-                    outline: { color: "black", width: 1 },
-                    size: "20px"
-                };
+                     // Marker symbol
+                     var markerSymbol = {
+                         type: "simple-marker",
+                         path: "M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z",
+                         color: hdn_incidentstatusColor,
+                         outline: { color: "black", width: 1 },
+                         size: "20px"
+                     };
 
-                // Popup content
-                var popupTemplate = {
-                    title: "Incident Details",
-                    content: `
-                        <b>Incident Number:</b> {IncidentID}<br>
-                        <b>Severity:</b> {Severity}<br>
-                        <b>Event Type:</b> {EventType}<br>
-                        <b>Asset Type:</b> {AssetType}<br>
-                        <b>Description:</b> {Description}<br>
-                        <b>Intersection:</b> {Intersection}<br>
-                        <b>Location:</b> {Location}<br>
-                        <b>Images:</b> <br>
-                        <b>Perimeter:</b> {Perimeter}<br>
-                    `
-                };
+                     // Popup content
+                     var popupTemplate = {
+                         title: "Incident Details",
+                         content: `
+                             <b>Incident Number:</b> {IncidentID}<br>
+                             <b>Severity:</b> {Severity}<br>
+                             <b>Event Type:</b> {EventType}<br>
+                             <b>Asset Type:</b> {AssetType}<br>
+                             <b>Description:</b> {Description}<br>
+                             <b>Intersection:</b> {Intersection}<br>
+                             <b>Location:</b> {Location}<br>
+                             <b>Images:</b> <br>
+                             <b>Perimeter:</b> {Perimeter}<br>
+                         `
+                     };
 
-                // Attributes for popup
-                var attributes = {
-                    IncidentID: $(this).data("incidentid") || "",
-                    Severity: $(this).data("severity") || "",
-                    EventType: $(this).data("eventtype") || "",
-                    AssetType: $(this).data("assettype") || "",
-                    Description: $(this).data("description") || "",
-                    Intersection: $(this).data("intersection") || "",
-                    Location: incidentLoc,
-                    Perimeter: hdn_radius || "N/A"
-                };
+                     // Attributes for popup
+                     var attributes = {
+                         IncidentID: $(this).data("incidentid") || "",
+                         Severity: $(this).data("severity") || "",
+                         EventType: $(this).data("eventtype") || "",
+                         AssetType: $(this).data("assettype") || "",
+                         Description: $(this).data("description") || "",
+                         Intersection: $(this).data("intersection") || "",
+                         Location: incidentLoc,
+                         Perimeter: hdn_radius || "N/A"
+                     };
 
-                // Marker with popup
-                var markerGraphic = new Graphic({
-                    geometry: point,
-                    symbol: markerSymbol,
-                    attributes: attributes,
-                    popupTemplate: popupTemplate
-                });
+                     // Marker with popup
+                     var markerGraphic = new Graphic({
+                         geometry: point,
+                         symbol: markerSymbol,
+                         attributes: attributes,
+                         popupTemplate: popupTemplate
+                     });
 
-                // Circle radius (default 0 if not provided)
-                var circle = new Circle({
-                    center: [hdn_lon, hdn_lat],
-                    radius: hdn_radius && hdn_radius !== '' ? parseInt(hdn_radius) : 0,
-                    radiusUnit: "miles"
-                });
+                     // Circle radius (default 0 if not provided)
+                     var circle = new Circle({
+                         center: [hdn_lon, hdn_lat],
+                         radius: hdn_radius && hdn_radius !== '' ? parseInt(hdn_radius) : 0,
+                         radiusUnit: "miles"
+                     });
 
-                var circleGraphic = new Graphic({
-                    geometry: circle,
-                    symbol: {
-                        type: "simple-fill",
-                        color: [255, 0, 0, 0.1], // transparent red
-                        outline: { color: hdn_incidentstatusColor, width: 2 }
-                    }
-                });
+                     var circleGraphic = new Graphic({
+                         geometry: circle,
+                         symbol: {
+                             type: "simple-fill",
+                             color: [255, 0, 0, 0.1], // transparent red
+                             outline: { color: hdn_incidentstatusColor, width: 2 }
+                         }
+                     });
 
-                // Add fresh graphics
-                window.graphicsLayer.addMany([markerGraphic, circleGraphic]);
+                     // Add fresh graphics
+                     window.graphicsLayer.addMany([markerGraphic, circleGraphic]);
 
-                // Zoom to circle extent
-                window.view.goTo(circle.extent.expand(1));
+                     // Zoom to circle extent
+                     window.view.goTo(circle.extent.expand(1));
 
-            } else {
-                if (window.graphicsLayer) {
-                    window.view.goTo(window.graphicsLayer.graphics);
-                }
-            }
+                 } else {
+                     if (window.graphicsLayer) {
+                         window.view.goTo(window.graphicsLayer.graphics);
+                     }
+                 }
+             });
+
         });
 
-   });
+         $(function () {
+            // Keep clicks inside the panel from triggering any global overlay handlers
+            $('.incident-list.map-overlay').on('click', function (e) {
+                e.stopPropagation();
+            });
+
+            // Existing header button toggle (content-only)
+            $('#incidentListToggleBtn').on('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var $btn = $(this);
+                var $icon = $btn.find('i');
+                var $content = $('#incidentListContent');
+
+                $content.stop(true, true).slideToggle(150, function () {
+                    var nowOpen = $content.is(':visible');
+                    $btn.attr('aria-expanded', nowOpen);
+                    $icon.toggleClass('fa-chevron-up', nowOpen)
+                         .toggleClass('fa-chevron-down', !nowOpen);
+                });
+            });
+        });
+
     </script>
+
+
 }
