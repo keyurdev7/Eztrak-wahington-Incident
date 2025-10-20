@@ -41,13 +41,13 @@
         formData.append("Id", document.getElementById("assessmentId").value);
         formData.append("StatusId", document.getElementById("status").value);
         formData.append("AssigneeId", document.getElementById("assignee").value);
-        formData.append("StartedTime", document.getElementById("startedTime").value);
-        formData.append("CompletedTime", document.getElementById("completedTime").value);
+       // formData.append("StartedTime", document.getElementById("startedTime").value);
+        //formData.append("CompletedTime", document.getElementById("completedTime").value);
         formData.append("Description", document.getElementById("description").value);
         formData.append("MainStepId", document.getElementById("mainstepId").value);
         formData.append("SubStepId", document.getElementById("substepId").value);
         formData.append("IncidentId", document.getElementById("hdnIncidentID").value);
-
+        formData.append("ImageUrl", document.getElementById("hdnImgUrl").value);
 
         // Append files (multiple)
         const files = document.getElementById("fileInputAssestment").files;
@@ -157,15 +157,15 @@
         formData.append("Id", document.getElementById("restorationId").value);
         formData.append("StatusId", document.getElementById("status").value);
         formData.append("RoleIds", document.getElementById("hdn_UpdateResortationRole").value);
-        formData.append("Started", document.getElementById("startedTime").value);
-        formData.append("Completed", document.getElementById("completedTime").value);
+        //formData.append("Started", document.getElementById("startedTime").value);
+       // formData.append("Completed", document.getElementById("completedTime").value);
         formData.append("Description", document.getElementById("description").value);
         formData.append("Task", document.getElementById("task").value);
 
         //formData.append("MainStepId", document.getElementById("mainstepId").value);
         //formData.append("SubStepId", document.getElementById("substepId").value);
         formData.append("IncidentId", document.getElementById("hdnIncidentID").value);
-
+        formData.append("ImageUrl", document.getElementById("hdnImgUrl").value);
 
         // Append files (multiple)
         const files = document.getElementById("fileInputRestoration").files;
@@ -257,7 +257,7 @@
         formData.append("StatusId", document.getElementById("status").value);
         formData.append("RoleIds", document.getElementById("hdn_UpdateCloseOutRole").value);
         //formData.append("Started", document.getElementById("startedTime").value);
-        formData.append("Completed", document.getElementById("completedTime").value);
+        //formData.append("Completed", document.getElementById("completedTime").value);
         formData.append("Description", document.getElementById("description").value);
         formData.append("Task", document.getElementById("task").value);
 
@@ -265,7 +265,7 @@
         //formData.append("SubStepId", document.getElementById("substepId").value);
         formData.append("IncidentId", document.getElementById("hdnIncidentID").value);
 
-
+        formData.append("ImageUrl", document.getElementById("hdnImgUrl").value);
         // Append files (multiple)
         const files = document.getElementById("fileInputCloseOut").files;
         for (let i = 0; i < files.length; i++) {
@@ -359,6 +359,8 @@
         formData.append("IncidentId", document.getElementById("IncidentId").value);
         formData.append("IncidentValidationId", document.getElementById("IncidentValidationId").value);
         formData.append("FieldTypeId", document.getElementById("FieldTypeId").value);
+        formData.append("SOL_Path", document.getElementById("hdnImgUrl").value);
+
         //formData.append("StatusId", document.getElementById("FieldTypeId").value);
         if (document.getElementById("FieldTypeId").value == 1) {
             formData.append("SourceOfLeak", document.getElementById("hdn_ResponsibleRole").value);

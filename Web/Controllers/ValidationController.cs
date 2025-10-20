@@ -196,7 +196,7 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveIncidentValidation1([FromForm] IncidentSubmitViewModel request)
         {
-            if (request == null)
+            if (request == null)    
                 return BadRequest(new { success = false, message = "Invalid request data." });
 
             try

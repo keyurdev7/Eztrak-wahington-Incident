@@ -429,8 +429,7 @@ namespace Repositories.Common
                 //var insertedValidationId = incidentValidation.Id;
                 #endregion
 
-                
-                  // 4. Add Incident Validation Locations
+                // 4. Add Incident Validation Locations
                 if (request.listSubmitValidationLocationVM.Any())
                 {
                     var validationLocation = request.listSubmitValidationLocationVM.Select(item =>
@@ -509,6 +508,17 @@ namespace Repositories.Common
                 };
 
                 await _db.IncidentValidationNotes.AddAsync(note);
+
+                #region IncidentValidationRestoration
+                // 9. Create default Restoration tasks
+                await SeedDefaultRestorationTasks(incidentValidation.Id, request.Id);
+                #endregion
+
+                #region IncidentValidationCloseout
+                // 10. Create default Closeout tasks
+                await SeedDefaultCloseoutTasks(incidentValidation.Id, request.Id);
+                #endregion
+
                 #region  Save everything in one go
                 // 6. Save everything in one go
                 await _db.SaveChangesAsync();
@@ -687,6 +697,16 @@ namespace Repositories.Common
                     ActiveStatus = ActiveStatus.Active
                 };
                 await _db.IncidentValidationRepairs.AddAsync(IncidentValidationRepair);
+                #endregion
+
+                #region IncidentValidationRestoration
+                // 9. Create default Restoration tasks
+                await SeedDefaultRestorationTasks(incidentValidation.Id, request.Id);
+                #endregion
+
+                #region IncidentValidationCloseout
+                // 10. Create default Closeout tasks
+                await SeedDefaultCloseoutTasks(incidentValidation.Id, request.Id);
                 #endregion
 
                 #region Incident Validation Task Info 
@@ -1060,6 +1080,192 @@ namespace Repositories.Common
             catch
             {
                 return 1L;
+            }
+        }
+
+        private async Task SeedDefaultRestorationTasks(long incidentValidationId, long incidentId)
+        {
+            try
+            {
+                // Get default status (Pending)
+                var defaultStatus = await _db.Progress
+                    .FirstOrDefaultAsync(p => !p.IsDeleted && p.Name.ToLower().Contains("Not Started"));
+                
+                var defaultStatusId = defaultStatus?.Id ?? 1; // Fallback to ID 1 if not found
+
+                // Get role IDs by name
+                var engineeringRole = await _db.IncidentRoles
+                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("Engineering"));
+                var mrcRole = await _db.IncidentRoles
+                    .FirstOrDefaultAsync(r => !r.IsDeleted && (r.Name.ToLower().Contains("M&R Crew") || r.Name.ToLower().Contains("maintenance")));
+                var customerServiceRole = await _db.IncidentRoles
+                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("Customer Service"));
+                var icRole = await _db.IncidentRoles
+                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("IC"));
+                var ferRole = await _db.IncidentRoles
+                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("FER"));
+
+                // Define the 5 default Restoration tasks
+                var defaultRestorationTasks = new List<IncidentValidationTask>
+                {
+                    new IncidentValidationTask
+                    {
+                        IncidentId = incidentId,
+                        IncidentValidationId = incidentValidationId,
+                        TaskDescription = "Pressure test completed for Segment A",
+                        RoleIds = engineeringRole?.Id.ToString() ?? "1", // Engineering
+                        StatusId = defaultStatusId,
+                        CreatedOn = DateTime.UtcNow,
+                        IsDeleted = false,
+                        ActiveStatus = ActiveStatus.Active
+                    },
+                    new IncidentValidationTask
+                    {
+                        IncidentId = incidentId,
+                        IncidentValidationId = incidentValidationId,
+                        TaskDescription = "Pressure test in progress for Segment B",
+                        RoleIds = engineeringRole?.Id.ToString() ?? "1", // Engineering
+                        StatusId = defaultStatusId,
+                        CreatedOn = DateTime.UtcNow,
+                        IsDeleted = false,
+                        ActiveStatus = ActiveStatus.Active
+                    },
+                    new IncidentValidationTask
+                    {
+                        IncidentId = incidentId,
+                        IncidentValidationId = incidentValidationId,
+                        TaskDescription = "Inspect and reinstall regulators and meters",
+                        RoleIds = mrcRole?.Id.ToString() ?? "2", // M&R Crew
+                        StatusId = defaultStatusId,
+                        CreatedOn = DateTime.UtcNow,
+                        IsDeleted = false,
+                        ActiveStatus = ActiveStatus.Active
+                    },
+                    new IncidentValidationTask
+                    {
+                        IncidentId = incidentId,
+                        IncidentValidationId = incidentValidationId,
+                        TaskDescription = "Relight customer appliances (residential)",
+                        RoleIds = customerServiceRole?.Id.ToString() ?? "3", // Customer Service
+                        StatusId = defaultStatusId,
+                        CreatedOn = DateTime.UtcNow,
+                        IsDeleted = false,
+                        ActiveStatus = ActiveStatus.Active
+                    },
+                    new IncidentValidationTask
+                    {
+                        IncidentId = incidentId,
+                        IncidentValidationId = incidentValidationId,
+                        TaskDescription = "Confirm all lines dried and restored",
+                        RoleIds = $"{icRole?.Id ?? 1},{ferRole?.Id ?? 2}", // IC / FER
+                        StatusId = defaultStatusId,
+                        CreatedOn = DateTime.UtcNow,
+                        IsDeleted = false,
+                        ActiveStatus = ActiveStatus.Active
+                    }
+                };
+
+                await _db.IncidentValidationTasks.AddRangeAsync(defaultRestorationTasks);
+                await _db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error seeding default Restoration tasks for Incident {IncidentId}", incidentId);
+            }
+        }
+
+        private async Task SeedDefaultCloseoutTasks(long incidentValidationId, long incidentId)
+        {
+            try
+            {
+                // Get default status (Not Started)
+                var defaultStatus = await _db.Progress
+                    .FirstOrDefaultAsync(p => !p.IsDeleted && p.Name.ToLower().Contains("Not Started"));
+                
+                var defaultStatusId = defaultStatus?.Id ?? 1; // Fallback to ID 1 if not found
+
+                // Get role names for closeout tasks
+                var icRole = await _db.IncidentRoles
+                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("IC"));
+                var gecRole = await _db.IncidentRoles
+                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("GEC"));
+                var engineeringRole = await _db.IncidentRoles
+                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("Engineering"));
+                var ferRole = await _db.IncidentRoles
+                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("FER"));
+                var vendorRole = await _db.IncidentRoles
+                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("Vendor"));
+                var complianceRole = await _db.IncidentRoles
+                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("Compliance"));
+                var accountingRole = await _db.IncidentRoles
+                   .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("Accounting"));
+
+                // Define the 5 default Closeout tasks
+                var defaultCloseoutTasks = new List<ValidationCloseout>
+                {
+                    new ValidationCloseout
+                    {
+                        IncidentId = incidentId,
+                        IncidentValidationId = incidentValidationId,
+                        Description = "Generate Major Customer Report (MCR)",
+                        Role = $"{icRole?.Id.ToString() ?? "IC"},{gecRole?.Id.ToString() ?? "1"}", // IC / GEC
+                        Status = defaultStatusId.ToString(),
+                        CreatedOn = DateTime.UtcNow,
+                        IsDeleted = false,
+                        ActiveStatus = ActiveStatus.Active
+                    },
+                    new ValidationCloseout
+                    {
+                        IncidentId = incidentId,
+                        IncidentValidationId = incidentValidationId,
+                        Description = "Prepare CPUC / PHMSA Report",
+                        Role = $"{engineeringRole?.Id.ToString() ?? "1"},{complianceRole?.Id.ToString() ?? "1"}", // Engineering / Compliance
+                        Status = defaultStatusId.ToString(),
+                        CreatedOn = DateTime.UtcNow,
+                        IsDeleted = false,
+                        ActiveStatus = ActiveStatus.Active
+                    },
+                    new ValidationCloseout
+                    {
+                        IncidentId = incidentId,
+                        IncidentValidationId = incidentValidationId,
+                        Description = "Environmental Summary & Disposal Documentation",
+                        Role = $"{ferRole?.Id.ToString() ?? "1"},{vendorRole?.Id.ToString() ?? "1"}", // FER / Vendor
+                        Status = defaultStatusId.ToString(),
+                        CreatedOn = DateTime.UtcNow,
+                        IsDeleted = false,
+                        ActiveStatus = ActiveStatus.Active
+                    },
+                    new ValidationCloseout
+                    {
+                        IncidentId = incidentId,
+                        IncidentValidationId = incidentValidationId,
+                        Description = "Finalize Cost Breakdown (Labor, Equipment, Material)",
+                        Role = $"{gecRole?.Id.ToString() ?? "1"},{accountingRole?.Id.ToString() ??"1"}", 
+                        Status = defaultStatusId.ToString(),
+                        CreatedOn = DateTime.UtcNow,
+                        IsDeleted = false,
+                        ActiveStatus = ActiveStatus.Active
+                    },
+                    new ValidationCloseout
+                    {
+                        IncidentId = incidentId,
+                        IncidentValidationId = incidentValidationId,
+                        Description = "Submit Lessons Learned Report",
+                        Role = $"{icRole?.Id.ToString() ?? "1"},{ferRole?.Id.ToString()  ?? "1"},{engineeringRole?.Id.ToString()  ?? "1"}", // IC / FER / Engineering
+                        Status = defaultStatusId.ToString(),
+                        CreatedOn = DateTime.UtcNow,
+                        IsDeleted = false,
+                        ActiveStatus = ActiveStatus.Active
+                    }
+                };
+
+                await _db.ValidationCloseouts.AddRangeAsync(defaultCloseoutTasks);
+                await _db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error seeding default Closeout tasks for Incident {IncidentId}", incidentId);
             }
         }
         #endregion

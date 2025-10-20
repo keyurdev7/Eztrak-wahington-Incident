@@ -1724,6 +1724,7 @@ namespace Repositories.Common
                         AssigneeId = substep.AssigneeId,
                         MainStepId = substep.MainstepId,
                         SubStepId = substep.SubstepId,
+                        ImageUrl= substep.ImagesUrl,
                         Assignees = incidentUsers.Select(user => new SelectListItem
                         {
                             Text = $"{user.Value.LastName} {user.Value.FirstName}",
@@ -2957,8 +2958,8 @@ namespace Repositories.Common
                     RoleIds = x.RoleIds,
                     StatusId = x.StatusId,
                     CreatedOn = x.CreatedOn,
-                    StartTime = x.StartTime,
-                    x.ComplateTime,
+                    //StartTime = x.StartTime,
+                   // x.ComplateTime,
                     x.ImageUrls,
                     x.Notes
                 })
@@ -2989,9 +2990,8 @@ namespace Repositories.Common
                     Task = p.TaskDescription ?? string.Empty,
                     FieldValue = string.IsNullOrWhiteSpace(responsible) ? "—" : responsible,
                     Status = string.IsNullOrWhiteSpace(statusName) ? "Pending" : statusName,
-
-                    Started = p.StartTime?.ToString("HH:mm") ?? "-",
-                    Completed = p.ComplateTime?.ToString("HH:mm") ?? "-",
+                    //Started = p.StartTime?.ToString("HH:mm") ?? "-",
+                    //Completed = p.ComplateTime?.ToString("HH:mm") ?? "-",
                     ImagesUrl = p?.ImageUrls ?? string.Empty,
                     ImageCount = string.IsNullOrWhiteSpace(p?.ImageUrls ?? string.Empty)
                         ? 0
@@ -3034,10 +3034,10 @@ namespace Repositories.Common
                 IncidentValidationId = entity.IncidentValidationId,
                 Task = entity.TaskDescription,
                 FieldValue = roleNames.Any() ? string.Join(" / ", roleNames) : "—",
-                Status = string.IsNullOrWhiteSpace(statusName) ? "Pending" : statusName,
-                Started = null,
-                Completed = null,
-                Attachment = null
+                Status = string.IsNullOrWhiteSpace(statusName) ? "Not Started" : statusName,
+                //Started = null,
+                //Completed = null,
+                Attachment = null,
             };
         }
 
@@ -3068,6 +3068,7 @@ namespace Repositories.Common
                     Task = details?.TaskDescription ?? string.Empty,
                     RoleIds = details?.RoleIds ?? string.Empty,
                     StatusId = details?.StatusId,
+                    ImageUrl = details?.ImageUrls ?? string.Empty,
                     StatusList = statusList
                     .Select(p => new SelectListItem
                     {
@@ -3122,8 +3123,8 @@ namespace Repositories.Common
                 details.RoleIds = request?.RoleIds ?? string.Empty; // comma-separated "1,2"
                 details.StatusId = request?.StatusId ?? 0;
                 details.ImageUrls = request?.ImageUrl ?? string.Empty;
-                details.StartTime = ParseTime(request?.Started ?? string.Empty);
-                details.ComplateTime = ParseTime(request?.Completed ?? string.Empty);
+                //details.StartTime = ParseTime(request?.Started ?? string.Empty);
+                //details.ComplateTime = ParseTime(request?.Completed ?? string.Empty);
                 details.Notes = request?.Description;
                 details.UpdatedOn = DateTime.UtcNow; // optional if you track update time
 
@@ -3240,8 +3241,8 @@ namespace Repositories.Common
                     IncidentValidationId = details.IncidentValidationId,
                     Description = details.Notes ?? string.Empty,
                     ImageUrl = details.ImageUrls ?? string.Empty,
-                    Completed = details.ComplateTime?.ToString("HH:mm") ?? "-",
-                    Started = details.StartTime?.ToString("HH:mm") ?? "-",
+                    //Completed = details.ComplateTime?.ToString("HH:mm") ?? "-",
+                    //Started = details.StartTime?.ToString("HH:mm") ?? "-",
                     StatusId = details.StatusId,
                     RoleIds = details.RoleIds, // still keep raw IDs
                     RoleName = roleNames,      // ✅ comma-separated role names
@@ -3340,8 +3341,8 @@ namespace Repositories.Common
                     Task = entity.Description,
                     FieldValue = roleNames.Any() ? string.Join(" / ", roleNames) : "—",
                     Status = string.IsNullOrWhiteSpace(statusName) ? "Not Started" : statusName,
-                    Started = null,
-                    Completed = null,
+                    //Started = null,
+                    //Completed = null,
                     Attachment = null
                 };
 
@@ -3379,6 +3380,7 @@ namespace Repositories.Common
                     Task = details?.Description ?? string.Empty,
                     RoleIds = details?.Role ?? string.Empty,
                     StatusId = !string.IsNullOrWhiteSpace(details?.Status) ? Convert.ToInt64(details?.Status) : 0,
+                    ImageUrl = details?.ImageUrls,
                     StatusList = statusList
                     .Select(p => new SelectListItem
                     {
@@ -3465,8 +3467,8 @@ namespace Repositories.Common
                         FieldValue = string.IsNullOrWhiteSpace(responsible) ? "—" : responsible,
                         Status = string.IsNullOrWhiteSpace(statusName) ? "Not Started" : statusName,
 
-                        Started = p.StartTime?.ToString("HH:mm") ?? "-",
-                        Completed = p.ComplateTime?.ToString("HH:mm") ?? "-",
+                        //Started = p.StartTime?.ToString("HH:mm") ?? "-",
+                        //Completed = p.ComplateTime?.ToString("HH:mm") ?? "-",
                         ImagesUrl = p?.ImageUrls ?? string.Empty,
                         ImageCount = string.IsNullOrWhiteSpace(p?.ImageUrls ?? string.Empty)
             ? 0
@@ -3504,8 +3506,8 @@ namespace Repositories.Common
                 details.Role = request?.RoleIds ?? string.Empty; // comma-separated "1,2"
                 details.Status = Convert.ToString(request?.StatusId);
                 details.ImageUrls = request?.ImageUrl ?? string.Empty;
-                details.StartTime = ParseTime(request?.Started ?? string.Empty);
-                details.ComplateTime = ParseTime(request?.Completed ?? string.Empty);
+                //details.StartTime = ParseTime(request?.Started ?? string.Empty);
+               // details.ComplateTime = ParseTime(request?.Completed ?? string.Empty);
                 details.Notes = request?.Description;
                 details.UpdatedOn = DateTime.UtcNow; // optional if you track update time
 
@@ -3622,8 +3624,8 @@ namespace Repositories.Common
                     IncidentValidationId = details.IncidentValidationId,
                     Description = details.Notes ?? string.Empty,
                     ImageUrl = details.ImageUrls ?? string.Empty,
-                    Completed = details.ComplateTime?.ToString("HH:mm") ?? "-",
-                    Started = details.StartTime?.ToString("HH:mm") ?? "-",
+                   // Completed = details.ComplateTime?.ToString("HH:mm") ?? "-",
+                   // Started = details.StartTime?.ToString("HH:mm") ?? "-",
                     StatusId = !string.IsNullOrWhiteSpace(details.Status) ? Convert.ToInt64(details.Status) : 0,
                     RoleIds = details.Role, // still keep raw IDs
                     RoleName = roleNames,      // ✅ comma-separated role names
@@ -3801,7 +3803,8 @@ namespace Repositories.Common
                         RoleList = rolesList,
                         FieldType = i.FieldType,
                         FieldTypeId = i.FieldTypeId,
-                        Id = RepairId
+                        Id = RepairId,
+                        SOL_Path= i.SOL_Path
                     }).FirstOrDefault()!;
 
             }

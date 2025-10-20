@@ -24,7 +24,7 @@ namespace Models
 
         public string? Notes { get; set; }
         public string? ImageUrls { get; set; }
-        public DateTime? StartTime { get; set; }
-        public DateTime? ComplateTime { get; set; }
+        //public DateTime? StartTime { get; set; }
+        //public DateTime? ComplateTime { get; set; }
     }
 }

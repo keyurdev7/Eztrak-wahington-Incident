@@ -24,7 +24,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Status</label>
-                                <select class="form-select" id="status" asp-for="@Model.StatusId" disabled>
+                                <select class="form-select" id="status" asp-for="@Model.StatusId">
                                     <option value="">Select status</option>
                                     @foreach (var item in Model.StatusList)
                                     {
@@ -54,18 +54,18 @@
                                 </select>
                             </div>
 
-                            <div class="d-flex align-items-center row">
-                                @* <div class="form-group col-md-6">
+                         @*    <div class="d-flex align-items-center row">
+                                <div class="form-group col-md-6">
                                     <label class="form-label">Completed</label>
                                     <input type="time" class="form-control" id="startedTime" asp-for="@Model.Started">
-                                </div>*@
+                                </div>
 
-                                <!-- Completed (Time only) -->
+                               
                                 <div class="form-group col-md-6">
                                     <label class="form-label">Completed</label>
                                     <input type="time" class="form-control" id="completedTime" asp-for="@Model.Completed">
                                 </div>
-                            </div>
+                            </div> *@
                             <div class="form-group">
                                 <label class="form-label">Description</label>
                                 <textarea class="form-control" id="description" rows="3" asp-for="@Model.Description" placeholder="Enter description or notes"></textarea>
@@ -98,6 +98,7 @@
 
                             <div class="form-group">
                                 <label class="form-label">Evidence</label>
+                                <input type="hidden" id="hdnImgUrl" value="@Model.ImageUrl" />
                                 <input type="file" id="fileInputCloseOut" multiple class="file-upload" asp-for="@Model.File">
                                 <div id="previewContainerCloseOut" class="d-flex flex-wrap gap-2"></div>
                             </div>

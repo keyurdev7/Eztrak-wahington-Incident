@@ -1516,12 +1516,12 @@
                                     }
                                     @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
                                 </div>
-                                @* <div class="card-custom signoffs">
-                                    <h6>Customer Notifications</h6>
+                                <div class="card-custom signoffs">
+                                 @*    <h6>Customer Notifications</h6>
 
                                     <div class="p-3 signoffContent">
                                         <p class="mb-0">Residential area relight letters distributed 3:30 PM.Commercial accounts scheduled for 6:00 PM.</p>
-                                    </div>
+                                    </div> *@
 
 
 
@@ -1531,15 +1531,15 @@
                                             @await Html.PartialAsync("_ViewAttachmentAssestmentPartial", Model.incidentViewRestorationAttachmentView)
                                         </div>
 
-                                        <strong>Attachments</strong>
+                                      @*   <strong>Attachments</strong>
                                         <ul class="attachments mt-2">
                                             <li><i class="fa-solid fa-circle"></i>mcr_final.pdf</li>
                                             <li><i class="fa-solid fa-circle"></i>cpucreport_draft.docx</li>
                                             <li><i class="fa-solid fa-circle"></i>disposal_manifest.pdf</li>
                                             <li><i class="fa-solid fa-circle"></i>cost_summary.xlsx</li>
-                                        </ul> 
+                                        </ul>  *@
                                     </div>
-                                </div> *@
+                                </div> 
                             </div>
                         </div>
                     </div>
@@ -2857,9 +2857,9 @@
             if (result.success) {
                 SwalSuccessAlert(result.data);
 
-                setTimeout(function () {
+              @*   setTimeout(function () {
                     window.location = '/Incidents';
-                }, 1000);
+                }, 1000); *@
 
             } else {
                 SwalErrorAlert(result.message || "Failed to Save Incident Validation.");

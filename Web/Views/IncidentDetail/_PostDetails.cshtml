@@ -43,9 +43,9 @@
             <h6>Updates @Model.IncidentViewPostType</h6>
             <div id="update-list">
                 @if (Model.IncidentViewRepairViewModel?.listIncidentViewPostViewModel != null &&
-                            Model.IncidentViewRepairViewModel.listIncidentViewPostViewModel.Any())
+                            Model.IncidentViewCloseoutViewModel.listIncidentViewPostViewModel.Any())
                 {
-                    @foreach (var post in Model.IncidentViewRepairViewModel.listIncidentViewPostViewModel)
+                    @foreach (var post in Model.IncidentViewCloseoutViewModel.listIncidentViewPostViewModel)
                     {
                         <div class="update-item">
                             <span class="update-time">@post.TimeforMessage</span>

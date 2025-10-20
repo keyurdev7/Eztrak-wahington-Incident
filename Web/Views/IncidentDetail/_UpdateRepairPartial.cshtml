@@ -160,6 +160,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label">Evidence</label>
+                                <input type="hidden" id="hdnImgUrl" value="@Model.SOL_Path" />
                                 <input type="file" id="fileInputRepair" multiple class="file-upload" asp-for="@Model.File">
                                 <div id="previewContainerRepair" class="d-flex flex-wrap gap-2"></div>
                             </div>

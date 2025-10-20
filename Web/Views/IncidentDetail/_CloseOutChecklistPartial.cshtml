@@ -7,8 +7,8 @@
             <th>Task</th>
             <th>Responsible Party</th>
             <th>Status</th>
-            <th>Completed</th>
-            <th>Attachment</th>
+            @* <th>Completed</th> *@
+            <th>Evidence</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -25,7 +25,7 @@
 
                     @if (!string.IsNullOrWhiteSpace(closeout.Status))
                     {
-                        @if (closeout.Status.ToLower() == "in progress")
+                        @if (closeout.Status.ToLower() == "started")
                         {
                             <td><span class="status-badge progressing">@closeout.Status</span></td>
                         }
@@ -33,7 +33,7 @@
                         {
                             <td><span class="status-badge not-started">@closeout.Status</span></td>
                         }
-                        else if (closeout.Status.ToLower() == "done")
+                        else if (closeout.Status.ToLower() == "complete")
                         {
                             <td><span class="status-badge done">@closeout.Status</span></td>
                         }
@@ -47,7 +47,7 @@
                         <td><span class="status-badge not-started">Not Started</span></td>
                     }
 
-                    <td>@closeout.Completed</td>
+                    @* <td>@closeout.Completed</td> *@
                     @if (closeout.ImageCount > 0)
                     {
                         <td><i class="fa fa-file-alt text-secondary me-1"></i>@closeout.ImageCount file </td>
@@ -57,7 +57,7 @@
                         <td><i class="fa fa-file-alt text-secondary me-1"></i></td>
                     }
 
-                    @if (!string.IsNullOrWhiteSpace(closeout.Completed) && closeout.Completed != "-")
+                    @if (!string.IsNullOrWhiteSpace(closeout.Status) && closeout.Status == "Complete")
                     {
                         <td><a href="#" class="text-primary text-decoration-none" onclick="ViewCloseOutDetails('@closeout.Id')">View</a></td>
                     }

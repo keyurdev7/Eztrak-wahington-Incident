@@ -547,8 +547,8 @@ namespace ViewModels.Incident
         public string? Task { get; set; }            // TaskDescription
         public string? FieldValue { get; set; }      // Responsible Party (resolved RoleIds)
         public string Status { get; set; }          // resolved from StatusId
-        public string? Started { get; set; }         // placeholder (no DB column in screenshot)
-        public string? Completed { get; set; }       // placeholder (no DB column in screenshot)
+        //public string? Started { get; set; }         // placeholder (no DB column in screenshot)
+       // public string? Completed { get; set; }       // placeholder (no DB column in screenshot)
         public string? Attachment { get; set; }      // placeholder (no DB column in screenshot)
         public string? RoleIds { get; set; }     // receives "1,2" (if you join them first)
         public int? StatusId { get; set; }
@@ -564,8 +564,8 @@ namespace ViewModels.Incident
         public string? Task { get; set; }            // TaskDescription
         public List<SelectListItem> RoleList { get; set; } = new();
         public List<SelectListItem> StatusList { get; set; } = new();
-        public string? Started { get; set; }         // placeholder (no DB column in screenshot)
-        public string? Completed { get; set; }       // placeholder (no DB column in screenshot)
+        //public string? Started { get; set; }         // placeholder (no DB column in screenshot)
+        //public string? Completed { get; set; }       // placeholder (no DB column in screenshot)
         public string? Attachment { get; set; }      // placeholder (no DB column in screenshot)
         public string? RoleIds { get; set; }     // receives "1,2" (if you join them first)
         public long? StatusId { get; set; }
