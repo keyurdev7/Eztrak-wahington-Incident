@@ -1224,8 +1224,8 @@
                                 @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
 
                             </div>
-                           @*  <div class="card">
-                                <div class="card-header bg-white fw-semibold" style="display:none">
+                            <div class="card">
+                               @*  <div class="card-header bg-white fw-semibold" style="display:none">
                                     <i class="fa fa-map-location-dot text-warning me-2"></i>Mini Map
                                 </div>
                                 <div class="card-body text-center" style="display:none">
@@ -1234,7 +1234,7 @@
                                         <i class="fa fa-location-dot"></i>
                                     </div>
                                     <p class="text-muted small mb-0">Mini Map View</p>
-                                </div>
+                                </div> *@
                                 <div class="card-body attachments">
                                     <h6 class="fw-semibold small mb-2">Attachments</h6>
 
@@ -1242,7 +1242,7 @@
                                         @await Html.PartialAsync("_ViewAttachmentAssestmentPartial", Model.incidentViewAssessmentAttachmentView)
                                     </div>
                                 </div>
-                            </div> *@
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1660,8 +1660,8 @@
                                 </div>
 
 
-                               @*  <div class="card-custom signoffs">
-                                    <h6>Management Sign-Offs</h6>
+                               <div class="card-custom signoffs">
+                                    @* <h6>Management Sign-Offs</h6>
 
                                     <div class="signoffContent">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -1684,7 +1684,7 @@
                                             <span class="status pending"><i class="fa-solid fa-triangle-exclamation"></i>Pending</span>
                                         </div>
                                     </div>
-
+ *@
                                     <div class="file-section">
                                         <strong>Attachments</strong>
 
@@ -1692,7 +1692,7 @@
                                             @await Html.PartialAsync("_ViewAttachmentAssestmentPartial", Model.incidentViewCloseOutAttachmentView)
                                         </div>
                                     </div>
-                                </div> *@
+                                </div> 
 
                             </div>
                         </div>
