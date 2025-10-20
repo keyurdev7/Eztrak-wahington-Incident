@@ -2857,9 +2857,9 @@
             if (result.success) {
                 SwalSuccessAlert(result.data);
 
-              @*   setTimeout(function () {
+                setTimeout(function () {
                     window.location = '/Incidents';
-                }, 1000); *@
+                }, 1000);
 
             } else {
                 SwalErrorAlert(result.message || "Failed to Save Incident Validation.");
