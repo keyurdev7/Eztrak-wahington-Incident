@@ -197,107 +197,113 @@
                             <div class="col-12 col-xl-6">
                                 <div class="validationCard callerInfo">
                                     <div class="section-header d-flex align-items-center justify-content-between">
-                                        <h6 class="mb-0">Caller Information</h6>
+                                        <h6 class="mb-0 font-colr"> <i class="fas fa-info-circle"></i>  Caller Information</h6>
                                     </div>
                                     <div class="section-body">
                                         <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
                                             <div class="info-sec">
                                                 <span class="info-title">Caller Name : </span>
                                             </div>
-                                            <div>@Model.IVDetails.CallerName</div>
+                                            <div class="fw-bold font-colr">@Model.IVDetails.CallerName</div>
                                         </div>
                                         <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
                                             <div class="info-sec">
                                                 <span class="info-title">Primary contact : </span>
                                             </div>
-                                            <div>@Model.IVDetails.CallerContact</div>
+                                            <div class="fw-bold font-colr">@Model.IVDetails.CallerContact</div>
                                         </div>
                                         <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
                                             <div class="info-sec">
                                                 <span class="info-title">Caller Addresst : </span>
                                             </div>
-                                            <div>@Model.IVDetails.CallerAddress</div>
+                                            <div class="fw-bold font-colr">@Model.IVDetails.CallerAddress</div>
                                         </div>
                                         <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
                                             <div class="info-sec">
                                                 <span class="info-title">Call Time : </span>
                                             </div>
-                                            <div>@Model.IVDetails.CallerDateTime</div>
+                                            <div class="fw-bold font-colr">@Model.IVDetails.CallerDateTime</div>
                                         </div>
 
                                     </div>
+                                    <div class="line-bottam"></div>
 
                                     <div class="section-header d-flex align-items-center justify-content-between">
-                                        <h6 class="mb-0">Incident Location</h6>
+                                        <h6 class="mb-0 font-colr"> <i class="fa fa-map-marker" aria-hidden="true"></i>  Incident Location</h6>
                                     </div>
                                     <div class="section-body">
-                                        <div class="info-item">
-                                            <i class="fa-solid fa-location-dot"></i>
-                                            <span class="info-title">Address</span>
-                                            <span class="info-sub">@Model.IVDetails.IncidentLocation</span>
-                                            <a href="#" class="map-link" onclick="OpenIncidentMap('@Model.Id')"><i class="fa-solid fa-map"></i> View on Map</a>
+                                        <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
+                                            <div class="info-sec">
+                                                <span class="info-title">Address : </span>
+                                            </div>
+                                            <div class="fw-bold font-colr">@Model.IVDetails.IncidentLocation   <a href="#" class="map-link" onclick="OpenIncidentMap('@Model.Id')"><i class="fa-solid fa-map"></i> View on Map</a> </div>
                                         </div>
-
-                                        <div class="info-item">
-                                            <i class="fa-solid fa-road"></i>
-                                            <span class="info-title">Nearest Intersection</span>
-                                            <span class="info-sub"> @Model.IVDetails.NearestIntersection</span>
+                                        <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
+                                            <div class="info-sec">
+                                                <span class="info-title">Nearest Intersection : </span>
+                                            </div>
+                                            <div class="fw-bold font-colr">@Model.IVDetails.NearestIntersection</div>
                                         </div>
-
-                                        <div class="info-item">
-                                            <i class="fa-solid fa-cube"></i>
-                                            <span class="info-title">Affected Assets</span>
-                                            <span class="assets info-sub">
+                                        <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
+                                            <div class="info-sec">
+                                                <span class="info-title">Affected Assets : </span>
+                                            </div>
+                                            <div>
                                                 @foreach (var item in Model.IVDetails.AffectedAssets)
                                                 {
-                                                    <span>@item</span>
+                                                    <span class="badge red" style="background-color: #96aaf3  !important;color:#3566e3 !important">@item</span>
+                                                   
                                                 }
-                                            </span>
+                                            </div>
                                         </div>
-                                    </div>
+                                     </div>
+                                    <div class="line-bottam"></div>
 
                                     <div class="section-header d-flex align-items-center justify-content-between">
-                                        <h6 class="mb-0">Incident Details</h6>
+                                        <h6 class="mb-0"> <i class="fa fa-map-pin" aria-hidden="true"></i>  Incident Details</h6>
                                     </div>
                                     <div class="section-body">
-                                        <div class="detailInfoSec d-flex align-items-center gap-2 mb-2">
+                                        <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
                                             <div class="info-sec">
-                                                <span class="info-title">Event Type</span>
+                                                <span class="info-title">Event Type : </span>
                                             </div>
-                                            <div>@Model.IVDetails.EventType</div>
+                                            <div class="fw-bold font-colr">@Model.IVDetails.EventType</div>
                                         </div>
-                                        <div class="detailInfoSec d-flex align-items-center gap-2 mb-2">
+                                         <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
                                             <div class="info-sec">
-                                                <span class="info-title">Reported Severity</span>
+                                                <span class="info-title">Reported Severity : </span>
                                             </div>
-                                            <span class="badge orange" style="background-color: @Model.IVDetails.SeverityColor !important">@Model.IVDetails.Severity</span>
+                                            <div class="badge orange" style="background-color: @Model.IVDetails.SeverityColor !important">@Model.IVDetails.Severity</div>
                                         </div>
-                                        <div class="detailInfoSec d-flex align-items-center gap-2 mb-2">
+                                        <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
                                             <div class="info-sec">
-
-                                                <span class="info-title">Current Status</span>
+                                                <span class="info-title">Current Status : </span>
                                             </div>
-                                            <span class="badge red" style="background-color: @Model.IVDetails.IncidentStatusColor !important">@Model.IVDetails.IncidentStatus</span>
+                                            <div class="badge red" style="background-color: @Model.IVDetails.IncidentStatusColor !important;">@Model.IVDetails.IncidentStatus</div>
                                         </div>
-                                        <div class="detailInfoSec">
+                                        <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
                                             <div class="info-sec">
-                                                <span class="info-title mb-2">Description</span>
+                                                <span class="info-title">Description : </span>
+                                            </div>
+                                             
                                                 <div class="desc-box">
                                                     @Model.IVDetails.DescriptionIssue
                                                 </div>
-                                            </div>
-
+                                             
                                         </div>
-                                    </div>
+                                     </div>
+
+                                    
+
+                                 
                                 </div>
 
-                                <div class="validationCard incidentDetail">
-                                </div>
+                                 
                             </div>
                             <div class="col-12 col-xl-6">
                                 <div class="validationCard safty">
                                     <div class="section-header d-flex align-items-center justify-content-between">
-                                        <h6 class="mb-0">Safety Assessment</h6>
+                                        <h6 class="mb-0 font-colr">  <i class="fa fa-map-marker" aria-hidden="true"></i> Safety Assessment</h6>
                                     </div>
                                     <div class="section-body">
                                         <div class="grid">
@@ -310,22 +316,26 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="supporting-information-sec">
+                                <div class="supporting-information-sec pt-3">
                                     <div class="section-card">
                                         <div class="section-header d-flex align-items-center justify-content-between">
-                                            <h6 class="mb-0">Supporting Information</h6>
+                                            <h6 class="mb-0 font-colr"> <i class="fa fa-map-marker" aria-hidden="true"></i> Supporting Information</h6>
                                         </div>
                                         <div class="section-body">
-                                            <!-- Service Notes -->
-                                            <div class="note-title">
-                                                <i class="fa-regular fa-file-lines"></i> Service Representative Notes
-                                            </div>
-                                            <div class="note-box">@Model.incidentSupportingInfoViewModel.Notes</div>
+                                            
+                                            <div class="note-boxtext">@Model.incidentSupportingInfoViewModel.Notes</div>
+ 
+                                        </div>
+                                    </div>
+                                </div>
 
-                                            <!-- Photos -->
-                                            <div class="photos-title">
-                                                <i class="fa-regular fa-image"></i> Photos (@Model.incidentSupportingInfoViewModel?.ImageUrls.Count())
-                                            </div>
+                                <div class="supporting-information-sec pt-3">
+                                    <div class="section-card">
+                                        <div class="section-header d-flex align-items-center justify-content-between">
+                                            <h6 class="mb-0 font-colr"> <i class="fa fa-map-marker" aria-hidden="true"></i> Photos  (@Model.incidentSupportingInfoViewModel?.ImageUrls.Count())</h6>
+                                        </div>
+                                        <div class="section-body">
+                                             
                                             <div class="photos-grid">
                                                 @foreach (var imageUrl in Model.incidentSupportingInfoViewModel?.ImageUrls)
                                                 {
@@ -531,7 +541,7 @@
 
                 @if (Model.incidentDetailByIdViewModel.StatusLegendId == 1)
                 {
-                    <form id="incident_validation_form">
+                    <form id="incident_validation_form">                     
                         <div id="validation" class="tab-content active">
                             <div class="phase-header">
                                 <div>
@@ -845,10 +855,26 @@
                 else
                 {
                     <div id="validation" class="tab-content">
-                        <div class="phase-header">
-                            <div>
-                                <div class="phaseTitle">Phase: <span class="fw-bold">Validation</span></div>
-                                <div class="phaseTitle">Progress: <span class="phaseTitle fw-bold">80% Complete</span></div>
+                        <div class="step-content mt-3">
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="status-card status-phase">
+                                    <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
+                                    <div>
+                                        <h6>Phase:</h6>
+                                        <h4>Overview</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="status-card status-progress">
+                                    <div class="status-icon" aria-hidden="true"><i class="fa fa-pie-chart"></i></div>
+                                    <div>
+                                        <h6>Progress:</h6>
+                                        <h4>80% Complete</h4>
+                                    </div>
+                                </div>
                             </div>
 
                         </div>
@@ -858,44 +884,80 @@
                             <!-- Incident Details -->
                             <div class="col-md-4">
                                 <div class="card-custom">
-                                    <div class="section-title">Incident Details</div>
-                                    <div class="section-body">
-                                        @* @foreach (var item in Model.IncidentValidationLocations)
-                                    { *@
 
-                                        <div class="info-item">
-                                            <div>
-                                                <span class="info-title">Severity Level:</span>
-                                                <div class="subtext">@Model.IncidentValidationLocations.SeverityName</div>
-                                            </div>
-                                        </div>
-                                        <div class="info-item">
-                                            <div>
-                                                <span class="info-title">Discovery Perimeter:</span>
-                                                <div class="subtext">@Model.IncidentValidationLocations.DiscoveryPerimeter</div>
-                                            </div>
-                                        </div>
-                                        <div class="info-item">
-                                            <div>
-                                                <span class="info-title">ICP Location:</span>
-                                                <div class="subtext">@Model.IncidentValidationLocations.ICPLocation</div>
-                                            </div>
-                                        </div>
-                                        <div class="info-item">
-                                            <div>
-                                                <span class="info-title">Source:</span>
-                                                <div class="subtext">@Model.IncidentValidationLocations.Source</div>
-                                            </div>
-                                        </div>
-
-
-                                        @* } *@
+                                    <div class="section-header d-flex align-items-center justify-content-between">
+                                        <h6 class="mb-0 font-colr"> <i class="fa-solid fa-pen"></i> Incident Details</h6>
                                     </div>
+                                    <div class="section-body">
+                                        <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
+                                            <div class="info-sec">
+                                                <span class="info-title">Severity Level : </span>
+                                            </div>
+                                            <div class="fw-bold font-colr">@Model.IncidentValidationLocations.SeverityName</div>
+                                        </div>
+                                        <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
+                                            <div class="info-sec">
+                                                <span class="info-title">Discovery Perimeter : </span>
+                                            </div>
+                                            <div class="fw-bold font-colr">@Model.IncidentValidationLocations.DiscoveryPerimeter</div>
+                                        </div>
+                                        <div class="detailInfoSec d-flex align-items-center gap-5 mb-2">
+                                            <div class="info-sec">
+                                                <span class="info-title">ICP Location : </span>
+                                            </div>
+                                            <div class="fw-bold font-colr">@Model.IncidentValidationLocations.ICPLocation</div>
+                                        </div>
+                                        <div class="detailInfoSec d-flex align-items-center gap-5 mb-2">
+                                            @* <div class="info-sec">
+                                                <span class="info-title">Source : </span>
+                                            </div>
+                                            <div class="fw-bold font-colr">@Model.IncidentValidationLocations.Source</div> *@
+                                        </div>
+
+                                    </div>
+
                                 </div>
                             </div>
-
-                            <!-- Assigned Roles -->
                             <div class="col-md-4">
+                                <div class="card-custom">
+                                    
+                                     
+
+                                        <div class="section-header d-flex align-items-center justify-content-between">
+                                        <h6 class="mb-0 font-colr"> <i class="fa-solid fa-user-check"></i> Assigned Roles</h6>
+                                        </div>
+                                        <div class="section-body">
+                                            <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
+                                                <div class="info-sec">
+                                                <span class="info-title">Incident Commander : </span>
+                                                </div>
+                                            <div class="fw-bold font-colr">@Model.incidentValidationAssignedRolesViewModel.IncidentCommanderName</div>
+                                            </div>
+                                            <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
+                                                <div class="info-sec">
+                                                <span class="info-title">Field Env. Rep (FER) : </span>
+                                                </div>
+                                            <div class="fw-bold font-colr">@Model.incidentValidationAssignedRolesViewModel.FieldEnvRepName</div>
+                                            </div>
+                                            <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
+                                                <div class="info-sec">
+                                                <span class="info-title">GEC Coordinator : </span>
+                                                </div>
+                                            <div class="fw-bold font-colr">@Model.incidentValidationAssignedRolesViewModel.GEC_CoordinatorName</div>
+                                            </div>
+                                            <div class="detailInfoSec d-flex align-items-center gap-5 mb-2">
+                                                <div class="info-sec">
+                                                <span class="info-title">Engineering Lead : </span>
+                                                </div>
+                                            <div class="fw-bold font-colr">@Model.incidentValidationAssignedRolesViewModel.EngineeringLeadName</div>
+                                            </div>
+
+                                        </div>
+
+                                </div>
+                            </div>
+                            <!-- Assigned Roles -->
+                           @*  <div class="col-md-4">
                                 <div class="card-custom">
                                     <div class="section-title">Assigned Roles</div>
                                     <div class="section-body">
@@ -927,44 +989,51 @@
                                     </div>
 
                                 </div>
-                            </div>
+                            </div> *@
+                                <div class="col-md-4">
 
-                            <!-- Validation Gates -->
-                            <div class="col-md-4">
                                 <div class="card-custom">
-                                    <div class="section-title">Validation Gates</div>
+
+
+
+                                    <div class="section-header d-flex align-items-center justify-content-between">
+                                        <h6 class="mb-0 font-colr"> <i class="fas fa-shield-alt"></i> Validation Gates </h6>
+                                    </div>
                                     <div class="section-body">
-                                        <div class="info-item">
-                                            <div>
-                                                <span class="info-title"><i class="fa fa-circle-check text-success me-2"></i>Containment Acknowledgment:</span>
-                                                <div class="subtext">@Model.incidentValidationGatesViewModel.ContainmentAcknowledgement</div>
+                                        <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
+                                            <div class="info-sec">
+                                                <span class="info-title">Containment Acknowledgment : </span>
                                             </div>
+                                            <div class="fw-bold font-colr">@Model.incidentValidationGatesViewModel.ContainmentAcknowledgement</div>
                                         </div>
-                                        <div class="info-item">
-                                            <div>
-                                                <span class="info-title">Exception Request:</span>
-                                                <div class="subtext">@Model.incidentValidationGatesViewModel.Exception</div>
+                                        <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
+                                            <div class="info-sec">
+                                                <span class="info-title">Exception Request : </span>
                                             </div>
+                                            <div class="fw-bold font-colr">@Model.incidentValidationGatesViewModel.Exception</div>
                                         </div>
-                                        <div class="info-item">
-                                            <div>
-                                                <span class="info-title">Independent Inspection Required:</span>
-                                                <div class="subtext">@Model.incidentValidationGatesViewModel.IndependentInspection</div>
+                                        <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
+                                            <div class="info-sec">
+                                                <span class="info-title">Independent Inspection Required : </span>
                                             </div>
+                                            <div class="fw-bold font-colr">@Model.incidentValidationGatesViewModel.IndependentInspection</div>
                                         </div>
-                                        <div class="info-item">
-                                            <div>
-                                                <span class="info-title">Regulatory Notifications:</span>
-                                                <div class="subtext">@Model.incidentValidationGatesViewModel.Regulatory</div>
+                                        <div class="detailInfoSec d-flex align-items-center gap-5 mb-2">
+                                            <div class="info-sec">
+                                                <span class="info-title">Regulatory Notification : </span>
                                             </div>
+                                            <div class="fw-bold font-colr">@Model.incidentValidationGatesViewModel.Regulatory</div>
                                         </div>
 
                                     </div>
 
                                 </div>
-                            </div>
-                        </div>
 
+ 
+                            </div>          
+                            </div>
+                          
+                         
                         @*  <!-- Validation Notes -->
                     <div class="card-custom mt-4 validation-notes">
                     <div class="section-title">Validation Notes</div>
@@ -1021,6 +1090,7 @@
                                 <span class="status-btn">Ready to Launch Assessment</span>
                             </div>
                         </div>
+                    </div>
                     </div>
                 }
 

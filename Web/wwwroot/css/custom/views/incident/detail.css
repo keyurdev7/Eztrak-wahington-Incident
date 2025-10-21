@@ -1022,9 +1022,12 @@
 
 
 #validation .info-title {
-    font-weight: bold;
+    min-width: 150px;
+    color: #4f5e6e;
+    font-size: 14px;
+    font-weight: 500;
     margin-top: 0;
-    margin-bottom: 12px;
+    
 }
 
 
@@ -1056,9 +1059,9 @@
     }
 
 #validation .section-title {
-    font-size: 18px;
-    font-weight: 800;
-    background: #f9fafb;
+    font-size: 16px;
+    font-weight: 600;
+   
     margin-bottom: 0;
     padding: 16px;
     border-radius: 12px;
@@ -1072,13 +1075,14 @@
 
 
 #validation .validation-notes .note {
-    background: #f9fafb;
+    background: #fafafa;
     border-radius: 10px;
     padding: 12px 16px;
     margin-bottom: 10px;
     display: flex;
     align-items: center;
     gap: 10px;
+    font-size: 14px;
 }
 
 #validation .validatedBy {
@@ -1090,24 +1094,29 @@
 #validation .note-badge {
     font-size: 0.8rem;
     font-weight: 700;
-    background: #fff3e0;
-    color: #b45309;
+    background: #ffa880;
+    color: #ffffff;
     border-radius: 6px;
-    padding: 2px 8px;
-    text-transform: uppercase;
+    padding: 6px 8px;
+    text-transform: uppercase
 }
 
 #validation .footer-section {
     background: #fff;
     border-radius: 10px;
-    padding: 15px 25px;
+    padding: 18px 25px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 0px 2px rgb(0 0 0 / 38%);
     font-size: 0.95rem;
 }
-
+#validation .section-header {
+    padding: 20px 14px;
+    border-radius: 12px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
     #validation .footer-section .status-btn {
         background-color: #d1fae5;
         color: #065f46;
@@ -1932,6 +1941,7 @@
         color: #ff7f32;
         margin-right: 8px;
     }
+
 #closeout .file-section {
     border-top: 1px solid #e9ecef;
     padding-top: 0.75rem;
@@ -2001,3 +2011,30 @@
     .status-progress h4 {
         color: #2f8d5b;
     }
+
+/* Description box */
+.desc-box {
+    width: 350px; /* requested width */
+    max-width: 100%; /* responsive: shrink within container */
+    height: 100px; /* requested height */
+    overflow: auto; /* scroll when content exceeds height */
+    padding: 8px 10px;
+    background: #f8f9fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+/* Minor spacing when used in detailInfoSec rows */
+.detailInfoSec .desc-box {
+    margin-top: 6px;
+}
+
+/* Small screens: ensure full width within column */
+@media (max-width: 576px) {
+    .desc-box {
+        width: 100%;
+        max-width: 100%;
+    }
+}
