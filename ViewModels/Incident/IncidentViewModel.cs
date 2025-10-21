@@ -458,7 +458,7 @@ namespace ViewModels.Incident
         public bool IsOwner { get; set; }
         public string ClockIn { get; set; } = string.Empty;
         public string ClockOut { get; set; } = string.Empty;
-        public string ImagesUrl { get; set; } = string.Empty;
+        public string? ImagesUrl { get; set; } = string.Empty;
         public string Notes { get; set; } = string.Empty;
         public long? ImageCount { get; set; }
     }
@@ -622,6 +622,18 @@ namespace ViewModels.Incident
         public string? PFO_Remark { get; set; }
         public string? VTF_Path { get; set; }
         public string? VTF_Remark { get; set; }
+        public string? SourceOfLeak { get; set; }
+
+        public int? SOL_Count { get; set; }
+        public int? PFO_Count { get; set; }
+        public int? VTF_Count { get; set; }
+
+        public string? SourceOfLeakStatus { get; set; }
+        public string? PreventFurtherOutageStatus { get; set; }
+        public string? PreventFurtherOutage { get; set; }
+        public string? VacuumTruckFitting { get; set; }
+        public string? VacuumTruckFittingStatus { get; set; }
+
     }
 
 

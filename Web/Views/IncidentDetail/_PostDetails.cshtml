@@ -8,7 +8,15 @@
     {
         <div>
             <h6>Updates @Model.IncidentViewPostType</h6>
-            <div id="update-list">
+
+            <div class="update-footer mt-3">
+                <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Post an update..."></textarea>
+                <button class="btn btn-update" id="btn_PostDetail_Save" data-type="1">
+                    <i class="fa-solid fa-paper-plane me-2"></i>Post Update
+                </button>
+            </div>
+
+            <div id="update-list" style="padding-top:10px">
                 @if (Model.IncidentViewRepairViewModel?.listIncidentViewPostViewModel != null &&
                             Model.IncidentViewRepairViewModel.listIncidentViewPostViewModel.Any())
                 {
@@ -29,19 +37,22 @@
                     <p>No updates available.</p>
                 }
             </div>
-            <div class="update-footer mt-3">
-                <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Post an update..."></textarea>
-                <button class="btn btn-update" id="btn_PostDetail_Save" data-type="1">
-                    <i class="fa-solid fa-paper-plane me-2"></i>Post Update
-                </button>
-            </div>
+         
         </div>
     }
     else if (Model.IncidentViewPostType == 2)
     {
         <div>
             <h6>Updates @Model.IncidentViewPostType</h6>
-            <div id="update-list">
+
+               <div class="update-footer mt-3">
+                <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Post an update..."></textarea>
+                <button class="btn btn-update" id="btn_PostDetail_Save" data-type="2">
+                    <i class="fa-solid fa-paper-plane me-2"></i>Post Update
+                </button>
+            </div>
+
+            <div id="update-list" style="padding-top:10px">
                 @if (Model.IncidentViewRepairViewModel?.listIncidentViewPostViewModel != null &&
                             Model.IncidentViewCloseoutViewModel.listIncidentViewPostViewModel.Any())
                 {
@@ -58,19 +69,22 @@
                     <p>No posts found.</p>
                 }
             </div>
-            <div class="update-footer mt-3">
-                <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Post an update..."></textarea>
-                <button class="btn btn-update" id="btn_PostDetail_Save" data-type="2">
-                    <i class="fa-solid fa-paper-plane me-2"></i>Post Update
-                </button>
-            </div>
+         
         </div>
     }
     else if (Model.IncidentViewPostType == 3)
     {
         <div>
             <h6>Updates @Model.IncidentViewPostType</h6>
-            <div id="update-list">
+
+              <div class="update-footer mt-3">
+                <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Post an update..."></textarea>
+                <button class="btn btn-update" id="btn_PostDetail_Save" data-type="3">
+                    <i class="fa-solid fa-paper-plane me-2"></i>Post Update
+                </button>
+            </div>
+
+            <div id="update-list" style="padding-top:10px">
                 @if (Model.IncidentAssessmentDetails?.listIncidentViewPostViewModel != null &&
                             Model.IncidentAssessmentDetails.listIncidentViewPostViewModel.Any())
                 {
@@ -87,19 +101,22 @@
                     <p>No posts found.</p>
                 }
             </div>
-            <div class="update-footer mt-3">
-                <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Post an update..."></textarea>
-                <button class="btn btn-update" id="btn_PostDetail_Save" data-type="3">
-                    <i class="fa-solid fa-paper-plane me-2"></i>Post Update
-                </button>
-            </div>
+          
         </div>
     }
     else if (Model.IncidentViewPostType == 4)
     {
         <div>
             <h6>Updates @Model.IncidentViewPostType</h6>
-            <div id="update-list">
+
+            <div class="update-footer mt-3">
+                <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Post an update..."></textarea>
+                <button class="btn btn-update" id="btn_PostDetail_Save" data-type="4">
+                    <i class="fa-solid fa-paper-plane me-2"></i>Post Update
+                </button>
+            </div>
+
+            <div id="update-list" style="padding-top:10px">
                 @if (Model.IncidentViewRestorationViewModel?.listIncidentViewPostViewModel != null &&
                             Model.IncidentViewRestorationViewModel.listIncidentViewPostViewModel.Any())
                 {
@@ -116,12 +133,7 @@
                     <p>No posts found.</p>
                 }
             </div>
-            <div class="update-footer mt-3">
-                <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Post an update..."></textarea>
-                <button class="btn btn-update" id="btn_PostDetail_Save" data-type="4">
-                    <i class="fa-solid fa-paper-plane me-2"></i>Post Update
-                </button>
-            </div>
+           
         </div>
     }
 

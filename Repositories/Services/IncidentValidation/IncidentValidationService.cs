@@ -49,14 +49,15 @@ namespace Repositories.Common
         private readonly ILogger<IncidentValidationService> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IAdditionalLocationsService _iAdditionalLocationsService;
-
+        private readonly IIncidentService _incidentService;
         public IncidentValidationService(ApplicationDbContext db, ILogger<IncidentValidationService> logger,
-                                        IHttpContextAccessor httpContextAccessor, IAdditionalLocationsService iAdditionalLocationsService)
+                                        IHttpContextAccessor httpContextAccessor, IAdditionalLocationsService iAdditionalLocationsService, IIncidentService incidentService)
         {
             _db = db;
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _iAdditionalLocationsService = iAdditionalLocationsService;
+            _incidentService = incidentService;
         }
 
         public async Task<List<IncidentValidationPendingViewModel>> GetValidationPendingList()
@@ -517,6 +518,45 @@ namespace Repositories.Common
                 #region IncidentValidationCloseout
                 // 10. Create default Closeout tasks
                 await SeedDefaultCloseoutTasks(incidentValidation.Id, request.Id);
+                #endregion
+
+
+                #region SaveAssesment
+                IncidentValidationAssessment assessment = new IncidentValidationAssessment()
+                {
+                    ActiveStatus = 0,
+                    CreatedBy = 1,
+                    CreatedOn = DateTime.Now,
+                    UpdatedOn = DateTime.Now,
+                    IncidentId = request.Id,
+
+                    IC_EstablishICP_AssignId = request.assignedRole.IncidentCommanderId,
+                    IC_EstablishICP_StatusId = 2,
+                    IC_MCR_AssignId = request.assignedRole.IncidentCommanderId,
+                    IC_MCR_StatusId = 2,
+                    IC_Notify_AssignId = request.assignedRole.IncidentCommanderId,
+                    IC_Notify_StatusId = 2,
+
+
+                    FER_LC_AssignId = request.assignedRole.FieldEnvRepId,
+                    FER_LC_StatusId = 2,
+                    FER_PCA_AssignId = request.assignedRole.FieldEnvRepId,
+                    FER_PCA_StatusId = 2,
+
+                    EGEC_ICT_AssignId = request.assignedRole.GECCoordinatorId,
+                    EGEC_ICT_StatusId = 2,
+                    EGEC_MLP_AssignId = request.assignedRole.GECCoordinatorId,
+                    EGEC_MLP_StatusId = 2,
+                    EGEC_RSM_AssignId = request.assignedRole.GECCoordinatorId,
+                    EGEC_RSM_StatusId = 2,
+
+                    UpdatedBy=1,
+                    IncidentValidationId = incidentValidation.Id,
+
+                };
+
+                //await _incidentService.SubmitAssestment(assessment);
+                await _db.IncidentValidationAssessments.AddAsync(assessment);
                 #endregion
 
                 #region  Save everything in one go

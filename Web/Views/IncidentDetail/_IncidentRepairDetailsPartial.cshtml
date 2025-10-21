@@ -25,9 +25,26 @@
                             <td>@repair.FieldValue</td>
                             <td><span class="badge badge-status badge-pending">@repair.FieldStatus</span></td>
 
-                            <td><i class="fa-solid fa-file-pdf me-2"></i> - </td>
+                            <td>
+                                <i class="fa-solid fa-file-pdf me-2"></i>
+                                @if (!string.IsNullOrEmpty(repair.FieldType) && repair.FieldType.Contains("Source of Leak"))
+                                {
+                                    @repair.SOL_Count
+                                }
+                                else if (!string.IsNullOrEmpty(repair.FieldType) && repair.FieldType.Contains("outage"))
+                                {
+                                    @repair.PFO_Count
+                                }
+                                else if (!string.IsNullOrEmpty(repair.FieldType) && repair.FieldType.Contains("vacuum "))
+                                {
+                                    @repair.VTF_Count
+                                }
+                                else
+                                {
+                                   <span>0</span>
+                                }
+                            </td>
                             <td><button class="btn btn-update btn-sm" onclick="EditRepairDetails('0','@repair.Id',@repair.FieldTypeId,@repair.IncidentId,@repair.IncidentValidationId)">Update</button></td>
-
                         </tr>
                     }
                 }

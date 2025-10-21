@@ -77,7 +77,7 @@ namespace Repositories.Common
 
         Task<long> GetTaskClouseOutCompletedCount(long incidentId);
 
-        Task<List<IncidentViewRepairListViewModel>> GetvalidationRepairVM(long id);
+        Task<List<IncidentViewRepairListViewModel>> GetvalidationRepairVM(long id, bool isEdit = false);
         Task<IncidentRepairEditViewModel> EditRepairDetails(long id, long RepairId, long FieldType, long IncidentId, long IncidentValidationId);
         Task<long> UpdateRepair(IncidentRepairEditViewModel request);
     }

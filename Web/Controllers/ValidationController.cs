@@ -182,6 +182,9 @@ namespace Web.Controllers
                 request.listSubmitValidationLocationVM.Add(incidentValidationLocationViewModel);
                 var resultId = await _iIncidentValidationService.SaveIncidentValidation(request);
 
+                
+
+
                 var successMsg = $"Incident validation saved successfully!";
 
                 return Ok(new { success = true, data = successMsg });

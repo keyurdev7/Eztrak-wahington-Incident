@@ -359,23 +359,29 @@
         formData.append("IncidentId", document.getElementById("IncidentId").value);
         formData.append("IncidentValidationId", document.getElementById("IncidentValidationId").value);
         formData.append("FieldTypeId", document.getElementById("FieldTypeId").value);
+
         formData.append("SOL_Path", document.getElementById("hdnImgUrl").value);
+        formData.append("VTF_Path", document.getElementById("hdnPFOImgUrl").value);
+        formData.append("PFO_Path", document.getElementById("hdnVTFImgUrl").value);
 
         //formData.append("StatusId", document.getElementById("FieldTypeId").value);
         if (document.getElementById("FieldTypeId").value == 1) {
             formData.append("SourceOfLeak", document.getElementById("hdn_ResponsibleRole").value);
             formData.append("SourceOfLeakStatus", document.getElementById("status").value);
             formData.append("SOL_Remark", document.getElementById("description").value);
+          
         }
         else if (document.getElementById("FieldTypeId").value == 2) {
             formData.append("PreventFurtherOutage", document.getElementById("hdn_ResponsibleRole").value);
             formData.append("PreventFurtherOutageStatus", document.getElementById("status").value);
             formData.append("PFO_Remark", document.getElementById("description").value);
+            
         }
         else if (document.getElementById("FieldTypeId").value == 3) {
             formData.append("VacuumTruckFitting", document.getElementById("hdn_ResponsibleRole").value);
             formData.append("VacuumTruckFittingStatus", document.getElementById("status").value);
             formData.append("VTF_Remark", document.getElementById("description").value);
+            
         }
 
 

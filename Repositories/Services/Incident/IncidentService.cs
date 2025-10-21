@@ -1703,14 +1703,14 @@ namespace Repositories.Common
                 // Build all substep entries
                 var allSubsteps = new List<IncidentCommanderDetailViewModel>
                                 {
-                                    new() { Mainstep = "Incident Commander", MainstepId = 1, SubstepId = 1, Substep = "Create MCR", StatusId = details.IC_MCR_StatusId, AssigneeId = details.IC_MCR_AssignId },
-                                    new() { Mainstep = "Incident Commander", MainstepId = 1, SubstepId = 2, Substep = "Notify Claims & Engineering", StatusId = details.IC_Notify_StatusId, AssigneeId = details.IC_Notify_AssignId },
-                                    new() { Mainstep = "Incident Commander", MainstepId = 1, SubstepId = 3, Substep = "Establish ICP (site access verified)", StatusId = details.IC_EstablishICP_StatusId, AssigneeId = details.IC_EstablishICP_AssignId },
-                                    new() { Mainstep = "Field Environmental Representative", MainstepId = 2, SubstepId = 1, Substep = "Prepare containment area (drums/totes/Baker tank)", StatusId = details.FER_PCA_StatusId, AssigneeId = details.FER_PCA_AssignId },
-                                    new() { Mainstep = "Field Environmental Representative", MainstepId = 2, SubstepId = 2, Substep = "Label containers; log IDs and capacity", StatusId = details.FER_LC_StatusId, AssigneeId = details.FER_LC_AssignId },
-                                    new() { Mainstep = "Engineering & GEC", MainstepId = 3, SubstepId = 1, Substep = "Retrieve system maps (regulators, BO streets, elevations)", StatusId = details.EGEC_RSM_StatusId, AssigneeId = details.EGEC_RSM_AssignId },
-                                    new() { Mainstep = "Engineering & GEC", MainstepId = 3, SubstepId = 2, Substep = "Mark low points & squeeze points", StatusId = details.EGEC_MLP_StatusId, AssigneeId = details.EGEC_MLP_AssignId },
-                                    new() { Mainstep = "Engineering & GEC", MainstepId = 3, SubstepId = 3, Substep = "Initiate cost tracking (RBA) for vendors", StatusId = details.EGEC_ICT_StatusId, AssigneeId = details.EGEC_ICT_AssignId }
+                                    new() { Mainstep = "Incident Commander", MainstepId = 1, SubstepId = 1, Substep = "Create MCR", StatusId = details.IC_MCR_StatusId, AssigneeId = details.IC_MCR_AssignId, ImagesUrl= details.IC_MCR_ImageUrls },
+                                    new() { Mainstep = "Incident Commander", MainstepId = 1, SubstepId = 2, Substep = "Notify Claims & Engineering", StatusId = details.IC_Notify_StatusId, AssigneeId = details.IC_Notify_AssignId,ImagesUrl= details.IC_Notify_ImageUrls  },
+                                    new() { Mainstep = "Incident Commander", MainstepId = 1, SubstepId = 3, Substep = "Establish ICP (site access verified)", StatusId = details.IC_EstablishICP_StatusId, AssigneeId = details.IC_EstablishICP_AssignId ,ImagesUrl= details.IC_EstablishICP_ImageUrls},
+                                    new() { Mainstep = "Field Environmental Representative", MainstepId = 2, SubstepId = 1, Substep = "Prepare containment area (drums/totes/Baker tank)", StatusId = details.FER_PCA_StatusId, AssigneeId = details.FER_PCA_AssignId,ImagesUrl= details.FER_PCA_ImageUrls },
+                                    new() { Mainstep = "Field Environmental Representative", MainstepId = 2, SubstepId = 2, Substep = "Label containers; log IDs and capacity", StatusId = details.FER_LC_StatusId, AssigneeId = details.FER_LC_AssignId ,ImagesUrl= details.FER_LC_ImageUrls},
+                                    new() { Mainstep = "Engineering & GEC", MainstepId = 3, SubstepId = 1, Substep = "Retrieve system maps (regulators, BO streets, elevations)", StatusId = details.EGEC_RSM_StatusId, AssigneeId = details.EGEC_RSM_AssignId,ImagesUrl= details.EGEC_RSM_ImageUrls },
+                                    new() { Mainstep = "Engineering & GEC", MainstepId = 3, SubstepId = 2, Substep = "Mark low points & squeeze points", StatusId = details.EGEC_MLP_StatusId, AssigneeId = details.EGEC_MLP_AssignId,ImagesUrl= details.EGEC_MLP_ImageUrls },
+                                    new() { Mainstep = "Engineering & GEC", MainstepId = 3, SubstepId = 3, Substep = "Initiate cost tracking (RBA) for vendors", StatusId = details.EGEC_ICT_StatusId, AssigneeId = details.EGEC_ICT_AssignId, ImagesUrl= details.EGEC_ICT_ImageUrls }
                                 };
 
                 // Find the matching substep based on mainstepId and substepId
@@ -1724,7 +1724,7 @@ namespace Repositories.Common
                         AssigneeId = substep.AssigneeId,
                         MainStepId = substep.MainstepId,
                         SubStepId = substep.SubstepId,
-                        ImageUrl= substep.ImagesUrl,
+                        ImageUrl = substep.ImagesUrl,
                         Assignees = incidentUsers.Select(user => new SelectListItem
                         {
                             Text = $"{user.Value.LastName} {user.Value.FirstName}",
@@ -2959,7 +2959,7 @@ namespace Repositories.Common
                     StatusId = x.StatusId,
                     CreatedOn = x.CreatedOn,
                     //StartTime = x.StartTime,
-                   // x.ComplateTime,
+                    // x.ComplateTime,
                     x.ImageUrls,
                     x.Notes
                 })
@@ -3507,7 +3507,7 @@ namespace Repositories.Common
                 details.Status = Convert.ToString(request?.StatusId);
                 details.ImageUrls = request?.ImageUrl ?? string.Empty;
                 //details.StartTime = ParseTime(request?.Started ?? string.Empty);
-               // details.ComplateTime = ParseTime(request?.Completed ?? string.Empty);
+                // details.ComplateTime = ParseTime(request?.Completed ?? string.Empty);
                 details.Notes = request?.Description;
                 details.UpdatedOn = DateTime.UtcNow; // optional if you track update time
 
@@ -3624,8 +3624,8 @@ namespace Repositories.Common
                     IncidentValidationId = details.IncidentValidationId,
                     Description = details.Notes ?? string.Empty,
                     ImageUrl = details.ImageUrls ?? string.Empty,
-                   // Completed = details.ComplateTime?.ToString("HH:mm") ?? "-",
-                   // Started = details.StartTime?.ToString("HH:mm") ?? "-",
+                    // Completed = details.ComplateTime?.ToString("HH:mm") ?? "-",
+                    // Started = details.StartTime?.ToString("HH:mm") ?? "-",
                     StatusId = !string.IsNullOrWhiteSpace(details.Status) ? Convert.ToInt64(details.Status) : 0,
                     RoleIds = details.Role, // still keep raw IDs
                     RoleName = roleNames,      // ✅ comma-separated role names
@@ -3679,18 +3679,24 @@ namespace Repositories.Common
         #endregion
 
         #region Repair
-        public async Task<List<IncidentViewRepairListViewModel>> GetvalidationRepairVM(long id)
+        public async Task<List<IncidentViewRepairListViewModel>> GetvalidationRepairVM(long id, bool isEdit = false)
         {
 
             var roles = await _db.IncidentRoles.ToListAsync();
             var statuses = await _db.Progress.ToListAsync();
-            var repairs = await _db.IncidentValidationRepairs
-                .Where(p => !p.IsDeleted && p.IncidentId == id)
-                .ToListAsync();
+            List<IncidentValidationRepair> repairs = new List<IncidentValidationRepair>();
+            if (!isEdit)
+                repairs = await _db.IncidentValidationRepairs
+                   .Where(p => !p.IsDeleted && p.IncidentId == id)
+                   .ToListAsync();
+            else
+                repairs = await _db.IncidentValidationRepairs
+              .Where(p => !p.IsDeleted && p.Id == id)
+              .ToListAsync();
 
             // Create base template (3 rows)
             var baseTemplate = new[]
-            {
+                {
         new { FieldTypeId = 1,
               FieldType = "Use \"Identifying Source of Leak\" Checklist (Pg. 4)",
               GetValue = new Func<IncidentValidationRepair, string?>(r => r?.SourceOfLeak),
@@ -3717,7 +3723,17 @@ namespace Repositories.Common
                     FieldTypeId = t.FieldTypeId,
                     FieldType = t.FieldType,
                     FieldValue = t.GetValue(r),
-                    FieldStatus = t.GetStatus(r)
+                    FieldStatus = t.GetStatus(r),
+                    r.SourceOfLeak,
+                    r.SOL_Path,
+                    r.VTF_Path,
+                    r.PFO_Path,
+                    r.PreventFurtherOutageStatus,
+                    r.PreventFurtherOutage,
+                    r.VacuumTruckFitting,
+                    r.VacuumTruckFittingStatus,
+                    r.SourceOfLeakStatus
+
                 }))
                 // Replace IDs with names
                 .Select(x => new
@@ -3734,7 +3750,16 @@ namespace Repositories.Common
                             .Select(v => long.TryParse(v, out var vid) ? roles.FirstOrDefault(r => r.Id == vid)?.Name : null)
                             .Where(name => !string.IsNullOrEmpty(name))
                     ),
-                    x.FieldStatus
+                    x.FieldStatus,
+                    x.SourceOfLeak,
+                    x.SourceOfLeakStatus,
+                    x.SOL_Path,
+                    x.VTF_Path,
+                    x.PFO_Path,
+                    x.PreventFurtherOutageStatus,
+                    x.PreventFurtherOutage,
+                    x.VacuumTruckFitting,
+                    x.VacuumTruckFittingStatus
                 })
                 .OrderBy(x => x.Id)
                 .ToList();
@@ -3748,7 +3773,24 @@ namespace Repositories.Common
                 FieldTypeId = p.FieldTypeId,
                 FieldType = (p.FieldType == "" ? "-" : p.FieldType),
                 FieldValue = (p.FieldValue == "" ? "-" : p.FieldValue ?? string.Empty),
-                FieldStatus = statuses.FirstOrDefault(s => s.Id == Convert.ToInt64(p.FieldStatus ?? "0"))?.Name ?? string.Empty
+                FieldStatus = statuses.FirstOrDefault(s => s.Id == Convert.ToInt64(p.FieldStatus ?? "0"))?.Name ?? string.Empty,
+                SOL_Path = repairs.FirstOrDefault(r => r.Id == p.Id)?.SOL_Path,
+                SourceOfLeak = repairs.FirstOrDefault(r => r.Id == p.Id)?.SourceOfLeak,
+                PFO_Path = repairs.FirstOrDefault(r => r.Id == p.Id)?.PFO_Path,
+                VTF_Path = repairs.FirstOrDefault(r => r.Id == p.Id)?.VTF_Path,
+                SOL_Count = (repairs.FirstOrDefault(r => r.Id == p.Id)?.SOL_Path)?
+                                 .Split(',', StringSplitOptions.RemoveEmptyEntries).Length ?? 0,
+
+                PFO_Count = (repairs.FirstOrDefault(r => r.Id == p.Id)?.PFO_Path)?
+                                 .Split(',', StringSplitOptions.RemoveEmptyEntries).Length ?? 0,
+
+                VTF_Count = (repairs.FirstOrDefault(r => r.Id == p.Id)?.VTF_Path)?
+                                 .Split(',', StringSplitOptions.RemoveEmptyEntries).Length ?? 0,
+                PreventFurtherOutageStatus = p.PreventFurtherOutageStatus,
+                PreventFurtherOutage=p.PreventFurtherOutage,
+                VacuumTruckFitting=p.VacuumTruckFitting,
+                VacuumTruckFittingStatus= p.VacuumTruckFittingStatus,
+                SourceOfLeakStatus= p.SourceOfLeakStatus
             }).ToList();
 
             return viewModelList;
@@ -3760,7 +3802,7 @@ namespace Repositories.Common
             try
             {
                 // Fetch the incident repair
-                List<IncidentViewRepairListViewModel> ListvalidationRepairVM = await GetvalidationRepairVM(RepairId);
+                List<IncidentViewRepairListViewModel> ListvalidationRepairVM = await GetvalidationRepairVM(RepairId, true);
 
 
                 var incidentUsers = await _db.IncidentUsers
@@ -3804,7 +3846,15 @@ namespace Repositories.Common
                         FieldType = i.FieldType,
                         FieldTypeId = i.FieldTypeId,
                         Id = RepairId,
-                        SOL_Path= i.SOL_Path
+                        SOL_Path = i.SOL_Path,
+                        SourceOfLeak = i.SourceOfLeak,
+                        PreventFurtherOutageStatus = i.PreventFurtherOutageStatus,
+                        PreventFurtherOutage = i.PreventFurtherOutage,
+                        VacuumTruckFitting = i.VacuumTruckFitting,
+                        VacuumTruckFittingStatus = i.VacuumTruckFittingStatus,
+                        SourceOfLeakStatus= i.SourceOfLeakStatus
+
+,
                     }).FirstOrDefault()!;
 
             }
