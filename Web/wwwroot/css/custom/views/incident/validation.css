@@ -473,14 +473,15 @@
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
+
     .section-header h6 {
-        font-size: 22px;
+        font-size: 18px;
         font-weight: 600;
     }
 
 
 .section-body {
-    padding: 16px 34px;
+    padding: 0px 34px 30px 34px;
 }
 
 .validationCard {
@@ -523,12 +524,14 @@
 .form-section h6 {
     font-size: 16px;
 }
+
 .clonePersonalDiv .Personnel {
     border: 1px solid #e5e7eb;
     border-radius: 10px;
     padding: 12px;
     width: 32.333333%;
 }
+
 .cloneTaskDiv .Task,
 .cloneCloseoutTaskDiv .CloseoutTask {
     border: 1px solid #e5e7eb;
@@ -536,50 +539,81 @@
     padding: 12px;
     width: 32.333333%;
 }
+
 #div_Shift {
     margin-bottom: 0;
 }
+
 .dltPersonnelbtn i,
 .dltCloseoutTaskbtn i,
 .dltTaskbtn i {
     color: red;
 }
+
 .borderCard {
     border: 1px solid #e5e7eb;
     border-radius: 10px;
     padding: 12px;
 }
-.assestitle{
-    font-size:20px;
-    font-weight:500;
+
+.assestitle {
+    font-size: 20px;
+    font-weight: 500;
 }
+
 .assesSubtitle {
     font-size: 18px;
     font-weight: 500;
 }
-.indicators h6{
-    margin-bottom:0;
+
+.indicators h6 {
+    margin-bottom: 0;
 }
-.indicators .selectRadio{
-    margin-left:16px;
+
+.indicators .selectRadio {
+    margin-left: 16px;
 }
+
 .callerInfo .section-body .info-item i,
 .incidentLoc .section-body .info-item i {
     color: #f54e00;
 }
-#step-1 .section-body{
-    min-height:251px;
+
+#step-1 .section-body .info-title {
+    min-width: 145px;
+    font-weight: 500;
+    color: #4f5e6e;
+    font-size: 14px;
 }
-    #step-1 .section-body .info-title {
-        min-width: 145px;
-        font-weight: 200;
-        color: #7d8bac;
-        padding-bottom: 10px;
-        font-size: 14px;
-    }
-.assessmentSec .section-body{
-    padding:0;
+
+.assessmentSec .section-body {
+    padding: 0;
 }
+
 .border-bottm {
-    border-bottom: 1px solid #f3f3f3
+    border-bottom: 1px solid #f3f3f3;
+    padding-bottom: 12px;
+}
+
+.line-bottam {
+    margin: 15px;
+    border: 1px solid #d2d9df;
+}
+
+.note-boxtext {
+    color: #727272;
+    font-size: 14px;
+}
+
+.font-colr {
+    color: #404C59;
+    min-width: -webkit-fill-available;
+}
+
+#validation .border-bottm {
+    min-width: 145px;
+    color: #4f5e6e;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 0;
 }
