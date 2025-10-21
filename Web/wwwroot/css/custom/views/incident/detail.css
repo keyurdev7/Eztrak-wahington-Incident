@@ -721,7 +721,7 @@
     align-items: center;
     gap: 8px;
     padding: 10px 0;
-    font-size: 18px;
+    font-size: 12px;
     font-weight: 500;
     color: #6b7280;
     cursor: pointer;
@@ -790,7 +790,12 @@
 }
 
 #incidentDetailsModal .tabBody {
-    padding: 0 26px;
+    background: #ffffff;
+    padding: 16px 16px;
+    margin: 25px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
 }
 
 .backBtn {
@@ -1935,4 +1940,64 @@
     #closeout .file-section i {
         color: #ff7f32;
         margin-right: 8px;
+    }
+
+.status-card {
+    border-radius: 18px;
+    border: 2px solid transparent;
+    padding: 22px 26px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.06);
+}
+
+    .status-card .status-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+    }
+
+    .status-card h6 {
+        font-size: 14px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #6b6b6b;
+        margin-bottom: 6px;
+    }
+
+    .status-card h4 {
+        font-size: 22px;
+        margin: 0;
+    }
+
+.status-phase {
+    background: #fffbf3;
+    border-color: #dcb270;
+}
+
+    .status-phase .status-icon {
+        background: #f7e6c9;
+        color: #b27a21;
+    }
+
+    .status-phase h4 {
+        color: #b27a21;
+    }
+
+.status-progress {
+    background: #f3fff9;
+    border-color: #75c996;
+}
+
+    .status-progress .status-icon {
+        background: #d6f4e0;
+        color: #2f8d5b;
+    }
+
+    .status-progress h4 {
+        color: #2f8d5b;
     }

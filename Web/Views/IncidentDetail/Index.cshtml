@@ -8,7 +8,7 @@
 <link href="~/css/custom/views/incident/detail.css" rel="stylesheet" />
 <link href="~/css/custom/views/incident/validation-index.css" rel="stylesheet" />
 <link href="~/css/custom/views/incident/validation.css" rel="stylesheet" />
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/light/main.css">
 <script src="https://js.arcgis.com/4.27/"></script>
 <script type="module" src="https://js.arcgis.com/embeddable-components/4.33/arcgis-embeddable-components.esm.js"></script>
@@ -31,6 +31,8 @@
                     <h5 class="modal-title"> @Model.incidentDetailByIdViewModel?.IncidentNumber</h5>
                 </div>
 
+            </div>
+            <div class="tabBody">
                 <div class="tabs">
                     <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "" : "active")" data-tab="dashboard">
                         <i class="fa fa-map-marker-alt"></i>Map
@@ -65,8 +67,6 @@
                         <i class="fas fa-comment-dots"></i> Communication
                     </div> *@
                 </div>
-            </div>
-            <div class="tabBody">
                 <div id="dashboard" class="tab-content @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "" : "active")">
                     <div class="row g-4">
 
@@ -173,40 +173,60 @@
 
                     <div class="step-content mt-3" id="step-1">
                         <div class="row mb-4">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
+                                <div class="status-card status-phase">
+                                    <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
+                                    <div>
+                                        <h6>Phase:</h6>
+                                        <h4>Overview</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="status-card status-progress">
+                                    <div class="status-icon" aria-hidden="true"><i class="fa fa-pie-chart"></i></div>
+                                    <div>
+                                        <h6>Progress:</h6>
+                                        <h4>80% Complete</h4>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row g-4">
+                            <div class="col-12 col-xl-6">
                                 <div class="validationCard callerInfo">
                                     <div class="section-header d-flex align-items-center justify-content-between">
                                         <h6 class="mb-0">Caller Information</h6>
                                     </div>
                                     <div class="section-body">
-                                        <div class="info-item">
-                                            <i class="fa-regular fa-user"></i>
-                                            <span class="info-title">Caller Name</span>
-                                            <span class="info-sub">@Model.IVDetails.CallerName</span>
+                                        <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
+                                            <div class="info-sec">
+                                                <span class="info-title">Caller Name : </span>
+                                            </div>
+                                            <div>@Model.IVDetails.CallerName</div>
+                                        </div>
+                                        <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
+                                            <div class="info-sec">
+                                                <span class="info-title">Primary contact : </span>
+                                            </div>
+                                            <div>@Model.IVDetails.CallerContact</div>
+                                        </div>
+                                        <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
+                                            <div class="info-sec">
+                                                <span class="info-title">Caller Addresst : </span>
+                                            </div>
+                                            <div>@Model.IVDetails.CallerAddress</div>
+                                        </div>
+                                        <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
+                                            <div class="info-sec">
+                                                <span class="info-title">Call Time : </span>
+                                            </div>
+                                            <div>@Model.IVDetails.CallerDateTime</div>
                                         </div>
 
-                                        <div class="info-item">
-                                            <i class="fa-solid fa-phone"></i>
-                                            <span class="info-title">@Model.IVDetails.CallerContact</span>
-                                            <span class="info-sub">Primary contact</span>
-                                        </div>
-
-                                        <div class="info-item">
-                                            <i class="fa-solid fa-location-dot"></i>
-                                            <span class="info-title">Caller Address</span>
-                                            <span class="info-sub">@Model.IVDetails.CallerAddress</span>
-                                        </div>
-
-                                        <div class="info-item">
-                                            <i class="fa-regular fa-calendar"></i>
-                                            <span class="info-title">Call Time</span>
-                                            <span class="info-sub">@Model.IVDetails.CallerDateTime</span>
-                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="validationCard incidentLoc">
+
                                     <div class="section-header d-flex align-items-center justify-content-between">
                                         <h6 class="mb-0">Incident Location</h6>
                                     </div>
@@ -221,7 +241,7 @@
                                         <div class="info-item">
                                             <i class="fa-solid fa-road"></i>
                                             <span class="info-title">Nearest Intersection</span>
-                                            <span class="info-sub" @Model.IVDetails.NearestIntersection</span>
+                                            <span class="info-sub"> @Model.IVDetails.NearestIntersection</span>
                                         </div>
 
                                         <div class="info-item">
@@ -235,10 +255,7 @@
                                             </span>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="validationCard incidentDetail">
+
                                     <div class="section-header d-flex align-items-center justify-content-between">
                                         <h6 class="mb-0">Incident Details</h6>
                                     </div>
@@ -273,10 +290,11 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="validationCard incidentDetail">
+                                </div>
                             </div>
-                        </div>
-                        <div class="row safety-supporting-info">
-                            <div class="col-md-6 col-lg-6">
+                            <div class="col-12 col-xl-6">
                                 <div class="validationCard safty">
                                     <div class="section-header d-flex align-items-center justify-content-between">
                                         <h6 class="mb-0">Safety Assessment</h6>
@@ -292,8 +310,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6 col-lg-6">
                                 <div class="supporting-information-sec">
                                     <div class="section-card">
                                         <div class="section-header d-flex align-items-center justify-content-between">
@@ -322,11 +338,103 @@
                                     </div>
                                 </div>
                             </div>
+
+
+
+
+
                         </div>
 
+                        @*   <!-----------------location and incident information--------------------------->
+                    <div class="section">
+                        <div class="section-card">
+                            <h3>Caller Information</h3>
+                            <div class="section-body">
+                                <div class="info-item d-flex align-items-start">
+                                    <i class="fa-regular fa-user"></i>
+                                    <div>
+                                        <span>@Model.incidentCellerInformation?.CallerName</span>
+                                        <div class="subtext">@Model.incidentCellerInformation?.RelationshipName</div>
+                                    </div>
+                                </div>
+                                <div class="info-item d-flex align-items-start">
+                                    <i class="fa-solid fa-phone"></i>
+                                    <div>
+                                        <strong>@Model.incidentCellerInformation?.CallerPhoneNumber</strong>
+                                        <div class="subtext">Primary contact</div>
+                                    </div>
+                                </div>
+                                <div class="info-item d-flex align-items-start">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <div>
+                                        <span class="info-title">Caller Address</span>
+                                        <div class="subtext">@Model.incidentCellerInformation?.CallerAddress</div>
+                                    </div>
+                                </div>
+                                <div class="info-item d-flex align-items-start">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    <div>
+                                        <span class="info-title">Call Time</span>
+                                        <div class="subtext">@Model.incidentCellerInformation?.CallDateInFormat @Model.incidentCellerInformation?.CallTimeInFormat</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
+                        <div class="section-card">
+                            <h3>Incident Location</h3>
+                            <div class="section-body">
+                                <div class="info-item d-flex align-items-start">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <div>
+                                        <span class="info-title">Address</span>
+                                        <div class="subtext">@Model.incidentiLocation?.Address</div>
+                                    </div>
+                                </div>
+                                <div class="info-item ">
+                                    <span class="info-title">Nearest Intersection</span> <br><span class="subtext">@Model.incidentiLocation?.Landmark</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-title">Service Account</span> <br><span class="subtext">@Model.incidentiLocation?.ServiceAccount</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-title">Affected Assets</span> <br>
+                                    @foreach (var asset in Model.incidentiLocation?.AssetNames)
+                                    {
+                                        <span class="badge">@asset</span>
+                                    }
 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-----------------Supporting information--------------------------->
+                    <div class="supporting-information-sec">
+                        <div class="section-card">
+                            <h3>Supporting Information</h3>
+                            <div class="section-body">
+                                <!-- Service Notes -->
+                                <div class="note-title">
+                                    <i class="fa-regular fa-file-lines"></i> Service Representative Notes
+                                </div>
+                                <div class="note-box">@Model.incidentSupportingInfoViewModel.Notes</div>
+
+                                <!-- Photos -->
+                                <div class="photos-title">
+                                    <i class="fa-regular fa-image"></i> Photos (@Model.incidentSupportingInfoViewModel?.ImageUrls.Count())
+                                </div>
+                                <div class="photos-grid">
+                                    @foreach (var imageUrl in Model.incidentSupportingInfoViewModel?.ImageUrls)
+                                    {
+                                        <div class="photo-item">
+                                            <img src="@imageUrl" alt="incidentPhoto" />
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div> *@
                     </div>
 
                     @*   <!-----------------location and incident information--------------------------->
