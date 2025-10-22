@@ -1386,6 +1386,10 @@ namespace Repositories.Common
                     .Where(p => !p.IsDeleted)
                     .ToDictionaryAsync(p => p.Id, p => p.Name);
 
+                var roleList = await _db.IncidentRoles
+                  .Where(p => !p.IsDeleted)
+                  .ToDictionaryAsync(p => p.Id, p => p.Name);
+
                 var ownerList = await _db.IncidentUsers
                     .Where(p => !p.IsDeleted && p.EmployeeType == "Supervisor")
                     .ToListAsync();
@@ -1451,7 +1455,7 @@ namespace Repositories.Common
         StatusId = details.IC_MCR_StatusId,
         Status = GetStatusName(details.IC_MCR_StatusId),
         AssigneeId = details.IC_MCR_AssignId,
-        Assignee = GetUserFullName(details.IC_MCR_AssignId),
+        Assignee = roleList.Where(x=>x.Key==details.IC_MCR_AssignId).FirstOrDefault().Value,
         IsOwner = IsOwner(details.IC_MCR_AssignId),
         ClockIn = details.IC_MCR_StartTime?.ToString("HH:mm") ?? "-",
         ClockOut = details.IC_MCR_ComplateTime?.ToString("HH:mm") ?? "-",
@@ -1470,7 +1474,7 @@ namespace Repositories.Common
         StatusId = details.IC_Notify_StatusId,
         Status = GetStatusName(details.IC_Notify_StatusId),
         AssigneeId = details.IC_Notify_AssignId,
-        Assignee = GetUserFullName(details.IC_Notify_AssignId),
+        Assignee = roleList.Where(x=>x.Key==details.IC_Notify_AssignId).FirstOrDefault().Value,
         IsOwner = IsOwner(details.IC_Notify_AssignId),
         ClockIn = details.IC_Notify_StartTime?.ToString("HH:mm") ?? "-",
         ClockOut = details.IC_Notify_ComplateTime?.ToString("HH:mm") ?? "-",
@@ -1489,7 +1493,7 @@ namespace Repositories.Common
         StatusId = details.IC_EstablishICP_StatusId,
         Status = GetStatusName(details.IC_EstablishICP_StatusId),
         AssigneeId = details.IC_EstablishICP_AssignId,
-        Assignee = GetUserFullName(details.IC_EstablishICP_AssignId),
+        Assignee = roleList.Where(x => x.Key == details.IC_EstablishICP_AssignId).FirstOrDefault().Value,
         IsOwner = IsOwner(details.IC_EstablishICP_AssignId),
         ClockIn = details.IC_EstablishICP_StartTime?.ToString("HH:mm") ?? "-",
         ClockOut = details.IC_EstablishICP_ComplateTime?.ToString("HH:mm") ?? "-",
@@ -1508,7 +1512,7 @@ namespace Repositories.Common
         StatusId = details.FER_PCA_StatusId,
         Status = GetStatusName(details.FER_PCA_StatusId),
         AssigneeId = details.FER_PCA_AssignId,
-        Assignee = GetUserFullName(details.FER_PCA_AssignId),
+        Assignee = roleList.Where(x => x.Key == details.FER_PCA_AssignId).FirstOrDefault().Value,
         IsOwner = IsOwner(details.FER_PCA_AssignId),
         ClockIn = details.FER_PCA_StartTime?.ToString("HH:mm") ?? "-",
         ClockOut = details.FER_PCA_ComplateTime?.ToString("HH:mm") ?? "-",
@@ -1527,7 +1531,7 @@ namespace Repositories.Common
         StatusId = details.FER_LC_StatusId,
         Status = GetStatusName(details.FER_LC_StatusId),
         AssigneeId = details.FER_LC_AssignId,
-        Assignee = GetUserFullName(details.FER_LC_AssignId),
+        Assignee = roleList.Where(x => x.Key == details.FER_LC_AssignId).FirstOrDefault().Value,
         IsOwner = IsOwner(details.FER_LC_AssignId),
         ClockIn = details.FER_LC_StartTime?.ToString("HH:mm") ?? "-",
         ClockOut = details.FER_LC_ComplateTime?.ToString("HH:mm") ?? "-",
@@ -1546,7 +1550,7 @@ namespace Repositories.Common
         StatusId = details.EGEC_RSM_StatusId,
         Status = GetStatusName(details.EGEC_RSM_StatusId),
         AssigneeId = details.EGEC_RSM_AssignId,
-        Assignee = GetUserFullName(details.EGEC_RSM_AssignId),
+        Assignee = roleList.Where(x => x.Key == details.EGEC_RSM_AssignId).FirstOrDefault().Value,
         IsOwner = IsOwner(details.EGEC_RSM_AssignId),
         ClockIn = details.EGEC_RSM_StartTime?.ToString("HH:mm") ?? "-",
         ClockOut = details.EGEC_RSM_ComplateTime?.ToString("HH:mm") ?? "-",
@@ -1565,7 +1569,7 @@ namespace Repositories.Common
         StatusId = details.EGEC_MLP_StatusId,
         Status = GetStatusName(details.EGEC_MLP_StatusId),
         AssigneeId = details.EGEC_MLP_AssignId,
-        Assignee = GetUserFullName(details.EGEC_MLP_AssignId),
+        Assignee =roleList.Where(x => x.Key == details.EGEC_MLP_AssignId).FirstOrDefault().Value,
         IsOwner = IsOwner(details.EGEC_MLP_AssignId),
         ClockIn = details.EGEC_MLP_StartTime?.ToString("HH:mm") ?? "-",
         ClockOut = details.EGEC_MLP_ComplateTime?.ToString("HH:mm") ?? "-",
@@ -1584,7 +1588,7 @@ namespace Repositories.Common
         StatusId = details.EGEC_ICT_StatusId,
         Status = GetStatusName(details.EGEC_ICT_StatusId),
         AssigneeId = details.EGEC_ICT_AssignId,
-        Assignee = GetUserFullName(details.EGEC_ICT_AssignId),
+        Assignee =roleList.Where(x => x.Key == details.EGEC_ICT_AssignId).FirstOrDefault().Value,
         IsOwner = IsOwner(details.EGEC_ICT_AssignId),
         ClockIn = details.EGEC_ICT_StartTime?.ToString("HH:mm") ?? "-",
         ClockOut = details.EGEC_ICT_ComplateTime?.ToString("HH:mm") ?? "-",
@@ -1694,6 +1698,11 @@ namespace Repositories.Common
                                 .Where(p => !p.IsDeleted)
                                 .ToDictionaryAsync(p => p.Id, p => p.Name);
 
+                               
+                var rolesList = await _db.IncidentRoles
+                                   .Where(it => !it.IsDeleted)
+                                 .ToDictionaryAsync(p => p.Id, p => p.Name);
+
 
                 if (details == null)
                     return new IncidentAssessmentEditViewModel();
@@ -1732,6 +1741,13 @@ namespace Repositories.Common
                         }).ToList(),
 
                         Status = statusList
+                            .Select(p => new SelectListItem
+                            {
+                                Text = p.Value,
+                                Value = p.Key.ToString()
+                            })
+                            .ToList(),
+                        RoleList = rolesList
                             .Select(p => new SelectListItem
                             {
                                 Text = p.Value,

@@ -20,7 +20,7 @@
                       @*   <th>Started</th>
                         <th>Completed</th> *@
                         <th>Evidence</th>
-                        <th>Action</th>
+                      
                     </tr>
                 </thead>
                 <tbody>
@@ -36,24 +36,44 @@
                                 {
                                     @if (task.Status.ToLower() == "started")
                                     {
-                                        <td><span class="status-badge progressing">@task.Status</span></td>
+                                        <td>
+                                            <a href="#" onclick="EditRestorationDetails('@task.Id')">
+                                            <span class="status-badge progressing">@task.Status</span>
+                                            </a>
+                                        </td>
                                     }
                                     else if (task.Status.ToLower() == "not started")
                                     {
-                                        <td><span class="status-badge not-started">@task.Status</span></td>
+                                        <td>
+                                            <a href="#" onclick="EditRestorationDetails('@task.Id')">
+                                            <span class="status-badge not-started">@task.Status</span>
+                                            </a>
+                                        </td>
                                     }
                                     else if (task.Status.ToLower() == "complete")
                                     {
-                                        <td><span class="status-badge done">@task.Status</span></td>
+                                        <td>
+                                            <a href="#" onclick="ViewRestorationDetails('@task.Id')">
+                                            <span class="status-badge done">@task.Status</span>
+                                            </a>
+                                        </td>
                                     }
                                     else
                                     {
-                                        <td><span class="status-badge not-started">@task.Status</span></td>
+                                        <td>
+                                            <a href="#"  onclick="EditRestorationDetails('@task.Id')">
+                                            <span class="status-badge not-started">@task.Status</span>
+                                            </a>
+                                        </td>
                                     }
                                 }
                                 else
                                 {
-                                    <td><span class="status-badge not-started">Not Started</span></td>
+                                    <td>
+                                        <a href="#"  onclick="EditRestorationDetails('@task.Id')">
+                                            <span class="status-badge not-started">Not Started</span>
+                                        </a>
+                                    </td>
                                 }
 
 
@@ -69,14 +89,14 @@
                                     <td><i class="fa fa-file-alt text-secondary me-1"></i></td>
                                 }
 
-                                @if (!string.IsNullOrWhiteSpace(task.Status) && task.Status == "Complete")
+                              @*   @if (!string.IsNullOrWhiteSpace(task.Status) && task.Status == "Complete")
                                 {
                                     <td><a href="#" class="text-primary text-decoration-none" onclick="ViewRestorationDetails('@task.Id')">View</a></td>
                                 }
                                 else
                                 {
                                     <td><button class="btn btn-update btn-sm" onclick="EditRestorationDetails('@task.Id')">Update</button></td>
-                                }
+                                } *@
                             </tr>
                         }
                     }

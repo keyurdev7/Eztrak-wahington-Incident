@@ -7,10 +7,25 @@
 {
     @if (Model.incidentCommanderDetailViewslist.GroupBy(p => p.Mainstep).ToList().Count > 0)
     {
-        bool isFirst = true;
-        @foreach (var itemGrpBy in Model.incidentCommanderDetailViewslist.GroupBy(p => p.Mainstep).ToList())
-        {
-            <div class="d-flex align-items-center justify-content-between section-title">
+        <div class="table-responsive table-rounded custom-scroll">
+            <table class="table align-middle text-left">
+                <thead class="table-light">
+                    <tr>
+                        <th>Step</th>
+                        <th>Responsible Party</th>
+                        <th>Status</th>
+                        
+                        @*   <th>Started</th>
+                                <th>Completed</th> *@
+                        <th>Evidence</th>
+                        @* <th>Actions</th> *@
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var itemGrpBy in Model.incidentCommanderDetailViewslist.GroupBy(p => p.Mainstep).ToList())
+                    {
+                        @*  <div class="d-flex align-items-center justify-content-between section-title">
                 <h6 class="fw-semibold  mb-0">
                     @itemGrpBy.Key
                 </h6>
@@ -18,43 +33,47 @@
                     Owner: @(Model.MainStepOwners.ContainsKey(itemGrpBy.Key)
                             ? Model.MainStepOwners[itemGrpBy.Key]
                             : "N/A")
-    </div>
-</div>
-<div class="table-responsive table-rounded custom-scroll">
-    <table class="table align-middle text-left">
+             </div>
+            </div> *@
 
-        @if (isFirst)
-                    {
-                        <thead class="table-light">
-                            <tr>
-                                <th>Step</th>
-                                <th>Status</th>
-                                <th>Assignee</th>
-                              @*   <th>Started</th>
-                                <th>Completed</th> *@
-                                <th>Evidence</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                    }
-                    <tbody>
+
                         @foreach (var item in itemGrpBy)
                         {
                             <tr>
                                 <td>@item.Substep</td>
+                                @if (!string.IsNullOrWhiteSpace(item.Assignee))
+                                {
+                                    <td>@item.Assignee</td>
+                                }
+                                else
+                                {
+                                    <td>-</td>
+                                }
+
                                 @if (!string.IsNullOrWhiteSpace(item.Status))
                                 {
                                     @if (item.Status.ToLower() == "started")
                                     {
-                                        <td><span class="status-badge progressing">@item.Status</span></td>
+                                        <td>
+                                            <a href="#" onclick="EditAssessmentDetails('@Model.Id','@item.MainstepId','@item.SubstepId')">
+                                                <span class="status-badge not-started">@item.Status</span>
+                                            </a>
+                                        </td>
                                     }
                                     else if (item.Status.ToLower() == "not started")
                                     {
-                                        <td><span class="status-badge not-started">@item.Status</span></td>
+                                        <td>
+                                            <a href="#" onclick="EditAssessmentDetails('@Model.Id','@item.MainstepId','@item.SubstepId')">
+                                                <span class="status-badge not-started">@item.Status</span>
+                                            </a>
+                                        </td>
                                     }
                                     else if (item.Status.ToLower() == "complete")
                                     {
-                                        <td><span class="status-badge done">@item.Status</span></td>
+                                        <td>
+                                            <a href="#" class="text-primary text-decoration-none" onclick="ViewAssessmentDetails('@Model.Id','@item.MainstepId','@item.SubstepId')"><span class="status-badge done">@item.Status</span></a>
+
+                                        </td>
                                     }
                                     else
                                     {
@@ -66,16 +85,9 @@
                                     <td><span class="status-badge not-started">Not Started</span></td>
                                 }
 
-                                @if (!string.IsNullOrWhiteSpace(item.Assignee))
-                                {
-                                    <td>@item.Assignee</td>
-                                }
-                                else
-                                {
-                                    <td>-</td>
-                                }
+                               
 
-                               @*  <td>@item.ClockIn</td>
+                                @*  <td>@item.ClockIn</td>
                                 <td>@item.ClockOut</td> *@
                                 @if (item.ImageCount > 0)
                                 {
@@ -85,21 +97,23 @@
                                 {
                                     <td><i class="fa fa-file-alt text-secondary me-1"></i></td>
                                 }
-                                @if (!string.IsNullOrWhiteSpace(item.Status) && item.Status == "Complete")
+                               @*  @if (!string.IsNullOrWhiteSpace(item.Status) && item.Status == "Complete")
                                 {
                                     <td><a href="#" class="text-primary text-decoration-none" onclick="ViewAssessmentDetails('@Model.Id','@item.MainstepId','@item.SubstepId')">View</a></td>
                                 }
                                 else
                                 {
                                     <td><button class="btn btn-update btn-sm" onclick="EditAssessmentDetails('@Model.Id','@item.MainstepId','@item.SubstepId')">Update</button></td>
-                                }
+                                } *@
                             </tr>
                         }
-                    </tbody>
-                </table>
-            </div>
-            isFirst = false;
-        }
+
+
+                    }
+                </tbody>
+            </table>
+        </div>
+
     }
     else
     {
@@ -110,15 +124,15 @@
                         <th>Step</th>
                         <th>Status</th>
                         <th>Assignee</th>
-                        <th>Started</th>
-                        <th>Completed</th>
+                        @*   <th>Started</th>
+                        <th>Completed</th> *@
                         <th>Evidence</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="7" style="text-align:center">No records found</td>
+                        <td colspan="4" style="text-align:center">No records found</td>
                     </tr>
                 </tbody>
             </table>
@@ -134,8 +148,8 @@ else
                     <th>Step</th>
                     <th>Status</th>
                     <th>Assignee</th>
-                    <th>Started</th>
-                    <th>Completed</th>
+                    @*   <th>Started</th>
+                    <th>Completed</th> *@
                     <th>Evidence</th>
                     <th>Actions</th>
                 </tr>

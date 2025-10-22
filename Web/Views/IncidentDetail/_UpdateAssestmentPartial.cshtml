@@ -78,10 +78,10 @@
                                 <label asp-for="@Model.SubStep">: <b>@Model.SubStep</b></label>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Assignee</label>
+                                <label class="form-label">Responsible Party</label>
                                 <select class="form-select" id="assignee" asp-for="@Model.AssigneeId">
-                                    <option value="">Select Assignee</option>
-                                    @foreach (var item in Model.Assignees)
+                                    <option value="">Select Responsible Party</option>
+                                    @foreach (var item in Model.RoleList)
                                     {
                                         @if (item.Value == Model.AssigneeId?.ToString())
                                         {

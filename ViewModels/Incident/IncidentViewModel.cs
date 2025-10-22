@@ -443,6 +443,7 @@ namespace ViewModels.Incident
         public List<IFormFile> File { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        public List<SelectListItem> RoleList { get; set; } = new();
     }
     public class IncidentCommanderDetailViewModel
     {

@@ -9,7 +9,7 @@
             <th>Status</th>
             @* <th>Completed</th> *@
             <th>Evidence</th>
-            <th>Action</th>
+          @*   <th>Action</th> *@
         </tr>
     </thead>
     <tbody>
@@ -27,24 +27,44 @@
                     {
                         @if (closeout.Status.ToLower() == "started")
                         {
-                            <td><span class="status-badge progressing">@closeout.Status</span></td>
+                            <td>
+                                <a href="#" class="text-primary text-decoration-none" onclick="EditCloseOutDetails('@closeout.Id')">
+                                    <span class="status-badge progressing">@closeout.Status</span>
+                                </a>
+                            </td>
                         }
                         else if (closeout.Status.ToLower() == "not started")
                         {
-                            <td><span class="status-badge not-started">@closeout.Status</span></td>
+                            <td>
+                                <a href="#" class="text-primary text-decoration-none" onclick="EditCloseOutDetails('@closeout.Id')">
+                                    <span class="status-badge not-started">@closeout.Status</span>
+                                </a>
+                            </td>
                         }
                         else if (closeout.Status.ToLower() == "complete")
                         {
-                            <td><span class="status-badge done">@closeout.Status</span></td>
+                            <td>
+                                <a href="#" class="text-primary text-decoration-none" onclick="ViewCloseOutDetails('@closeout.Id')">
+                                <span class="status-badge done">@closeout.Status</span>
+                            </a>    
+                            </td>
                         }
                         else
                         {
-                            <td><span class="status-badge not-started">@closeout.Status</span></td>
+                            <td>
+                                <a href="#" class="text-primary text-decoration-none" onclick="EditCloseOutDetails('@closeout.Id')">
+                                <span class="status-badge not-started">@closeout.Status</span>
+                                </a>
+                            </td>
                         }
                     }
                     else
                     {
-                        <td><span class="status-badge not-started">Not Started</span></td>
+                        <td>
+                            <a href="#" class="text-primary text-decoration-none" onclick="EditCloseOutDetails('@closeout.Id')">
+                            <span class="status-badge not-started">Not Started</span>
+                            </a>
+                        </td>
                     }
 
                     @* <td>@closeout.Completed</td> *@
@@ -57,14 +77,7 @@
                         <td><i class="fa fa-file-alt text-secondary me-1"></i></td>
                     }
 
-                    @if (!string.IsNullOrWhiteSpace(closeout.Status) && closeout.Status == "Complete")
-                    {
-                        <td><a href="#" class="text-primary text-decoration-none" onclick="ViewCloseOutDetails('@closeout.Id')">View</a></td>
-                    }
-                    else
-                    {
-                        <td><button class="btn btn-update btn-sm" onclick="EditCloseOutDetails('@closeout.Id')">Update</button></td>
-                    }
+                  
 
                 </tr>
             }
@@ -72,7 +85,7 @@
         else
         {
             <tr>
-                <td colspan="7" style=" text-align:center">
+                <td colspan="4" style=" text-align:center">
                     No records found
                 </td>
             </tr>

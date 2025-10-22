@@ -12,7 +12,7 @@
                     <th>Responsible Party</th>
                     <th>Status</th>
                     <th>Evidence</th>
-                    <th>Action</th>
+                   
                 </tr>
             </thead>
             <tbody>
@@ -23,7 +23,11 @@
                         <tr>
                             <td>@repair.FieldType</td>
                             <td>@repair.FieldValue</td>
-                            <td><span class="badge badge-status badge-pending">@repair.FieldStatus</span></td>
+                            <td>
+                                <a href="#"  onclick="EditRepairDetails('0','@repair.Id',@repair.FieldTypeId,@repair.IncidentId,@repair.IncidentValidationId)">
+                                <span class="badge badge-status badge-pending">@repair.FieldStatus</span>
+                                </a>
+                            </td>
 
                             <td>
                                 <i class="fa-solid fa-file-pdf me-2"></i>
@@ -44,14 +48,14 @@
                                    <span>0</span>
                                 }
                             </td>
-                            <td><button class="btn btn-update btn-sm" onclick="EditRepairDetails('0','@repair.Id',@repair.FieldTypeId,@repair.IncidentId,@repair.IncidentValidationId)">Update</button></td>
+                          
                         </tr>
                     }
                 }
                 else
                 {
                     <tr>
-                        <td colspan="7"></td>
+                        <td colspan="4"></td>
                     </tr>
                 }
             </tbody>
@@ -68,12 +72,12 @@ else
                     <th>Responsible Party</th>
                     <th>Status</th>
                     <th>Evidence</th>
-                    <th>Action</th>
+                   
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td colspan="5" style="text-align:center">No records found</td>
+                    <td colspan="4" style="text-align:center">No records found</td>
                 </tr>
             </tbody>
         </table>
