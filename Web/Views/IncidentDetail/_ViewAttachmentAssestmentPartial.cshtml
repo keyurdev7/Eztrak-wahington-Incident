@@ -1,7 +1,44 @@
 ﻿@model ViewModels.Incident.IncidentViewAssessmentAttachmentViewModel
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+ 
+<div class="photos-grid">
+    @foreach (var item in Model.Image)
+    {
+        
+            string src = item ?? string.Empty;
 
-@foreach (var item in Model.Image)
-{
-    <p class="mb-0 small"><i class="fa fa-circle"></i> @item</p>
-}
+            if (!string.IsNullOrWhiteSpace(item))
+            {
+                // if already an absolute URL, use as-is
+                if (item.StartsWith("http", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    src = item;
+                }
+                // if already a virtual or absolute app path, resolve with Url.Content
+                else if (item.StartsWith("~") || item.StartsWith("/"))
+                {
+                    src = Url.Content(item);
+                }
+                else
+                {
+                    // Build storage path from configuration:
+                    // UploadBaseStoragePath (preferred) -> UploadBasePath -> "Storage"
+                    var basePath = Configuration["UploadBaseStoragePath"] 
+                                   ?? Configuration["UploadBasePath"] 
+                                   ?? "Storage";
 
+                    var subPath = "uploads/" + Model.PageName;
+                    var combined = $"{basePath.TrimEnd('/')}/{subPath.Trim('/')}/{item.TrimStart('/')}";
+                    combined = combined.Replace("//", "/").TrimStart('/');
+
+                    src = Url.Content("~/" + combined);
+                
+               
+                }
+            }
+
+        <div class="photo-item photos-grid-att">
+            <img src="@src" alt="incidentPhoto" />
+        </div>
+    }
+</div>

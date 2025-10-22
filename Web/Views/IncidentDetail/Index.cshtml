@@ -1254,7 +1254,7 @@
 
                         <!-- Daily Summary -->
                         <div class="col-lg-3 dailySummaryRight">
-                            <div class="card shadow-sm border-0 rounded-4 mb-4 DailysummaryContent">
+                          @*   <div class="card shadow-sm border-0 rounded-4 mb-4 DailysummaryContent">
                                 <div class="card-header rounded-top-4 ">
                                     <h5 class="mb-0"><i class="fa-solid fa-chart-line me-2"></i>Daily Summary</h5>
                                     (<span id="summaryDate">@DateTime.Now.ToString("MMM d, yyyy")</span>)
@@ -1325,7 +1325,7 @@
                                         }
                                     </div>
                                 </div>
-                            </div>
+                            </div> *@
                         </div>
                     </div>
                 </div>
@@ -1337,7 +1337,7 @@
                                 <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
                                 <div>
                                     <h6>Phase:</h6>
-                                    <h4>Overview</h4>
+                                    <h4>Assessment</h4>
                                 </div>
                             </div>
                         </div>
@@ -1386,6 +1386,40 @@
 
                         </div>
                     </div> *@
+                    <div class="topCard mb-3">
+                        <div class="row g-3">
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Open:</div>
+                                    <div><span class="info-value" id="openTaskCount">20</span></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Completed:</div>
+                                    <div><span class="info-value" id="completedTaskCount">80</span></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Total:</div>
+                                    <div><span class="info-value">100</span></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">% Complete:</div>
+
+                                    <div><span class="info-value">80 %</span></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
                     <div class="row g-3">
                         <!-- Left Section -->
                         <div class="col-lg-8">
@@ -1454,9 +1488,11 @@
                                     </div>
                                     <p class="text-muted small mb-0">Mini Map View</p>
                                 </div> *@
-                                <div class="card-body attachments">
-                                    <h6 class="fw-semibold small mb-2">Attachments</h6>
-
+                                <div class="file-section">
+                                    <strong>Attachments</strong>
+                                    @{
+                                        Model.incidentViewAssessmentAttachmentView.PageName = "Assessment";
+                                    }
                                     <div id="div_Attachments">
                                         @await Html.PartialAsync("_ViewAttachmentAssestmentPartial", Model.incidentViewAssessmentAttachmentView)
                                     </div>
@@ -1473,7 +1509,7 @@
                                 <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
                                 <div>
                                     <h6>Phase:</h6>
-                                    <h4>Overview</h4>
+                                    <h4>Repair</h4>
                                 </div>
                             </div>
                         </div>
@@ -1493,29 +1529,29 @@
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Purge Points:</div>
-                                    <div><span class="info-value">6</span> <span class="info-sub">Active</span></div>
+                                    <div class="info-title">Open:</div>
+                                    <div><span class="info-value">5</span>  </div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Extraction Volume:</div>
-                                    <div><span class="info-value">9,800</span> <span class="info-sub">gal</span></div>
+                                    <div class="info-title">Completed:</div>
+                                    <div><span class="info-value">15</span> </div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Vacuum Trucks:</div>
-                                    <div><span class="info-value">2</span> <span class="info-sub">On Site</span></div>
+                                    <div class="info-title">Total:</div>
+                                    <div><span class="info-value">20</span>  </div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Containment Verified:</div>
-                                    <div class="text-green"><i class="fa-regular fa-circle-check info-icon"></i>(FER)</div>
+                                    <div class="info-title">% Complete:</div>
+                                    <div><span class="info-value">75%</span> </div>
                                 </div>
                             </div>
 
@@ -1663,7 +1699,7 @@
                                 <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
                                 <div>
                                     <h6>Phase:</h6>
-                                    <h4>Overview</h4>
+                                    <h4>Restoration</h4>
                                 </div>
                             </div>
                         </div>
@@ -1683,29 +1719,29 @@
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Pressure Tests:</div>
-                                    <div><span class="info-value">2</span> <span class="info-sub">of 4 Complete</span></div>
+                                    <div class="info-title">Open:</div>
+                                    <div><span class="info-value">10</span> </div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Customers Restored:</div>
-                                    <div><span class="info-value">65</span> <span class="info-sub"> / 120</span></div>
+                                    <div class="info-title">Completed:</div>
+                                    <div><span class="info-value">10</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Meters/Regulators Verified:</div>
-                                    <div><span class="info-value">32</span></div>
+                                    <div class="info-title">Total:</div>
+                                    <div><span class="info-value">20</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Relights Remaining:</div>
-                                    <div><span class="info-value">18</span></div>
+                                    <div class="info-title">% Complete:</div>
+                                    <div><span class="info-value">50%</span></div>
                                 </div>
                             </div>
 
@@ -1789,8 +1825,11 @@
                                     <div class="file-section">
                                         <strong>Attachments</strong>
                                         <div id="div_RestorationAttachments">
+                                            @{
+                                                Model.incidentViewRestorationAttachmentView.PageName = "Restoration";
+                                            }
                                             @await Html.PartialAsync("_ViewAttachmentAssestmentPartial", Model.incidentViewRestorationAttachmentView)
-                                        </div>
+                                        </div>                                                                
 
                                       @*   <strong>Attachments</strong>
                                         <ul class="attachments mt-2">
@@ -1813,7 +1852,7 @@
                                 <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
                                 <div>
                                     <h6>Phase:</h6>
-                                    <h4>Overview</h4>
+                                    <h4>Closeout</h4>
                                 </div>
                             </div>
                         </div>
@@ -1833,33 +1872,65 @@
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Total Duration:</div>
+                                    <div class="info-title">Open:</div>
+                                    <div><span class="info-value">50</span></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Completed:</div>
+                                    <div><span class="info-value">50</span> </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Total:</div>
+                                    <div><span class="info-value">100</span></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">% Complete:</div>
+                                    <div><span class="info-value">50%</span>  </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                       @*  <div class="row g-3">
+
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card text-center text-md-start">
+                                    <div class="info-title">Open:</div>
                                     <div><span class="info-value">2 Days, 8 Hours</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Total Cost:</div>
+                                    <div class="info-title">Completed:</div>
                                     <div><span class="info-value">$38,450</span> <span class="info-sub"> / 120</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Personnel Involved:</div>
+                                    <div class="info-title">Total:</div>
                                     <div><span class="info-value">@Model.IncidentViewCloseoutViewModel.PersonnelInvolved</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Reports Completed:</div>
+                                    <div class="info-title">% Complete:</div>
                                     <div><span class="info-value">@Model.TotalCompletedCloseOut</span> <span class="info-sub"> / @Model.IncidentViewCloseoutViewModel.TotalCloseOut</span></div>
                                 </div>
                             </div>
 
-                        </div>
+                        </div> *@
                     </div>
                     <div class="row">
                         <div class="col-md-8">
@@ -1969,7 +2040,9 @@
  *@
                                     <div class="file-section">
                                         <strong>Attachments</strong>
-
+                                        @{
+                                            Model.incidentViewCloseOutAttachmentView.PageName = "ClouseOut";
+                                        }
                                         <div id="div_Attachments_Closeout">
                                             @await Html.PartialAsync("_ViewAttachmentAssestmentPartial", Model.incidentViewCloseOutAttachmentView)
                                         </div>

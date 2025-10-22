@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
-
-using Pagination;
+﻿using Pagination;
 using ViewModels.Charts.Shared;
 using ViewModels.Dashboard.Common.Card;
 using ViewModels.Dashboard.Common.Table;
@@ -14,9 +12,9 @@ namespace ViewModels.Dashboard
         {
 
         }
-       
+
         public IncidentDashboardViewModel IncidentDashboard { get; set; } = new();
-       
+
         public ChartViewModel PendingOrder { get; set; } = new();
         public ChartViewModel WorkOrder { get; set; } = new();
         public ChartViewModel WorkOrderByAssetType { get; set; } = new();
@@ -122,6 +120,7 @@ namespace ViewModels.Dashboard
     }
     public class IncidentRecentViewModel
     {
+        public long? id { get; set; } = default!;
         public string incidentId { get; set; } = default!;
         public string incidentloc { get; set; } = default!;
         public string eventtype { get; set; } = default!;

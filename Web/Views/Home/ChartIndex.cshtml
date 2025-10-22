@@ -677,6 +677,8 @@
                                                      data-radius="@(!string.IsNullOrWhiteSpace(item.perimeter) ? item.perimeter : "0")"
                                                      data-incidentstatusColor="@item.incidentstatusColor"
                                                      style="cursor:pointer">
+
+                                                    <a href="/IncidentDetail/Index/@item.id">
                                                     <div class="incident-details">
                                                         <span class="dot" style="width: 12px;height: 12px;min-width: 12px;border-radius: 50%;display: inline-block;background-color:@item.incidentstatusColor"></span>
                                                         <div class="incident-info" style="margin-left: 20px;">
@@ -690,7 +692,8 @@
                                                             <p>@item.incidentloc</p>
                                                             <p>@item.eventtype</p>
                                                         </div>
-                                                    </div>
+                                                        </div>
+                                                    </a>
                                                     
                                                 </div>
                                             }
