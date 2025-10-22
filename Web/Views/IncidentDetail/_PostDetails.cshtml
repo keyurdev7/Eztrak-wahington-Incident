@@ -24,9 +24,9 @@
                     @foreach (var post in Model.IncidentViewRepairViewModel.listIncidentViewPostViewModel)
                     {
 
-                        <div class="update-item">
-                            <span class="update-time">@post.TimeforMessage</span>
-                            <div>@post.Message</div>
+                        <div class="update-item d-flex justify-content-between align-items-start mb-2">
+                            <div class="update-message flex-grow-1 me-3">@post.Message</div>
+                            <span class="update-time text-end" style="white-space:nowrap">@post.TimeforMessage</span>
                         </div>
 
                     }
@@ -58,9 +58,9 @@
                 {
                     @foreach (var post in Model.IncidentViewCloseoutViewModel.listIncidentViewPostViewModel)
                     {
-                        <div class="update-item">
-                            <span class="update-time">@post.TimeforMessage</span>
-                            <div>@post.Message</div>
+                        <div class="update-item d-flex justify-content-between align-items-start mb-2">
+                            <div class="update-message flex-grow-1 me-3">@post.Message</div>
+                            <span class="update-time text-end" style="white-space:nowrap">@post.TimeforMessage</span>
                         </div>
                     }
                 }
@@ -90,9 +90,9 @@
                 {
                     @foreach (var post in Model.IncidentAssessmentDetails.listIncidentViewPostViewModel)
                     {
-                        <div class="update-item">
-                            <span class="update-time">@post.TimeforMessage</span>
-                            <div>@post.Message</div>
+                        <div class="update-item d-flex justify-content-between align-items-start mb-2">
+                            <div class="update-message flex-grow-1 me-3">@post.Message</div>
+                            <span class="update-time text-end" style="white-space:nowrap">@post.TimeforMessage</span>
                         </div>
                     }
                 }
@@ -122,9 +122,9 @@
                 {
                     @foreach (var post in Model.IncidentViewRestorationViewModel.listIncidentViewPostViewModel)
                     {
-                        <div class="update-item">
-                            <span class="update-time">@post.TimeforMessage</span>
-                            <div>@post.Message</div>
+                        <div class="update-item d-flex justify-content-between align-items-start mb-2">
+                            <div class="update-message flex-grow-1 me-3">@post.Message</div>
+                            <span class="update-time text-end" style="white-space:nowrap">@post.TimeforMessage</span>
                         </div>
                     }
                 }
@@ -212,7 +212,12 @@
             let now = new Date();
             let hours = now.getHours().toString().padStart(2, "0");
             let minutes = now.getMinutes().toString().padStart(2, "0");
-            let currentTime = `${hours}:${minutes}`;
+            let year = now.getFullYear();
+            let month = (now.getMonth() + 1).toString().padStart(2, "0"); // Months are 0-based
+            let day = now.getDate().toString().padStart(2, "0");
+
+            let currentTime = `${month}-${day}-${year} ${hours}:${minutes}`;
+         //   let currentTime = `${hours}:${minutes}`;
             formData.append("IncidentViewPostViewModel.TimeforMessage", currentTime + " ");
             formData.append("IncidentViewPostViewModel.IncidentId", @Model.Id);
             formData.append("IncidentViewPostViewModel.IncidentViewType", type);
@@ -255,9 +260,9 @@
                 // append new posts
                 result.data.forEach(item => {
                     container.find("#update-list").append(`
-                        <div class="update-item">
-                            <span class="update-time">${item.TimeforMessage || ''}</span>
-                            <div>${item.Message || ''}</div>
+                        <div class="update-item d-flex justify-content-between align-items-start mb-2">
+                            <div class="update-message flex-grow-1 me-3">${item.Message || ''}</div>
+                            <span class="update-time text-end" style="white-space:nowrap">${item.TimeforMessage || ''}</span>
                         </div>
                     `);
                 });

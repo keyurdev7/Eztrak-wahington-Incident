@@ -1,42 +1,11 @@
-﻿using AutoMapper;
-
-using Azure;
-
-using Centangle.Common.ResponseHelpers;
-using Centangle.Common.ResponseHelpers.Models;
-
-using DataLibrary;
-
-using DocumentFormat.OpenXml.InkML;
-using DocumentFormat.OpenXml.Wordprocessing;
+﻿using DataLibrary;
 
 using Enums;
-
-using Helpers.Extensions;
-using Helpers.File;
-
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 using Models;
-using Models.Common.Interfaces;
-
-using Pagination;
-
-using Repositories.Shared.UserInfoServices.Interface;
-
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-
-using ViewModels;
 using ViewModels.Dashboard;
-using ViewModels.Incident;
-using ViewModels.Shared;
 
 namespace Repositories.Common
 {
@@ -242,6 +211,7 @@ namespace Repositories.Common
                 {
                     incidentRecents.Add(new IncidentRecentViewModel()
                     {
+                        id = item.Id,
                         eventtype = GetEventTypes(eventTypes, item.EventTypeIds ?? string.Empty),
                         incidentId = item.IncidentID,
                         incidentloc = item.LocationAddress ?? string.Empty,

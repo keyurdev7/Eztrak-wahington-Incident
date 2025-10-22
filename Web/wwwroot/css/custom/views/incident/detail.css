@@ -687,7 +687,9 @@
     display: flex;
     gap: 12px;
 }
-
+.photos-grid-att {
+    margin: 10px 0 0 18px;
+}
 .photo-item {
     background: #f8f9fa;
     border-radius: 8px;
@@ -1133,6 +1135,7 @@
 #assessment .card {
     border: none;
     border-radius: 10px;
+    padding: 15px 0;
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
@@ -1664,7 +1667,7 @@
 
 #closeout .file-section,
 #restoration .file-section {
-    border-top: 1px solid #dee2e6;
+    
     margin-top: 15px;
     padding: 10px 0;
 }
@@ -1857,7 +1860,7 @@
     }
 
 #restoration .file-section {
-    border-top: 1px solid #e9ecef;
+    border-top: none;
     padding-top: 0.75rem;
 }
 
@@ -1943,7 +1946,7 @@
     }
 
 #closeout .file-section {
-    border-top: 1px solid #e9ecef;
+    border-top: none;
     padding-top: 0.75rem;
 }
 
