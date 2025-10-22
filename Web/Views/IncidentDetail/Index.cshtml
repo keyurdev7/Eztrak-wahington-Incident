@@ -1122,7 +1122,27 @@
                             <button class="btn btn-outline-secondary btn-common"><i class="fa-solid fa-print me-2"></i>Print Roster</button>
                         </div>
                     </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="status-card status-phase">
+                                <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
+                                <div>
+                                    <h6>Phase:</h6>
+                                    <h4>Overview</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="status-card status-progress">
+                                <div class="status-icon" aria-hidden="true"><i class="fa fa-pie-chart"></i></div>
+                                <div>
+                                    <h6>Progress:</h6>
+                                    <h4>80% Complete</h4>
+                                </div>
+                            </div>
+                        </div>
 
+                    </div>
                     <div class="row g-3">
                         <!-- Summary Cards -->
                         <div class="col-lg-9">
@@ -1172,7 +1192,7 @@
                                                     <th>Shift</th>
                                                     <th>Time In</th>
                                                     <th>Hours So Far</th>
-                                                    <th>Supervisor</th>
+                                                   @*  <th>Supervisor</th> *@
                                                 </tr>
                                             </thead>
                                             <tbody id="personnelTableBody">
@@ -1194,12 +1214,12 @@
                                                                 @(personnels.TimeIn?.ToString("HH.mm") ?? "00.00")
                                                             </td>
                                                             <td>@hoursSoFar.ToString("0.00")</td>
-                                                            <td class="supervisor"
+                                                            @* <td class="supervisor"
                                                                 data-UserId="@personnels.UserId"
                                                                 data-CompanyId="@personnels.CompanyId"
                                                                 data-id="@personnels.IncidentValidationPersonnelsId">
                                                                 @(string.IsNullOrEmpty(personnels.Supervisor) ? "Select" : personnels.Supervisor)
-                                                            </td>
+                                                            </td> *@
                                                         </tr>
                                                     }
                                                 }
@@ -1311,7 +1331,28 @@
                 </div>
 
                 <div id="assessment" class="tab-content">
-                    <div class="topCard mb-3">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="status-card status-phase">
+                                <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
+                                <div>
+                                    <h6>Phase:</h6>
+                                    <h4>Overview</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="status-card status-progress">
+                                <div class="status-icon" aria-hidden="true"><i class="fa fa-pie-chart"></i></div>
+                                <div>
+                                    <h6>Progress:</h6>
+                                    <h4>80% Complete</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    @* <div class="topCard mb-3">
                         <div class="row g-3">
 
                             <div class="col-md-3 col-sm-6">
@@ -1344,7 +1385,7 @@
                             </div>
 
                         </div>
-                    </div>
+                    </div> *@
                     <div class="row g-3">
                         <!-- Left Section -->
                         <div class="col-lg-8">
@@ -1426,6 +1467,27 @@
                 </div>
 
                 <div id="repair" class="tab-content">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="status-card status-phase">
+                                <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
+                                <div>
+                                    <h6>Phase:</h6>
+                                    <h4>Overview</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="status-card status-progress">
+                                <div class="status-icon" aria-hidden="true"><i class="fa fa-pie-chart"></i></div>
+                                <div>
+                                    <h6>Progress:</h6>
+                                    <h4>80% Complete</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                     <div class="topCard mb-3">
                         <div class="row g-3">
 
@@ -1595,6 +1657,27 @@
                 </div>
 
                 <div id="restoration" class="tab-content">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="status-card status-phase">
+                                <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
+                                <div>
+                                    <h6>Phase:</h6>
+                                    <h4>Overview</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="status-card status-progress">
+                                <div class="status-icon" aria-hidden="true"><i class="fa fa-pie-chart"></i></div>
+                                <div>
+                                    <h6>Progress:</h6>
+                                    <h4>80% Complete</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                     <div class="topCard mb-3">
                         <div class="row g-3">
 
@@ -1724,6 +1807,27 @@
                 </div>
 
                 <div id="closeout" class="tab-content">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="status-card status-phase">
+                                <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
+                                <div>
+                                    <h6>Phase:</h6>
+                                    <h4>Overview</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="status-card status-progress">
+                                <div class="status-icon" aria-hidden="true"><i class="fa fa-pie-chart"></i></div>
+                                <div>
+                                    <h6>Progress:</h6>
+                                    <h4>80% Complete</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                     <div class="topCard mb-3">
                         <div class="row g-3">
 
