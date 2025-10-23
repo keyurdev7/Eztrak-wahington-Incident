@@ -10,7 +10,10 @@
 
 
 
-         
+        <div>
+            <div class="card-custom validation-notes">
+                <div class="section-title"> </div>
+
                 <div id="update-list" style="padding:10px;overflow-y:auto;height:200px">
                     @if (Model.IncidentViewRepairViewModel?.listIncidentViewPostViewModel != null &&
                                     Model.IncidentViewRepairViewModel.listIncidentViewPostViewModel.Any())
@@ -37,12 +40,15 @@
                         <i class="fa-solid fa-paper-plane me-2"></i>Add Note
                     </button>
                 </div>
-            
+            </div>
+        </div>
     }
     else if (Model.IncidentViewPostType == 2)
     {
 
-         
+        <div>
+            <div class="card-custom validation-notes">
+                <div class="section-title"></div>
 
                 <div id="update-list" style="padding:10px;overflow-y:auto;height:200px">
                     @if (Model.IncidentViewRepairViewModel?.listIncidentViewPostViewModel != null &&
@@ -70,14 +76,16 @@
                         <i class="fa-solid fa-paper-plane me-2"></i>Add Note
                     </button>
                 </div>
-             
+            </div>
+        </div>
 
 
     }
     else if (Model.IncidentViewPostType == 3)
     {
          
-          
+            <div class="card-custom validation-notes">
+                <div class="section-title"> </div>
 
                 <div id="update-list" class="card-custom-bdy" style="padding:10px;overflow-y:auto;height:200px">
                     @if (Model.IncidentAssessmentDetails?.listIncidentViewPostViewModel != null &&
@@ -105,13 +113,15 @@
                         <i class="fa-solid fa-paper-plane me-2"></i>Add Note
                     </button>
                 </div>
-             
+            </div>
          
 
     }
     else if (Model.IncidentViewPostType == 4)
     {
-         
+        <div>
+            <div class="card-custom validation-notes">
+                <div class="section-title"> </div>
 
                 <div id="update-list" style="padding:10px;overflow-y:auto;height:200px">
                     @if (Model.IncidentViewRestorationViewModel?.listIncidentViewPostViewModel != null &&
@@ -139,7 +149,8 @@
                         <i class="fa-solid fa-paper-plane me-2"></i>Add Note
                     </button>
                 </div>
-            
+            </div>
+        </div>
 
 
     }
