@@ -6,135 +6,153 @@
 <form id="NewPostDetailForm">
     @if (Model.IncidentViewPostType == 1)
     {
+
+
+
+
         <div>
-            <h6>Updates @Model.IncidentViewPostType</h6>
+            <div class="card-custom validation-notes">
+                <div class="section-title">Repair Notes</div>
 
-            <div class="update-footer mt-3">
-                <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Post an update..."></textarea>
-                <button class="btn btn-update" id="btn_PostDetail_Save" data-type="1">
-                    <i class="fa-solid fa-paper-plane me-2"></i>Post Update
-                </button>
-            </div>
-
-            <div id="update-list" style="padding-top:10px">
-                @if (Model.IncidentViewRepairViewModel?.listIncidentViewPostViewModel != null &&
-                            Model.IncidentViewRepairViewModel.listIncidentViewPostViewModel.Any())
-                {
-
-                    @foreach (var post in Model.IncidentViewRepairViewModel.listIncidentViewPostViewModel)
+                <div id="update-list" style="padding:10px;overflow-y:auto;height:200px">
+                    @if (Model.IncidentViewRepairViewModel?.listIncidentViewPostViewModel != null &&
+                                    Model.IncidentViewRepairViewModel.listIncidentViewPostViewModel.Any())
                     {
-
-                        <div class="update-item d-flex justify-content-between align-items-start mb-2">
-                            <div class="update-message flex-grow-1 me-3">@post.Message</div>
-                            <span class="update-time text-end" style="white-space:nowrap">@post.TimeforMessage</span>
-                        </div>
-
+                        @foreach (var post in Model.IncidentViewRepairViewModel.listIncidentViewPostViewModel.OrderByDescending(x => x.Id))
+                        {
+                            <div class="update-item d-flex justify-content-between align-items-start mb-2">
+                                <div class="update-message flex-grow-1 me-3">@post.Message</div>
+                                <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
+                                    <span class="update-time">@post.TimeforMessage</span>
+                                    <span class="update-email postby-div text-muted">admin@eztrak.com</span>
+                                </div>
+                            </div>
+                        }
                     }
-
-                }
-                else
-                {
-                    <p>No updates available.</p>
-                }
+                    else
+                    {
+                        <p>No posts found.</p>
+                    }
+                </div>
+                <div class="update-footer m-3">
+                    <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Add new note..."></textarea>
+                    <button class="btn btn-update" id="btn_PostDetail_Save" data-type="1">
+                        <i class="fa-solid fa-paper-plane me-2"></i>Add Note
+                    </button>
+                </div>
             </div>
-         
         </div>
     }
     else if (Model.IncidentViewPostType == 2)
     {
+
         <div>
-            <h6>Updates @Model.IncidentViewPostType</h6>
+            <div class="card-custom validation-notes">
+                <div class="section-title">Closeout Notes</div>
 
-               <div class="update-footer mt-3">
-                <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Post an update..."></textarea>
-                <button class="btn btn-update" id="btn_PostDetail_Save" data-type="2">
-                    <i class="fa-solid fa-paper-plane me-2"></i>Post Update
-                </button>
-            </div>
-
-            <div id="update-list" style="padding-top:10px">
-                @if (Model.IncidentViewRepairViewModel?.listIncidentViewPostViewModel != null &&
-                            Model.IncidentViewCloseoutViewModel.listIncidentViewPostViewModel.Any())
-                {
-                    @foreach (var post in Model.IncidentViewCloseoutViewModel.listIncidentViewPostViewModel)
+                <div id="update-list" style="padding:10px;overflow-y:auto;height:200px">
+                    @if (Model.IncidentViewRepairViewModel?.listIncidentViewPostViewModel != null &&
+                                    Model.IncidentViewCloseoutViewModel.listIncidentViewPostViewModel.Any())
                     {
-                        <div class="update-item d-flex justify-content-between align-items-start mb-2">
-                            <div class="update-message flex-grow-1 me-3">@post.Message</div>
-                            <span class="update-time text-end" style="white-space:nowrap">@post.TimeforMessage</span>
-                        </div>
+                        @foreach (var post in Model.IncidentViewCloseoutViewModel.listIncidentViewPostViewModel.OrderByDescending(x => x.Id))
+                        {
+                            <div class="update-item d-flex justify-content-between align-items-start mb-2">
+                                <div class="update-message flex-grow-1 me-3">@post.Message</div>
+                                <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
+                                    <span class="update-time">@post.TimeforMessage</span>
+                                    <span class="update-email postby-div text-muted">admin@eztrak.com</span>
+                                </div>
+                            </div>
+                        }
                     }
-                }
-                else
-                {
-                    <p>No posts found.</p>
-                }
+                    else
+                    {
+                        <p>No posts found.</p>
+                    }
+                </div>
+                <div class="update-footer m-3">
+                    <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Add new note..."></textarea>
+                    <button class="btn btn-update" id="btn_PostDetail_Save" data-type="2">
+                        <i class="fa-solid fa-paper-plane me-2"></i>Add Note
+                    </button>
+                </div>
             </div>
-         
         </div>
+
+
     }
     else if (Model.IncidentViewPostType == 3)
     {
         <div>
-            <h6>Updates @Model.IncidentViewPostType</h6>
+            <div class="card-custom validation-notes">
+                <div class="section-title">Assessment Notes</div>
 
-              <div class="update-footer mt-3">
-                <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Post an update..."></textarea>
-                <button class="btn btn-update" id="btn_PostDetail_Save" data-type="3">
-                    <i class="fa-solid fa-paper-plane me-2"></i>Post Update
-                </button>
-            </div>
-
-            <div id="update-list" style="padding-top:10px">
-                @if (Model.IncidentAssessmentDetails?.listIncidentViewPostViewModel != null &&
-                            Model.IncidentAssessmentDetails.listIncidentViewPostViewModel.Any())
-                {
-                    @foreach (var post in Model.IncidentAssessmentDetails.listIncidentViewPostViewModel)
+                <div id="update-list" class="card-custom-bdy" style="padding:10px;overflow-y:auto;height:200px">
+                    @if (Model.IncidentAssessmentDetails?.listIncidentViewPostViewModel != null &&
+                                    Model.IncidentAssessmentDetails.listIncidentViewPostViewModel.Any())
                     {
-                        <div class="update-item d-flex justify-content-between align-items-start mb-2">
-                            <div class="update-message flex-grow-1 me-3">@post.Message</div>
-                            <span class="update-time text-end" style="white-space:nowrap">@post.TimeforMessage</span>
-                        </div>
+                        @foreach (var post in Model.IncidentAssessmentDetails.listIncidentViewPostViewModel.OrderByDescending(x => x.Id))
+                        {
+                            <div class="update-item d-flex justify-content-between align-items-start mb-2">
+                                <div class="update-message flex-grow-1 me-3">@post.Message</div>
+                                <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
+                                    <span class="update-time">@post.TimeforMessage</span>
+                                    <span class="update-email postby-div text-muted">admin@eztrak.com</span>
+                                </div>
+                            </div>
+                        }
                     }
-                }
-                else
-                {
-                    <p>No posts found.</p>
-                }
+                    else
+                    {
+                        <p>No posts found.</p>
+                    }
+                </div>
+                <div class="update-footer m-3">
+                    <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Add new note..."></textarea>
+                    <button class="btn btn-update" id="btn_PostDetail_Save" data-type="3">
+                        <i class="fa-solid fa-paper-plane me-2"></i>Add Note
+                    </button>
+                </div>
             </div>
-          
         </div>
+
     }
     else if (Model.IncidentViewPostType == 4)
     {
         <div>
-            <h6>Updates @Model.IncidentViewPostType</h6>
+            <div class="card-custom validation-notes">
+                <div class="section-title">Restoration Notes</div>
 
-            <div class="update-footer mt-3">
-                <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Post an update..."></textarea>
-                <button class="btn btn-update" id="btn_PostDetail_Save" data-type="4">
-                    <i class="fa-solid fa-paper-plane me-2"></i>Post Update
-                </button>
-            </div>
-
-            <div id="update-list" style="padding-top:10px">
-                @if (Model.IncidentViewRestorationViewModel?.listIncidentViewPostViewModel != null &&
-                            Model.IncidentViewRestorationViewModel.listIncidentViewPostViewModel.Any())
-                {
-                    @foreach (var post in Model.IncidentViewRestorationViewModel.listIncidentViewPostViewModel)
+                <div id="update-list" style="padding:10px;overflow-y:auto;height:200px">
+                    @if (Model.IncidentViewRestorationViewModel?.listIncidentViewPostViewModel != null &&
+                                    Model.IncidentViewRestorationViewModel.listIncidentViewPostViewModel.Any())
                     {
-                        <div class="update-item d-flex justify-content-between align-items-start mb-2">
-                            <div class="update-message flex-grow-1 me-3">@post.Message</div>
-                            <span class="update-time text-end" style="white-space:nowrap">@post.TimeforMessage</span>
-                        </div>
+                        @foreach (var post in Model.IncidentViewRestorationViewModel.listIncidentViewPostViewModel.OrderByDescending(x => x.Id))
+                        {
+                            <div class="update-item d-flex justify-content-between align-items-start mb-2">
+                                <div class="update-message flex-grow-1 me-3">@post.Message</div>
+                                <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
+                                    <span class="update-time">@post.TimeforMessage</span>
+                                    <span class="update-email postby-div-map text-muted">admin@eztrak.com</span>
+                                </div>
+                            </div>
+                        }
                     }
-                }
-                else
-                {
-                    <p>No posts found.</p>
-                }
+                    else
+                    {
+                        <p>No posts found.</p>
+                    }
+                </div>
+                <div class="update-footer m-3">
+                    <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Add new note..."></textarea>
+                    <button class="btn btn-update" id="btn_PostDetail_Save" data-type="4">
+                        <i class="fa-solid fa-paper-plane me-2"></i>Add Note
+                    </button>
+                </div>
             </div>
-           
         </div>
+
+
     }
 
 </form>
@@ -178,28 +196,32 @@
 
 
 <script>
+      $(document).ready(function () {
+        $("#btn_PostDetail_Save").each(function () {
+            var firstLine = $(this).data("firstline");
+            if (firstLine && !$(this).find(".btn-firstline").length) {
+                // prepend a block-level span so it appears as the "first line" inside the button
+                $(this).prepend('<span class="btn-firstline d-block small text-muted">' + firstLine + '</span>');
+            }
+        });
+    });
+
+    // keep only one delegated click handler; pass the clicked button into savePostDetails
     $(document).off("click", "#btn_PostDetail_Save");
     $(document).on("click", "#btn_PostDetail_Save", function (e) {
         e.preventDefault();
         var type = $(this).attr("data-type");
 
-        savePostDetails(type);
+        // pass the clicked element so we can scope to the correct card/update-list/postvalue
+        savePostDetails(type, this);
     })
 
-    async function savePostDetails(type) {
+    async function savePostDetails(type, clickedBtn) {
 
         type = parseInt(type);
+        var $btn = $(clickedBtn);
+        var $card = $btn.closest(".card-custom");
 
-        // let response = await fetch("/IncidentDetail/SavePostDetails", {
-        //     method: "POST"
-        // });
-
-        // if (response.ok) {
-        //     let result = await response.json();
-        //     console.log("Saved successfully:", result);
-        // } else {
-        //     console.error("Error saving:", response.status);
-        // }
         try {
 
             let form = [];
@@ -222,17 +244,9 @@
             formData.append("IncidentViewPostViewModel.IncidentId", @Model.Id);
             formData.append("IncidentViewPostViewModel.IncidentViewType", type);
 
-            //var data = $(this).attr("data-posttype");
-            //var data1 = $(this).data("posttype");
-
-            if (type == 1)
-                formData.append("IncidentViewPostViewModel.Message", $("#repair").find("#postvalue").val());
-            else if (type == 2)
-                formData.append("IncidentViewPostViewModel.Message", $("#closeout").find("#postvalue").val());
-            else if (type == 3)
-                formData.append("IncidentViewPostViewModel.Message", $("#assessment").find("#postvalue").val());
-            else if (type == 4)
-                formData.append("IncidentViewPostViewModel.Message", $("#restoration").find("#postvalue").val());
+            // get message from the textarea inside the same card/footer as the clicked button
+            var message = $card.find("#postvalue").val();
+            formData.append("IncidentViewPostViewModel.Message", message);
 
             let response = await fetch("/IncidentDetail/SavePostDetails", {
                 method: "POST",
@@ -242,33 +256,35 @@
             let result = await response.json();
 
             if (result.success && result.data) {
-                let container;
-
-                // choose the correct section based on type
-                if (type == 1)
-                    container = $("#repair");
-                else if (type == 2)
-                    container = $("#closeout");
-                else if (type == 3)
-                    container = $("#assessment");
-                else if (type == 4)
-                    container = $("#restoration");
+                let $updateList = $card.find("#update-list");
 
                 // clear old list
-                container.find("#update-list").empty();
+                $updateList.empty();
 
                 // append new posts
                 result.data.forEach(item => {
-                    container.find("#update-list").append(`
+                    $updateList.append(`
                         <div class="update-item d-flex justify-content-between align-items-start mb-2">
                             <div class="update-message flex-grow-1 me-3">${item.Message || ''}</div>
-                            <span class="update-time text-end" style="white-space:nowrap">${item.TimeforMessage || ''}</span>
+                            <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
+                                <span class="update-time">${item.TimeforMessage || ''}</span>
+                                <span class="update-email small text-muted">admin@eztrak.com</span>
+                            </div>
                         </div>
                     `);
                 });
 
+                // scroll the update-list to the bottom so last record is visible
+                // animate for smoothness
+                try {
+                    $updateList.animate({ scrollTop: $updateList.prop("scrollHeight") }, 300);
+                } catch (err) {
+                    // fallback: set immediately
+                    $updateList.scrollTop($updateList.prop("scrollHeight"));
+                }
+
                 // clear textarea
-                container.find("#postvalue").val("");
+                $card.find("#postvalue").val("");
             }
 
 
@@ -280,7 +296,3 @@
         }
     }
 </script>
-
-
-
-

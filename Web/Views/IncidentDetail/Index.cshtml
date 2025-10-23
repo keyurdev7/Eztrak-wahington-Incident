@@ -174,49 +174,8 @@
                 <div id="dashboard" class="tab-content @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "" : "active")">
                     <div class="row g-4">
 
-@*                         <!-- Chat & Handoffs -->
-                        <div class="col-lg-3">
-                            <!-- Chat & Handoffs -->
-                            <div class="card shadow-sm border-0 h-100 rounded-4">
-                                <div class="card-header bg-white fw-semibold border-bottom">
-                                    <i class="fa-solid fa-comments me-2 text-warning"></i>Chat & Handoffs
-                                </div>
-
-                                <!-- Chat Messages -->
-                                <div class="card-body chat-body" id="chatMessages">
-                                    @foreach (var item in Model.listIncidentMapChats)
-                                    {
-                                        <div class="handoff-item">
-                                            <span class="badge role-badge">@item.SentBy</span>
-                                            @item.ChatMessage
-                                        </div>
-                                    }
-                                </div>
-
-                                <!-- Input Area -->
-                                <div class="card-body chat-input-area">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="SelectRole">
-                                            <select class="form-select" id="roleSelect">
-                                                <option value="IC" data-role-type="1">IC</option>
-                                                <option value="FER" data-role-type="2">FER</option>
-                                                <option value="GEC" data-role-type="3">GEC</option>
-                                                <option value="EL" data-role-type="4">EL</option>
-                                            </select>
-                                        </div>
-                                        <div class="mesgsend">
-                                            <input type="text" id="messageInput" class="form-control" placeholder="Type a message..." />
-                                        </div>
-                                        <div class="sendBtn">
-                                            <button class="btn btn-send" id="sendBtn">
-                                                <i class="fa-solid fa-paper-plane"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> *@
-
+                       <!-- Chat & Handoffs -->
+                      
                         <!-- Map View -->
                         <div class="col-lg-12">
                             <div class="card shadow-sm border-0 h-100 rounded-4 text-center">
@@ -226,6 +185,61 @@
                                 <div class="card-body d-flex flex-column justify-content-center align-items-center">
                                     <div id="map" style="height:500px;width:100%;"></div>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <!-- Chat & Handoffs -->
+                            <div class="card shadow-sm border-0 h-100 rounded-4">
+                                <div class="card-header bg-white fw-semibold border-bottom d-flex justify-content-between align-items-center">
+                                    <div>  <i class="fa-solid fa-comments me-2 text-warning"></i>Map Notes</div>
+                                    <a class="text-decoration-none text-warning small fw-semibold"
+                                       data-bs-toggle="collapse" href="#timelineCollapse" role="button"
+                                       aria-expanded="true" aria-controls="timelineCollapse" id="collapseToggle">
+                                        <i class="fa-solid fa-angle-up me-1"></i>
+                                    </a>
+                                </div>
+                                <div class="collapse show" id="timelineCollapse">
+                            <div class="card shadow-sm border-0 h-100 rounded-4">
+                                
+                                <!-- Chat Messages -->
+                                <div class="card-body chat-body" id="chatMessages">
+                                    @foreach (var item in Model.listIncidentMapChats)
+                                    {
+                                        @* <div class="handoff-item">
+                                            <span class="badge role-badge">@item.SentBy</span>
+                                            @item.ChatMessage
+                                        </div>
+ *@
+                                                <div class="update-item-map d-flex justify-content-between align-items-start mb-2">
+                                                    <div class="update-message flex-grow-1 me-3">@item.ChatMessage</div>
+                                                    <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
+                                                        <span class="update-time-map">@item.SentBy</span>
+                                                        <span class="update-email postby-div-map text-muted">admin@eztrak.com</span>
+                                                    </div>
+                                                </div>
+                                    }
+                                </div>
+
+                                <!-- Input Area -->
+                                <div class="card-body chat-input-area">
+                                    <div class="align-items-center gap-2">
+                                        
+                                        <div class="mesgsend">
+                                                    <textarea rows="5" class="form-control mb-2" id="messageInput" placeholder="Add new note..."></textarea>
+                                                    <button class="btn btn-update" id="sendBtn" data-type="1">
+                                                        <i class="fa-solid fa-paper-plane me-2" style="color:#ffffff !important"></i>Add Note
+                                                    </button>
+                                            
+                                        </div>
+                                     @*    <div class="sendBtn">
+                                            <button class="btn btn-send" id="sendBtn">
+                                                <i class="fa-solid fa-paper-plane"></i> Add Post
+                                            </button>
+                                        </div> *@
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
                             </div>
                         </div>
 
@@ -1488,7 +1502,17 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-lg-12">
+                       
+                        <div class="post-div">
+                            @{
+                                Model.IncidentViewPostType = 3; // assessment
+                            }
+                            @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
 
+                        </div>
+                       
+                    </div>
                         <!-- Right Section -->
                        @*  <div class="col-lg-4">
                             <div class="updates d-flex flex-column justify-content-between mb-3">
@@ -1521,16 +1545,7 @@
                             </div>
                         </div> *@  
                     </div>
-
-                    <div class="card-custom mt-4 validation-notes">
-                        <div class="section-title">Validation Notes</div>
-                        <div class="updates d-flex flex-column justify-content-between h-100 mb-3">
-                            @{
-                                Model.IncidentViewPostType = 4; // restoration
-                            }
-                            @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
-                        </div>
-                    </div>
+ 
                 </div>
 
                 <div id="repair" class="tab-content">
@@ -1689,6 +1704,18 @@
                                 </div> *@
                             </div>
                         </div>
+
+                        <div class="col-lg-12">
+
+                            <div class="post-div">
+                                @{
+                                    Model.IncidentViewPostType = 1; // Rapair
+                                }
+                                @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
+
+                            </div>
+
+                        </div>
                        @*  <div class="col-md-4">
                             <div class="RightSection">
                                 <!-- Updates -->
@@ -1794,6 +1821,18 @@
                                     </div>
                                 </div> *@
                             </div>
+                        </div>
+
+                        <div class="col-lg-12">
+
+                            <div class="post-div">
+                                @{
+                                    Model.IncidentViewPostType = 4; // restoration
+                                }
+                                @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
+
+                            </div>
+
                         </div>
                      @*    <div class="col-md-4">
                             <div class="RightSection">
@@ -1972,6 +2011,18 @@
                                 </div> *@
 
                             </div>
+                        </div>
+
+                        <div class="col-lg-12">
+
+                            <div class="post-div">
+                                @{
+                                    Model.IncidentViewPostType = 2; // Close out
+                                }
+                                @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
+
+                            </div>
+
                         </div>
                        @* @* @*  <div class="col-md-4">
                             <div class="RightSection">
@@ -2707,12 +2758,19 @@
 <script>
        const sendBtn = document.getElementById('sendBtn');
        const messageInput = document.getElementById('messageInput');
-       const roleSelect = document.getElementById('roleSelect');
+       const roleSelect = '';
        const chatMessages = document.getElementById('chatMessages');
+       let now = new Date();
+            let hours = now.getHours().toString().padStart(2, "0");
+            let minutes = now.getMinutes().toString().padStart(2, "0");
+            let year = now.getFullYear();
+            let month = (now.getMonth() + 1).toString().padStart(2, "0"); // Months are 0-based
+            let day = now.getDate().toString().padStart(2, "0");
 
+            let currentTime = `${month}-${day}-${year} ${hours}:${minutes}`;
     // Handle Send button click
     sendBtn.addEventListener('click', async () => {
-      const role = roleSelect.value.trim();
+      const role = currentTime;
       const message = messageInput.value.trim();
       const id = @(Model.Id ?? 0);
 
@@ -2735,7 +2793,20 @@
           // Create new chat message element
           const newMsg = document.createElement('div');
           newMsg.classList.add('handoff-item');
-          newMsg.innerHTML = `<span class="badge role-badge">${role}</span> ${message}`;
+         @*  newMsg.innerHTML = `<span class="badge role-badge">${role}</span> ${message}`; *@
+
+
+     newMsg.innerHTML = `        <div class="update-item-map d-flex justify-content-between align-items-start mb-2">
+                                                    <div class="update-message flex-grow-1 me-3">${message}</div>
+                                                    <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
+                                                        <span class="update-time-map">${role}</span>
+                                                        <span class="update-email postby-div-map text-muted">admin@eztrak.com</span>
+                                                    </div>
+                                                </div>
+                                                `;
+
+
+
 
           // Append to chat section
           chatMessages.appendChild(newMsg);

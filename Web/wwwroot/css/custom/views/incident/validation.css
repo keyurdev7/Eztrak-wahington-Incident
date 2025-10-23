@@ -617,3 +617,55 @@
     font-weight: 500;
     margin-top: 0;
 }
+.update-item-map {
+    background-color: #F9FAFB;
+    padding: 9px;
+    margin-bottom: 12px;
+}
+.btn-update {
+    background-color: #f15a29;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 10px;
+  
+}
+#repair .section-title {
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    background: #f9fafb;
+    padding: 16px;
+    border-radius: 12px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+#restoration .section-title {
+    background: #f9fafb;
+    padding: 16px;
+    border-radius: 12px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+#closeout .section-title {
+    background: #f9fafb;
+    padding: 16px;
+    border-radius: 12px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.postby-div {
+    padding: 6px 15px;
+    font-size: 12px;
+}
+.postby-div-map {
+    padding: 10px;
+    font-size: 12px;
+}
+.update-time-map {
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: #ffead1;
+    color: #d35400;
+    border-radius: 6px;
+    padding: 2px 8px;
+    margin-right: 8px
+}
