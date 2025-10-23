@@ -453,7 +453,9 @@ namespace Repositories.Common
                         StatusLegendId = item.StatusLegendId,
                         RelationShipName = item.Relationship?.Name ?? string.Empty,
                         RelationShipId = item?.RelationshipId,
-                        AdditionalLocationCount = addCount
+                        AdditionalLocationCount = addCount,
+                        Phase= item?.Phase,
+                        Progress= item?.Progress
                     });
                 }
                 return incidentGridViews;
@@ -3697,40 +3699,50 @@ namespace Repositories.Common
         #region Repair
         public async Task<List<IncidentViewRepairListViewModel>> GetvalidationRepairVM(long id, bool isEdit = false)
         {
-
             var roles = await _db.IncidentRoles.ToListAsync();
             var statuses = await _db.Progress.ToListAsync();
-            List<IncidentValidationRepair> repairs = new List<IncidentValidationRepair>();
+
+            List<IncidentValidationRepair> repairs;
+
             if (!isEdit)
                 repairs = await _db.IncidentValidationRepairs
-                   .Where(p => !p.IsDeleted && p.IncidentId == id)
-                   .ToListAsync();
+                    .Where(p => !p.IsDeleted && p.IncidentId == id)
+                    .ToListAsync();
             else
                 repairs = await _db.IncidentValidationRepairs
-              .Where(p => !p.IsDeleted && p.Id == id)
-              .ToListAsync();
+                    .Where(p => !p.IsDeleted && p.Id == id)
+                    .ToListAsync();
 
-            // Create base template (3 rows)
+            // Base template (3 rows)
             var baseTemplate = new[]
-                {
-        new { FieldTypeId = 1,
-              FieldType = "Use \"Identifying Source of Leak\" Checklist (Pg. 4)",
-              GetValue = new Func<IncidentValidationRepair, string?>(r => r?.SourceOfLeak),
-              GetStatus = new Func<IncidentValidationRepair, string?>(r => r?.SourceOfLeakStatus) },
-
-        new { FieldTypeId = 2,
-              FieldType = "Identify ideal purge locations to prevent further outage (use engineering data)",
-              GetValue = new Func<IncidentValidationRepair, string?>(r => r?.PreventFurtherOutage),
-              GetStatus = new Func<IncidentValidationRepair, string?>(r => r?.PreventFurtherOutageStatus) },
-
-        new { FieldTypeId = 3,
-              FieldType = "Verify vacuum truck fittings (2\" cam-lock and 2\" → ¾\" adaptors available)",
-              GetValue = new Func<IncidentValidationRepair, string?>(r => r?.VacuumTruckFitting),
-              GetStatus = new Func<IncidentValidationRepair, string?>(r => r?.VacuumTruckFittingStatus) }
+            {
+        new
+        {
+            FieldTypeId = 1,
+            FieldType = "Use \"Identifying Source of Leak\" Checklist (Pg. 4)",
+            GetValue = new Func<IncidentValidationRepair, string?>(r => r?.SourceOfLeak),
+            GetStatus = new Func<IncidentValidationRepair, string?>(r => r?.SourceOfLeakStatus)
+        },
+        new
+        {
+            FieldTypeId = 2,
+            FieldType = "Identify ideal purge locations to prevent further outage (use engineering data)",
+            GetValue = new Func<IncidentValidationRepair, string?>(r => r?.PreventFurtherOutage),
+            GetStatus = new Func<IncidentValidationRepair, string?>(r => r?.PreventFurtherOutageStatus)
+        },
+        new
+        {
+            FieldTypeId = 3,
+            FieldType = "Verify vacuum truck fittings (2\" cam-lock and 2\" → ¾\" adaptors available)",
+            GetValue = new Func<IncidentValidationRepair, string?>(r => r?.VacuumTruckFitting),
+            GetStatus = new Func<IncidentValidationRepair, string?>(r => r?.VacuumTruckFittingStatus)
+        }
     };
 
-            // If no data in DB, still show 3 rows
-            var result = (repairs.Any() ? repairs : new List<IncidentValidationRepair> { new IncidentValidationRepair { IncidentId = id } })
+            // Ensure at least 3 rows even if no DB records exist
+            var result = (repairs.Any()
+                ? repairs
+                : new List<IncidentValidationRepair> { new IncidentValidationRepair { IncidentId = id } })
                 .SelectMany(r => baseTemplate.Select(t => new
                 {
                     r.Id,
@@ -3749,68 +3761,107 @@ namespace Repositories.Common
                     r.VacuumTruckFitting,
                     r.VacuumTruckFittingStatus,
                     r.SourceOfLeakStatus
-
                 }))
-                // Replace IDs with names
-                .Select(x => new
+                // Map FieldValue IDs → Role Names
+                .Select(x =>
                 {
-                    x.Id,
-                    x.IncidentId,
-                    x.IncidentValidationId,
-                    x.FieldType,
-                    x.FieldTypeId,
-                    FieldValue = string.Join(" / ",
-                        (x.FieldValue ?? "")
-                            .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                            .Select(v => v.Trim())
-                            .Select(v => long.TryParse(v, out var vid) ? roles.FirstOrDefault(r => r.Id == vid)?.Name : null)
-                            .Where(name => !string.IsNullOrEmpty(name))
-                    ),
-                    x.FieldStatus,
-                    x.SourceOfLeak,
-                    x.SourceOfLeakStatus,
-                    x.SOL_Path,
-                    x.VTF_Path,
-                    x.PFO_Path,
-                    x.PreventFurtherOutageStatus,
-                    x.PreventFurtherOutage,
-                    x.VacuumTruckFitting,
-                    x.VacuumTruckFittingStatus
+                    string fieldValue = x.FieldValue ?? string.Empty;
+
+                    // If empty, assign default RoleId = 1 (Engineering)
+                    if (string.IsNullOrWhiteSpace(fieldValue))
+                    {
+                        var defaultRole = roles.FirstOrDefault(r => r.Id == 1)?.Name ?? "Engineering";
+                        fieldValue = defaultRole;
+                    }
+                    else
+                    {
+                        // Convert Role IDs to Role Names
+                        fieldValue = string.Join(" / ",
+                            (x.FieldValue ?? "")
+                                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                .Select(v => v.Trim())
+                                .Select(v => long.TryParse(v, out var vid)
+                                    ? roles.FirstOrDefault(r => r.Id == vid)?.Name
+                                    : v)
+                                .Where(name => !string.IsNullOrEmpty(name))
+                        );
+                    }
+
+                    return new
+                    {
+                        x.Id,
+                        x.IncidentId,
+                        x.IncidentValidationId,
+                        x.FieldType,
+                        x.FieldTypeId,
+                        FieldValue = fieldValue,
+                        x.FieldStatus,
+                        x.SourceOfLeak,
+                        x.SourceOfLeakStatus,
+                        x.SOL_Path,
+                        x.VTF_Path,
+                        x.PFO_Path,
+                        x.PreventFurtherOutageStatus,
+                        x.PreventFurtherOutage,
+                        x.VacuumTruckFitting,
+                        x.VacuumTruckFittingStatus
+                    };
                 })
-                .OrderBy(x => x.Id)
+                .OrderBy(x => x.FieldTypeId)
                 .ToList();
 
             // Map to ViewModel
-            var viewModelList = result.Select(p => new IncidentViewRepairListViewModel
+            var viewModelList = result.Select(p =>
             {
-                Id = p.Id,
-                IncidentId = p.IncidentId,
-                IncidentValidationId = p.IncidentValidationId,
-                FieldTypeId = p.FieldTypeId,
-                FieldType = (p.FieldType == "" ? "-" : p.FieldType),
-                FieldValue = (p.FieldValue == "" ? "-" : p.FieldValue ?? string.Empty),
-                FieldStatus = statuses.FirstOrDefault(s => s.Id == Convert.ToInt64(p.FieldStatus ?? "0"))?.Name ?? string.Empty,
-                SOL_Path = repairs.FirstOrDefault(r => r.Id == p.Id)?.SOL_Path,
-                SourceOfLeak = repairs.FirstOrDefault(r => r.Id == p.Id)?.SourceOfLeak,
-                PFO_Path = repairs.FirstOrDefault(r => r.Id == p.Id)?.PFO_Path,
-                VTF_Path = repairs.FirstOrDefault(r => r.Id == p.Id)?.VTF_Path,
-                SOL_Count = (repairs.FirstOrDefault(r => r.Id == p.Id)?.SOL_Path)?
-                                 .Split(',', StringSplitOptions.RemoveEmptyEntries).Length ?? 0,
+                var repairRec = repairs.FirstOrDefault(r => r.Id == p.Id);
 
-                PFO_Count = (repairs.FirstOrDefault(r => r.Id == p.Id)?.PFO_Path)?
-                                 .Split(',', StringSplitOptions.RemoveEmptyEntries).Length ?? 0,
+                var sourceOfLeakValue = string.IsNullOrEmpty(p.SourceOfLeak) ? "1" : p.SourceOfLeak;
+                var sourceOfLeakStatusValue = string.IsNullOrEmpty(p.SourceOfLeakStatus) ? "2" : p.SourceOfLeakStatus;
 
-                VTF_Count = (repairs.FirstOrDefault(r => r.Id == p.Id)?.VTF_Path)?
-                                 .Split(',', StringSplitOptions.RemoveEmptyEntries).Length ?? 0,
-                PreventFurtherOutageStatus = p.PreventFurtherOutageStatus,
-                PreventFurtherOutage=p.PreventFurtherOutage,
-                VacuumTruckFitting=p.VacuumTruckFitting,
-                VacuumTruckFittingStatus= p.VacuumTruckFittingStatus,
-                SourceOfLeakStatus= p.SourceOfLeakStatus
+                var preventFurtherOutageValue = string.IsNullOrEmpty(p.PreventFurtherOutage) ? "1" : p.PreventFurtherOutage;
+                var preventFurtherOutageStatusValue = string.IsNullOrEmpty(p.PreventFurtherOutageStatus) ? "2" : p.PreventFurtherOutageStatus;
+
+                var vacuumTruckFittingValue = string.IsNullOrEmpty(p.VacuumTruckFitting) ? "1" : p.VacuumTruckFitting;
+                var vacuumTruckFittingStatusValue = string.IsNullOrEmpty(p.VacuumTruckFittingStatus) ? "2" : p.VacuumTruckFittingStatus;
+
+                return new IncidentViewRepairListViewModel
+                {
+                    Id = p.Id,
+                    IncidentId = p.IncidentId,
+                    IncidentValidationId = p.IncidentValidationId,
+                    FieldTypeId = p.FieldTypeId,
+                    FieldType = string.IsNullOrEmpty(p.FieldType) ? "-" : p.FieldType,
+
+                    // ✅ Responsible Party (FieldValue)
+                    FieldValue = string.IsNullOrEmpty(p.FieldValue) ? "Engineering" : p.FieldValue,
+
+                    // ✅ Progress Status
+                    FieldStatus = string.IsNullOrEmpty(p.FieldStatus)
+                        ? "Not Started"
+                        : statuses.FirstOrDefault(s => s.Id == Convert.ToInt64(p.FieldStatus ?? "0"))?.Name ?? "Not Started",
+
+                    SOL_Path = repairRec?.SOL_Path,
+                    PFO_Path = repairRec?.PFO_Path,
+                    VTF_Path = repairRec?.VTF_Path,
+
+                    SOL_Count = (repairRec?.SOL_Path)?.Split(',', StringSplitOptions.RemoveEmptyEntries).Length ?? 0,
+                    PFO_Count = (repairRec?.PFO_Path)?.Split(',', StringSplitOptions.RemoveEmptyEntries).Length ?? 0,
+                    VTF_Count = (repairRec?.VTF_Path)?.Split(',', StringSplitOptions.RemoveEmptyEntries).Length ?? 0,
+
+                    SourceOfLeak = sourceOfLeakValue,
+                    SourceOfLeakStatus = sourceOfLeakStatusValue,
+
+                    PreventFurtherOutage = preventFurtherOutageValue,
+                    PreventFurtherOutageStatus = preventFurtherOutageStatusValue,
+
+                    VacuumTruckFitting = vacuumTruckFittingValue,
+                    VacuumTruckFittingStatus = vacuumTruckFittingStatusValue
+                };
             }).ToList();
 
             return viewModelList;
         }
+
         public async Task<IncidentRepairEditViewModel> EditRepairDetails(long id, long RepairId, long FieldType, long IncidentId, long IncidentValidationId)
         {
             IncidentRepairEditViewModel editViewModel = new();

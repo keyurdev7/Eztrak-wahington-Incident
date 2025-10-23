@@ -169,12 +169,13 @@ namespace ViewModels.Incident
         public string EventTypeId { get; set; }
         public long? SeverityId { get; set; }
         public string Severity { get; set; }
-
         public long? RelationShipId { get; set; }
         public string RelationShipName { get; set; }
         public string DescriptionIssue { get; set; }
         public string GasESIndicator { get; set; }
         public int AdditionalLocationCount { get; set; } = 0;
+        public string? Phase { get; set; }
+        public string? Progress { get; set; }
     }
     public class ChangeStatusRequest
     {

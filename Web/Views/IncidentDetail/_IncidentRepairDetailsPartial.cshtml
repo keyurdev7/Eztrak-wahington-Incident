@@ -12,7 +12,7 @@
                     <th>Responsible Party</th>
                     <th>Status</th>
                     <th>Evidence</th>
-                   
+
                 </tr>
             </thead>
             <tbody>
@@ -24,8 +24,38 @@
                             <td>@repair.FieldType</td>
                             <td>@repair.FieldValue</td>
                             <td>
-                                <a href="#"  onclick="EditRepairDetails('0','@repair.Id',@repair.FieldTypeId,@repair.IncidentId,@repair.IncidentValidationId)">
-                                <span class="badge badge-status badge-pending">@repair.FieldStatus</span>
+                                @{
+                                    var fieldStatus = repair.FieldStatus?.ToLower() ?? "";
+                                    string fieldClass = "";
+
+                                    switch (fieldStatus)
+                                    {
+                                        case "not started":
+                                            fieldClass = "badge badge-status badge-pending";
+                                            break;
+                                        case "started":
+                                            fieldClass = "badge badge-status badge-progressing";
+                                            break;
+                                        case "complete":
+                                            fieldClass = "badge badge-status badge-complete";
+                                            break;
+
+                                        default:
+                                            fieldClass = "badge badge-status badge-pending";
+                                            break;
+                                    }
+                                }
+
+                                <a href="#"
+                                   onclick="EditRepairDetails('0','@repair.Id', @repair.FieldTypeId, @repair.IncidentId, @repair.IncidentValidationId)">
+                                    @if (!string.IsNullOrEmpty(repair.FieldStatus))
+                                    {
+                                        <span class="@fieldClass">@repair.FieldStatus</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="">-</span>
+                                    }
                                 </a>
                             </td>
 
@@ -45,10 +75,10 @@
                                 }
                                 else
                                 {
-                                   <span>0</span>
+                                    <span>0</span>
                                 }
                             </td>
-                          
+
                         </tr>
                     }
                 }
@@ -72,7 +102,7 @@ else
                     <th>Responsible Party</th>
                     <th>Status</th>
                     <th>Evidence</th>
-                   
+
                 </tr>
             </thead>
             <tbody>

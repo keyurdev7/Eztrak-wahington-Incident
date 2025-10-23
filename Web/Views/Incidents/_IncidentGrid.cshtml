@@ -22,6 +22,8 @@
                 <input type="checkbox" id="selectAll" />
             </th>
             <th>Status</th>
+            <th>Phase</th>
+            <th>Progress </th>
             <th style="display:none">Severity</th>
             <th>Event Type</th>
             <th>Source</th>
@@ -53,6 +55,12 @@
                     </td>
                     <td style="text-align:center !important">
                         <span class="dot" style="width: 12px;height: 12px;border-radius: 50%;display: inline-block;background-color:@item.StatusLegendColor"></span>
+                    </td>
+                    <td>
+                        @item.Phase
+                    </td>
+                    <td>
+                        @item.Progress%
                     </td>
                     <td style="display:none">
                         @if (item.Severity == SeverityEnum.Low.ToString())

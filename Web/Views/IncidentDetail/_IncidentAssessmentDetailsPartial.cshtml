@@ -56,7 +56,7 @@
                                     {
                                         <td>
                                             <a href="#" onclick="EditAssessmentDetails('@Model.Id','@item.MainstepId','@item.SubstepId')">
-                                                <span class="status-badge not-started">@item.Status</span>
+                                                <span class="status-badge progressing">@item.Status</span>
                                             </a>
                                         </td>
                                     }
@@ -71,7 +71,8 @@
                                     else if (item.Status.ToLower() == "complete")
                                     {
                                         <td>
-                                            <a href="#" class="text-primary text-decoration-none" onclick="ViewAssessmentDetails('@Model.Id','@item.MainstepId','@item.SubstepId')"><span class="status-badge done">@item.Status</span></a>
+                                           
+                                            <span class="status-badge done">@item.Status</span>
 
                                         </td>
                                     }
@@ -91,11 +92,16 @@
                                 <td>@item.ClockOut</td> *@
                                 @if (item.ImageCount > 0)
                                 {
-                                    <td><i class="fa fa-file-alt text-secondary me-1"></i>@item.ImageCount file </td>
+                                    <td>
+                                        <a href="#" class="text-secondary text-decoration-none"
+                                           onclick="ViewAssessmentDetails('@Model.Id','@item.MainstepId','@item.SubstepId')">
+                                            <i class="fa fa-file-alt text-secondary me-1"></i>@item.ImageCount file
+                                        </a>
+                                    </td>
                                 }
                                 else
                                 {
-                                    <td><i class="fa fa-file-alt text-secondary me-1"></i></td>
+                                    <td><i class="fa fa-file-alt text-secondary me-1"></i>0 file</td>
                                 }
                                @*  @if (!string.IsNullOrWhiteSpace(item.Status) && item.Status == "Complete")
                                 {
