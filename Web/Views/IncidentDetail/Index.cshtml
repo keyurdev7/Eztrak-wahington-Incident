@@ -21,6 +21,94 @@
         cursor: not-allowed; /* show disabled cursor */
     }
 </style>
+<style>
+    .tab-item.disabled {
+        pointer-events: none; /* disables clicking */
+        opacity: 0.5; /* visually indicate disabled */
+        cursor: not-allowed; /* show disabled cursor */
+    }
+
+    /* Header layout — keep overall height fixed; contents align right */
+    .tabHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        height: 64px; /* fixed header height — do not change per request */
+        padding: 0.5rem 1rem;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+        background: #ffffff;
+    }
+
+        .tabHeader .titleSec {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            min-width: 0; /* avoid flex overflow */
+        }
+
+            .tabHeader .titleSec .modal-title {
+                font-size: 1.05rem;
+                font-weight: 600;
+                margin: 0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+        /* Right side status group */
+        .tabHeader .header-status {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+    .status-card {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+      
+        padding: .35rem .6rem;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(16,24,40,0.04);
+        
+        min-width: 300px;
+    }
+
+        .status-card .status-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1f2d5a;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .status-card h6 {
+            margin: 0;
+            font-size: 11px;
+            color: #6b7280;
+            line-height: 1;
+        }
+
+        .status-card h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1;
+        }
+ 
+
+    .tabHeader .header-status {
+        justify-content: flex-start;
+        gap: .4rem;
+        flex-wrap: wrap;
+    }
+
+ 
+</style>
 <div id="incidentDetailsModal" tabindex="-1" aria-hidden="true">
     <input type="hidden" id="hdnIncidentID" value="@Model.Id" />
     <div class="container-fuild">
@@ -30,7 +118,23 @@
                     <button type="button" class="backBtn" data-bs-dismiss="modal" id="closeModalBtn"><i class="fa fa-arrow-left-long"></i></button>
                     <h5 class="modal-title"> @Model.incidentDetailByIdViewModel?.IncidentNumber</h5>
                 </div>
+                <div class="header-status">
+                    <div class="status-card status-phase" title="Phase">
+                        <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
+                        <div>
+                            <h6>Phase:</h6>
+                            <h4 id="tabname">Overview</h4>
+                        </div>
+                    </div>
 
+                    <div class="status-card status-progress" title="Progress">
+                        <div class="status-icon" aria-hidden="true"><i class="fa fa-pie-chart"></i></div>
+                        <div>
+                            <h6>Progress:</h6>
+                            <h4>80% Complete</h4>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="tabBody">
                 <div class="tabs">
@@ -70,7 +174,7 @@
                 <div id="dashboard" class="tab-content @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "" : "active")">
                     <div class="row g-4">
 
-                        <!-- Chat & Handoffs -->
+@*                         <!-- Chat & Handoffs -->
                         <div class="col-lg-3">
                             <!-- Chat & Handoffs -->
                             <div class="card shadow-sm border-0 h-100 rounded-4">
@@ -111,10 +215,10 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> *@
 
                         <!-- Map View -->
-                        <div class="col-lg-9">
+                        <div class="col-lg-12">
                             <div class="card shadow-sm border-0 h-100 rounded-4 text-center">
                                 <div class="card-header bg-white fw-semibold border-bottom text-left">
                                     <i class="fa-solid fa-location-dot me-2 text-warning"></i>Map View
@@ -127,7 +231,7 @@
 
 
                     </div>
-                    <div class="row">
+                  @*   <div class="row">
                         <div class="col-lg-12">
                             <!-- Timeline -->
                             <div class="card shadow-sm border-0 h-100 rounded-4">
@@ -163,7 +267,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> *@
                     @* <div class="bg-white rounded p-4 shadow-sm border border-gray-200 mb-4">
                         <div id="map" style="height:800px; width:100%;"></div>
                     </div> *@
@@ -172,27 +276,7 @@
                 <div id="overview" class="tab-content">
 
                     <div class="step-content mt-3" id="step-1">
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="status-card status-phase">
-                                    <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
-                                    <div>
-                                        <h6>Phase:</h6>
-                                        <h4>Overview</h4>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="status-card status-progress">
-                                    <div class="status-icon" aria-hidden="true"><i class="fa fa-pie-chart"></i></div>
-                                    <div>
-                                        <h6>Progress:</h6>
-                                        <h4>80% Complete</h4>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
+                      
                         <div class="row g-4">
                             <div class="col-12 col-xl-6">
                                 <div class="validationCard callerInfo">
@@ -543,13 +627,7 @@
                 {
                     <form id="incident_validation_form">                     
                         <div id="validation" class="tab-content active">
-                            <div class="phase-header">
-                                <div>
-                                    <div class="phaseTitle">Phase: <span class="fw-bold">Validation</span></div>
-                                    <div class="phaseTitle">Progress: <span class="phaseTitle fw-bold">80% Complete</span></div>
-                                </div>
-
-                            </div>
+                           
                             <div style="text-align: right;" class="mb-3">
                                 <button type="button" class="btn btn-primary btn-sm" style="height: 48px; width: 100px;" id="saveValidationBtn">
                                     Validate
@@ -857,28 +935,11 @@
                     <div id="validation" class="tab-content">
                         <div class="step-content mt-3">
 
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="status-card status-phase">
-                                    <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
-                                    <div>
-                                        <h6>Phase:</h6>
-                                        <h4>Overview</h4>
-                                    </div>
-                                </div>
+                            <div style="text-align: right;" class="mb-3">
+                                <button type="button" class="btn btn-primary btn-sm" style="height: 48px; width: 100px;" id="editValidationBtn">
+                                    Edit
+                                </button>
                             </div>
-                            <div class="col-md-6">
-                                <div class="status-card status-progress">
-                                    <div class="status-icon" aria-hidden="true"><i class="fa fa-pie-chart"></i></div>
-                                    <div>
-                                        <h6>Progress:</h6>
-                                        <h4>80% Complete</h4>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
                         <!-- Top Cards -->
                         <div class="row g-3">
                             <!-- Incident Details -->
@@ -1122,27 +1183,7 @@
                             <button class="btn btn-outline-secondary btn-common"><i class="fa-solid fa-print me-2"></i>Print Roster</button>
                         </div>
                     </div>
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <div class="status-card status-phase">
-                                <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
-                                <div>
-                                    <h6>Phase:</h6>
-                                    <h4>Overview</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="status-card status-progress">
-                                <div class="status-icon" aria-hidden="true"><i class="fa fa-pie-chart"></i></div>
-                                <div>
-                                    <h6>Progress:</h6>
-                                    <h4>80% Complete</h4>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
+                   
                     <div class="row g-3">
                         <!-- Summary Cards -->
                         <div class="col-lg-9">
@@ -1331,27 +1372,7 @@
                 </div>
 
                 <div id="assessment" class="tab-content">
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <div class="status-card status-phase">
-                                <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
-                                <div>
-                                    <h6>Phase:</h6>
-                                    <h4>Assessment</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="status-card status-progress">
-                                <div class="status-icon" aria-hidden="true"><i class="fa fa-pie-chart"></i></div>
-                                <div>
-                                    <h6>Progress:</h6>
-                                    <h4>80% Complete</h4>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
+                  
                     @* <div class="topCard mb-3">
                         <div class="row g-3">
 
@@ -1392,21 +1413,21 @@
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">Open:</div>
-                                    <div><span class="info-value" id="openTaskCount">20</span></div>
+                                    <div><span class="info-value" id="openTaskCount">8</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">Completed:</div>
-                                    <div><span class="info-value" id="completedTaskCount">80</span></div>
+                                    <div><span class="info-value" id="completedTaskCount">0</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">Total:</div>
-                                    <div><span class="info-value">100</span></div>
+                                    <div><span class="info-value">0</span></div>
                                 </div>
                             </div>
 
@@ -1414,7 +1435,7 @@
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">% Complete:</div>
 
-                                    <div><span class="info-value">80 %</span></div>
+                                    <div><span class="info-value">0 %</span></div>
                                 </div>
                             </div>
 
@@ -1422,7 +1443,7 @@
                     </div>
                     <div class="row g-3">
                         <!-- Left Section -->
-                        <div class="col-lg-8">
+                        <div class="col-lg-12">
 
                             <div class="section-card">
                                 <div class="d-flex align-items-center justify-content-between section-title">
@@ -1469,7 +1490,7 @@
                         </div>
 
                         <!-- Right Section -->
-                        <div class="col-lg-4">
+                       @*  <div class="col-lg-4">
                             <div class="updates d-flex flex-column justify-content-between mb-3">
                                 @{
                                     Model.IncidentViewPostType = 3; // assessment
@@ -1488,7 +1509,7 @@
                                     </div>
                                     <p class="text-muted small mb-0">Mini Map View</p>
                                 </div> *@
-                                <div class="file-section">
+                                @* <div class="file-section">
                                     <strong>Attachments</strong>
                                     @{
                                         Model.incidentViewAssessmentAttachmentView.PageName = "Assessment";
@@ -1498,67 +1519,57 @@
                                     </div>
                                 </div>
                             </div>
+                        </div> *@  
+                    </div>
+
+                    <div class="card-custom mt-4 validation-notes">
+                        <div class="section-title">Validation Notes</div>
+                        <div class="updates d-flex flex-column justify-content-between h-100 mb-3">
+                            @{
+                                Model.IncidentViewPostType = 4; // restoration
+                            }
+                            @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
                         </div>
                     </div>
                 </div>
 
                 <div id="repair" class="tab-content">
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <div class="status-card status-phase">
-                                <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
-                                <div>
-                                    <h6>Phase:</h6>
-                                    <h4>Repair</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="status-card status-progress">
-                                <div class="status-icon" aria-hidden="true"><i class="fa fa-pie-chart"></i></div>
-                                <div>
-                                    <h6>Progress:</h6>
-                                    <h4>80% Complete</h4>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
+                   
                     <div class="topCard mb-3">
                         <div class="row g-3">
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">Open:</div>
-                                    <div><span class="info-value">5</span>  </div>
+                                    <div><span class="info-value">3</span>  </div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">Completed:</div>
-                                    <div><span class="info-value">15</span> </div>
+                                    <div><span class="info-value">0</span> </div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">Total:</div>
-                                    <div><span class="info-value">20</span>  </div>
+                                    <div><span class="info-value">0</span>  </div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">% Complete:</div>
-                                    <div><span class="info-value">75%</span> </div>
+                                    <div><span class="info-value">0%</span> </div>
                                 </div>
                             </div>
 
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-12">
                             <div class="LeftSection">
                                 <!-- Pre-Operation Setup -->
                                 <div class="card mb-4">
@@ -1678,7 +1689,7 @@
                                 </div> *@
                             </div>
                         </div>
-                        <div class="col-md-4">
+                       @*  <div class="col-md-4">
                             <div class="RightSection">
                                 <!-- Updates -->
                                 <div class="updates d-flex flex-column justify-content-between h-100">
@@ -1688,67 +1699,47 @@
                                     @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
                                 </div>
                             </div>
-                        </div>
+                        </div> *@
                     </div>
                 </div>
 
                 <div id="restoration" class="tab-content">
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <div class="status-card status-phase">
-                                <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
-                                <div>
-                                    <h6>Phase:</h6>
-                                    <h4>Restoration</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="status-card status-progress">
-                                <div class="status-icon" aria-hidden="true"><i class="fa fa-pie-chart"></i></div>
-                                <div>
-                                    <h6>Progress:</h6>
-                                    <h4>80% Complete</h4>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
+                  
                     <div class="topCard mb-3">
                         <div class="row g-3">
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">Open:</div>
-                                    <div><span class="info-value">10</span> </div>
+                                    <div><span class="info-value">5</span> </div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">Completed:</div>
-                                    <div><span class="info-value">10</span></div>
+                                    <div><span class="info-value">0</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">Total:</div>
-                                    <div><span class="info-value">20</span></div>
+                                    <div><span class="info-value">0</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">% Complete:</div>
-                                    <div><span class="info-value">50%</span></div>
+                                    <div><span class="info-value">0%</span></div>
                                 </div>
                             </div>
 
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-12">
                             <div class="LeftSection">
 
                                 <div id="div_restoration_checklist">
@@ -1804,7 +1795,7 @@
                                 </div> *@
                             </div>
                         </div>
-                        <div class="col-md-4">
+                     @*    <div class="col-md-4">
                             <div class="RightSection">
                                 <!-- Updates -->
                                 <div class="updates d-flex flex-column justify-content-between h-100 mb-3">
@@ -1818,7 +1809,7 @@
 
                                     <div class="p-3 signoffContent">
                                         <p class="mb-0">Residential area relight letters distributed 3:30 PM.Commercial accounts scheduled for 6:00 PM.</p>
-                                    </div> *@
+                                    </div>  
 
 
 
@@ -1831,70 +1822,50 @@
                                             @await Html.PartialAsync("_ViewAttachmentAssestmentPartial", Model.incidentViewRestorationAttachmentView)
                                         </div>                                                                
 
-                                      @*   <strong>Attachments</strong>
+                                         <strong>Attachments</strong>
                                         <ul class="attachments mt-2">
                                             <li><i class="fa-solid fa-circle"></i>mcr_final.pdf</li>
                                             <li><i class="fa-solid fa-circle"></i>cpucreport_draft.docx</li>
                                             <li><i class="fa-solid fa-circle"></i>disposal_manifest.pdf</li>
                                             <li><i class="fa-solid fa-circle"></i>cost_summary.xlsx</li>
-                                        </ul>  *@
+                                        </ul>   
                                     </div>
                                 </div> 
                             </div>
-                        </div>
+                        </div> *@
                     </div>
                 </div>
 
                 <div id="closeout" class="tab-content">
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <div class="status-card status-phase">
-                                <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
-                                <div>
-                                    <h6>Phase:</h6>
-                                    <h4>Closeout</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="status-card status-progress">
-                                <div class="status-icon" aria-hidden="true"><i class="fa fa-pie-chart"></i></div>
-                                <div>
-                                    <h6>Progress:</h6>
-                                    <h4>80% Complete</h4>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
+                   
                     <div class="topCard mb-3">
                         <div class="row g-3">
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">Open:</div>
-                                    <div><span class="info-value">50</span></div>
+                                    <div><span class="info-value">5</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">Completed:</div>
-                                    <div><span class="info-value">50</span> </div>
+                                    <div><span class="info-value">0</span> </div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">Total:</div>
-                                    <div><span class="info-value">100</span></div>
+                                    <div><span class="info-value">0</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">% Complete:</div>
-                                    <div><span class="info-value">50%</span>  </div>
+                                    <div><span class="info-value">0%</span>  </div>
                                 </div>
                             </div>
 
@@ -1933,7 +1904,7 @@
                         </div> *@
                     </div>
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-12">
                             <div class="LeftSection">
 
                                 <div class="card mb-4">
@@ -2002,7 +1973,7 @@
 
                             </div>
                         </div>
-                        <div class="col-md-4">
+                       @* @* @*  <div class="col-md-4">
                             <div class="RightSection">
                                 <!-- Updates -->
                                 <div class="updates d-flex flex-column justify-content-between h-100 mb-3">
@@ -2037,7 +2008,7 @@
                                             <span class="status pending"><i class="fa-solid fa-triangle-exclamation"></i>Pending</span>
                                         </div>
                                     </div>
- *@
+  
                                     <div class="file-section">
                                         <strong>Attachments</strong>
                                         @{
@@ -2050,7 +2021,7 @@
                                 </div> 
 
                             </div>
-                        </div>
+                        </div>  *@
                     </div>
                 </div>
 
@@ -3620,6 +3591,65 @@
         });
 
 </script>
+<script>
+    // Tab handling + dynamic header bind
+    (function () {
+        const tabNameEl = document.getElementById("tabname");
 
+        function getLabelFromTab(tabEl) {
+            if (!tabEl) return "";
+            // clone and remove icon nodes so we get only the text label
+            const clone = tabEl.cloneNode(true);
+            clone.querySelectorAll("i, svg").forEach(n => n.remove());
+            return (clone.textContent || "").replace(/\s+/g, " ").trim();
+        }
+
+        function setTabNameFromTab(tabEl) {
+            const label = getLabelFromTab(tabEl) || tabEl.getAttribute("data-tab") || "";
+            if (tabNameEl) tabNameEl.textContent = label;
+        }
+
+        // existing click handler upgraded to also set tab header text
+        document.querySelectorAll(".tab-item").forEach(tab => {
+            tab.addEventListener("click", function () {
+                // Remove active from all tabs
+                document.querySelectorAll(".tab-item").forEach(el => el.classList.remove("active"));
+                this.classList.add("active");
+
+                // Hide all contents
+                document.querySelectorAll(".tab-content").forEach(content => content.classList.remove("active"));
+
+                // Show selected content
+                const tabId = this.getAttribute("data-tab");
+                const content = document.getElementById(tabId);
+                if (content) content.classList.add("active");
+
+                // Update header name
+                setTabNameFromTab(this);
+            });
+        });
+
+        // Initialize header on load from currently active tab (server-set or first)
+        document.addEventListener("DOMContentLoaded", function () {
+            const activeTab = document.querySelector(".tab-item.active") || document.querySelector(".tab-item");
+            setTabNameFromTab(activeTab);
+        });
+
+        // Catch programmatic class changes that set a tab active (MutationObserver)
+        const observerConfig = { attributes: true, attributeFilter: ["class"], subtree: false };
+        document.querySelectorAll(".tab-item").forEach(tab => {
+            const mo = new MutationObserver(mutations => {
+                mutations.forEach(m => {
+                    if (m.type === "attributes") {
+                        if (tab.classList.contains("active")) {
+                            setTabNameFromTab(tab);
+                        }
+                    }
+                });
+            });
+            mo.observe(tab, observerConfig);
+        });
+    })();
+</script>
 <script src="~/js/custom/loader/loader.js"></script>
 <script src="~/js/views/incident/incident-detail.js"></script>
