@@ -1017,12 +1017,17 @@
 }
 
 #validation .section-body {
+  
     padding: 16px;
+  
 }
-
-    #validation .section-body i {
-        color: #f54e00 !important;
-    }
+.section-body-part {
+    overflow: auto;
+    height: 300px;
+}
+#validation .section-body i {
+    color: #f54e00 !important;
+}
 
 
 #validation .info-title {
@@ -1066,6 +1071,7 @@
     font-weight: 600;
     margin-bottom: 0;
     padding: 16px;
+    background-color: #f9fafb;
     border-radius: 12px;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;

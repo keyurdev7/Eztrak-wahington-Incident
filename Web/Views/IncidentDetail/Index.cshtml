@@ -193,12 +193,12 @@
                                 <div class="card-header bg-white fw-semibold border-bottom d-flex justify-content-between align-items-center">
                                     <div>  <i class="fa-solid fa-comments me-2 text-warning"></i>Map Notes</div>
                                     <a class="text-decoration-none text-warning small fw-semibold"
-                                       data-bs-toggle="collapse" href="#timelineCollapse" role="button"
-                                       aria-expanded="true" aria-controls="timelineCollapse" id="collapseToggle">
+                                       data-bs-toggle="collapse" href="#mapNotesCollapse" role="button"
+                                       aria-expanded="true" aria-controls="mapNotesCollapse" id="mapNotesCollapseToggle">
                                         <i class="fa-solid fa-angle-up me-1"></i>
                                     </a>
                                 </div>
-                                <div class="collapse show" id="timelineCollapse">
+                                <div class="collapse" id="mapNotesCollapse">
                             <div class="card shadow-sm border-0 h-100 rounded-4">
                                 
                                 <!-- Chat Messages -->
@@ -690,7 +690,7 @@
                                                     <ul id="suggestionsICPLocation" class="suggestions-list"></ul>
                                                 </div>
                                             </div>
-                                            <div class="info-item">
+                                            <div class="info-item" style="display:none">
                                                 <div>
                                                     <span class="info-title">Source:</span>
                                                     <input type="text" id="Source" asp-for="@Model.IVValidation.Source" class=" form-control mb-2">
@@ -911,18 +911,27 @@
                             <div class="card-custom mt-4 validation-notes">
                                 <div class="section-title">Validation Notes</div>
                                 <div class="section-body" id="validationNotesBody">
+                                    <div class="section-body-part">
                                     @if (Model.incidentValidationsDetailsViewModel.IncidentValidationNotesList != null && Model.incidentValidationsDetailsViewModel.IncidentValidationNotesList.Any())
                                     {
                                         foreach (var n in Model.incidentValidationsDetailsViewModel.IncidentValidationNotesList)
                                         {
-                                            <div class="note" data-note-id="@n.Id">
+                                            @* <div class="note" data-note-id="@n.Id">
                                                 <span class="note-badge">@(!string.IsNullOrEmpty(n.CreatedByName) ? n.CreatedByName.Split(' ').FirstOrDefault()?.ToUpper() : "IC")</span>
                                                 <span class="note-text">@n.Notes</span>
                                                 <div class="note-meta">@n.CreatedOn</div>
+                                            </div> *@
+
+                                            <div class="update-item-map d-flex justify-content-between align-items-start mb-2">
+                                                <div class="update-message flex-grow-1 me-3">@n.Notes</div>
+                                                <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
+                                                    <span class="update-time-map">@n.CreatedOn</span>
+                                                    <span class="update-email postby-div-map text-muted">admin@eztrak.com</span>
+                                                </div>
                                             </div>
                                         }
-                                    }
-
+                                        }
+                                    </div>
                                     <textarea class="form-control mt-3" rows="3" id="addNote" placeholder="Add new note..."></textarea>
                                 </div>
                             </div>
@@ -1135,18 +1144,27 @@
                         <div class="card-custom mt-4 validation-notes">
                             <div class="section-title">Validation Notes</div>
                             <div class="section-body" id="validationNotesBody">
+                                <div class="section-body-part">
                                 @if (Model.incidentValidationsDetailsViewModel.IncidentValidationNotesList != null && Model.incidentValidationsDetailsViewModel.IncidentValidationNotesList.Any())
                                 {
                                     foreach (var n in Model.incidentValidationsDetailsViewModel.IncidentValidationNotesList)
                                     {
-                                        <div class="note" data-note-id="@n.Id">
+                                        @* <div class="note" data-note-id="@n.Id">
                                             <span class="note-badge">@(!string.IsNullOrEmpty(n.CreatedByName) ? n.CreatedByName.Split(' ').FirstOrDefault()?.ToUpper() : "IC")</span>
                                             <span class="note-text">@n.Notes</span>
                                             <div class="note-meta">@n.CreatedOn</div>
-                                        </div>
+                                        </div> *@
+
+                                            <div class="update-item-map d-flex justify-content-between align-items-start mb-2">
+                                                <div class="update-message flex-grow-1 me-3">@n.Notes</div>
+                                                <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
+                                                    <span class="update-time-map">@n.CreatedOn</span>
+                                                    <span class="update-email postby-div-map text-muted">admin@eztrak.com</span>
+                                                </div>
+                                            </div>
                                     }
                                 }
-
+                                </div>
                                 <textarea class="form-control mt-3" rows="3" id="addNote" placeholder="Add new note..."></textarea>
                             </div>
                         </div>
@@ -2744,8 +2762,8 @@
     });
 </script>
 <script>
-    const toggleLink = document.getElementById("collapseToggle");
-    const timelineCollapse = document.getElementById("timelineCollapse");
+    const toggleLink = document.getElementById("mapNotesCollapseToggle");
+    const timelineCollapse = document.getElementById("mapNotesCollapse");
 
     timelineCollapse.addEventListener("hidden.bs.collapse", function () {
       toggleLink.innerHTML = '<i class="fa-solid fa-angle-down me-1"></i>';
@@ -2914,72 +2932,99 @@
 </script>
 <script>
     (function () {
-        const textarea = document.getElementById('addNote');
-        const notesBody = document.getElementById('validationNotesBody');
+           const textarea = document.getElementById('addNote');
+           const notesBody = document.getElementById('validationNotesBody');
 
-        // Press Enter (no shift) to submit
-        textarea.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                saveNote();
-            }
-        });
+           // helper to escape html (prevent XSS)
+           function escapeHtml(unsafe) {
+               return unsafe
+                   .replace(/&/g, "&amp;")
+                   .replace(/</g, "&lt;")
+                   .replace(/>/g, "&gt;")
+                   .replace(/"/g, "&quot;")
+                   .replace(/'/g, "&#039;");
+           }
 
-        async function saveNote() {
-            const text = textarea.value.trim();
-            if (!text) return;
+           // Press Enter (no shift) to submit
+           textarea.addEventListener('keydown', function (e) {
+               if (e.key === 'Enter' && !e.shiftKey) {
+                   e.preventDefault();
+                   saveNote();
+               }
+           });
 
-            const payload = {
-                IncidentId: '@Model.Id',
-                IncidentValidationId: @Model.incidentValidationsDetailsViewModel?.IncidentValidationId ?? 0,
-                Notes: text
-            };
+           async function saveNote() {
+               const text = textarea.value.trim();
+               if (!text) return;
 
-            try {
-                const res = await fetch('@Url.Action("SaveValidationNote", "IncidentDetail")', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                });
-                const json = await res.json();
-                if (json && json.success) {
-                    // build note HTML (mirrors server rendered HTML)
-                    const noteEl = document.createElement('div');
-                    noteEl.className = 'note';
-                    noteEl.setAttribute('data-note-id', json.id || '');
+               const payload = {
+                   IncidentId: '@Model.Id',
+                   IncidentValidationId: @Model.incidentValidationsDetailsViewModel?.IncidentValidationId ?? 0,
+                   Notes: text
+               };
 
-                    const badge = document.createElement('span');
-                    badge.className = 'note-badge';
-                    badge.textContent = 'IC'; // or compute from current user if you want
+               try {
+                   const res = await fetch('@Url.Action("SaveValidationNote", "IncidentDetail")', {
+                       method: 'POST',
+                       headers: {
+                           'Content-Type': 'application/json'
+                       },
+                       body: JSON.stringify(payload)
+                   });
+                   const json = await res.json();
+                   if (json && json.success) {
+                       // build note HTML using same style as existing update-list entries
+                       const now = new Date();
+                       const formattedTime = now.toLocaleString('en-US', {
+                           month: "short",
+                           day: "2-digit",
+                           hour: "2-digit",
+                           minute: "2-digit",
+                           hour12: true
+                       });
 
-                    const txt = document.createElement('span');
-                    txt.className = 'note-text';
-                    txt.textContent = text;
+                       const safeText = escapeHtml(text);
 
-                    const meta = document.createElement('div');
-                    meta.className = 'note-meta';
-                    const now = new Date();
-                    meta.textContent = now.toLocaleString('en-US', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+                       const noteHtml = `
+                           <div class="update-item-map d-flex justify-content-between align-items-start mb-2" data-note-id="${json.id || ''}">
+                               <div class="update-message flex-grow-1 me-3">${safeText}</div>
+                               <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
+                                   <span class="update-time-map">${formattedTime}</span>
+                                   <span class="update-email postby-div-map text-muted">admin@eztrak.com</span>
+                               </div>
+                           </div>
+                       `;
 
-                    noteEl.appendChild(badge);
-                    noteEl.appendChild(txt);
-                    noteEl.appendChild(meta);
+                       // insert new note at top (mirrors behavior of update-list code)
+                       // use jQuery if available for convenience, fallback to DOM methods
+                       if (window.jQuery) {
+                           const $nb = $('#validationNotesBody');
+                           // if you want to replace full list based on server data in future:
+                           // $nb.empty(); $nb.append(...);
+                           $nb.prepend(noteHtml);
 
-                    // insert at top
-                    notesBody.insertBefore(noteEl, notesBody.firstChild);
+                           // animate scroll to top (optional)
+                           try {
+                               $nb.animate({ scrollTop: 0 }, 150);
+                           } catch (err) { /* ignore animation errors */ }
+                       } else {
+                           const wrapper = document.createElement('div');
+                           wrapper.innerHTML = noteHtml;
+                           notesBody.insertBefore(wrapper.firstElementChild, notesBody.firstChild);
+                       }
 
-                    textarea.value = '';
-                } else {
-                    alert(json.message || 'Failed to save note.');
-                }
-            } catch (err) {
-                console.error(err);
-                alert('Error saving note.');
-            }
-        }
-    })();
+                       // clear textarea
+                       textarea.value = '';
+                       textarea.focus();
+                   } else {
+                       alert(json.message || 'Failed to save note.');
+                   }
+               } catch (err) {
+                   console.error(err);
+                   alert('Error saving note.');
+               }
+           }
+       })();
 </script>
 <script>
 

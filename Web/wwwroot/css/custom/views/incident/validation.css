@@ -607,9 +607,11 @@
 
 .font-colr {
     color: #404C59;
-    min-width: -webkit-fill-available;
+ 
 }
-
+.info-sec {
+    max-width: 150px;
+}
 #validation .border-bottm {
     min-width: 145px;
     color: #4f5e6e;
@@ -669,3 +671,30 @@
     padding: 2px 8px;
     margin-right: 8px
 }
+
+#validationNotesBody {
+  
+    scrollbar-width: thin;
+    scrollbar-color: #ffb366 transparent;
+}
+
+    /* WebKit-based browsers */
+    #validationNotesBody::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    #validationNotesBody::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    #validationNotesBody::-webkit-scrollbar-thumb {
+        background-color: #ffb366;
+        border-radius: 10px;
+        border: 2px solid transparent; /* creates padding effect if desired */
+        background-clip: padding-box;
+    }
+
+        #validationNotesBody::-webkit-scrollbar-thumb:hover {
+            background-color: #ff9f3d;
+        }
