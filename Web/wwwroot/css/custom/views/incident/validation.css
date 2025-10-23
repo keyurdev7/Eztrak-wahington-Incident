@@ -698,3 +698,7 @@
         #validationNotesBody::-webkit-scrollbar-thumb:hover {
             background-color: #ff9f3d;
         }
+.bg-white-note {
+    --bs-bg-opacity: 1;
+    background-color: rgb(248 249 250) !important;
+}

@@ -107,6 +107,37 @@
         flex-wrap: wrap;
     }
 
+    .map-notes.map-overlay {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 360px;
+        z-index: 1200;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        background: #fff;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        pointer-events: auto;
+    }
+
+        .map-notes.map-overlay .mapNotesContent {
+            max-height: 400px;
+            overflow: auto;
+            padding: 12px;
+        }
+
+        .map-notes.map-overlay .mapNotesHeader {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e9e9e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .map-notes.map-overlay .btn-col {
+            
+            cursor: pointer;
+        }
  
 </style>
 <div id="incidentDetailsModal" tabindex="-1" aria-hidden="true">
@@ -174,72 +205,54 @@
                 <div id="dashboard" class="tab-content @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "" : "active")">
                     <div class="row g-4">
 
-                       <!-- Chat & Handoffs -->
-                        <div class="col-lg-3">
-                            <!-- Chat & Handoffs -->
-                            <div class="card shadow-sm border-0 h-100 rounded-4">
-                                <div class="card-header bg-white fw-semibold border-bottom d-flex justify-content-between align-items-center">
-                                    <div>  <i class="fa-solid fa-comments me-2 text-warning"></i>Map Notes</div>
-                                    <a class="text-decoration-none text-warning small fw-semibold"
-                                       data-bs-toggle="collapse" href="#mapNotesCollapse" role="button"
-                                       aria-expanded="true" aria-controls="mapNotesCollapse" id="mapNotesCollapseToggle">
-                                        <i class="fa-solid fa-angle-up me-1"></i>
-                                    </a>
-                                </div>
-                                <div class="collapse" id="mapNotesCollapse">
-                                    <div class="card shadow-sm border-0 h-100 rounded-4">
-
-                                        <!-- Chat Messages -->
-                                        <div class="card-body chat-body" id="chatMessages">
-                                            @foreach (var item in Model.listIncidentMapChats)
-                                            {
-                                                @* <div class="handoff-item">
-                                            <span class="badge role-badge">@item.SentBy</span>
-                                            @item.ChatMessage
-                                        </div>
- *@
-                                                <div class="update-item-map d-flex justify-content-between align-items-start mb-2">
-                                                    <div class="update-message flex-grow-1 me-3">@item.ChatMessage</div>
-                                                    <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
-                                                        <span class="update-time-map">@item.SentBy</span>
-                                                        <span class="update-email postby-div-map text-muted">admin@eztrak.com</span>
-                                                    </div>
-                                                </div>
-                                            }
-                                        </div>
-
-                                        <!-- Input Area -->
-                                        <div class="card-body chat-input-area">
-                                            <div class="align-items-center gap-2">
-
-                                                <div class="mesgsend">
-                                                    <textarea rows="5" class="form-control mb-2" id="messageInput" placeholder="Add new note..."></textarea>
-                                                    <button class="btn btn-update" id="sendBtn" data-type="1">
-                                                        <i class="fa-solid fa-paper-plane me-2" style="color:#ffffff !important"></i>Add Note
-                                                    </button>
-
-                                                </div>
-                                                @*    <div class="sendBtn">
-                                            <button class="btn btn-send" id="sendBtn">
-                                                <i class="fa-solid fa-paper-plane"></i> Add Post
-                                            </button>
-                                        </div> *@
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
+                     
                         <!-- Map View -->
-                        <div class="col-lg-9">
+                        <div class="col-lg-12">
                             <div class="card shadow-sm border-0 h-100 rounded-4 text-center">
                                 <div class="card-header bg-white fw-semibold border-bottom text-left">
                                     <i class="fa-solid fa-location-dot me-2 text-warning"></i>Map View
                                 </div>
                                 <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                                    <div id="map" style="height:500px;width:100%;"></div>
+                                    <div id="map" style="height:500px;width:100%;position:relative;">
+                                        <!-- Map Notes overlay placed INSIDE #map so it sits top-right of the map -->
+                                        <div class="map-notes map-overlay" id="mapNotesOverlay" style="position:absolute; top:16px; right:16px; width:360px; z-index:1200;">
+                                            <div class="mapNotesHeader">
+                                                <div class="mapNotesTitle"><i class="fa-solid fa-comments me-2 text-warning"></i>Map Notes</div>
+                                                <button id="mapNotesToggleBtn"
+                                                        type="button"
+                                                        class="btn btn-sm btn-light btn-col"
+                                                        aria-expanded="true"
+                                                        aria-controls="mapNotesContent"
+                                                        title="Collapse/Expand">
+                                                    <i class="fa fa-chevron-up"></i>
+                                                </button>
+                                            </div>
+
+                                            <div id="mapNotesContent" class="mapNotesContent">
+                                                <div class="card-body chat-body" id="chatMessages" style="padding:0; max-height: 200px; overflow:auto;">
+                                                    @foreach (var item in Model.listIncidentMapChats)
+                                                    {
+                                                        <div class="update-item-map d-flex justify-content-between align-items-start mb-2">
+                                                            <div class="update-message">@item.ChatMessage</div>
+                                                            <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
+                                                                <span class="update-time-map">@item.SentBy</span>
+                                                                <span class="update-email postby-div-map text-muted">admin@eztrak.com</span>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+
+                                                <div class="chat-input-area" style="padding-top:8px;">
+                                                    <div class="mesgsend">
+                                                        <textarea rows="3" class="form-control mb-2" id="messageInput" placeholder="Add new note..."></textarea>
+                                                        <button class="btn btn-update w-100" id="sendBtn" data-type="1">
+                                                            <i class="fa-solid fa-paper-plane me-2" style="color:#ffffff !important"></i>Add Note
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -957,12 +970,7 @@
                 {
                     <div id="validation" class="tab-content">
                         <div class="step-content mt-3">
-
-                            <div style="text-align: right;" class="mb-3">
-                                <button type="button" class="btn btn-primary btn-sm" style="height: 48px; width: 100px;" id="editValidationBtn">
-                                    Edit
-                                </button>
-                            </div>
+ 
                         <!-- Top Cards -->
                         <div class="row g-3">
                             <!-- Incident Details -->
@@ -971,6 +979,7 @@
 
                                     <div class="section-header d-flex align-items-center justify-content-between">
                                         <h6 class="mb-0 font-colr"> <i class="fa-solid fa-pen"></i> Incident Details</h6>
+                                            <h6 class="mb-0 font-colr"> <a><small>Edit</small></a> </h6>
                                     </div>
                                     <div class="section-body">
                                         <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
@@ -1009,6 +1018,7 @@
 
                                         <div class="section-header d-flex align-items-center justify-content-between">
                                         <h6 class="mb-0 font-colr"> <i class="fa-solid fa-user-check"></i> Assigned Roles</h6>
+                                         <h6 class="mb-0 font-colr"> <a><small>Edit</small></a> </h6>
                                         </div>
                                         <div class="section-body">
                                             <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
@@ -1082,6 +1092,7 @@
 
                                     <div class="section-header d-flex align-items-center justify-content-between">
                                         <h6 class="mb-0 font-colr"> <i class="fas fa-shield-alt"></i> Validation Gates </h6>
+                                            <h6 class="mb-0 font-colr"> <a><small>Edit</small></a> </h6>
                                     </div>
                                     <div class="section-body">
                                         <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
@@ -1442,31 +1453,34 @@
                         <div class="row g-3">
 
                             <div class="col-md-3 col-sm-6">
-                                <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Open:</div>
-                                    <div><span class="info-value" id="openTaskCount">8</span></div>
+                                <div class="info-card text-center text-md-start"
+                                     style="background-color:#e8f0fe; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                                    <div class="info-title" style="font-weight:600; color:#333;">Open:</div>
+                                    <div><span class="info-value" id="openTaskCount" style="font-size:22px; font-weight:700; color:#1a73e8;">8</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
-                                <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Completed:</div>
-                                    <div><span class="info-value" id="completedTaskCount">0</span></div>
+                                <div class="info-card text-center text-md-start"
+                                     style="background-color:#dff7df; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                                    <div class="info-title" style="font-weight:600; color:#333;">Completed:</div>
+                                    <div><span class="info-value" id="completedTaskCount" style="font-size:22px; font-weight:700; color:#198754;">0</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
-                                <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Total:</div>
-                                    <div><span class="info-value">8</span></div>
+                                <div class="info-card text-center text-md-start"
+                                     style="background-color:#fff3cd; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                                    <div class="info-title" style="font-weight:600; color:#333;">Total:</div>
+                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#c58a00;">8</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
-                                <div class="info-card text-center text-md-start">
-                                    <div class="info-title">% Complete:</div>
-
-                                    <div><span class="info-value">0 %</span></div>
+                                <div class="info-card text-center text-md-start"
+                                     style="background-color:#f2f2f2; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                                    <div class="info-title" style="font-weight:600; color:#333;">% Complete:</div>
+                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#6c757d;">0%</span></div>
                                 </div>
                             </div>
 
@@ -1474,7 +1488,7 @@
                     </div>
                     <div class="row g-3">
                         <!-- Left Section -->
-                        <div class="col-lg-12">
+                        <div class="col-lg-9">
 
                             <div class="section-card">
                                 <div class="d-flex align-items-center justify-content-between section-title">
@@ -1519,17 +1533,59 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-12">
-                       
-                        <div class="post-div">
-                            @{
-                                Model.IncidentViewPostType = 3; // assessment
-                            }
-                            @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
+                        <div class="col-lg-3">
+                            <div class="card shadow-sm border-0 rounded-4">
+                                <div class="card-header bg-white-note fw-semibold  d-flex justify-content-between align-items-center">
+                                    <div><i class="fa-solid fa-list-check me-2 text-warning"></i> Assessment Notes</div>
+                                    <a class="text-decoration-none text-warning small fw-semibold"
+                                       data-bs-toggle="collapse" href="#assessmentNotesCollapse" role="button"
+                                       aria-expanded="false" aria-controls="assessmentNotesCollapse" id="assessmentNotesCollapseToggle">
+                                        <i class="fa-solid fa-angle-down me-1"></i>
+                                    </a>
+                                </div>
 
+                                <div class="collapse" id="assessmentNotesCollapse">
+                                    <div class="card-body p-3">
+                                        @{
+                                            Model.IncidentViewPostType = 3; // assessment
+                                        }
+                                        @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                       
-                    </div>
+                        <!-- Right Section -->
+                        @*  <div class="col-lg-4">
+                            <div class="updates d-flex flex-column justify-content-between mb-3">
+                                @{
+                                    Model.IncidentViewPostType = 3; // assessment
+                                }
+                                @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
+
+                            </div>
+                            <div class="card">
+                               @*  <div class="card-header bg-white fw-semibold" style="display:none">
+                                    <i class="fa fa-map-location-dot text-warning me-2"></i>Mini Map
+                                </div>
+                                <div class="card-body text-center" style="display:none">
+                                    <p class="small text-muted mb-3">Shows ICP and newly marked low/squeeze points.</p>
+                                    <div class="mini-map-icon mb-2">
+                                        <i class="fa fa-location-dot"></i>
+                                    </div>
+                                    <p class="text-muted small mb-0">Mini Map View</p>
+                                </div> *@
+                        @* <div class="file-section">
+                                    <strong>Attachments</strong>
+                                    @{
+                                        Model.incidentViewAssessmentAttachmentView.PageName = "Assessment";
+                                    }
+                                    <div id="div_Attachments">
+                                        @await Html.PartialAsync("_ViewAttachmentAssestmentPartial", Model.incidentViewAssessmentAttachmentView)
+                                    </div>
+                                </div>
+                            </div>
+                        </div> *@  
+                    
                         <!-- Right Section -->
                        @*  <div class="col-lg-4">
                             <div class="updates d-flex flex-column justify-content-between mb-3">
@@ -1571,37 +1627,41 @@
                         <div class="row g-3">
 
                             <div class="col-md-3 col-sm-6">
-                                <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Open:</div>
-                                    <div><span class="info-value">3</span>  </div>
+                                <div class="info-card text-center text-md-start"
+                                     style="background-color:#e8f0fe; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                                    <div class="info-title" style="font-weight:600; color:#333;">Open:</div>
+                                    <div><span class="info-value" id="openTaskCount" style="font-size:22px; font-weight:700; color:#1a73e8;">3</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
-                                <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Completed:</div>
-                                    <div><span class="info-value">0</span> </div>
+                                <div class="info-card text-center text-md-start"
+                                     style="background-color:#dff7df; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                                    <div class="info-title" style="font-weight:600; color:#333;">Completed:</div>
+                                    <div><span class="info-value" id="completedTaskCount" style="font-size:22px; font-weight:700; color:#198754;">0</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
-                                <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Total:</div>
-                                    <div><span class="info-value">3</span>  </div>
+                                <div class="info-card text-center text-md-start"
+                                     style="background-color:#fff3cd; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                                    <div class="info-title" style="font-weight:600; color:#333;">Total:</div>
+                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#c58a00;">3</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
-                                <div class="info-card text-center text-md-start">
-                                    <div class="info-title">% Complete:</div>
-                                    <div><span class="info-value">0%</span> </div>
+                                <div class="info-card text-center text-md-start"
+                                     style="background-color:#f2f2f2; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                                    <div class="info-title" style="font-weight:600; color:#333;">% Complete:</div>
+                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#6c757d;">0%</span></div>
                                 </div>
                             </div>
 
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-9">
                             <div class="LeftSection">
                                 <!-- Pre-Operation Setup -->
                                 <div class="card mb-4">
@@ -1733,17 +1793,27 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-12">
+                <div class="col-lg-3">
+                    <div class="card shadow-sm border-0 rounded-4">
+                                <div class="card-header bg-white-note fw-semibold d-flex justify-content-between align-items-center">
+                            <div><i class="fa-solid fa-screwdriver-wrench me-2 text-warning"></i> Repair Notes</div>
+                            <a class="text-decoration-none text-warning small fw-semibold"
+                               data-bs-toggle="collapse" href="#repairNotesCollapse" role="button"
+                               aria-expanded="false" aria-controls="repairNotesCollapse" id="repairNotesCollapseToggle">
+                                <i class="fa-solid fa-angle-down me-1"></i>
+                            </a>
+                        </div>
 
-                            <div class="post-div">
+                        <div class="collapse" id="repairNotesCollapse">
+                            <div class="card-body p-3">
                                 @{
-                                    Model.IncidentViewPostType = 1; // Rapair
+                                    Model.IncidentViewPostType = 1; // Repair
                                 }
                                 @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
-
                             </div>
-
                         </div>
+                    </div>
+                </div>
                        @*  <div class="col-md-4">
                             <div class="RightSection">
                                 <!-- Updates -->
@@ -1764,37 +1834,41 @@
                         <div class="row g-3">
 
                             <div class="col-md-3 col-sm-6">
-                                <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Open:</div>
-                                    <div><span class="info-value">5</span> </div>
+                                <div class="info-card text-center text-md-start"
+                                     style="background-color:#e8f0fe; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                                    <div class="info-title" style="font-weight:600; color:#333;">Open:</div>
+                                    <div><span class="info-value" id="openTaskCount" style="font-size:22px; font-weight:700; color:#1a73e8;">5</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
-                                <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Completed:</div>
-                                    <div><span class="info-value">0</span></div>
+                                <div class="info-card text-center text-md-start"
+                                     style="background-color:#dff7df; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                                    <div class="info-title" style="font-weight:600; color:#333;">Completed:</div>
+                                    <div><span class="info-value" id="completedTaskCount" style="font-size:22px; font-weight:700; color:#198754;">0</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
-                                <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Total:</div>
-                                    <div><span class="info-value">5</span></div>
+                                <div class="info-card text-center text-md-start"
+                                     style="background-color:#fff3cd; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                                    <div class="info-title" style="font-weight:600; color:#333;">Total:</div>
+                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#c58a00;">5</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
-                                <div class="info-card text-center text-md-start">
-                                    <div class="info-title">% Complete:</div>
-                                    <div><span class="info-value">0%</span></div>
+                                <div class="info-card text-center text-md-start"
+                                     style="background-color:#f2f2f2; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                                    <div class="info-title" style="font-weight:600; color:#333;">% Complete:</div>
+                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#6c757d;">0%</span></div>
                                 </div>
                             </div>
 
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-9">
                             <div class="LeftSection">
 
                                 <div id="div_restoration_checklist">
@@ -1851,17 +1925,27 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-12">
+                <div class="col-lg-3">
+                    <div class="card shadow-sm border-0 rounded-4">
+                                <div class="card-header bg-white-note fw-semibold d-flex justify-content-between align-items-center">
+                            <div><i class="fa-solid fa-rotate me-2 text-warning"></i> Restoration Notes</div>
+                            <a class="text-decoration-none text-warning small fw-semibold"
+                               data-bs-toggle="collapse" href="#restorationNotesCollapse" role="button"
+                               aria-expanded="false" aria-controls="restorationNotesCollapse" id="restorationNotesCollapseToggle">
+                                <i class="fa-solid fa-angle-down me-1"></i>
+                            </a>
+                        </div>
 
-                            <div class="post-div">
+                        <div class="collapse" id="restorationNotesCollapse">
+                            <div class="card-body p-3">
                                 @{
                                     Model.IncidentViewPostType = 4; // restoration
                                 }
                                 @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
-
                             </div>
-
                         </div>
+                    </div>
+                </div>
                      @*    <div class="col-md-4">
                             <div class="RightSection">
                                 <!-- Updates -->
@@ -1909,30 +1993,34 @@
                         <div class="row g-3">
 
                             <div class="col-md-3 col-sm-6">
-                                <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Open:</div>
-                                    <div><span class="info-value">5</span></div>
+                                <div class="info-card text-center text-md-start"
+                                     style="background-color:#e8f0fe; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                                    <div class="info-title" style="font-weight:600; color:#333;">Open:</div>
+                                    <div><span class="info-value" id="openTaskCount" style="font-size:22px; font-weight:700; color:#1a73e8;">5</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
-                                <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Completed:</div>
-                                    <div><span class="info-value">0</span> </div>
+                                <div class="info-card text-center text-md-start"
+                                     style="background-color:#dff7df; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                                    <div class="info-title" style="font-weight:600; color:#333;">Completed:</div>
+                                    <div><span class="info-value" id="completedTaskCount" style="font-size:22px; font-weight:700; color:#198754;">0</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
-                                <div class="info-card text-center text-md-start">
-                                    <div class="info-title">Total:</div>
-                                    <div><span class="info-value">5</span></div>
+                                <div class="info-card text-center text-md-start"
+                                     style="background-color:#fff3cd; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                                    <div class="info-title" style="font-weight:600; color:#333;">Total:</div>
+                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#c58a00;">5</span></div>
                                 </div>
                             </div>
 
                             <div class="col-md-3 col-sm-6">
-                                <div class="info-card text-center text-md-start">
-                                    <div class="info-title">% Complete:</div>
-                                    <div><span class="info-value">0%</span>  </div>
+                                <div class="info-card text-center text-md-start"
+                                     style="background-color:#f2f2f2; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                                    <div class="info-title" style="font-weight:600; color:#333;">% Complete:</div>
+                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#6c757d;">0%</span></div>
                                 </div>
                             </div>
 
@@ -1971,7 +2059,7 @@
                         </div> *@
                     </div>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-9">
                             <div class="LeftSection">
 
                                 <div class="card mb-4">
@@ -2041,17 +2129,27 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-12">
+                <div class="col-lg-3">
+                    <div class="card shadow-sm border-0 rounded-4">
+                                <div class="card-header bg-white-note fw-semibold  d-flex justify-content-between align-items-center">
+                            <div><i class="fa-regular fa-circle-check me-2 text-warning"></i> Closeout Notes</div>
+                            <a class="text-decoration-none text-warning small fw-semibold"
+                               data-bs-toggle="collapse" href="#closeoutNotesCollapse" role="button"
+                               aria-expanded="false" aria-controls="closeoutNotesCollapse" id="closeoutNotesCollapseToggle">
+                                <i class="fa-solid fa-angle-down me-1"></i>
+                            </a>
+                        </div>
 
-                            <div class="post-div">
+                        <div class="collapse" id="closeoutNotesCollapse">
+                            <div class="card-body p-3">
                                 @{
                                     Model.IncidentViewPostType = 2; // Close out
                                 }
                                 @await Html.PartialAsync("~/Views/IncidentDetail/_PostDetails.cshtml", Model)
-
                             </div>
-
                         </div>
+                    </div>
+                </div>
                        @* @* @*  <div class="col-md-4">
                             <div class="RightSection">
                                 <!-- Updates -->
@@ -2761,16 +2859,66 @@
     });
 </script>
 <script>
-    const toggleLink = document.getElementById("mapNotesCollapseToggle");
-    const timelineCollapse = document.getElementById("mapNotesCollapse");
+    (function () {
+        const pairs = [
+            { toggleId: 'mapNotesCollapseToggle', collapseId: 'mapNotesCollapse' },
+            { toggleId: 'assessmentNotesCollapseToggle', collapseId: 'assessmentNotesCollapse' },
+            { toggleId: 'repairNotesCollapseToggle', collapseId: 'repairNotesCollapse' },
+            { toggleId: 'restorationNotesCollapseToggle', collapseId: 'restorationNotesCollapse' },
+            { toggleId: 'closeoutNotesCollapseToggle', collapseId: 'closeoutNotesCollapse' }
+        ];
 
-    timelineCollapse.addEventListener("hidden.bs.collapse", function () {
-      toggleLink.innerHTML = '<i class="fa-solid fa-angle-down me-1"></i>';
-    });
+        pairs.forEach(function (p) {
+            const toggle = document.getElementById(p.toggleId);
+            const collapseEl = document.getElementById(p.collapseId);
 
-    timelineCollapse.addEventListener("shown.bs.collapse", function () {
-      toggleLink.innerHTML = '<i class="fa-solid fa-angle-up me-1"></i>';
-    });
+            if (!toggle || !collapseEl) return;
+
+            // update icon when collapse hides/shows
+            collapseEl.addEventListener('hidden.bs.collapse', function () {
+                toggle.innerHTML = '<i class="fa-solid fa-angle-down me-1"></i>';
+                toggle.setAttribute('aria-expanded', 'false');
+            });
+
+            collapseEl.addEventListener('shown.bs.collapse', function () {
+                toggle.innerHTML = '<i class="fa-solid fa-angle-up me-1"></i>';
+                toggle.setAttribute('aria-expanded', 'true');
+            });
+
+            // initialize icon based on current state
+            if (collapseEl.classList.contains('show')) {
+                toggle.innerHTML = '<i class="fa-solid fa-angle-up me-1"></i>';
+                toggle.setAttribute('aria-expanded', 'true');
+            } else {
+                toggle.innerHTML = '<i class="fa-solid fa-angle-down me-1"></i>';
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    })();
+      (function () {
+        // Toggle behavior same as ChartIndex incidentListToggleBtn
+        $(function () {
+            $('#mapNotesToggleBtn').on('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var $btn = $(this);
+                var $icon = $btn.find('i');
+                var $content = $('#mapNotesContent');
+
+                $content.stop(true, true).slideToggle(150, function () {
+                    var nowOpen = $content.is(':visible');
+                    $btn.attr('aria-expanded', nowOpen);
+                    $icon.toggleClass('fa-chevron-up', nowOpen)
+                         .toggleClass('fa-chevron-down', !nowOpen);
+                });
+            });
+
+            // Prevent clicks inside overlay from bubbling to map handlers
+            $('#mapNotesOverlay').on('click', function (e) {
+                e.stopPropagation();
+            });
+        });
+    })();
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
