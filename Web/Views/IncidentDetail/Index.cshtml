@@ -1247,7 +1247,7 @@
                                                     <th>Shift</th>
                                                     <th>Time In</th>
                                                     <th>Hours So Far</th>
-                                                   @*  <th>Supervisor</th> *@
+                                                    <th>Supervisor</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="personnelTableBody">
@@ -1269,12 +1269,12 @@
                                                                 @(personnels.TimeIn?.ToString("HH.mm") ?? "00.00")
                                                             </td>
                                                             <td>@hoursSoFar.ToString("0.00")</td>
-                                                            @* <td class="supervisor"
+                                                            <td class="supervisor"
                                                                 data-UserId="@personnels.UserId"
                                                                 data-CompanyId="@personnels.CompanyId"
                                                                 data-id="@personnels.IncidentValidationPersonnelsId">
                                                                 @(string.IsNullOrEmpty(personnels.Supervisor) ? "Select" : personnels.Supervisor)
-                                                            </td> *@
+                                                            </td> 
                                                         </tr>
                                                     }
                                                 }
@@ -1589,8 +1589,19 @@
                                 <!-- Pre-Operation Setup -->
                                 <div class="card mb-4">
                                     <div class="card-body p-0">
-                                        <h6 class="fw-bold mb-0 p-3">Pre-Operation Setup</h6>
-                                        <div class="table-responsive table-rounded custom-scroll">
+
+                                        <div class="d-flex justify-content-between align-items-center mb-0 p-3">
+                                            <h6 class="fw-bold mb-0">Pre-Operation Setup</h6>
+            <button type="button" class="btn btn-add">
+                <i class="fa-solid fa-plus me-2"></i>Add 
+            </button>
+        </div>
+
+                                       @*  <h6 class="fw-bold mb-0 p-3"></h6>
+                                        <button type="button" class="btn btn-add" >
+                                            <i class="fa-solid fa-plus me-2"></i>Add
+                                        </button>
+ *@                                        <div class="table-responsive table-rounded custom-scroll">
                                             <div id="div_repair_details">
                                             </div>
                                         </div>

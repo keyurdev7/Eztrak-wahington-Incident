@@ -54,5 +54,7 @@ namespace Models
         public string? OtherEventDetail { get; set; }
         public double Lat { get; set; }
         public double Lng { get; set; }
+        public string? Phase { get; set; }
+        public string? Progress { get; set; }
     }
 }

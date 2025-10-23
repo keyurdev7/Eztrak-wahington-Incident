@@ -1179,13 +1179,13 @@
 }
 
 #assessment .done {
-    background-color: #d1f2d3;
-    color: #1e8e3e;
+    background-color: green;
+    color: #fff;
 }
 
 #assessment .progressing {
-    background-color: #dbe6fb;
-    color: #325bce;
+    background-color: #f54e00;
+    color: #fff;
 }
 
 #assessment .not-started {
@@ -1403,22 +1403,22 @@
 #repair .badge-pending,
 #restoration .badge-pending,
 #closeout .badge-pending {
-    background-color: #fff3cd;
-    color: #856404;
+    background-color: #d93025;
+    color: #fff;
 }
 
 #repair .badge-complete,
 #restoration .badge-complete,
 #closeout .badge-complete {
-    background-color: #d1e7dd;
-    color: #0f5132;
+    background-color: green;
+    color: #fff;
 }
 
 #repair .badge-progress,
 #restoration .badge-progress,
 #closeout .badge-progress {
-    background-color: #fce9dc;
-    color: #b35a00;
+    background-color: #f54e00;
+    color: #fff;
 }
 
 #repair .btn-add,
@@ -1912,13 +1912,13 @@
 }
 
 #closeout .done {
-    background-color: #d1f2d3;
-    color: #1e8e3e;
+    background-color: green;
+    color: #fff;
 }
 
 #closeout .progressing {
-    background-color: #dbe6fb;
-    color: #325bce;
+    background-color: #ea580c;
+    color: #fff;
 }
 
 #closeout .not-started {
@@ -1927,13 +1927,13 @@
 }
 
 #restoration .done {
-    background-color: #d1f2d3;
-    color: #1e8e3e;
+    background-color: green;
+    color: #fff;
 }
 
 #restoration .progressing {
-    background-color: #dbe6fb;
-    color: #325bce;
+    background-color: #f54e00;
+    color: #fff;
 }
 
 #restoration .not-started {
