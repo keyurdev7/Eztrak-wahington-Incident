@@ -2022,7 +2022,7 @@
 
 .status-phase {
     background: #fffbf3;
-    border-color: #dcb270;
+   
 }
 
     .status-phase .status-icon {
@@ -2036,7 +2036,7 @@
 
 .status-progress {
     background: #f3fff9;
-    border-color: #75c996;
+   
 }
 
     .status-progress .status-icon {

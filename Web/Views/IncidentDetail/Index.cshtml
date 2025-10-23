@@ -175,19 +175,7 @@
                     <div class="row g-4">
 
                        <!-- Chat & Handoffs -->
-                      
-                        <!-- Map View -->
-                        <div class="col-lg-12">
-                            <div class="card shadow-sm border-0 h-100 rounded-4 text-center">
-                                <div class="card-header bg-white fw-semibold border-bottom text-left">
-                                    <i class="fa-solid fa-location-dot me-2 text-warning"></i>Map View
-                                </div>
-                                <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                                    <div id="map" style="height:500px;width:100%;"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
+                        <div class="col-lg-3">
                             <!-- Chat & Handoffs -->
                             <div class="card shadow-sm border-0 h-100 rounded-4">
                                 <div class="card-header bg-white fw-semibold border-bottom d-flex justify-content-between align-items-center">
@@ -199,13 +187,13 @@
                                     </a>
                                 </div>
                                 <div class="collapse" id="mapNotesCollapse">
-                            <div class="card shadow-sm border-0 h-100 rounded-4">
-                                
-                                <!-- Chat Messages -->
-                                <div class="card-body chat-body" id="chatMessages">
-                                    @foreach (var item in Model.listIncidentMapChats)
-                                    {
-                                        @* <div class="handoff-item">
+                                    <div class="card shadow-sm border-0 h-100 rounded-4">
+
+                                        <!-- Chat Messages -->
+                                        <div class="card-body chat-body" id="chatMessages">
+                                            @foreach (var item in Model.listIncidentMapChats)
+                                            {
+                                                @* <div class="handoff-item">
                                             <span class="badge role-badge">@item.SentBy</span>
                                             @item.ChatMessage
                                         </div>
@@ -217,33 +205,45 @@
                                                         <span class="update-email postby-div-map text-muted">admin@eztrak.com</span>
                                                     </div>
                                                 </div>
-                                    }
-                                </div>
+                                            }
+                                        </div>
 
-                                <!-- Input Area -->
-                                <div class="card-body chat-input-area">
-                                    <div class="align-items-center gap-2">
-                                        
-                                        <div class="mesgsend">
+                                        <!-- Input Area -->
+                                        <div class="card-body chat-input-area">
+                                            <div class="align-items-center gap-2">
+
+                                                <div class="mesgsend">
                                                     <textarea rows="5" class="form-control mb-2" id="messageInput" placeholder="Add new note..."></textarea>
                                                     <button class="btn btn-update" id="sendBtn" data-type="1">
                                                         <i class="fa-solid fa-paper-plane me-2" style="color:#ffffff !important"></i>Add Note
                                                     </button>
-                                            
-                                        </div>
-                                     @*    <div class="sendBtn">
+
+                                                </div>
+                                                @*    <div class="sendBtn">
                                             <button class="btn btn-send" id="sendBtn">
                                                 <i class="fa-solid fa-paper-plane"></i> Add Post
                                             </button>
                                         </div> *@
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            </div>
                             </div>
                         </div>
 
 
+                        <!-- Map View -->
+                        <div class="col-lg-9">
+                            <div class="card shadow-sm border-0 h-100 rounded-4 text-center">
+                                <div class="card-header bg-white fw-semibold border-bottom text-left">
+                                    <i class="fa-solid fa-location-dot me-2 text-warning"></i>Map View
+                                </div>
+                                <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                                    <div id="map" style="height:500px;width:100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                       
                     </div>
                   @*   <div class="row">
                         <div class="col-lg-12">
@@ -1211,8 +1211,7 @@
                         </div>
                         <div class="d-flex gap-2 mt-3 mt-md-0">
                             <button class="btn btnAdd text-white btn-common" id="addPerson"><i class="fa-solid fa-user-plus me-2"></i>Add Person</button>
-                            <button class="btn btn-outline-secondary btn-common"><i class="fa-solid fa-download me-2"></i>Export (CSV)</button>
-                            <button class="btn btn-outline-secondary btn-common"><i class="fa-solid fa-print me-2"></i>Print Roster</button>
+                            
                         </div>
                     </div>
                    
@@ -1459,7 +1458,7 @@
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">Total:</div>
-                                    <div><span class="info-value">0</span></div>
+                                    <div><span class="info-value">8</span></div>
                                 </div>
                             </div>
 
@@ -1588,7 +1587,7 @@
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">Total:</div>
-                                    <div><span class="info-value">0</span>  </div>
+                                    <div><span class="info-value">3</span>  </div>
                                 </div>
                             </div>
 
@@ -1781,7 +1780,7 @@
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">Total:</div>
-                                    <div><span class="info-value">0</span></div>
+                                    <div><span class="info-value">5</span></div>
                                 </div>
                             </div>
 
@@ -1926,7 +1925,7 @@
                             <div class="col-md-3 col-sm-6">
                                 <div class="info-card text-center text-md-start">
                                     <div class="info-title">Total:</div>
-                                    <div><span class="info-value">0</span></div>
+                                    <div><span class="info-value">5</span></div>
                                 </div>
                             </div>
 
