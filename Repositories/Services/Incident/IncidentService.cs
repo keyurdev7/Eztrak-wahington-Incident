@@ -454,8 +454,8 @@ namespace Repositories.Common
                         RelationShipName = item.Relationship?.Name ?? string.Empty,
                         RelationShipId = item?.RelationshipId,
                         AdditionalLocationCount = addCount,
-                        Phase= item?.Phase,
-                        Progress= item?.Progress
+                        Phase= !string.IsNullOrEmpty(item?.Phase) ? item?.Phase : "Validation",
+                        Progress= !string.IsNullOrEmpty(item?.Progress) ? item?.Progress : "0",
                     });
                 }
                 return incidentGridViews;
