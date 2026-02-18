@@ -321,8 +321,8 @@ button.close {
 
     .login-page .login-form .btn {
         width: 100px;
-        background-color: #5b9bd5;
-        border: 2px solid #5b9bd5;
+        background-color: #f54e00;
+        border: 2px solid #f54e00;
         box-shadow: none;
         font-weight: 600;
         color: #fff;
@@ -331,7 +331,7 @@ button.close {
 
         .login-page .login-form .btn:hover {
             background-color: transparent;
-            color: #5b9bd5;
+            color: #f54e00;
         }
 
     .login-page footer {
@@ -1516,7 +1516,7 @@ Media Query
         }
 
             .sidebar .logo img.min {
-                display: none;
+                padding-left:28%;
                 position: relative;
                 top: -2px;
                 left: -2px;
