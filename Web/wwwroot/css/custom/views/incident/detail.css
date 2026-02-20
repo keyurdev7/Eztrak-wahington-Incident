@@ -716,8 +716,57 @@
 /*****************tab sec******************/
 #incidentDetailsModal .tabs {
     display: flex;
+    align-items: center;
+    justify-content: space-between;
     border-bottom: 1px solid #e5e7eb;
     gap: 30px;
+    padding: 0 1rem;
+}
+
+#incidentDetailsModal .tabs .tabs-container {
+    display: flex;
+    gap: 30px;
+    flex: 1;
+}
+
+/* Compact progress indicator inline with tabs */
+.progress-indicator-compact {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.6rem;
+    margin-left: auto;
+}
+
+.progress-icon-compact {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1f2d5a;
+    border-radius: 6px;
+    font-size: 12px;
+    background: #f3f4f6;
+}
+
+.progress-text-compact {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.progress-label {
+    font-size: 10px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.progress-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1f2d5a;
+    margin: 0;
 }
 
 #incidentDetailsModal .tab-item {

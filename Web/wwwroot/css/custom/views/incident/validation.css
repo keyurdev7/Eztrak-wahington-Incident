@@ -664,9 +664,9 @@
 }
 .update-time-map {
     font-size: 0.85rem;
-    font-weight: 600;
-    background: #ffead1;
-    color: #d35400;
+    font-weight: 400; /* removed bold (was 600) */
+    background: transparent; /* removed orange background */
+    color: #6b7280; /* changed from orange to gray */
     border-radius: 6px;
     padding: 2px 8px;
     margin-right: 8px

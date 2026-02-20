@@ -456,6 +456,7 @@ namespace Repositories.Common
                         AdditionalLocationCount = addCount,
                         Phase= !string.IsNullOrEmpty(item?.Phase) ? item?.Phase : "Validation",
                         Progress= !string.IsNullOrEmpty(item?.Progress) ? item?.Progress : "0",
+                        ImageUrl = item.ImageUrl ?? string.Empty,
                     });
                 }
                 return incidentGridViews;
@@ -2206,10 +2207,68 @@ namespace Repositories.Common
                 var userIdParsed = !string.IsNullOrEmpty(userId) ? long.Parse(userId) : 0;
                 var userName = _httpContextAccessor?.HttpContext?.User.Identity?.Name ?? "Unknown";
 
+                // Ensure IncidentValidation exists for this incident
+                long incidentValidationId = request.IncidentValidationId;
+                
+                if (incidentValidationId <= 0)
+                {
+                    // Try to get existing IncidentValidation for this incident
+                    var existingValidation = await _db.IncidentValidations
+                        .FirstOrDefaultAsync(iv => iv.IncidentId == request.IncidentId && !iv.IsDeleted);
+                    
+                    if (existingValidation != null)
+                    {
+                        incidentValidationId = existingValidation.Id;
+                    }
+                    else
+                    {
+                        // Create a new IncidentValidation if none exists
+                        var incident = await _db.Incidents.FirstOrDefaultAsync(i => i.Id == request.IncidentId);
+                        if (incident == null)
+                        {
+                            _logger.LogWarning("Incident {IncidentId} not found when saving validation note", request.IncidentId);
+                            return 0;
+                        }
+
+                        var newValidation = new IncidentValidation
+                        {
+                            IncidentId = request.IncidentId,
+                            IsMarkFalseAlarm = false,
+                            ValidationNotes = string.Empty,
+                            AssignResponseTeams = string.Empty,
+                            ConfirmedSeverityLevelId = incident.SeverityLevelId ?? 1,
+                            DiscoveryPerimeterId = 1,
+                            CreatedOn = DateTime.UtcNow,
+                            CreatedBy = userIdParsed,
+                            UpdatedOn = DateTime.UtcNow,
+                            UpdatedBy = userIdParsed,
+                            IsDeleted = false,
+                            ActiveStatus = Enums.ActiveStatus.Active
+                        };
+
+                        await _db.IncidentValidations.AddAsync(newValidation);
+                        await _db.SaveChangesAsync();
+                        incidentValidationId = newValidation.Id;
+                    }
+                }
+                else
+                {
+                    // Verify that the provided IncidentValidationId exists and belongs to this incident
+                    var validationExists = await _db.IncidentValidations
+                        .AnyAsync(iv => iv.Id == incidentValidationId && iv.IncidentId == request.IncidentId && !iv.IsDeleted);
+                    
+                    if (!validationExists)
+                    {
+                        _logger.LogWarning("IncidentValidation {ValidationId} does not exist or does not belong to Incident {IncidentId}", 
+                            incidentValidationId, request.IncidentId);
+                        return 0;
+                    }
+                }
+
                 var note = new IncidentValidationNotes
                 {
                     IncidentId = request.IncidentId,
-                    IncidentValidationId = request.IncidentValidationId,
+                    IncidentValidationId = incidentValidationId,
                     Notes = request.Notes,
                     CreatedOn = DateTime.UtcNow,
                     CreatedBy = userIdParsed,
@@ -4000,6 +4059,166 @@ namespace Repositories.Common
             {
                 await transaction.RollbackAsync();
                 _logger.LogError(ex, "Error updating Repair");
+                return 0;
+            }
+        }
+        #endregion
+
+        #region Edit Sections
+        public async Task<List<SeverityLevelModifyViewModel>> GetAllSeverityLevels()
+        {
+            try
+            {
+                var severityLevels = await _db.SeverityLevels
+                    .Where(s => !s.IsDeleted)
+                    .OrderBy(s => s.Name == "High" ? 1 : s.Name == "Moderate" ? 2 : s.Name == "Low" ? 3 : 4)
+                    .Select(s => new SeverityLevelModifyViewModel
+                    {
+                        Id = s.Id,
+                        Name = s.Name,
+                        Color = s.Color,
+                        Description = s.Description
+                    })
+                    .ToListAsync();
+                return severityLevels;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error GetAllSeverityLevels");
+                return new List<SeverityLevelModifyViewModel>();
+            }
+        }
+
+        public async Task<long> UpdateIncidentDetails(UpdateIncidentDetailsRequest request)
+        {
+            try
+            {
+                var validationLocation = await _db.IncidentValidationLocations
+                    .FirstOrDefaultAsync(p => !p.IsDeleted && p.IncidentId == request.IncidentId);
+
+                if (validationLocation == null)
+                {
+                    // Create new if doesn't exist
+                    validationLocation = new IncidentValidationLocation
+                    {
+                        IncidentId = request.IncidentId,
+                        IncidentValidationId = request.IncidentValidationId ?? 0,
+                        ConfirmedSeverityLevelId = request.SeverityLevelId,
+                        DiscoveryPerimeterId = request.DiscoveryPerimeterId,
+                        ICPLocation = request.ICPLocation,
+                        CreatedOn = DateTime.UtcNow,
+                        IsDeleted = false,
+                        ActiveStatus = ActiveStatus.Active
+                    };
+                    await _db.IncidentValidationLocations.AddAsync(validationLocation);
+                }
+                else
+                {
+                    // Update existing
+                    validationLocation.ConfirmedSeverityLevelId = request.SeverityLevelId;
+                    validationLocation.DiscoveryPerimeterId = request.DiscoveryPerimeterId;
+                    validationLocation.ICPLocation = request.ICPLocation;
+                    validationLocation.UpdatedOn = DateTime.UtcNow;
+                }
+
+                await _db.SaveChangesAsync();
+                return validationLocation.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error UpdateIncidentDetails");
+                return 0;
+            }
+        }
+
+        public async Task<long> UpdateAssignedRoles(UpdateAssignedRolesRequest request)
+        {
+            try
+            {
+                var assignedRole = await _db.IncidentValidationAssignedRoles
+                    .FirstOrDefaultAsync(p => !p.IsDeleted && p.IncidentId == request.IncidentId);
+
+                if (assignedRole == null)
+                {
+                    // Create new if doesn't exist
+                    assignedRole = new IncidentValidationAssignedRole
+                    {
+                        IncidentId = request.IncidentId,
+                        IncidentValidationId = request.IncidentValidationId,
+                        IncidentCommander = request.IncidentCommanderId,
+                        FieldEnvRep = request.FieldEnvRepId,
+                        GEC_Coordinator = request.GEC_CoordinatorId,
+                        EngineeringLead = request.EngineeringLeadId,
+                        CreatedOn = DateTime.UtcNow,
+                        IsDeleted = false,
+                        ActiveStatus = ActiveStatus.Active
+                    };
+                    await _db.IncidentValidationAssignedRoles.AddAsync(assignedRole);
+                }
+                else
+                {
+                    // Update existing
+                    assignedRole.IncidentCommander = request.IncidentCommanderId;
+                    assignedRole.FieldEnvRep = request.FieldEnvRepId;
+                    assignedRole.GEC_Coordinator = request.GEC_CoordinatorId;
+                    assignedRole.EngineeringLead = request.EngineeringLeadId;
+                    assignedRole.UpdatedOn = DateTime.UtcNow;
+                }
+
+                await _db.SaveChangesAsync();
+                return assignedRole.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error UpdateAssignedRoles");
+                return 0;
+            }
+        }
+
+        public async Task<long> UpdateValidationGates(UpdateValidationGatesRequest request)
+        {
+            try
+            {
+                var validationGate = await _db.IncidentValidationGates
+                    .FirstOrDefaultAsync(p => !p.IsDeleted && p.IncidentId == request.IncidentId);
+
+                if (validationGate == null)
+                {
+                    // Create new if doesn't exist
+                    validationGate = new IncidentValidationGate
+                    {
+                        IncidentId = request.IncidentId,
+                        IncidentValidationId = request.IncidentValidationId,
+                        ContainmentAcknowledgement = request.ContainmentAcknowledgement ?? false,
+                        Exception = request.Exception ?? false,
+                        IndependentInspection = request.IndependentInspection ?? false,
+                        Regulatory = request.Regulatory ?? string.Empty,
+                        CreatedOn = DateTime.UtcNow,
+                        IsDeleted = false,
+                        ActiveStatus = ActiveStatus.Active
+                    };
+                    await _db.IncidentValidationGates.AddAsync(validationGate);
+                }
+                else
+                {
+                    // Update existing
+                    if (request.ContainmentAcknowledgement.HasValue)
+                        validationGate.ContainmentAcknowledgement = request.ContainmentAcknowledgement.Value;
+                    if (request.Exception.HasValue)
+                        validationGate.Exception = request.Exception.Value;
+                    if (request.IndependentInspection.HasValue)
+                        validationGate.IndependentInspection = request.IndependentInspection.Value;
+                    if (!string.IsNullOrEmpty(request.Regulatory))
+                        validationGate.Regulatory = request.Regulatory;
+                    validationGate.UpdatedOn = DateTime.UtcNow;
+                }
+
+                await _db.SaveChangesAsync();
+                return validationGate.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error UpdateValidationGates");
                 return 0;
             }
         }

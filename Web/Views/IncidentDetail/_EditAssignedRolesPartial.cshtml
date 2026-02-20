@@ -1,0 +1,62 @@
+@using ViewModels.Incident
+@model IncidentValidationAssignedRolesViewModel
+
+<form id="assignedRolesEditForm">
+    <input type="hidden" name="IncidentId" value="@Model.IncidentId" />
+    <input type="hidden" name="IncidentValidationId" value="@Model.IncidentValidationId" />
+    <input type="hidden" name="Id" value="@Model.Id" />
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group mb-3">
+                <label>Incident Commander</label>
+                <select class="form-select" name="IncidentCommanderId" id="IncidentCommanderId">
+                    <option value="">Select Incident Commander</option>
+                    @foreach (var item in ViewBag.UserList as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)
+                    {
+                        <option value="@item.Value" selected="@(item.Value == Model.IncidentCommanderId?.ToString())">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group mb-3">
+                <label>Field Env. Rep (FER)</label>
+                <select class="form-select" name="FieldEnvRepId" id="FieldEnvRepId">
+                    <option value="">Select Field Env. Rep</option>
+                    @foreach (var item in ViewBag.UserList as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)
+                    {
+                        <option value="@item.Value" selected="@(item.Value == Model.FieldEnvRepId?.ToString())">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group mb-3">
+                <label>GEC Coordinator</label>
+                <select class="form-select" name="GEC_CoordinatorId" id="GEC_CoordinatorId">
+                    <option value="">Select GEC Coordinator</option>
+                    @foreach (var item in ViewBag.UserList as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)
+                    {
+                        <option value="@item.Value" selected="@(item.Value == Model.GEC_CoordinatorId?.ToString())">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group mb-3">
+                <label>Engineering Lead</label>
+                <select class="form-select" name="EngineeringLeadId" id="EngineeringLeadId">
+                    <option value="">Select Engineering Lead</option>
+                    @foreach (var item in ViewBag.UserList as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)
+                    {
+                        <option value="@item.Value" selected="@(item.Value == Model.EngineeringLeadId?.ToString())">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+</form>
+

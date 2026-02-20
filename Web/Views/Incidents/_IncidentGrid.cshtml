@@ -22,6 +22,7 @@
                 <input type="checkbox" id="selectAll" />
             </th>
             <th>Status</th>
+            <th>Image</th>
             <th>Phase</th>
             <th>Progress </th>
             <th style="display:none">Severity</th>
@@ -55,6 +56,24 @@
                     </td>
                     <td style="text-align:center !important">
                         <span class="dot" style="width: 12px;height: 12px;border-radius: 50%;display: inline-block;background-color:@item.StatusLegendColor"></span>
+                    </td>
+                    <td style="text-align:center !important">
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            var firstImage = item.ImageUrl.Split(',', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()?.Trim();
+                            if (!string.IsNullOrEmpty(firstImage))
+                            {
+                                <img src="@firstImage" alt="Incident Image" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="event.stopPropagation(); window.open('@firstImage', '_blank');" />
+                            }
+                            else
+                            {
+                                <i class="fa fa-image text-muted" style="font-size: 20px;"></i>
+                            }
+                        }
+                        else
+                        {
+                            <i class="fa fa-image text-muted" style="font-size: 20px;"></i>
+                        }
                     </td>
                     <td>
                         @item.Phase
@@ -151,7 +170,7 @@
         else
         {
             <tr>
-                <td colspan="12" class="text-center">No records found.</td>
+                <td colspan="13" class="text-center">No records found.</td>
             </tr>
         }
     </tbody>

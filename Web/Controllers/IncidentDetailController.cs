@@ -828,6 +828,113 @@ namespace Web.Controllers
         }
 
         #endregion
+
+        #region Edit Sections
+        [HttpGet]
+        public async Task<PartialViewResult> GetIncidentDetailsForEdit(long incidentId)
+        {
+            try
+            {
+                var model = await _iIncidentService.GetIncidentDetailsById(incidentId);
+                ViewBag.IncidentId = incidentId;
+                ViewBag.IncidentValidationId = model.incidentValidationsDetailsViewModel?.IncidentValidationId ?? 0;
+                
+                // Get severity levels for dropdown
+                var severityLevels = await _iIncidentService.GetAllSeverityLevels();
+                ViewBag.SeverityLevels = severityLevels.Select(s => new SelectListItem
+                {
+                    Value = s.Id.ToString(),
+                    Text = s.Name
+                }).ToList();
+                
+                return PartialView("_EditIncidentDetailsPartial", model.IncidentValidationLocations);
+            }
+            catch (Exception ex)
+            {
+                return PartialView("_EditIncidentDetailsPartial", new ViewModels.Incident.IncidentValidationLocationViewModel());
+            }
+        }
+
+        [HttpGet]
+        public async Task<PartialViewResult> GetAssignedRolesForEdit(long incidentId)
+        {
+            try
+            {
+                var model = await _iIncidentService.GetIncidentDetailsById(incidentId);
+                ViewBag.IncidentId = incidentId;
+                ViewBag.IncidentValidationId = model.incidentValidationsDetailsViewModel?.IncidentValidationId ?? 0;
+                
+                // Get user list for dropdown
+                var userList = await _iIncidentService.GetAllUsersDrop();
+                ViewBag.UserList = userList;
+                
+                return PartialView("_EditAssignedRolesPartial", model.incidentValidationAssignedRolesViewModel);
+            }
+            catch (Exception ex)
+            {
+                return PartialView("_EditAssignedRolesPartial", new ViewModels.Incident.IncidentValidationAssignedRolesViewModel());
+            }
+        }
+
+        [HttpGet]
+        public async Task<PartialViewResult> GetValidationGatesForEdit(long incidentId)
+        {
+            try
+            {
+                var model = await _iIncidentService.GetIncidentDetailsById(incidentId);
+                ViewBag.IncidentId = incidentId;
+                ViewBag.IncidentValidationId = model.incidentValidationsDetailsViewModel?.IncidentValidationId ?? 0;
+                
+                return PartialView("_EditValidationGatesPartial", model.incidentValidationGatesViewModel);
+            }
+            catch (Exception ex)
+            {
+                return PartialView("_EditValidationGatesPartial", new ViewModels.Incident.IncidentValidationGatesViewModel());
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateIncidentDetails([FromForm] UpdateIncidentDetailsRequest request)
+        {
+            try
+            {
+                var result = await _iIncidentService.UpdateIncidentDetails(request);
+                return Json(new { success = result > 0, message = result > 0 ? "Saved successfully" : "Failed to save" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateAssignedRoles([FromForm] UpdateAssignedRolesRequest request)
+        {
+            try
+            {
+                var result = await _iIncidentService.UpdateAssignedRoles(request);
+                return Json(new { success = result > 0, message = result > 0 ? "Saved successfully" : "Failed to save" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateValidationGates([FromForm] UpdateValidationGatesRequest request)
+        {
+            try
+            {
+                var result = await _iIncidentService.UpdateValidationGates(request);
+                return Json(new { success = result > 0, message = result > 0 ? "Saved successfully" : "Failed to save" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        #endregion
     }
 }
 

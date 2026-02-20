@@ -176,6 +176,7 @@ namespace ViewModels.Incident
         public int AdditionalLocationCount { get; set; } = 0;
         public string? Phase { get; set; }
         public string? Progress { get; set; }
+        public string? ImageUrl { get; set; }
     }
     public class ChangeStatusRequest
     {
@@ -654,6 +655,38 @@ namespace ViewModels.Incident
         public string? PFO_Remark { get; set; }
         public string? VTF_Path { get; set; }
         public string? VTF_Remark { get; set; }
+    }
+
+    public class UpdateIncidentDetailsRequest
+    {
+        public long Id { get; set; }
+        public long IncidentId { get; set; }
+        public long? IncidentValidationId { get; set; }
+        public long? SeverityLevelId { get; set; }
+        public long? DiscoveryPerimeterId { get; set; }
+        public string? ICPLocation { get; set; }
+    }
+
+    public class UpdateAssignedRolesRequest
+    {
+        public long Id { get; set; }
+        public long IncidentId { get; set; }
+        public long IncidentValidationId { get; set; }
+        public long? IncidentCommanderId { get; set; }
+        public long? FieldEnvRepId { get; set; }
+        public long? GEC_CoordinatorId { get; set; }
+        public long? EngineeringLeadId { get; set; }
+    }
+
+    public class UpdateValidationGatesRequest
+    {
+        public long Id { get; set; }
+        public long IncidentId { get; set; }
+        public long IncidentValidationId { get; set; }
+        public bool? ContainmentAcknowledgement { get; set; }
+        public bool? Exception { get; set; }
+        public bool? IndependentInspection { get; set; }
+        public string? Regulatory { get; set; }
     }
 }
 

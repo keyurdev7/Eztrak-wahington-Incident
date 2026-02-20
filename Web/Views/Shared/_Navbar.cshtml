@@ -74,7 +74,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/Incidents" class="@(currentPath.Contains("/incidents") ? "active" : "")">
+                        <a href="/Incidents" class="@(currentPath.Contains("/incidents") || currentPath.Contains("/incidentdetail") ? "active" : "")">
                             <span class="SidebarIcon incident"><i class="fas fa-border-all"></i></span>
                             <span class="name">Incidents</span>
                         </a>

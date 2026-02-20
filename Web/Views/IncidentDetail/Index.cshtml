@@ -28,14 +28,14 @@
         cursor: not-allowed; /* show disabled cursor */
     }
 
-    /* Header layout — keep overall height fixed; contents align right */
+    /* Header layout — reduced height to save space */
     .tabHeader {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
-        height: 64px; /* fixed header height — do not change per request */
-        padding: 0.5rem 1rem;
+        height: 48px; /* reduced from 64px to save space */
+        padding: 0.35rem 1rem;
         border-bottom: 1px solid rgba(0,0,0,0.06);
         background: #ffffff;
     }
@@ -114,9 +114,10 @@
         width: 360px;
         z-index: 1200;
         box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-        background: #fff;
+        background: rgba(255, 255, 255, 0.6); /* transparent background */
+        backdrop-filter: blur(10px); /* backdrop blur effect */
         border-radius: 8px;
-        border: 1px solid #e5e7eb;
+        border: 1px solid rgba(213, 213, 213, 0.5);
         pointer-events: auto;
     }
 
@@ -138,69 +139,65 @@
             
             cursor: pointer;
         }
+
+    /* Ensure zoom controls are visible and above map notes */
+    .esri-ui-top-left {
+        z-index: 1001 !important; /* Above map notes (z-index: 1200) but below overlay content */
+    }
+
+    .esri-zoom {
+        z-index: 1001 !important;
+    }
  
 </style>
 <div id="incidentDetailsModal" tabindex="-1" aria-hidden="true">
     <input type="hidden" id="hdnIncidentID" value="@Model.Id" />
     <div class="container-fuild">
         <div id="incidentDetailsContent">
-            <div class="tabHeader">
-                <div class="d-flex align-items-center  titleSec ">
-                    <button type="button" class="backBtn" data-bs-dismiss="modal" id="closeModalBtn"><i class="fa fa-arrow-left-long"></i></button>
-                    <h5 class="modal-title"> @Model.incidentDetailByIdViewModel?.IncidentNumber</h5>
-                </div>
-                <div class="header-status">
-                    <div class="status-card status-phase" title="Phase">
-                        <div class="status-icon" aria-hidden="true"><i class="fas fa-credit-card" aria-hidden="true"></i></div>
-                        <div>
-                            <h6>Phase:</h6>
-                            <h4 id="tabname">Overview</h4>
-                        </div>
-                    </div>
-
-                    <div class="status-card status-progress" title="Progress">
-                        <div class="status-icon" aria-hidden="true"><i class="fa fa-pie-chart"></i></div>
-                        <div>
-                            <h6>Progress:</h6>
-                            <h4>0% Complete</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="tabBody">
                 <div class="tabs">
-                    <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "" : "active")" data-tab="dashboard">
-                        <i class="fa fa-map-marker-alt"></i>Map
-                    </div>
-                    <div class="tab-item" data-tab="overview">
-                        <i class="far fa-file-alt"></i> Overview
-                    </div>
-                    <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "active" : "")" data-tab="validation">
-                        <i class="fas fa-shield-alt"></i> Validation
-                    </div>
-                    <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "disabled" : "")" data-tab="personnel">
-                        <i class="fa-regular fa-user"></i> Personnel
-                    </div>
-                    <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "disabled" : "")" data-tab="assessment">
-                        <i class="fa-solid fa-clipboard-check"></i>Assessment
-                    </div>
-                    <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "disabled" : "")" data-tab="repair">
-                        <i class="fa-solid fa-screwdriver-wrench"></i> Repair
-                    </div>
-                    <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "disabled" : "")" data-tab="restoration">
-                        <i class="fa-solid fa-rotate"></i> Restoration
-                    </div>
-                    <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "disabled" : "")" data-tab="closeout">
-                        <i class="fa-regular fa-circle-check"></i> Closeout
-                    </div>
+                    <div class="tabs-container">
+                        <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "" : "active")" data-tab="dashboard">
+                            <i class="fa fa-map-marker-alt"></i>Map
+                        </div>
+                        <div class="tab-item" data-tab="overview">
+                            <i class="far fa-file-alt"></i> Overview
+                        </div>
+                        <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "active" : "")" data-tab="validation">
+                            <i class="fas fa-shield-alt"></i> Validation
+                        </div>
+                        <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "disabled" : "")" data-tab="personnel">
+                            <i class="fa-regular fa-user"></i> Personnel
+                        </div>
+                        <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "disabled" : "")" data-tab="assessment">
+                            <i class="fa-solid fa-clipboard-check"></i>Assessment
+                        </div>
+                        <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "disabled" : "")" data-tab="repair">
+                            <i class="fa-solid fa-screwdriver-wrench"></i> Repair
+                        </div>
+                        <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "disabled" : "")" data-tab="restoration">
+                            <i class="fa-solid fa-rotate"></i> Restoration
+                        </div>
+                        <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "disabled" : "")" data-tab="closeout">
+                            <i class="fa-regular fa-circle-check"></i> Closeout
+                        </div>
 
-                    @* <div class="tab-item" data-tab="worksteps">
-                        <i class="fas fa-tasks"></i> Policies
-                    </div>
+                        @* <div class="tab-item" data-tab="worksteps">
+                            <i class="fas fa-tasks"></i> Policies
+                        </div>
 
-                    <div class="tab-item" data-tab="communication">
-                        <i class="fas fa-comment-dots"></i> Communication
-                    </div> *@
+                        <div class="tab-item" data-tab="communication">
+                            <i class="fas fa-comment-dots"></i> Communication
+                        </div> *@
+                    </div>
+                    <!-- Progress indicator inline with tabs -->
+                    <div class="progress-indicator-compact">
+                        <div class="progress-icon-compact"><i class="fa fa-pie-chart"></i></div>
+                        <div class="progress-text-compact">
+                            <span class="progress-label">Progress:</span>
+                            <span class="progress-value">0% Complete</span>
+                        </div>
+                    </div>
                 </div>
                 <div id="dashboard" class="tab-content @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "" : "active")">
                     <div class="row g-4">
@@ -214,6 +211,17 @@
                                 </div>
                                 <div class="card-body d-flex flex-column justify-content-center align-items-center">
                                     <div id="map" style="height:500px;width:100%;position:relative;">
+                                        <!-- Map View Toggle (Satellite/Street) -->
+                                        <div style="position: absolute; top: 10px; right: 380px; z-index: 1001;">
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm btn-light" id="streetViewBtn" onclick="switchMapView('street')" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.1);">
+                                                    <i class="fa fa-map"></i> Street
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-light" id="satelliteViewBtn" onclick="switchMapView('satellite')" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.1);">
+                                                    <i class="fa fa-satellite"></i> Satellite
+                                                </button>
+                                            </div>
+                                        </div>
                                         <!-- Map Notes overlay placed INSIDE #map so it sits top-right of the map -->
                                         <div class="map-notes map-overlay" id="mapNotesOverlay" style="position:absolute; top:16px; right:16px; width:360px; z-index:1200;">
                                             <div class="mapNotesHeader">
@@ -979,7 +987,7 @@
 
                                     <div class="section-header d-flex align-items-center justify-content-between">
                                         <h6 class="mb-0 font-colr"> <i class="fa-solid fa-pen"></i> Incident Details</h6>
-                                            <h6 class="mb-0 font-colr"> <a><small>Edit</small></a> </h6>
+                                            <h6 class="mb-0 font-colr"> <a href="#" onclick="openEditIncidentDetailsModal(@Model.Id); return false;" style="cursor: pointer;"><small>Edit</small></a> </h6>
                                     </div>
                                     <div class="section-body">
                                         <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
@@ -1018,7 +1026,7 @@
 
                                         <div class="section-header d-flex align-items-center justify-content-between">
                                         <h6 class="mb-0 font-colr"> <i class="fa-solid fa-user-check"></i> Assigned Roles</h6>
-                                         <h6 class="mb-0 font-colr"> <a><small>Edit</small></a> </h6>
+                                         <h6 class="mb-0 font-colr"> <a href="#" onclick="openEditAssignedRolesModal(@Model.Id); return false;" style="cursor: pointer;"><small>Edit</small></a> </h6>
                                         </div>
                                         <div class="section-body">
                                             <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
@@ -1092,7 +1100,7 @@
 
                                     <div class="section-header d-flex align-items-center justify-content-between">
                                         <h6 class="mb-0 font-colr"> <i class="fas fa-shield-alt"></i> Validation Gates </h6>
-                                            <h6 class="mb-0 font-colr"> <a><small>Edit</small></a> </h6>
+                                            <h6 class="mb-0 font-colr"> <a href="#" onclick="openEditValidationGatesModal(@Model.Id); return false;" style="cursor: pointer;"><small>Edit</small></a> </h6>
                                     </div>
                                     <div class="section-body">
                                         <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
@@ -2324,6 +2332,64 @@
 </div>
 <div id="div_repair_modal">
 </div>
+
+<!-- Edit Incident Details Modal -->
+<div class="modal fade" id="editIncidentDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-pen me-2"></i>Edit Incident Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="incidentDetailsEditContent">
+                <!-- Content loaded via AJAX -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveIncidentDetails()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Assigned Roles Modal -->
+<div class="modal fade" id="editAssignedRolesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-user-check me-2"></i>Edit Assigned Roles</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="assignedRolesEditContent">
+                <!-- Content loaded via AJAX -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveAssignedRoles()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Validation Gates Modal -->
+<div class="modal fade" id="editValidationGatesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-shield-alt me-2"></i>Edit Validation Gates</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="validationGatesEditContent">
+                <!-- Content loaded via AJAX -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveValidationGates()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @functions {
     string GetBoxClass(string value)
     {
@@ -2344,9 +2410,13 @@
 }
 
 <script>
-    document.getElementById("closeModalBtn").addEventListener("click", function () {
-        window.location.href = "/Incidents";
-    });
+    // Back button removed from header, but keep functionality if needed elsewhere
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener("click", function () {
+            window.location.href = "/Incidents";
+        });
+    }
 
     // Tab click handler
     document.querySelectorAll(".tab-item").forEach(tab => {
@@ -2723,9 +2793,15 @@
 
         console.log("ArcGIS modules loaded ✔");
 
+        // Store current basemap type
+        window.currentBasemap = "streets-navigation-vector";
+
         var map = new Map({
-            basemap: "streets-navigation-vector"
+            basemap: window.currentBasemap
         });
+
+        // Make map globally accessible for view switching
+        window.mapInstance = map;
 
         var incidents = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ListIncidentLocationMapViewModel));
         var firstObj = incidents[0];
@@ -2734,7 +2810,10 @@
             container: "map",
             map: map,
             center: [firstObj.lon, firstObj.lat],
-            zoom: 6
+            zoom: 6,
+            ui: {
+                components: ["zoom"] // Ensure zoom controls are visible
+            }
         });
 
         var graphicsLayer = new GraphicsLayer();
@@ -2857,6 +2936,51 @@
         });
 
     });
+</script>
+<script>
+    // Switch between satellite and street view
+    function switchMapView(viewType) {
+        if (!window.mapInstance) return;
+        
+        require(["esri/Basemap", "esri/layers/TileLayer"], function(Basemap, TileLayer) {
+            var streetBtn = document.getElementById('streetViewBtn');
+            var satelliteBtn = document.getElementById('satelliteViewBtn');
+            
+            if (viewType === 'satellite') {
+                // Switch to satellite view
+                window.mapInstance.basemap = "satellite";
+                window.currentBasemap = "satellite";
+                
+                // Update button styles
+                if (streetBtn) {
+                    streetBtn.classList.remove('active');
+                    streetBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+                    streetBtn.style.color = '';
+                }
+                if (satelliteBtn) {
+                    satelliteBtn.classList.add('active');
+                    satelliteBtn.style.background = 'rgba(245, 78, 0, 0.9)';
+                    satelliteBtn.style.color = 'white';
+                }
+            } else {
+                // Switch to street view
+                window.mapInstance.basemap = "streets-navigation-vector";
+                window.currentBasemap = "streets-navigation-vector";
+                
+                // Update button styles
+                if (streetBtn) {
+                    streetBtn.classList.add('active');
+                    streetBtn.style.background = 'rgba(245, 78, 0, 0.9)';
+                    streetBtn.style.color = 'white';
+                }
+                if (satelliteBtn) {
+                    satelliteBtn.classList.remove('active');
+                    satelliteBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+                    satelliteBtn.style.color = '';
+                }
+            }
+        });
+    }
 </script>
 <script>
     (function () {
@@ -3530,6 +3654,232 @@
            SaveIncidentValidation();
        });
 
+    // Edit Incident Details Modal Functions
+    async function openEditIncidentDetailsModal(incidentId) {
+        try {
+            showLoader();
+            const response = await fetch(`/IncidentDetail/GetIncidentDetailsForEdit?incidentId=${incidentId}`);
+            if (!response.ok) throw new Error("Failed to load incident details");
+            
+            const html = await response.text();
+            document.getElementById('incidentDetailsEditContent').innerHTML = html;
+            
+            // Initialize autocomplete after content is loaded
+            setTimeout(function() {
+                initICPLocationAutocompleteEdit();
+            }, 100);
+            
+            const modal = new bootstrap.Modal(document.getElementById('editIncidentDetailsModal'));
+            modal.show();
+        } catch (error) {
+            console.error("Error loading incident details:", error);
+            alert("Failed to load incident details");
+        } finally {
+            hideLoader();
+        }
+    }
+
+    function initICPLocationAutocompleteEdit() {
+        var $input = $('#ICPLocationEdit');
+        var $suggestionList = $('#suggestionsICPLocationEdit');
+
+        if ($input.length === 0 || $suggestionList.length === 0) return;
+
+        // Remove any existing event handlers to avoid duplicates
+        $input.off('input');
+
+        $input.on('input', function () {
+            var query = $(this).val().trim();
+
+            if (query.length > 2) {
+                $.getJSON('/Incidents/Suggest', { text: query }, function (data) {
+                    $suggestionList.empty().show();
+
+                    $.each(data, function (i, item) {
+                        // Escape single quotes in text
+                        var safeText = item.text.replace(/'/g, "\\'");
+                        var $li = $('<li>' + safeText + '</li>');
+                        $li.on('click', function () {
+                            selectICPLocationEdit(item.text, item.magicKey);
+                        });
+                        $suggestionList.append($li);
+                    });
+                });
+            } else {
+                $suggestionList.hide();
+            }
+        });
+    }
+
+    function selectICPLocationEdit(address, magicKey) {
+        var $input = $('#ICPLocationEdit');
+        var $suggestionList = $('#suggestionsICPLocationEdit');
+
+        $input.val(address);
+        $suggestionList.empty().hide();
+    }
+
+    async function saveIncidentDetails() {
+        try {
+            const form = document.getElementById('incidentDetailsEditForm');
+            if (!form) {
+                alert("Form not found");
+                return;
+            }
+            
+            const formData = new FormData(form);
+            formData.append('Id', $('#hdnIncidentID').val());
+            
+            showLoader();
+            const response = await fetch('/IncidentDetail/UpdateIncidentDetails', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                bootstrap.Modal.getInstance(document.getElementById('editIncidentDetailsModal')).hide();
+                // Reload only the validation tab content without refreshing the page
+                await reloadValidationTabContent();
+            } else {
+                alert(result.message || "Failed to save incident details");
+            }
+        } catch (error) {
+            console.error("Error saving incident details:", error);
+            alert("Failed to save incident details");
+        } finally {
+            hideLoader();
+        }
+    }
+
+    // Edit Assigned Roles Modal Functions
+    async function openEditAssignedRolesModal(incidentId) {
+        try {
+            showLoader();
+            const response = await fetch(`/IncidentDetail/GetAssignedRolesForEdit?incidentId=${incidentId}`);
+            if (!response.ok) throw new Error("Failed to load assigned roles");
+            
+            const html = await response.text();
+            document.getElementById('assignedRolesEditContent').innerHTML = html;
+            const modal = new bootstrap.Modal(document.getElementById('editAssignedRolesModal'));
+            modal.show();
+        } catch (error) {
+            console.error("Error loading assigned roles:", error);
+            alert("Failed to load assigned roles");
+        } finally {
+            hideLoader();
+        }
+    }
+
+    async function saveAssignedRoles() {
+        try {
+            const form = document.getElementById('assignedRolesEditForm');
+            if (!form) {
+                alert("Form not found");
+                return;
+            }
+            
+            const formData = new FormData(form);
+            formData.append('Id', $('#hdnIncidentID').val());
+            
+            showLoader();
+            const response = await fetch('/IncidentDetail/UpdateAssignedRoles', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                bootstrap.Modal.getInstance(document.getElementById('editAssignedRolesModal')).hide();
+                // Reload only the validation tab content without refreshing the page
+                await reloadValidationTabContent();
+            } else {
+                alert(result.message || "Failed to save assigned roles");
+            }
+        } catch (error) {
+            console.error("Error saving assigned roles:", error);
+            alert("Failed to save assigned roles");
+        } finally {
+            hideLoader();
+        }
+    }
+
+    // Edit Validation Gates Modal Functions
+    async function openEditValidationGatesModal(incidentId) {
+        try {
+            showLoader();
+            const response = await fetch(`/IncidentDetail/GetValidationGatesForEdit?incidentId=${incidentId}`);
+            if (!response.ok) throw new Error("Failed to load validation gates");
+            
+            const html = await response.text();
+            document.getElementById('validationGatesEditContent').innerHTML = html;
+            const modal = new bootstrap.Modal(document.getElementById('editValidationGatesModal'));
+            modal.show();
+        } catch (error) {
+            console.error("Error loading validation gates:", error);
+            alert("Failed to load validation gates");
+        } finally {
+            hideLoader();
+        }
+    }
+
+    async function saveValidationGates() {
+        try {
+            const form = document.getElementById('validationGatesEditForm');
+            if (!form) {
+                alert("Form not found");
+                return;
+            }
+            
+            const formData = new FormData(form);
+            formData.append('Id', $('#hdnIncidentID').val());
+            
+            // Handle Regulatory checkboxes - collect all checked values
+            const regulatoryCheckboxes = form.querySelectorAll('input[name="Regulatory"]:checked');
+            const regulatoryValues = Array.from(regulatoryCheckboxes).map(cb => cb.value);
+            formData.delete('Regulatory'); // Remove individual values
+            if (regulatoryValues.length > 0) {
+                formData.append('Regulatory', regulatoryValues.join(','));
+            }
+            
+            showLoader();
+            const response = await fetch('/IncidentDetail/UpdateValidationGates', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                bootstrap.Modal.getInstance(document.getElementById('editValidationGatesModal')).hide();
+                // Reload only the validation tab content without refreshing the page
+                await reloadValidationTabContent();
+            } else {
+                alert(result.message || "Failed to save validation gates");
+            }
+        } catch (error) {
+            console.error("Error saving validation gates:", error);
+            alert("Failed to save validation gates");
+        } finally {
+            hideLoader();
+        }
+    }
+
+    // Function to reload validation tab content and preserve active tab
+    async function reloadValidationTabContent() {
+        try {
+            // Store current active tab before reload
+            const activeTab = document.querySelector('.tab-item.active');
+            const activeTabName = activeTab ? activeTab.getAttribute('data-tab') : 'validation';
+            sessionStorage.setItem('activeTab', activeTabName);
+            
+            // Reload the page - the tab will be restored on load
+            location.reload();
+        } catch (error) {
+            console.error("Error reloading validation tab:", error);
+            location.reload();
+        }
+    }
+
 </script>
 
 <script>
@@ -3866,7 +4216,7 @@
 
 </script>
 <script>
-    // Tab handling + dynamic header bind
+    // Tab handling (phase name display removed from header)
     (function () {
         const tabNameEl = document.getElementById("tabname");
 
@@ -3879,8 +4229,11 @@
         }
 
         function setTabNameFromTab(tabEl) {
+            // Phase name element removed, so this is now a no-op
+            // Keeping function for potential future use
+            if (!tabNameEl) return;
             const label = getLabelFromTab(tabEl) || tabEl.getAttribute("data-tab") || "";
-            if (tabNameEl) tabNameEl.textContent = label;
+            tabNameEl.textContent = label;
         }
 
         // existing click handler upgraded to also set tab header text
@@ -3905,6 +4258,30 @@
 
         // Initialize header on load from currently active tab (server-set or first)
         document.addEventListener("DOMContentLoaded", function () {
+            // Restore active tab from sessionStorage if available
+            const savedTab = sessionStorage.getItem('activeTab');
+            if (savedTab) {
+                // Remove active from all tabs and content
+                document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                // Activate the saved tab
+                const tabToActivate = document.querySelector(`.tab-item[data-tab="${savedTab}"]`);
+                const contentToActivate = document.getElementById(savedTab);
+                
+                if (tabToActivate && !tabToActivate.classList.contains('disabled')) {
+                    tabToActivate.classList.add('active');
+                    if (contentToActivate) {
+                        contentToActivate.classList.add('active');
+                    }
+                    setTabNameFromTab(tabToActivate);
+                    // Clear sessionStorage after restoring
+                    sessionStorage.removeItem('activeTab');
+                    return;
+                }
+            }
+            
+            // Default: use server-set active tab or first tab
             const activeTab = document.querySelector(".tab-item.active") || document.querySelector(".tab-item");
             setTabNameFromTab(activeTab);
         });

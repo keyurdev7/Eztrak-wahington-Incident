@@ -1,0 +1,103 @@
+@using ViewModels.Incident
+@model IncidentValidationGatesViewModel
+
+<form id="validationGatesEditForm">
+    <input type="hidden" name="IncidentId" value="@Model.IncidentId" />
+    <input type="hidden" name="IncidentValidationId" value="@Model.IncidentValidationId" />
+    <input type="hidden" name="Id" value="@Model.Id" />
+    
+    <div class="form-group mb-3">
+        <label class="form-label">Containment Acknowledgment</label>
+        <div class="d-flex gap-3">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="ContainmentAcknowledgement" id="ContainmentYes" value="true" 
+                       @(Model.ContainmentAcknowledgement == "FER Signed" || Model.ContainmentAcknowledgement == "Yes" ? "checked" : "") />
+                <label class="form-check-label" for="ContainmentYes">Yes</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="ContainmentAcknowledgement" id="ContainmentNo" value="false" 
+                       @(Model.ContainmentAcknowledgement == "No" || string.IsNullOrEmpty(Model.ContainmentAcknowledgement) ? "checked" : "") />
+                <label class="form-check-label" for="ContainmentNo">No</label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-group mb-3">
+        <label class="form-label">Exception Request</label>
+        <div class="d-flex gap-3">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="Exception" id="ExceptionYes" value="true" 
+                       @(Model.Exception == "Yes" ? "checked" : "") />
+                <label class="form-check-label" for="ExceptionYes">Yes</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="Exception" id="ExceptionNo" value="false" 
+                       @(Model.Exception == "No" || string.IsNullOrEmpty(Model.Exception) ? "checked" : "") />
+                <label class="form-check-label" for="ExceptionNo">No</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="Exception" id="ExceptionNA" value="2" 
+                       @(Model.Exception == "N/A" ? "checked" : "") />
+                <label class="form-check-label" for="ExceptionNA">N/A</label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-group mb-3">
+        <label class="form-label">Independent Inspection Required</label>
+        <div class="d-flex gap-3">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="IndependentInspection" id="IndependentInspectionYes" value="true" 
+                       @(Model.IndependentInspection == "Yes" ? "checked" : "") />
+                <label class="form-check-label" for="IndependentInspectionYes">Yes</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="IndependentInspection" id="IndependentInspectionNo" value="false" 
+                       @(Model.IndependentInspection == "No" || string.IsNullOrEmpty(Model.IndependentInspection) ? "checked" : "") />
+                <label class="form-check-label" for="IndependentInspectionNo">No</label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-group mb-3">
+        <label class="form-label">Regulatory Notification</label>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="Regulatory" id="RegulatoryCPOC" value="1" 
+                           @(Model.Regulatory.Contains("CPOC") ? "checked" : "") />
+                    <label class="form-check-label" for="RegulatoryCPOC">CPOC</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="Regulatory" id="RegulatoryPHMSA" value="2" 
+                           @(Model.Regulatory.Contains("PHMSA") ? "checked" : "") />
+                    <label class="form-check-label" for="RegulatoryPHMSA">PHMSA</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="Regulatory" id="RegulatoryNTSB" value="3" 
+                           @(Model.Regulatory.Contains("NTSB") ? "checked" : "") />
+                    <label class="form-check-label" for="RegulatoryNTSB">NTSB</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="Regulatory" id="RegulatoryEPA" value="4" 
+                           @(Model.Regulatory.Contains("EPA") ? "checked" : "") />
+                    <label class="form-check-label" for="RegulatoryEPA">EPA</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="Regulatory" id="RegulatoryLFD" value="5" 
+                           @(Model.Regulatory.Contains("Local Fire Dept") || Model.Regulatory.Contains("LFD") ? "checked" : "") />
+                    <label class="form-check-label" for="RegulatoryLFD">Local Fire Dept</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
