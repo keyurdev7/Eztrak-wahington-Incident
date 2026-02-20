@@ -1,6 +1,47 @@
 ﻿@using System.Web
+@using System.IO
 @using ViewModels.Incident
 @model IncidentAssessmentDetailViewModel
+@{
+    // Helper function to get file type icon based on file extension
+    // Handles multiple file types by prioritizing: images > PDFs > documents > generic
+    string GetFileTypeIcon(string imageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+            return "fa-file-alt text-muted";
+
+        var fileExtensions = imageUrl.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(u => System.IO.Path.GetExtension(u.Trim()).ToLower())
+            .ToList();
+
+        if (fileExtensions.Count == 0)
+            return "fa-file-alt text-muted";
+
+        // Define file type categories
+        var imageExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg" };
+        var docExts = new[] { ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".rtf" };
+
+        // Count file types
+        var imageCount = fileExtensions.Count(ext => imageExts.Contains(ext));
+        var pdfCount = fileExtensions.Count(ext => ext == ".pdf");
+        var docCount = fileExtensions.Count(ext => docExts.Contains(ext));
+
+        // Prioritize: if there are any images, show image icon
+        if (imageCount > 0)
+            return "fa-file-image text-success";
+
+        // If there are any PDFs, show PDF icon
+        if (pdfCount > 0)
+            return "fa-file-pdf text-danger";
+
+        // If there are any documents, show document icon
+        if (docCount > 0)
+            return "fa-file-word text-primary";
+
+        // Default to generic file icon
+        return "fa-file-alt text-secondary";
+    }
+}
 
 
 @if (Model != null)
@@ -93,15 +134,15 @@
                                 @if (item.ImageCount > 0)
                                 {
                                     <td>
-                                        <a href="#" class="text-secondary text-decoration-none"
+                                        <a href="#" class="text-decoration-none"
                                            onclick="ViewAssessmentDetails('@Model.Id','@item.MainstepId','@item.SubstepId')">
-                                            <i class="fa fa-file-alt text-secondary me-1"></i>@item.ImageCount file
+                                            <i class="fa @GetFileTypeIcon(item.ImagesUrl ?? "") me-1"></i>@(item.ImageCount) file
                                         </a>
                                     </td>
                                 }
                                 else
                                 {
-                                    <td><i class="fa fa-file-alt text-secondary me-1"></i>0 file</td>
+                                    <td><i class="fa fa-file-alt text-muted me-1"></i>@("0 file")</td>
                                 }
                                @*  @if (!string.IsNullOrWhiteSpace(item.Status) && item.Status == "Complete")
                                 {

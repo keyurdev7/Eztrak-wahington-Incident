@@ -13,29 +13,32 @@
         <div>
             <div class="card-custom validation-notes">
               
-                <div id="update-list" style="padding:10px;overflow-y:auto;height:200px">
+                <div id="update-list" class="card-custom-bdy">
                     @if (Model.IncidentViewRepairViewModel?.listIncidentViewPostViewModel != null &&
                                     Model.IncidentViewRepairViewModel.listIncidentViewPostViewModel.Any())
                     {
                         @foreach (var post in Model.IncidentViewRepairViewModel.listIncidentViewPostViewModel.OrderByDescending(x => x.Id))
                         {
-                            <div class="update-item d-flex justify-content-between align-items-start mb-2">
-                                <div class="update-message flex-grow-1 me-3">@post.Message</div>
-                                <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
+                            <div class="update-item notes-item">
+                                <div class="update-message">@post.Message</div>
+                                <div class="update-meta">
                                     <span class="update-time">@post.TimeforMessage</span>
-                                    <span class="update-email postby-div text-muted">admin@eztrak.com</span>
+                                    <span class="update-email postby-div">admin@eztrak.com</span>
                                 </div>
                             </div>
                         }
                     }
                     else
                     {
-                        <p>No posts found.</p>
+                        <div class="notes-empty-state">
+                            <i class="fa-solid fa-sticky-note text-muted mb-2"></i>
+                            <p class="text-muted mb-0">No notes yet</p>
+                        </div>
                     }
                 </div>
-                <div class="update-footer m-3">
-                    <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Add new note..."></textarea>
-                    <button class="btn btn-update" id="btn_PostDetail_Save" data-type="1">
+                <div class="update-footer notes-footer">
+                    <textarea rows="3" class="form-control notes-textarea" id="postvalue" placeholder="Add new note..."></textarea>
+                    <button class="btn btn-update notes-submit-btn" id="btn_PostDetail_Save" data-type="1">
                         <i class="fa-solid fa-paper-plane me-2"></i>Add Note
                     </button>
                 </div>
@@ -48,29 +51,32 @@
         <div>
             <div class="card-custom validation-notes">
            
-                <div id="update-list" style="padding:10px;overflow-y:auto;height:200px">
+                <div id="update-list" class="card-custom-bdy">
                     @if (Model.IncidentViewRepairViewModel?.listIncidentViewPostViewModel != null &&
                                     Model.IncidentViewCloseoutViewModel.listIncidentViewPostViewModel.Any())
                     {
                         @foreach (var post in Model.IncidentViewCloseoutViewModel.listIncidentViewPostViewModel.OrderByDescending(x => x.Id))
                         {
-                            <div class="update-item d-flex justify-content-between align-items-start mb-2">
-                                <div class="update-message flex-grow-1 me-3">@post.Message</div>
-                                <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
+                            <div class="update-item notes-item">
+                                <div class="update-message">@post.Message</div>
+                                <div class="update-meta">
                                     <span class="update-time">@post.TimeforMessage</span>
-                                    <span class="update-email postby-div text-muted">admin@eztrak.com</span>
+                                    <span class="update-email postby-div">admin@eztrak.com</span>
                                 </div>
                             </div>
                         }
                     }
                     else
                     {
-                        <p>No posts found.</p>
+                        <div class="notes-empty-state">
+                            <i class="fa-solid fa-sticky-note text-muted mb-2"></i>
+                            <p class="text-muted mb-0">No notes yet</p>
+                        </div>
                     }
                 </div>
-                <div class="update-footer m-3">
-                    <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Add new note..."></textarea>
-                    <button class="btn btn-update" id="btn_PostDetail_Save" data-type="2">
+                <div class="update-footer notes-footer">
+                    <textarea rows="3" class="form-control notes-textarea" id="postvalue" placeholder="Add new note..."></textarea>
+                    <button class="btn btn-update notes-submit-btn" id="btn_PostDetail_Save" data-type="2">
                         <i class="fa-solid fa-paper-plane me-2"></i>Add Note
                     </button>
                 </div>
@@ -85,29 +91,32 @@
             <div class="card-custom validation-notes">
               
 
-                <div id="update-list" class="card-custom-bdy" style="padding:10px;overflow-y:auto;height:200px">
+                <div id="update-list" class="card-custom-bdy notes-list-container">
                     @if (Model.IncidentAssessmentDetails?.listIncidentViewPostViewModel != null &&
                                     Model.IncidentAssessmentDetails.listIncidentViewPostViewModel.Any())
                     {
                         @foreach (var post in Model.IncidentAssessmentDetails.listIncidentViewPostViewModel.OrderByDescending(x => x.Id))
                         {
-                            <div class="update-item d-flex justify-content-between align-items-start mb-2">
-                                <div class="update-message flex-grow-1 me-3">@post.Message</div>
-                                <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
+                            <div class="update-item notes-item">
+                                <div class="update-message">@post.Message</div>
+                                <div class="update-meta">
                                     <span class="update-time">@post.TimeforMessage</span>
-                                    <span class="update-email postby-div text-muted">admin@eztrak.com</span>
+                                    <span class="update-email postby-div">admin@eztrak.com</span>
                                 </div>
                             </div>
                         }
                     }
                     else
                     {
-                        <p>No posts found.</p>
+                        <div class="notes-empty-state">
+                            <i class="fa-solid fa-sticky-note text-muted mb-2"></i>
+                            <p class="text-muted mb-0">No notes yet</p>
+                        </div>
                     }
                 </div>
-                <div class="update-footer m-3">
-                    <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Add new note..."></textarea>
-                    <button class="btn btn-update" id="btn_PostDetail_Save" data-type="3">
+                <div class="update-footer notes-footer">
+                    <textarea rows="3" class="form-control notes-textarea" id="postvalue" placeholder="Add new note..."></textarea>
+                    <button class="btn btn-update notes-submit-btn" id="btn_PostDetail_Save" data-type="3">
                         <i class="fa-solid fa-paper-plane me-2"></i>Add Note
                     </button>
                 </div>
@@ -121,29 +130,32 @@
             <div class="card-custom validation-notes">
               
 
-                <div id="update-list" style="padding:10px;overflow-y:auto;height:200px">
+                <div id="update-list" class="card-custom-bdy">
                     @if (Model.IncidentViewRestorationViewModel?.listIncidentViewPostViewModel != null &&
                                     Model.IncidentViewRestorationViewModel.listIncidentViewPostViewModel.Any())
                     {
                         @foreach (var post in Model.IncidentViewRestorationViewModel.listIncidentViewPostViewModel.OrderByDescending(x => x.Id))
                         {
-                            <div class="update-item d-flex justify-content-between align-items-start mb-2">
-                                <div class="update-message flex-grow-1 me-3">@post.Message</div>
-                                <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
+                            <div class="update-item notes-item">
+                                <div class="update-message">@post.Message</div>
+                                <div class="update-meta">
                                     <span class="update-time">@post.TimeforMessage</span>
-                                    <span class="update-email postby-div-map text-muted">admin@eztrak.com</span>
+                                    <span class="update-email postby-div-map">admin@eztrak.com</span>
                                 </div>
                             </div>
                         }
                     }
                     else
                     {
-                        <p>No posts found.</p>
+                        <div class="notes-empty-state">
+                            <i class="fa-solid fa-sticky-note text-muted mb-2"></i>
+                            <p class="text-muted mb-0">No notes yet</p>
+                        </div>
                     }
                 </div>
-                <div class="update-footer m-3">
-                    <textarea rows="5" class="form-control mb-2" id="postvalue" placeholder="Add new note..."></textarea>
-                    <button class="btn btn-update" id="btn_PostDetail_Save" data-type="4">
+                <div class="update-footer notes-footer">
+                    <textarea rows="3" class="form-control notes-textarea" id="postvalue" placeholder="Add new note..."></textarea>
+                    <button class="btn btn-update notes-submit-btn" id="btn_PostDetail_Save" data-type="4">
                         <i class="fa-solid fa-paper-plane me-2"></i>Add Note
                     </button>
                 </div>
@@ -262,11 +274,11 @@
                 // append new posts
                 result.data.forEach(item => {
                     $updateList.append(`
-                        <div class="update-item d-flex justify-content-between align-items-start mb-2">
-                            <div class="update-message flex-grow-1 me-3">${item.Message || ''}</div>
-                            <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
+                        <div class="update-item notes-item">
+                            <div class="update-message">${item.Message || ''}</div>
+                            <div class="update-meta">
                                 <span class="update-time">${item.TimeforMessage || ''}</span>
-                                <span class="update-email small text-muted">admin@eztrak.com</span>
+                                <span class="update-email postby-div">admin@eztrak.com</span>
                             </div>
                         </div>
                     `);

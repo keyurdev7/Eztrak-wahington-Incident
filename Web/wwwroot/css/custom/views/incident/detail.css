@@ -1291,20 +1291,138 @@
 }
 
 
+/* Assessment Notes - Compact Design */
+#assessment .notes-list-container {
+    padding: 10px;
+    overflow-y: auto;
+    max-height: 250px;
+    min-height: 150px;
+}
+
+#assessment .notes-item {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+#assessment .notes-item:hover {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    border-color: #d1d5db;
+}
+
+#assessment .notes-item:last-child {
+    margin-bottom: 0;
+}
+
 #assessment .update-item {
-    background-color: #F9FAFB;
-    padding: 9px;
-    margin-bottom: 12px;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+#assessment .update-item:hover {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    border-color: #d1d5db;
+}
+
+#assessment .update-item:last-child {
+    margin-bottom: 0;
+}
+
+#assessment .update-message {
+    color: #374151;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+    flex-grow: 1;
+}
+
+#assessment .update-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    margin-top: 2px;
 }
 
 #assessment .update-time {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #6b7280;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+}
+
+#assessment .update-email {
+    font-size: 0.65rem;
+    color: #9ca3af;
+}
+
+#assessment .notes-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 15px;
+    text-align: center;
+}
+
+#assessment .notes-empty-state i {
+    font-size: 1.5rem;
+    opacity: 0.5;
+}
+
+#assessment .notes-footer {
+    padding: 10px;
+    border-top: 1px solid #e5e7eb;
+    background-color: #fafafa;
+}
+
+#assessment .notes-textarea {
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    padding: 8px 10px;
     font-size: 0.85rem;
-    font-weight: 600;
-    background: #ffead1;
-    color: #d35400;
-    border-radius: 6px;
-    padding: 2px 8px;
-    margin-right: 8px;
+    resize: none;
+    transition: all 0.2s ease;
+    background-color: #ffffff;
+    margin-bottom: 8px;
+}
+
+#assessment .notes-textarea:focus {
+    outline: none;
+    border-color: #f15a29;
+    box-shadow: 0 0 0 2px rgba(241, 90, 41, 0.1);
+}
+
+#assessment .notes-textarea::placeholder {
+    color: #9ca3af;
+}
+
+#assessment .notes-submit-btn {
+    width: 100%;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+#assessment .notes-submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(241, 90, 41, 0.3);
 }
 
 #assessment .update-footer input {
@@ -1599,30 +1717,119 @@
     height: 100%;
 }
 
+/* Repair, Restoration, Closeout Notes - Compact Design */
+#repair .card-custom-bdy,
+#restoration .card-custom-bdy,
+#closeout .card-custom-bdy {
+    padding: 10px;
+    overflow-y: auto;
+    max-height: 250px;
+    min-height: 150px;
+}
+
 #repair .update-item,
 #restoration .update-item,
 #closeout .update-item {
-    background-color: #F9FAFB;
-    padding: 9px;
-    margin-bottom: 12px;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+#repair .update-item:hover,
+#restoration .update-item:hover,
+#closeout .update-item:hover {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    border-color: #d1d5db;
+}
+
+#repair .update-item:last-child,
+#restoration .update-item:last-child,
+#closeout .update-item:last-child {
+    margin-bottom: 0;
+}
+
+#repair .update-message,
+#restoration .update-message,
+#closeout .update-message {
+    color: #374151;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+    flex-grow: 1;
+}
+
+#repair .update-meta,
+#restoration .update-meta,
+#closeout .update-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    margin-top: 2px;
 }
 
 #repair .update-time,
 #restoration .update-time,
 #closeout .update-time {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #6b7280;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+}
+
+#repair .update-email,
+#restoration .update-email,
+#closeout .update-email {
+    font-size: 0.65rem;
+    color: #9ca3af;
+}
+
+#repair .update-footer,
+#restoration .update-footer,
+#closeout .update-footer {
+    padding: 10px;
+    border-top: 1px solid #e5e7eb;
+    background-color: #fafafa;
+}
+
+#repair .update-footer textarea,
+#restoration .update-footer textarea,
+#closeout .update-footer textarea {
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    padding: 8px 10px;
     font-size: 0.85rem;
-    font-weight: 600;
-    background: #ffead1;
-    color: #d35400;
-    border-radius: 6px;
-    padding: 2px 8px;
-    margin-right: 8px;
+    resize: none;
+    transition: all 0.2s ease;
+    background-color: #ffffff;
+    margin-bottom: 8px;
+}
+
+#repair .update-footer textarea:focus,
+#restoration .update-footer textarea:focus,
+#closeout .update-footer textarea:focus {
+    outline: none;
+    border-color: #f15a29;
+    box-shadow: 0 0 0 2px rgba(241, 90, 41, 0.1);
+}
+
+#repair .update-footer textarea::placeholder,
+#restoration .update-footer textarea::placeholder,
+#closeout .update-footer textarea::placeholder {
+    color: #9ca3af;
 }
 
 #repair .update-footer input,
 #restoration .update-footer input,
-#closeout .update-footer input,
-{
+#closeout .update-footer input {
     border-radius: 10px;
 }
 
@@ -1861,7 +2068,7 @@
 .card-custom-bdy::-webkit-scrollbar-thumb,
 .card-custom-bdy {
     scrollbar-width: thin;
-    scrollbar-color: #ffb366 transparent;
+    scrollbar-color: #d1d5db transparent;
 }
 
     .card-custom-bdy::-webkit-scrollbar {
@@ -1869,9 +2076,28 @@
     }
 
     .card-custom-bdy::-webkit-scrollbar-thumb {
-        background-color: #ffb366;
+        background-color: #d1d5db;
         border-radius: 10px;
     }
+
+    .card-custom-bdy::-webkit-scrollbar-thumb:hover {
+        background-color: #9ca3af;
+    }
+
+/* Empty state styling for all note sections */
+.notes-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.notes-empty-state i {
+    font-size: 2rem;
+    opacity: 0.5;
+}
 /* Map View section */
 #dashboard .map-icon {
     width: 70px;

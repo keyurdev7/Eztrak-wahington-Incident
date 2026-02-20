@@ -1,6 +1,59 @@
 ﻿@using System.Web
+@using System.IO
 @using ViewModels.Incident
 @model IncidentViewRepairViewModel
+@{
+    // Helper function to get file type icon based on file extension
+    // Handles multiple file types by prioritizing: images > PDFs > documents > generic
+    string GetFileTypeIcon(string imageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+            return "fa-file-alt text-muted";
+
+        var fileExtensions = imageUrl.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(u => System.IO.Path.GetExtension(u.Trim()).ToLower())
+            .ToList();
+
+        if (fileExtensions.Count == 0)
+            return "fa-file-alt text-muted";
+
+        // Define file type categories
+        var imageExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg" };
+        var docExts = new[] { ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".rtf" };
+
+        // Count file types
+        var imageCount = fileExtensions.Count(ext => imageExts.Contains(ext));
+        var pdfCount = fileExtensions.Count(ext => ext == ".pdf");
+        var docCount = fileExtensions.Count(ext => docExts.Contains(ext));
+
+        // Prioritize: if there are any images, show image icon
+        if (imageCount > 0)
+            return "fa-file-image text-success";
+
+        // If there are any PDFs, show PDF icon
+        if (pdfCount > 0)
+            return "fa-file-pdf text-danger";
+
+        // If there are any documents, show document icon
+        if (docCount > 0)
+            return "fa-file-word text-primary";
+
+        // Default to generic file icon
+        return "fa-file-alt text-secondary";
+    }
+    
+    // Helper function to get the appropriate file path based on field type
+    string GetRepairImageUrl(IncidentViewRepairListViewModel repair)
+    {
+        if (!string.IsNullOrEmpty(repair.FieldType) && repair.FieldType.Contains("Source of Leak"))
+            return repair.SOL_Path ?? "";
+        else if (!string.IsNullOrEmpty(repair.FieldType) && repair.FieldType.Contains("outage"))
+            return repair.PFO_Path ?? "";
+        else if (!string.IsNullOrEmpty(repair.FieldType) && repair.FieldType.Contains("vacuum "))
+            return repair.VTF_Path ?? "";
+        return "";
+    }
+}
 
 @if (Model != null)
 {
@@ -60,22 +113,31 @@
                             </td>
 
                             <td>
-                                <i class="fa-solid fa-file-pdf me-2"></i>
-                                @if (!string.IsNullOrEmpty(repair.FieldType) && repair.FieldType.Contains("Source of Leak"))
-                                {
-                                    @repair.SOL_Count
+                                @{
+                                    var imageUrl = GetRepairImageUrl(repair);
+                                    var fileCount = 0;
+                                    if (!string.IsNullOrEmpty(repair.FieldType) && repair.FieldType.Contains("Source of Leak"))
+                                    {
+                                        fileCount = repair.SOL_Count ?? 0;
+                                    }
+                                    else if (!string.IsNullOrEmpty(repair.FieldType) && repair.FieldType.Contains("outage"))
+                                    {
+                                        fileCount = repair.PFO_Count ?? 0;
+                                    }
+                                    else if (!string.IsNullOrEmpty(repair.FieldType) && repair.FieldType.Contains("vacuum "))
+                                    {
+                                        fileCount = repair.VTF_Count ?? 0;
+                                    }
                                 }
-                                else if (!string.IsNullOrEmpty(repair.FieldType) && repair.FieldType.Contains("outage"))
+                                @if (fileCount > 0)
                                 {
-                                    @repair.PFO_Count
-                                }
-                                else if (!string.IsNullOrEmpty(repair.FieldType) && repair.FieldType.Contains("vacuum "))
-                                {
-                                    @repair.VTF_Count
+                                    <a href="#" onclick="EditRepairDetails('0','@repair.Id', @repair.FieldTypeId, @repair.IncidentId, @repair.IncidentValidationId)" class="text-decoration-none">
+                                        <i class="fa @GetFileTypeIcon(imageUrl) me-1"></i>@(fileCount) file
+                                    </a>
                                 }
                                 else
                                 {
-                                    <span>0</span>
+                                    <i class="fa fa-file-alt text-muted me-1"></i>@("0 file")
                                 }
                             </td>
 
