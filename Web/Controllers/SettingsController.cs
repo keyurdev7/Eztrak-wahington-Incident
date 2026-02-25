@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 using Repositories.Common;
@@ -782,10 +782,14 @@ namespace Web.Controllers
 
                 if (id == 0)
                     return StatusCode(StatusCodes.Status500InternalServerError,
-                        new { success = false, message = "Failed to save usermanagement.Use diffrent email address." });
+                        new { success = false, message = "Failed to save usermanagement. Use different email address." });
 
                 var successMsg = "UserManagement saved successfully!";
                 return Ok(new { success = true, data = successMsg });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
             }
             catch (Exception)
             {

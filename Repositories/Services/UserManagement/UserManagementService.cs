@@ -1,9 +1,10 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Centangle.Common.ResponseHelpers.Models;
 using DataLibrary;
 using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using Enums;
+using Helpers.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -131,12 +132,38 @@ namespace Repositories.Common
             return list;
         }
 
+        private const string DefaultPassword = "LAC@1234";
+
+        private async Task<string> GetRoleNameByIdAsync(long roleId)
+        {
+            var name = await _db.Roles.Where(r => r.Id == roleId).Select(r => r.Name).FirstOrDefaultAsync();
+            return name ?? "";
+        }
+
+        /// <summary>Returns true if no other user (excluding excludeUserId) has this PIN. PIN must be plain 4 digits.</summary>
+        private async Task<bool> IsPinCodeUniqueAsync(string pinCode, long excludeUserId = 0)
+        {
+            if (string.IsNullOrWhiteSpace(pinCode)) return true;
+            var encoded = pinCode.Trim().EncodePasswordToBase64();
+            var exists = await _db.Users
+                .AnyAsync(x => x.PinCode == encoded && x.Id != excludeUserId && !x.IsDeleted);
+            return !exists;
+        }
+
         public async Task<long> SaveUserManagement(UserManagementModifyViewModel viewModel)
         {
             await using var transaction = await _db.Database.BeginTransactionAsync();
             try
             {
-                var now = DateTime.UtcNow;
+                var roleName = await GetRoleNameByIdAsync(viewModel.RoleId);
+                var isTechnician = roleName.Equals("TECHNICIAN", StringComparison.OrdinalIgnoreCase);
+
+                if (isTechnician && !string.IsNullOrWhiteSpace(viewModel.PinCode))
+                {
+                    var pinUnique = await IsPinCodeUniqueAsync(viewModel.PinCode.Trim(), excludeUserId: 0);
+                    if (!pinUnique)
+                        throw new InvalidOperationException("Pin code is already in use by another user.");
+                }
 
                 var user = new ApplicationUser
                 {
@@ -149,12 +176,23 @@ namespace Repositories.Common
                     EmailConfirmed = true,
                     ActiveStatus = viewModel.ActiveStatus,
                     Department = viewModel.Department,
-                    PhoneNumber =viewModel.PhoneNumber,
+                    PhoneNumber = viewModel.PhoneNumber,
                 };
 
                 var hasher = new PasswordHasher<ApplicationUser>();
-                user.PasswordHash = hasher.HashPassword(user, "LAC@1234");
-
+                if (isTechnician)
+                {
+                    user.PasswordHash = hasher.HashPassword(user, DefaultPassword);
+                    user.PinCode = !string.IsNullOrWhiteSpace(viewModel.PinCode)
+                        ? viewModel.PinCode.Trim().EncodePasswordToBase64()
+                        : null;
+                }
+                else
+                {
+                    var passwordToUse = !string.IsNullOrWhiteSpace(viewModel.Password) ? viewModel.Password : DefaultPassword;
+                    user.PasswordHash = hasher.HashPassword(user, passwordToUse);
+                    user.PinCode = null;
+                }
 
                 _db.Users.Add(user);
                 await _db.SaveChangesAsync();
@@ -188,10 +226,10 @@ namespace Repositories.Common
                     .FirstOrDefaultAsync(t => t.Id == viewModel.Id);
 
                 if (user == null)
-                {
-                    // if not found, create new
                     return await SaveUserManagement(viewModel);
-                }
+
+                var roleName = await GetRoleNameByIdAsync(viewModel.RoleId);
+                var isTechnician = roleName.Equals("TECHNICIAN", StringComparison.OrdinalIgnoreCase);
 
                 await using var transaction = await _db.Database.BeginTransactionAsync();
 
@@ -205,6 +243,31 @@ namespace Repositories.Common
                 user.PhoneNumber = viewModel.PhoneNumber;
                 user.UpdatedOn = DateTime.UtcNow;
 
+                if (isTechnician)
+                {
+                    if (!string.IsNullOrWhiteSpace(viewModel.PinCode))
+                    {
+                        var pinUnique = await IsPinCodeUniqueAsync(viewModel.PinCode.Trim(), excludeUserId: user.Id);
+                        if (!pinUnique)
+                            throw new InvalidOperationException("Pin code is already in use by another user.");
+                        user.PinCode = viewModel.PinCode.Trim().EncodePasswordToBase64();
+                    }
+                    if (!string.IsNullOrWhiteSpace(viewModel.Password))
+                    {
+                        var hasher = new PasswordHasher<ApplicationUser>();
+                        user.PasswordHash = hasher.HashPassword(user, viewModel.Password);
+                    }
+                }
+                else
+                {
+                    user.PinCode = null;
+                    if (!string.IsNullOrWhiteSpace(viewModel.Password))
+                    {
+                        var hasher = new PasswordHasher<ApplicationUser>();
+                        user.PasswordHash = hasher.HashPassword(user, viewModel.Password);
+                    }
+                }
+
                 try
                 {
                     var existingRoles = _db.UserRoles.Where(r => r.UserId == user.Id);
@@ -212,12 +275,11 @@ namespace Repositories.Common
 
                     if (viewModel.RoleId > 0)
                     {
-                        var userRole = new IdentityUserRole<long>
+                        await _db.UserRoles.AddAsync(new IdentityUserRole<long>
                         {
                             UserId = user.Id,
                             RoleId = viewModel.RoleId
-                        };
-                        await _db.UserRoles.AddAsync(userRole);
+                        });
                     }
 
                     await _db.SaveChangesAsync();
@@ -233,7 +295,7 @@ namespace Repositories.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error UpdateIncidentTeam.");
+                _logger.LogError(ex, "Error UpdateUserManagement.");
                 return 0;
             }
         }

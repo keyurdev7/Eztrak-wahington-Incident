@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DataLibrary\DataLibrary.csproj" />
     <ProjectReference Include="..\Enums\Enums.csproj" />
+    <ProjectReference Include="..\Helpers\Helpers.csproj" />
     <ProjectReference Include="..\Models\Models.csproj" />
     <ProjectReference Include="..\Pagination\Pagination.csproj" />
     <ProjectReference Include="..\ViewModels\ViewModels.csproj" />

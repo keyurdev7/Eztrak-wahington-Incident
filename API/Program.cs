@@ -191,6 +191,7 @@ builder.Services.AddScoped(typeof(ITransactionService<,,>), typeof(TransactionSe
 builder.Services.AddScoped(typeof(IEquipmentTransactionService<,,>), typeof(EquipmentTransactionService<,,>));
 builder.Services.AddScoped(typeof(IDynamicColumnService<,,>), typeof(DynamicColumnService<,,>));
 builder.Services.AddScoped<IAttachment, AttachmentService>();
+builder.Services.AddScoped<IIncidentDashboardService, IncidentDashboardService>();
 builder.Services.AddDefaultCorrelationId();
 
 

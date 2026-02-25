@@ -1,4 +1,4 @@
-﻿
+
 
 $(function () {
     GetAllRelationships();
@@ -110,6 +110,19 @@ $(function () {
         if ($("#RoleId").val() === "" || $("#RoleId").val() === null) {
             SwalErrorAlert("Please Select Role");
             isValid = false;
+        }
+        var selectedRoleText = $("#RoleId option:selected").text().trim().toLowerCase();
+        var isTechnician = selectedRoleText === "technician";
+        if (isTechnician) {
+            var pin = $.trim($("#PinCode").val());
+            var confirmPin = $.trim($("#ConfirmPinCode").val());
+            if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
+                SwalErrorAlert("Pin code must be exactly 4 digits.");
+                isValid = false;
+            } else if (pin !== confirmPin) {
+                SwalErrorAlert("Pin code and confirm pin code do not match.");
+                isValid = false;
+            }
         }
         $("#addUserModal").find("input[data-val-required]").each(function () {
             var $field = $(this);

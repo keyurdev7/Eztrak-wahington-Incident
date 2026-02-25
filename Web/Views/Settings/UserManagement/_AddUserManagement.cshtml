@@ -1,4 +1,4 @@
-﻿@using ViewModels
+@using ViewModels
 @model UserManagementModifyViewModel
 
 <style>
@@ -54,6 +54,22 @@
                     <div class="form-group">
                         <label>Phone Number</label>
                         <input type="text" placeholder="555-0123" asp-for="PhoneNumber">
+                    </div>
+                    <div id="passwordGroup" class="form-group">
+                        <label>Password</label>
+                        <input type="password" placeholder="Password" name="Password" id="Password" autocomplete="new-password">
+                    </div>
+                    <div id="passwordConfirmGroup" class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" placeholder="Confirm password" name="ConfirmPassword" id="ConfirmPassword" autocomplete="new-password">
+                    </div>
+                    <div id="pinCodeGroup" class="form-group" style="display: none;">
+                        <label>Pin Code (4 digits) *</label>
+                        <input type="password" inputmode="numeric" pattern="\d*" maxlength="4" placeholder="4-digit PIN" name="PinCode" id="PinCode" autocomplete="off">
+                    </div>
+                    <div id="pinCodeConfirmGroup" class="form-group" style="display: none;">
+                        <label>Confirm Pin Code *</label>
+                        <input type="password" inputmode="numeric" pattern="\d*" maxlength="4" placeholder="Confirm 4-digit PIN" name="ConfirmPinCode" id="ConfirmPinCode" autocomplete="off">
                     </div>
                     <div class="form-group">
                         <label>Status</label>
@@ -179,25 +195,37 @@
 <script>
     $(document).ready(function () {
         function showPermissions() {
-            // Hide all <p> and <ul> inside permissions-box
             $(".permissions-box p, .permissions-box ul").hide();
-
-            // Get selected role text
             var selectedRole = $("#RoleId option:selected").text().trim();
             if (selectedRole) {
-                // Find matching <ul> by ID (remove spaces in role name)
                 var $roleUl = $("#" + selectedRole.replace(/\s+/g, ''));
-
-                // Show the <ul> and the <p> right before it
                 $roleUl.show();
                 $roleUl.prev("p").show();
             }
         }
 
-        // Run when dropdown changes
-        $("#RoleId").on("change", showPermissions);
+        function togglePasswordVsPin() {
+            var selectedRole = $("#RoleId option:selected").text().trim().toLowerCase();
+            var isTechnician = selectedRole === "technician";
+            if (isTechnician) {
+                $("#passwordGroup, #passwordConfirmGroup").hide();
+                $("#Password, #ConfirmPassword").val("").removeAttr("data-val-required");
+                $("#pinCodeGroup, #pinCodeConfirmGroup").show();
+                $("#PinCode").attr("data-val-required", "true").attr("data-val-required-val", "Pin code is required for Technician.");
+            } else {
+                $("#pinCodeGroup, #pinCodeConfirmGroup").hide();
+                $("#PinCode, #ConfirmPinCode").val("").removeAttr("data-val-required");
+                $("#passwordGroup, #passwordConfirmGroup").show();
+                $("#PinCode").removeAttr("data-val-required");
+            }
+        }
 
-        // Run once on page load
+        $("#RoleId").on("change", function () {
+            showPermissions();
+            togglePasswordVsPin();
+        });
+
         showPermissions();
+        togglePasswordVsPin();
     });
 </script>
