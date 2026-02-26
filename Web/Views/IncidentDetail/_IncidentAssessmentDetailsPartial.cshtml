@@ -1,212 +1,103 @@
-﻿@using System.Web
+@using System.Web
 @using System.IO
 @using ViewModels.Incident
 @model IncidentAssessmentDetailViewModel
 @{
-    // Helper function to get file type icon based on file extension
-    // Handles multiple file types by prioritizing: images > PDFs > documents > generic
     string GetFileTypeIcon(string imageUrl)
     {
-        if (string.IsNullOrWhiteSpace(imageUrl))
-            return "fa-file-alt text-muted";
-
+        if (string.IsNullOrWhiteSpace(imageUrl)) return "fa-file-alt text-muted";
         var fileExtensions = imageUrl.Split(',', StringSplitOptions.RemoveEmptyEntries)
-            .Select(u => System.IO.Path.GetExtension(u.Trim()).ToLower())
-            .ToList();
-
-        if (fileExtensions.Count == 0)
-            return "fa-file-alt text-muted";
-
-        // Define file type categories
+            .Select(u => System.IO.Path.GetExtension(u.Trim()).ToLower()).ToList();
+        if (fileExtensions.Count == 0) return "fa-file-alt text-muted";
         var imageExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg" };
         var docExts = new[] { ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".rtf" };
-
-        // Count file types
-        var imageCount = fileExtensions.Count(ext => imageExts.Contains(ext));
-        var pdfCount = fileExtensions.Count(ext => ext == ".pdf");
-        var docCount = fileExtensions.Count(ext => docExts.Contains(ext));
-
-        // Prioritize: if there are any images, show image icon
-        if (imageCount > 0)
-            return "fa-file-image text-success";
-
-        // If there are any PDFs, show PDF icon
-        if (pdfCount > 0)
-            return "fa-file-pdf text-danger";
-
-        // If there are any documents, show document icon
-        if (docCount > 0)
-            return "fa-file-word text-primary";
-
-        // Default to generic file icon
+        if (fileExtensions.Count(ext => imageExts.Contains(ext)) > 0) return "fa-file-image text-success";
+        if (fileExtensions.Count(ext => ext == ".pdf") > 0) return "fa-file-pdf text-danger";
+        if (fileExtensions.Count(ext => docExts.Contains(ext)) > 0) return "fa-file-word text-primary";
         return "fa-file-alt text-secondary";
     }
 }
 
-
 @if (Model != null)
 {
-    @if (Model.incidentCommanderDetailViewslist.GroupBy(p => p.Mainstep).ToList().Count > 0)
-    {
-        <div class="table-responsive table-rounded custom-scroll">
-            <table class="table align-middle text-left">
-                <thead class="table-light">
-                    <tr>
-                        <th>Step</th>
-                        <th>Responsible Party</th>
-                        <th>Status</th>
-                        
-                        @*   <th>Started</th>
-                                <th>Completed</th> *@
-                        <th>Evidence</th>
-                        @* <th>Actions</th> *@
-                    </tr>
-                </thead>
-                <tbody>
-
-                    @foreach (var itemGrpBy in Model.incidentCommanderDetailViewslist.GroupBy(p => p.Mainstep).ToList())
-                    {
-                        @*  <div class="d-flex align-items-center justify-content-between section-title">
-                <h6 class="fw-semibold  mb-0">
-                    @itemGrpBy.Key
-                </h6>
-                <div class="text-muted small ms-2">
-                    Owner: @(Model.MainStepOwners.ContainsKey(itemGrpBy.Key)
-                            ? Model.MainStepOwners[itemGrpBy.Key]
-                            : "N/A")
-             </div>
-            </div> *@
-
-
-                        @foreach (var item in itemGrpBy)
+    <div class="card mb-4">
+        <div class="card-body p-0">
+            <div class="d-flex justify-content-end align-items-center mb-0 p-3">
+                <button type="button" class="btn btn-add" onclick="OpenAddAssessmentTaskModal()">
+                    <i class="fa-solid fa-plus me-2"></i>Add Task
+                </button>
+            </div>
+            <div class="table-responsive table-rounded custom-scroll">
+                <table class="table align-middle text-left">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Task</th>
+                            <th>Responsible Party</th>
+                            <th>Status</th>
+                            <th>Evidence</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.AssessmentTasks != null && Model.AssessmentTasks.Any())
                         {
-                            <tr>
-                                <td>@item.Substep</td>
-                                @if (!string.IsNullOrWhiteSpace(item.Assignee))
-                                {
-                                    <td>@item.Assignee</td>
-                                }
-                                else
-                                {
-                                    <td>-</td>
-                                }
-
-                                @if (!string.IsNullOrWhiteSpace(item.Status))
-                                {
-                                    @if (item.Status.ToLower() == "started")
-                                    {
-                                        <td>
-                                            <a href="#" onclick="EditAssessmentDetails('@Model.Id','@item.MainstepId','@item.SubstepId')">
-                                                <span class="status-badge progressing">@item.Status</span>
-                                            </a>
-                                        </td>
-                                    }
-                                    else if (item.Status.ToLower() == "not started")
-                                    {
-                                        <td>
-                                            <a href="#" onclick="EditAssessmentDetails('@Model.Id','@item.MainstepId','@item.SubstepId')">
-                                                <span class="status-badge not-started">@item.Status</span>
-                                            </a>
-                                        </td>
-                                    }
-                                    else if (item.Status.ToLower() == "complete")
-                                    {
-                                        <td>
-                                           
-                                            <span class="status-badge done">@item.Status</span>
-
-                                        </td>
-                                    }
-                                    else
-                                    {
-                                        <td><span class="status-badge not-started">@item.Status</span></td>
-                                    }
-                                }
-                                else
-                                {
-                                    <td><span class="status-badge not-started">Not Started</span></td>
-                                }
-
-                               
-
-                                @*  <td>@item.ClockIn</td>
-                                <td>@item.ClockOut</td> *@
-                                @if (item.ImageCount > 0)
-                                {
+                            foreach (var task in Model.AssessmentTasks)
+                            {
+                                <tr>
+                                    <td>@task.Task</td>
+                                    <td>@(string.IsNullOrWhiteSpace(task.FieldValue) ? "—" : task.FieldValue)</td>
                                     <td>
-                                        <a href="#" class="text-decoration-none"
-                                           onclick="ViewAssessmentDetails('@Model.Id','@item.MainstepId','@item.SubstepId')">
-                                            <i class="fa @GetFileTypeIcon(item.ImagesUrl ?? "") me-1"></i>@(item.ImageCount) file
-                                        </a>
+                                        @if (!string.IsNullOrWhiteSpace(task.Status))
+                                        {
+                                            @if (task.Status.ToLower() == "started")
+                                            { <span class="status-badge progressing">@task.Status</span> }
+                                            else if (task.Status.ToLower() == "not started")
+                                            { <span class="status-badge not-started">@task.Status</span> }
+                                            else if (task.Status.ToLower() == "complete")
+                                            { <span class="status-badge done">@task.Status</span> }
+                                            else
+                                            { <span class="status-badge not-started">@task.Status</span> }
+                                        }
+                                        else
+                                        { <span class="status-badge not-started">Not Started</span> }
                                     </td>
-                                }
-                                else
-                                {
-                                    <td><i class="fa fa-file-alt text-muted me-1"></i>@("0 file")</td>
-                                }
-                               @*  @if (!string.IsNullOrWhiteSpace(item.Status) && item.Status == "Complete")
-                                {
-                                    <td><a href="#" class="text-primary text-decoration-none" onclick="ViewAssessmentDetails('@Model.Id','@item.MainstepId','@item.SubstepId')">View</a></td>
-                                }
-                                else
-                                {
-                                    <td><button class="btn btn-update btn-sm" onclick="EditAssessmentDetails('@Model.Id','@item.MainstepId','@item.SubstepId')">Update</button></td>
-                                } *@
-                            </tr>
+                                    <td>
+                                        @if (task.ImageCount > 0)
+                                        {
+                                            <i class="fa @GetFileTypeIcon(task.ImagesUrl ?? "") me-1"></i>@(task.ImageCount) @("file")
+                                        }
+                                        else
+                                        {
+                                            <i class="fa fa-file-alt text-muted me-1"></i>@("0 file")
+                                        }
+                                    </td>
+                                </tr>
+                            }
                         }
-
-
-                    }
-                </tbody>
-            </table>
+                        else
+                        {
+                            <tr><td colspan="4" class="text-center">No tasks found</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
-
-    }
-    else
-    {
-        <div class="table-responsive table-rounded custom-scroll">
-            <table class="table align-middle text-left">
-                <thead class="table-light">
-                    <tr>
-                        <th>Step</th>
-                        <th>Status</th>
-                        <th>Assignee</th>
-                        @*   <th>Started</th>
-                        <th>Completed</th> *@
-                        <th>Evidence</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="4" style="text-align:center">No records found</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    }
+    </div>
 }
 else
 {
-    <div class="table-responsive table-rounded custom-scroll">
-        <table class="table align-middle text-left">
-            <thead class="table-light">
-                <tr>
-                    <th>Step</th>
-                    <th>Status</th>
-                    <th>Assignee</th>
-                    @*   <th>Started</th>
-                    <th>Completed</th> *@
-                    <th>Evidence</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="7" style="text-align:center">No records found</td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="card mb-4">
+        <div class="card-body p-0">
+            <div class="d-flex justify-content-end align-items-center mb-0 p-3">
+                <button type="button" class="btn btn-add" onclick="OpenAddAssessmentTaskModal()">
+                    <i class="fa-solid fa-plus me-2"></i>Add Task
+                </button>
+            </div>
+            <div class="table-responsive table-rounded custom-scroll">
+                <table class="table align-middle text-left">
+                    <thead class="table-light"><tr><th>Task</th><th>Responsible Party</th><th>Status</th><th>Evidence</th></tr></thead>
+                    <tbody><tr><td colspan="4" class="text-center">No tasks found</td></tr></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 }
-

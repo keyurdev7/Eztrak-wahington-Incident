@@ -1,177 +1,105 @@
-﻿@using System.Web
+@using System.Web
 @using System.IO
 @using ViewModels.Incident
-@model IncidentViewRepairViewModel
+@model IncidentViewTaskViewModel
 @{
-    // Helper function to get file type icon based on file extension
-    // Handles multiple file types by prioritizing: images > PDFs > documents > generic
     string GetFileTypeIcon(string imageUrl)
     {
-        if (string.IsNullOrWhiteSpace(imageUrl))
-            return "fa-file-alt text-muted";
-
+        if (string.IsNullOrWhiteSpace(imageUrl)) return "fa-file-alt text-muted";
         var fileExtensions = imageUrl.Split(',', StringSplitOptions.RemoveEmptyEntries)
-            .Select(u => System.IO.Path.GetExtension(u.Trim()).ToLower())
-            .ToList();
-
-        if (fileExtensions.Count == 0)
-            return "fa-file-alt text-muted";
-
-        // Define file type categories
+            .Select(u => System.IO.Path.GetExtension(u.Trim()).ToLower()).ToList();
+        if (fileExtensions.Count == 0) return "fa-file-alt text-muted";
         var imageExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg" };
         var docExts = new[] { ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".rtf" };
-
-        // Count file types
-        var imageCount = fileExtensions.Count(ext => imageExts.Contains(ext));
-        var pdfCount = fileExtensions.Count(ext => ext == ".pdf");
-        var docCount = fileExtensions.Count(ext => docExts.Contains(ext));
-
-        // Prioritize: if there are any images, show image icon
-        if (imageCount > 0)
-            return "fa-file-image text-success";
-
-        // If there are any PDFs, show PDF icon
-        if (pdfCount > 0)
-            return "fa-file-pdf text-danger";
-
-        // If there are any documents, show document icon
-        if (docCount > 0)
-            return "fa-file-word text-primary";
-
-        // Default to generic file icon
+        if (fileExtensions.Count(ext => imageExts.Contains(ext)) > 0) return "fa-file-image text-success";
+        if (fileExtensions.Count(ext => ext == ".pdf") > 0) return "fa-file-pdf text-danger";
+        if (fileExtensions.Count(ext => docExts.Contains(ext)) > 0) return "fa-file-word text-primary";
         return "fa-file-alt text-secondary";
-    }
-    
-    // Helper function to get the appropriate file path based on field type
-    string GetRepairImageUrl(IncidentViewRepairListViewModel repair)
-    {
-        if (!string.IsNullOrEmpty(repair.FieldType) && repair.FieldType.Contains("Source of Leak"))
-            return repair.SOL_Path ?? "";
-        else if (!string.IsNullOrEmpty(repair.FieldType) && repair.FieldType.Contains("outage"))
-            return repair.PFO_Path ?? "";
-        else if (!string.IsNullOrEmpty(repair.FieldType) && repair.FieldType.Contains("vacuum "))
-            return repair.VTF_Path ?? "";
-        return "";
     }
 }
 
 @if (Model != null)
 {
-    <div class="table-responsive table-rounded custom-scroll">
-        <table class="table align-middle text-left">
-            <thead class="table-light">
-                <tr>
-                    <th>Step</th>
-                    <th>Responsible Party</th>
-                    <th>Status</th>
-                    <th>Evidence</th>
-
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.listIncidentViewRepairViewModel != null)
-                {
-                    @foreach (var repair in Model.listIncidentViewRepairViewModel)
-                    {
+    <div class="card mb-4">
+        <div class="card-body p-0">
+            <div class="d-flex justify-content-between align-items-center mb-0 p-3">
+                <h6 class="fw-bold mb-0">Pre-Operation Setup</h6>
+                <button type="button" class="btn btn-add" onclick="OpenAddRepairTaskModal()">
+                    <i class="fa-solid fa-plus me-2"></i>Add Task
+                </button>
+            </div>
+            <div class="table-responsive table-rounded custom-scroll">
+                <table class="table align-middle text-left">
+                    <thead class="table-light">
                         <tr>
-                            <td>@repair.FieldType</td>
-                            <td>@repair.FieldValue</td>
-                            <td>
-                                @{
-                                    var fieldStatus = repair.FieldStatus?.ToLower() ?? "";
-                                    string fieldClass = "";
-
-                                    switch (fieldStatus)
-                                    {
-                                        case "not started":
-                                            fieldClass = "badge badge-status badge-pending";
-                                            break;
-                                        case "started":
-                                            fieldClass = "badge badge-status badge-progressing";
-                                            break;
-                                        case "complete":
-                                            fieldClass = "badge badge-status badge-complete";
-                                            break;
-
-                                        default:
-                                            fieldClass = "badge badge-status badge-pending";
-                                            break;
-                                    }
-                                }
-
-                                <a href="#"
-                                   onclick="EditRepairDetails('0','@repair.Id', @repair.FieldTypeId, @repair.IncidentId, @repair.IncidentValidationId)">
-                                    @if (!string.IsNullOrEmpty(repair.FieldStatus))
-                                    {
-                                        <span class="@fieldClass">@repair.FieldStatus</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="">-</span>
-                                    }
-                                </a>
-                            </td>
-
-                            <td>
-                                @{
-                                    var imageUrl = GetRepairImageUrl(repair);
-                                    var fileCount = 0;
-                                    if (!string.IsNullOrEmpty(repair.FieldType) && repair.FieldType.Contains("Source of Leak"))
-                                    {
-                                        fileCount = repair.SOL_Count ?? 0;
-                                    }
-                                    else if (!string.IsNullOrEmpty(repair.FieldType) && repair.FieldType.Contains("outage"))
-                                    {
-                                        fileCount = repair.PFO_Count ?? 0;
-                                    }
-                                    else if (!string.IsNullOrEmpty(repair.FieldType) && repair.FieldType.Contains("vacuum "))
-                                    {
-                                        fileCount = repair.VTF_Count ?? 0;
-                                    }
-                                }
-                                @if (fileCount > 0)
-                                {
-                                    <a href="#" onclick="EditRepairDetails('0','@repair.Id', @repair.FieldTypeId, @repair.IncidentId, @repair.IncidentValidationId)" class="text-decoration-none">
-                                        <i class="fa @GetFileTypeIcon(imageUrl) me-1"></i>@(fileCount) file
-                                    </a>
-                                }
-                                else
-                                {
-                                    <i class="fa fa-file-alt text-muted me-1"></i>@("0 file")
-                                }
-                            </td>
-
+                            <th>Task</th>
+                            <th>Responsible Party</th>
+                            <th>Status</th>
+                            <th>Evidence</th>
                         </tr>
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="4"></td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                    </thead>
+                    <tbody>
+                        @if (Model.listIncidentViewTaskViewModel != null && Model.listIncidentViewTaskViewModel.Any())
+                        {
+                            foreach (var task in Model.listIncidentViewTaskViewModel)
+                            {
+                                <tr>
+                                    <td>@task.Task</td>
+                                    <td>@(string.IsNullOrWhiteSpace(task.FieldValue) ? "—" : task.FieldValue)</td>
+                                    <td>
+                                        @if (!string.IsNullOrWhiteSpace(task.Status))
+                                        {
+                                            @if (task.Status.ToLower() == "started")
+                                            { <span class="status-badge progressing">@task.Status</span> }
+                                            else if (task.Status.ToLower() == "not started")
+                                            { <span class="status-badge not-started">@task.Status</span> }
+                                            else if (task.Status.ToLower() == "complete")
+                                            { <span class="status-badge done">@task.Status</span> }
+                                            else
+                                            { <span class="status-badge not-started">@task.Status</span> }
+                                        }
+                                        else
+                                        { <span class="status-badge not-started">Not Started</span> }
+                                    </td>
+                                    <td>
+                                        @if (task.ImageCount > 0)
+                                        {
+                                            <i class="fa @GetFileTypeIcon(task.ImagesUrl ?? "") me-1"></i>@(task.ImageCount) @("file")
+                                        }
+                                        else
+                                        {
+                                            <i class="fa fa-file-alt text-muted me-1"></i>@("0 file")
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="4" class="text-center">No tasks found</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 }
 else
 {
-    <div class="table-responsive table-rounded custom-scroll">
-        <table class="table align-middle text-left">
-            <thead class="table-light">
-                <tr>
-                    <th>Step</th>
-                    <th>Responsible Party</th>
-                    <th>Status</th>
-                    <th>Evidence</th>
-
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="4" style="text-align:center">No records found</td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="card mb-4">
+        <div class="card-body p-0">
+            <div class="d-flex justify-content-between align-items-center mb-0 p-3">
+                <h6 class="fw-bold mb-0">Pre-Operation Setup</h6>
+                <button type="button" class="btn btn-add" onclick="OpenAddRepairTaskModal()">
+                    <i class="fa-solid fa-plus me-2"></i>Add Task
+                </button>
+            </div>
+            <div class="table-responsive table-rounded custom-scroll">
+                <table class="table align-middle text-left">
+                    <thead class="table-light"><tr><th>Task</th><th>Responsible Party</th><th>Status</th><th>Evidence</th></tr></thead>
+                    <tbody><tr><td colspan="4" class="text-center">No tasks found</td></tr></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 }

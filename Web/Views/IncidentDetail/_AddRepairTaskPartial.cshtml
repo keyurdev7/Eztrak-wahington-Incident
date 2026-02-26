@@ -1,0 +1,56 @@
+@model ViewModels.Incident.IncidentViewTaskListViewModel
+<div id="addRepairTaskModal" class="modal" tabindex="-1" role="dialog" style="display:none;">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form id="formAddRepairTask">
+                <div class="modal-header">
+                    <h5 class="modal-title">Repair Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnCloseAddRepairTask"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="IncidentId" value="@ViewBag.CurrentIncidentId" />
+                    <input type="hidden" name="IncidentValidationId" value="@ViewBag.CurrentIncidentValidationId" />
+                    <div class="mb-3">
+                        <label class="form-label">Task Description <span class="text-danger">*</span></label>
+                        <textarea name="Task" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Responsible Role (Multiple)</label>
+                        <input type="hidden" id="hdn_ResponsibleRoleRepair" name="RoleIds" />
+                        <div class="multiselect-dropdown" id="chk_ResponsibleRoleRepair">
+                            <div class="dropdown-btn">Choose roles</div>
+                            <div class="dropdown-list">
+                                @foreach (var r in (IEnumerable<SelectListItem>)ViewBag.Roles ?? new List<SelectListItem>())
+                                {
+                                    <label>
+                                        <input class="form-check-input" type="checkbox" value="@r.Value" data-name="@r.Text"> @r.Text
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select name="StatusId" class="form-select" disabled>
+                            @foreach (var s in (IEnumerable<SelectListItem>)ViewBag.Statuses ?? new List<SelectListItem>())
+                            {
+                                @if (s.Text == "Not Started")
+                                {
+                                    <option value="@s.Value" selected>@s.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@s.Value">@s.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btnCancelAddRepairTask">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btnSaveAddRepairTask">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,4 @@
-﻿using CorrelationId.Abstractions;
+using CorrelationId.Abstractions;
 using Enums;
 using Helpers.Extensions;
 using Microsoft.AspNetCore.Http;
@@ -116,11 +116,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     public DbSet<IncidentRole> IncidentRoles { get; set; }
     public DbSet<IncidentShift> IncidentShifts { get; set; }
     public DbSet<IncidentValidationPersonnel> IncidentValidationPersonnels { get; set; }
-    public DbSet<IncidentValidationRepair> IncidentValidationRepairs { get; set; }
     public DbSet<IncidentValidationNotes> IncidentValidationNotes { get; set; }
     public DbSet<ValidationCloseout> ValidationCloseouts { get; set; }
-    public DbSet<IncidentValidationAssessment> IncidentValidationAssessments { get; set; }
     public DbSet<IncidentValidationTask> IncidentValidationTasks { get; set; }
+    public DbSet<IncidentValidationAssessmentTask> IncidentValidationAssessmentTasks { get; set; }
+    public DbSet<IncidentValidationRepairTask> IncidentValidationRepairTasks { get; set; }
     public DbSet<IncidentMapChat> IncidentMapChats { get; set; }
     
     public DbSet<IncidentPostDetail> IncidentPostDetails { get; set; }

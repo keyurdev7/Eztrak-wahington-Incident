@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 
 using Azure;
 
@@ -1405,269 +1405,51 @@ namespace Repositories.Common
                     .Where(p => !p.IsDeleted)
                     .ToDictionaryAsync(p => p.Id, p => new { p.FirstName, p.LastName });
 
-                var details = await _db.IncidentValidationAssessments
-                    .Where(p => !p.IsDeleted && p.IncidentId == request.IncidentId)
-                    .FirstOrDefaultAsync();
+                var assessmentTasks = await GetAssessmentTasksVM(request.IncidentId);
+                assessmentDetailViewModel.AssessmentTasks = assessmentTasks;
 
-
-                if (details == null)
+                var firstTask = assessmentTasks.FirstOrDefault();
+                if (firstTask == null)
                 {
                     assessmentDetailViewModel.Status = statusList
-                    .Select(p => new SelectListItem
-                    {
-                        Text = p.Value,
-                        Value = p.Key.ToString()
-                    })
+                    .Select(p => new SelectListItem { Text = p.Value, Value = p.Key.ToString() })
                     .ToList();
-
                     assessmentDetailViewModel.OwenerTypes = ownerList
-                        .Select(user => new SelectListItem
-                        {
-                            Text = $"{user.LastName} {user.FirstName}",
-                            Value = user.Id.ToString()
-                        })
+                        .Select(user => new SelectListItem { Text = $"{user.LastName} {user.FirstName}", Value = user.Id.ToString() })
                         .ToList();
-
+                    assessmentDetailViewModel.Id = 0;
+                    assessmentDetailViewModel.IncidentId = request.IncidentId;
+                    assessmentDetailViewModel.IncidentValidationId = null;
                     return assessmentDetailViewModel;
                 }
-                ListPostDetailVM = await GetPostDetailVM(Convert.ToInt64(details?.IncidentId), 3);
+
+                var validationId = firstTask.IncidentValidationId ?? 0;
+                ListPostDetailVM = await GetPostDetailVM(request.IncidentId, 3);
 
 
-                string GetUserFullName(long? userId) =>
-                    userId.HasValue && incidentUsers.TryGetValue(userId.Value, out var user)
-                        ? $"{user.LastName} {user.FirstName}"
-                        : string.Empty;
+                var openTaskCount = assessmentTasks.Count(x =>
+                    x.Status != null && x.Status.Equals("Started", StringComparison.OrdinalIgnoreCase));
+                var completedTaskCount = assessmentTasks.Count(x =>
+                    x.Status != null && x.Status.Equals("Complete", StringComparison.OrdinalIgnoreCase));
 
-                string GetStatusName(long? statusId) =>
-                    statusId.HasValue && statusList.TryGetValue(statusId.Value, out var name)
-                        ? name
-                        : string.Empty;
-
-                bool IsOwner(long? assignId) =>
-                    assignId.HasValue && ownerList.Any(p => p.Id == assignId.Value);
-
-                // Build all substep entries
-                var incidentCommanderDetails = new List<IncidentCommanderDetailViewModel>
-{
-    new()
-    {
-        Mainstep = "Incident Commander",
-        MainstepId = 1,
-        Substep = "Create MCR",
-        SubstepId = 1,
-        StatusId = details.IC_MCR_StatusId,
-        Status = GetStatusName(details.IC_MCR_StatusId),
-        AssigneeId = details.IC_MCR_AssignId,
-        Assignee = roleList.Where(x=>x.Key==details.IC_MCR_AssignId).FirstOrDefault().Value,
-        IsOwner = IsOwner(details.IC_MCR_AssignId),
-        ClockIn = details.IC_MCR_StartTime?.ToString("HH:mm") ?? "-",
-        ClockOut = details.IC_MCR_ComplateTime?.ToString("HH:mm") ?? "-",
-        ImagesUrl = details.IC_MCR_ImageUrls,
-        ImageCount = string.IsNullOrWhiteSpace(details.IC_MCR_ImageUrls)
-                        ? 0
-                        : details.IC_MCR_ImageUrls.Split(',', StringSplitOptions.RemoveEmptyEntries).Length,
-        Notes = details.IC_MCR_Notes
-    },
-    new()
-    {
-        Mainstep = "Incident Commander",
-        MainstepId = 1,
-        SubstepId = 2,
-        Substep = "Notify Claims & Engineering",
-        StatusId = details.IC_Notify_StatusId,
-        Status = GetStatusName(details.IC_Notify_StatusId),
-        AssigneeId = details.IC_Notify_AssignId,
-        Assignee = roleList.Where(x=>x.Key==details.IC_Notify_AssignId).FirstOrDefault().Value,
-        IsOwner = IsOwner(details.IC_Notify_AssignId),
-        ClockIn = details.IC_Notify_StartTime?.ToString("HH:mm") ?? "-",
-        ClockOut = details.IC_Notify_ComplateTime?.ToString("HH:mm") ?? "-",
-        ImagesUrl = details.IC_Notify_ImageUrls,
-        ImageCount = string.IsNullOrWhiteSpace(details.IC_Notify_ImageUrls)
-                        ? 0
-                        : details.IC_Notify_ImageUrls.Split(',', StringSplitOptions.RemoveEmptyEntries).Length,
-        Notes = details.IC_Notify_Notes
-    },
-    new()
-    {
-        Mainstep = "Incident Commander",
-        MainstepId = 1,
-        SubstepId = 3,
-        Substep = "Establish ICP (site access verified)",
-        StatusId = details.IC_EstablishICP_StatusId,
-        Status = GetStatusName(details.IC_EstablishICP_StatusId),
-        AssigneeId = details.IC_EstablishICP_AssignId,
-        Assignee = roleList.Where(x => x.Key == details.IC_EstablishICP_AssignId).FirstOrDefault().Value,
-        IsOwner = IsOwner(details.IC_EstablishICP_AssignId),
-        ClockIn = details.IC_EstablishICP_StartTime?.ToString("HH:mm") ?? "-",
-        ClockOut = details.IC_EstablishICP_ComplateTime?.ToString("HH:mm") ?? "-",
-        ImagesUrl = details.IC_EstablishICP_ImageUrls,
-        ImageCount = string.IsNullOrWhiteSpace(details.IC_EstablishICP_ImageUrls)
-                        ? 0
-                        : details.IC_EstablishICP_ImageUrls.Split(',', StringSplitOptions.RemoveEmptyEntries).Length,
-        Notes = details.IC_EstablishICP_Notes
-    },
-    new()
-    {
-        Mainstep = "Field Environmental Representative",
-        MainstepId = 2,
-        SubstepId = 1,
-        Substep = "Prepare containment area (drums/totes/Baker tank)",
-        StatusId = details.FER_PCA_StatusId,
-        Status = GetStatusName(details.FER_PCA_StatusId),
-        AssigneeId = details.FER_PCA_AssignId,
-        Assignee = roleList.Where(x => x.Key == details.FER_PCA_AssignId).FirstOrDefault().Value,
-        IsOwner = IsOwner(details.FER_PCA_AssignId),
-        ClockIn = details.FER_PCA_StartTime?.ToString("HH:mm") ?? "-",
-        ClockOut = details.FER_PCA_ComplateTime?.ToString("HH:mm") ?? "-",
-        ImagesUrl = details.FER_PCA_ImageUrls,
-        ImageCount = string.IsNullOrWhiteSpace(details.FER_PCA_ImageUrls)
-                        ? 0
-                        : details.FER_PCA_ImageUrls.Split(',', StringSplitOptions.RemoveEmptyEntries).Length,
-        Notes = details.FER_PCA_Notes
-    },
-    new()
-    {
-        Mainstep = "Field Environmental Representative",
-        MainstepId = 2,
-        SubstepId = 2,
-        Substep = "Label containers; log IDs and capacity",
-        StatusId = details.FER_LC_StatusId,
-        Status = GetStatusName(details.FER_LC_StatusId),
-        AssigneeId = details.FER_LC_AssignId,
-        Assignee = roleList.Where(x => x.Key == details.FER_LC_AssignId).FirstOrDefault().Value,
-        IsOwner = IsOwner(details.FER_LC_AssignId),
-        ClockIn = details.FER_LC_StartTime?.ToString("HH:mm") ?? "-",
-        ClockOut = details.FER_LC_ComplateTime?.ToString("HH:mm") ?? "-",
-        ImagesUrl = details.FER_LC_ImageUrls,
-        ImageCount = string.IsNullOrWhiteSpace(details.FER_LC_ImageUrls)
-                        ? 0
-                        : details.FER_LC_ImageUrls.Split(',', StringSplitOptions.RemoveEmptyEntries).Length,
-        Notes = details.FER_LC_Notes
-    },
-    new()
-    {
-        Mainstep = "Engineering & GEC",
-        MainstepId = 3,
-        SubstepId = 1,
-        Substep = "Retrieve system maps (regulators, BO streets, elevations)",
-        StatusId = details.EGEC_RSM_StatusId,
-        Status = GetStatusName(details.EGEC_RSM_StatusId),
-        AssigneeId = details.EGEC_RSM_AssignId,
-        Assignee = roleList.Where(x => x.Key == details.EGEC_RSM_AssignId).FirstOrDefault().Value,
-        IsOwner = IsOwner(details.EGEC_RSM_AssignId),
-        ClockIn = details.EGEC_RSM_StartTime?.ToString("HH:mm") ?? "-",
-        ClockOut = details.EGEC_RSM_ComplateTime?.ToString("HH:mm") ?? "-",
-        ImagesUrl = details.EGEC_RSM_ImageUrls,
-        ImageCount = string.IsNullOrWhiteSpace(details.EGEC_RSM_ImageUrls)
-                        ? 0
-                        : details.EGEC_RSM_ImageUrls.Split(',', StringSplitOptions.RemoveEmptyEntries).Length,
-        Notes = details.EGEC_RSM_Notes
-    },
-    new()
-    {
-        Mainstep = "Engineering & GEC",
-        MainstepId = 3,
-        SubstepId = 2,
-        Substep = "Mark low points & squeeze points",
-        StatusId = details.EGEC_MLP_StatusId,
-        Status = GetStatusName(details.EGEC_MLP_StatusId),
-        AssigneeId = details.EGEC_MLP_AssignId,
-        Assignee =roleList.Where(x => x.Key == details.EGEC_MLP_AssignId).FirstOrDefault().Value,
-        IsOwner = IsOwner(details.EGEC_MLP_AssignId),
-        ClockIn = details.EGEC_MLP_StartTime?.ToString("HH:mm") ?? "-",
-        ClockOut = details.EGEC_MLP_ComplateTime?.ToString("HH:mm") ?? "-",
-        ImagesUrl = details.EGEC_MLP_ImageUrls,
-        ImageCount = string.IsNullOrWhiteSpace(details.EGEC_MLP_ImageUrls)
-                        ? 0
-                        : details.EGEC_MLP_ImageUrls.Split(',', StringSplitOptions.RemoveEmptyEntries).Length,
-        Notes = details.EGEC_MLP_Notes
-    },
-    new()
-    {
-        Mainstep = "Engineering & GEC",
-        MainstepId = 3,
-        SubstepId = 3,
-        Substep = "Initiate cost tracking (RBA) for vendors",
-        StatusId = details.EGEC_ICT_StatusId,
-        Status = GetStatusName(details.EGEC_ICT_StatusId),
-        AssigneeId = details.EGEC_ICT_AssignId,
-        Assignee =roleList.Where(x => x.Key == details.EGEC_ICT_AssignId).FirstOrDefault().Value,
-        IsOwner = IsOwner(details.EGEC_ICT_AssignId),
-        ClockIn = details.EGEC_ICT_StartTime?.ToString("HH:mm") ?? "-",
-        ClockOut = details.EGEC_ICT_ComplateTime?.ToString("HH:mm") ?? "-",
-        ImagesUrl = details.EGEC_ICT_ImageUrls,
-        ImageCount = string.IsNullOrWhiteSpace(details.EGEC_ICT_ImageUrls)
-                        ? 0
-                        : details.EGEC_ICT_ImageUrls.Split(',', StringSplitOptions.RemoveEmptyEntries).Length,
-        Notes = details.EGEC_ICT_Notes
-    }
-};
-
-
-                // --- 🧮 Calculate Task Counts ---
-                var openTaskCount = incidentCommanderDetails.Count(x =>
-                    x.Status != null && x.Status.Equals("In Progress", StringComparison.OrdinalIgnoreCase));
-
-                var completedTaskCount = incidentCommanderDetails.Count(x =>
-                    x.Status != null && x.Status.Equals("Done", StringComparison.OrdinalIgnoreCase));
-
-                // --- 🔍 Apply Filters ---
+                var filteredTasks = assessmentTasks.AsEnumerable();
                 if (!string.IsNullOrWhiteSpace(request.step))
-                {
-                    incidentCommanderDetails = incidentCommanderDetails
-                                             .Where(x => x.Substep != null &&
-                                                         x.Substep.Contains(request.step, StringComparison.OrdinalIgnoreCase))
-                                             .ToList();
-                }
-
-                if (request.ownerId > 0)
-                {
-                    incidentCommanderDetails = incidentCommanderDetails
-                        .Where(x => x.AssigneeId == request.ownerId)
-                        .ToList();
-                }
-
+                    filteredTasks = filteredTasks.Where(x => x.Task != null && x.Task.Contains(request.step, StringComparison.OrdinalIgnoreCase));
                 if (request.statusID > 0)
-                {
-                    incidentCommanderDetails = incidentCommanderDetails
-                        .Where(x => x.StatusId == request.statusID)
-                        .ToList();
-                }
+                    filteredTasks = filteredTasks.Where(x => x.StatusId == request.statusID);
+                assessmentDetailViewModel.AssessmentTasks = filteredTasks.ToList();
 
-                // --- Build Owner Dictionary ---
-                var ownersByMainStep = incidentCommanderDetails
-                    .Where(x => x.IsOwner)
-                    .GroupBy(x => x.Mainstep)
-                    .ToDictionary(
-                        g => g.Key,
-                        g => g.Select(x => x.Assignee).FirstOrDefault() ?? string.Empty
-                    );
-
-                // --- Map to ViewModel ---
-                assessmentDetailViewModel.IncidentId = details.IncidentId;
-                assessmentDetailViewModel.Id = details.Id;
-                assessmentDetailViewModel.IncidentValidationId = details.IncidentValidationId;
-                assessmentDetailViewModel.incidentCommanderDetailViewslist = incidentCommanderDetails;
-                assessmentDetailViewModel.MainStepOwners = ownersByMainStep;
-
+                assessmentDetailViewModel.IncidentId = request.IncidentId;
+                assessmentDetailViewModel.Id = firstTask.Id;
+                assessmentDetailViewModel.IncidentValidationId = validationId;
                 assessmentDetailViewModel.Status = statusList
-                    .Select(p => new SelectListItem
-                    {
-                        Text = p.Value,
-                        Value = p.Key.ToString()
-                    })
+                    .Select(p => new SelectListItem { Text = p.Value, Value = p.Key.ToString() })
                     .ToList();
-
                 assessmentDetailViewModel.OwenerTypes = ownerList
-                    .Select(user => new SelectListItem
-                    {
-                        Text = $"{user.LastName} {user.FirstName}",
-                        Value = user.Id.ToString()
-                    })
+                    .Select(user => new SelectListItem { Text = $"{user.LastName} {user.FirstName}", Value = user.Id.ToString() })
                     .ToList();
                 assessmentDetailViewModel.OpenTaskCount = openTaskCount;
                 assessmentDetailViewModel.CompletedTaskCount = completedTaskCount;
-
                 assessmentDetailViewModel.PrimaryLocationCount = additionalLocations.Count(p => p.IsPrimaryLocation);
                 assessmentDetailViewModel.AdditionalLocationCount = additionalLocations.Count(p => !p.IsPrimaryLocation);
                 assessmentDetailViewModel.ICPLocationCount = additionalLocations.Count;
@@ -1684,440 +1466,129 @@ namespace Repositories.Common
 
         public async Task<IncidentAssessmentEditViewModel> EditAssessmentDetails(long id, long mainstepId, long substepId)
         {
-            IncidentAssessmentEditViewModel editViewModel = new();
-
             try
             {
-                // Fetch the incident assessment
-                var details = await _db.IncidentValidationAssessments
-                                       .Where(p => !p.IsDeleted && p.Id == id)
-                                       .FirstOrDefaultAsync();
-
-                var incidentUsers = await _db.IncidentUsers
-                   .Where(p => !p.IsDeleted)
-                   .ToDictionaryAsync(p => p.Id, p => new { p.FirstName, p.LastName });
-
-                var statusList = await _db.Progress
-                                .Where(p => !p.IsDeleted)
-                                .ToDictionaryAsync(p => p.Id, p => p.Name);
-
-                               
-                var rolesList = await _db.IncidentRoles
-                                   .Where(it => !it.IsDeleted)
-                                 .ToDictionaryAsync(p => p.Id, p => p.Name);
-
-
-                if (details == null)
+                var task = await _db.IncidentValidationAssessmentTasks
+                    .Where(p => !p.IsDeleted && p.Id == id)
+                    .FirstOrDefaultAsync();
+                if (task == null)
                     return new IncidentAssessmentEditViewModel();
 
+                var statusList = await _db.Progress.Where(p => !p.IsDeleted).ToDictionaryAsync(p => p.Id, p => p.Name);
+                var rolesList = await _db.IncidentRoles.Where(it => !it.IsDeleted).ToDictionaryAsync(p => p.Id, p => p.Name);
+                var firstRoleId = (task.RoleIds ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).FirstOrDefault();
+                long? assigneeId = long.TryParse(firstRoleId, out var rid) ? rid : (long?)null;
 
-
-                // Build all substep entries
-                var allSubsteps = new List<IncidentCommanderDetailViewModel>
-                                {
-                                    new() { Mainstep = "Incident Commander", MainstepId = 1, SubstepId = 1, Substep = "Create MCR", StatusId = details.IC_MCR_StatusId, AssigneeId = details.IC_MCR_AssignId, ImagesUrl= details.IC_MCR_ImageUrls },
-                                    new() { Mainstep = "Incident Commander", MainstepId = 1, SubstepId = 2, Substep = "Notify Claims & Engineering", StatusId = details.IC_Notify_StatusId, AssigneeId = details.IC_Notify_AssignId,ImagesUrl= details.IC_Notify_ImageUrls  },
-                                    new() { Mainstep = "Incident Commander", MainstepId = 1, SubstepId = 3, Substep = "Establish ICP (site access verified)", StatusId = details.IC_EstablishICP_StatusId, AssigneeId = details.IC_EstablishICP_AssignId ,ImagesUrl= details.IC_EstablishICP_ImageUrls},
-                                    new() { Mainstep = "Field Environmental Representative", MainstepId = 2, SubstepId = 1, Substep = "Prepare containment area (drums/totes/Baker tank)", StatusId = details.FER_PCA_StatusId, AssigneeId = details.FER_PCA_AssignId,ImagesUrl= details.FER_PCA_ImageUrls },
-                                    new() { Mainstep = "Field Environmental Representative", MainstepId = 2, SubstepId = 2, Substep = "Label containers; log IDs and capacity", StatusId = details.FER_LC_StatusId, AssigneeId = details.FER_LC_AssignId ,ImagesUrl= details.FER_LC_ImageUrls},
-                                    new() { Mainstep = "Engineering & GEC", MainstepId = 3, SubstepId = 1, Substep = "Retrieve system maps (regulators, BO streets, elevations)", StatusId = details.EGEC_RSM_StatusId, AssigneeId = details.EGEC_RSM_AssignId,ImagesUrl= details.EGEC_RSM_ImageUrls },
-                                    new() { Mainstep = "Engineering & GEC", MainstepId = 3, SubstepId = 2, Substep = "Mark low points & squeeze points", StatusId = details.EGEC_MLP_StatusId, AssigneeId = details.EGEC_MLP_AssignId,ImagesUrl= details.EGEC_MLP_ImageUrls },
-                                    new() { Mainstep = "Engineering & GEC", MainstepId = 3, SubstepId = 3, Substep = "Initiate cost tracking (RBA) for vendors", StatusId = details.EGEC_ICT_StatusId, AssigneeId = details.EGEC_ICT_AssignId, ImagesUrl= details.EGEC_ICT_ImageUrls }
-                                };
-
-                // Find the matching substep based on mainstepId and substepId
-                var substep = allSubsteps.FirstOrDefault(s => s.MainstepId == mainstepId && s.SubstepId == substepId);
-
-                if (substep != null)
+                return new IncidentAssessmentEditViewModel
                 {
-                    editViewModel = new IncidentAssessmentEditViewModel
-                    {
-                        StatusId = substep.StatusId,
-                        AssigneeId = substep.AssigneeId,
-                        MainStepId = substep.MainstepId,
-                        SubStepId = substep.SubstepId,
-                        ImageUrl = substep.ImagesUrl,
-                        Assignees = incidentUsers.Select(user => new SelectListItem
-                        {
-                            Text = $"{user.Value.LastName} {user.Value.FirstName}",
-                            Value = user.Key.ToString()
-                        }).ToList(),
-
-                        Status = statusList
-                            .Select(p => new SelectListItem
-                            {
-                                Text = p.Value,
-                                Value = p.Key.ToString()
-                            })
-                            .ToList(),
-                        RoleList = rolesList
-                            .Select(p => new SelectListItem
-                            {
-                                Text = p.Value,
-                                Value = p.Key.ToString()
-                            })
-                            .ToList(),
-
-                        MainStep = substep.Mainstep,
-                        SubStep = substep.Substep,
-                        Id = id
-                    };
-                }
-
+                    Id = task.Id,
+                    IncidentId = task.IncidentId ?? 0,
+                    IncidentValidationId = task.IncidentValidationId,
+                    StatusId = task.StatusId,
+                    AssigneeId = assigneeId,
+                    MainStepId = mainstepId,
+                    SubStepId = substepId,
+                    ImageUrl = task.ImageUrls,
+                    SubStep = task.TaskDescription ?? "",
+                    MainStep = "Assessment",
+                    Status = statusList.Select(p => new SelectListItem { Text = p.Value, Value = p.Key.ToString() }).ToList(),
+                    RoleList = rolesList.Select(p => new SelectListItem { Text = p.Value, Value = p.Key.ToString() }).ToList()
+                };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in EditAssessmentDetails for Id: {Id}, MainstepId: {mainstepId}, SubstepId: {substepId}", id, mainstepId, substepId);
+                _logger.LogError(ex, "Error in EditAssessmentDetails for Id: {Id}", id);
                 return new IncidentAssessmentEditViewModel();
             }
-
-            return editViewModel;
         }
         public async Task<long> UpdateAssessment(IncidentAssessmentEditViewModel request)
         {
-            await using var transaction = await _db.Database.BeginTransactionAsync();
             try
             {
-                var details = await _db.IncidentValidationAssessments
+                var task = await _db.IncidentValidationAssessmentTasks
                     .FirstOrDefaultAsync(p => !p.IsDeleted && p.Id == request.Id);
-
-                if (details == null)
+                if (task == null)
                     return 0;
 
-                // Time parsing helper
-                DateTime? ParseTime(string time) =>
-                    TimeSpan.TryParse(time, out var ts) ? DateTime.Today.Add(ts) : (DateTime?)null;
-
-                // Step mapping configuration
-                var stepMap = new Dictionary<(int mainStep, int subStep), Action>
-                {
-                    // Incident Commander
-                    [(1, 1)] = () =>
-                    {
-                        details.IC_MCR_AssignId = request.AssigneeId;
-                        details.IC_MCR_StatusId = request.StatusId;
-                        details.IC_MCR_StartTime = ParseTime(request.StartedTime);
-                        details.IC_MCR_ComplateTime = ParseTime(request.CompletedTime);
-                        details.IC_MCR_Notes = request.Description;
-                        details.IC_MCR_ImageUrls = request.ImageUrl;
-                    },
-                    [(1, 2)] = () =>
-                    {
-                        details.IC_Notify_AssignId = request.AssigneeId;
-                        details.IC_Notify_StatusId = request.StatusId;
-                        details.IC_Notify_StartTime = ParseTime(request.StartedTime);
-                        details.IC_Notify_ComplateTime = ParseTime(request.CompletedTime);
-                        details.IC_Notify_Notes = request.Description;
-                        details.IC_Notify_ImageUrls = request.ImageUrl;
-                    },
-                    [(1, 3)] = () =>
-                    {
-                        details.IC_EstablishICP_AssignId = request.AssigneeId;
-                        details.IC_EstablishICP_StatusId = request.StatusId;
-                        details.IC_EstablishICP_StartTime = ParseTime(request.StartedTime);
-                        details.IC_EstablishICP_ComplateTime = ParseTime(request.CompletedTime);
-                        details.IC_EstablishICP_Notes = request.Description;
-                        details.IC_EstablishICP_ImageUrls = request.ImageUrl;
-                    },
-
-                    // Field Environmental Representative
-                    [(2, 1)] = () =>
-                    {
-                        details.FER_PCA_AssignId = request.AssigneeId;
-                        details.FER_PCA_StatusId = request.StatusId;
-                        details.FER_PCA_StartTime = ParseTime(request.StartedTime);
-                        details.FER_PCA_ComplateTime = ParseTime(request.CompletedTime);
-                        details.FER_PCA_Notes = request.Description;
-                        details.FER_PCA_ImageUrls = request.ImageUrl;
-                    },
-                    [(2, 2)] = () =>
-                    {
-                        details.FER_LC_AssignId = request.AssigneeId;
-                        details.FER_LC_StatusId = request.StatusId;
-                        details.FER_LC_StartTime = ParseTime(request.StartedTime);
-                        details.FER_LC_ComplateTime = ParseTime(request.CompletedTime);
-                        details.FER_LC_Notes = request.Description;
-                        details.FER_LC_ImageUrls = request.ImageUrl;
-                    },
-
-                    // Engineering & GEC
-                    [(3, 1)] = () =>
-                    {
-                        details.EGEC_RSM_AssignId = request.AssigneeId;
-                        details.EGEC_RSM_StatusId = request.StatusId;
-                        details.EGEC_RSM_StartTime = ParseTime(request.StartedTime);
-                        details.EGEC_RSM_ComplateTime = ParseTime(request.CompletedTime);
-                        details.EGEC_RSM_Notes = request.Description;
-                        details.EGEC_RSM_ImageUrls = request.ImageUrl;
-                    },
-                    [(3, 2)] = () =>
-                    {
-                        details.EGEC_MLP_AssignId = request.AssigneeId;
-                        details.EGEC_MLP_StatusId = request.StatusId;
-                        details.EGEC_MLP_StartTime = ParseTime(request.StartedTime);
-                        details.EGEC_MLP_ComplateTime = ParseTime(request.CompletedTime);
-                        details.EGEC_MLP_Notes = request.Description;
-                        details.EGEC_MLP_ImageUrls = request.ImageUrl;
-                    },
-                    [(3, 3)] = () =>
-                    {
-                        details.EGEC_ICT_AssignId = request.AssigneeId;
-                        details.EGEC_ICT_StatusId = request.StatusId;
-                        details.EGEC_ICT_StartTime = ParseTime(request.StartedTime);
-                        details.EGEC_ICT_ComplateTime = ParseTime(request.CompletedTime);
-                        details.EGEC_ICT_Notes = request.Description;
-                        details.EGEC_ICT_ImageUrls = request.ImageUrl;
-                    }
-                };
-
-                // Execute correct mapping
-                if (stepMap.TryGetValue(((int)request.MainStepId, (int)request.SubStepId), out var apply))
-                    apply();
-                else
-                    return 0;
+                task.StatusId = request.StatusId;
+                task.RoleIds = request.AssigneeId.HasValue ? request.AssigneeId.Value.ToString() : task.RoleIds;
+                if (!string.IsNullOrEmpty(request.ImageUrl))
+                    task.ImageUrls = request.ImageUrl;
+                if (!string.IsNullOrEmpty(request.Description))
+                    task.Notes = request.Description;
+                task.UpdatedOn = DateTime.UtcNow;
 
                 await _db.SaveChangesAsync();
-                await transaction.CommitAsync();
-
-                return details.Id;
+                return task.Id;
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
-                _logger.LogError(ex, "Error updating assessment");
+                _logger.LogError(ex, "Error updating assessment task");
                 return 0;
             }
         }
         public async Task<IncidentAssessmentReadViewModel> ViewAssessmentDetails(long id, long mainstepId, long substepId)
         {
-            IncidentAssessmentReadViewModel editViewModel = new();
-
             try
             {
-                // Fetch the incident assessment
-                var details = await _db.IncidentValidationAssessments
-                                       .Where(p => !p.IsDeleted && p.Id == id)
-                                       .FirstOrDefaultAsync();
-
-                var incidentUsers = await _db.IncidentUsers
-                   .Where(p => !p.IsDeleted)
-                   .ToDictionaryAsync(p => p.Id, p => new { p.FirstName, p.LastName });
-
-                var statusList = await _db.Progress
-                                .Where(p => !p.IsDeleted)
-                                .ToDictionaryAsync(p => p.Id, p => p.Name);
-
-                string GetUserFullName(long? userId) =>
-                   userId.HasValue && incidentUsers.TryGetValue(userId.Value, out var user)
-                       ? $"{user.LastName} {user.FirstName}"
-                       : string.Empty;
-
-                string GetStatusName(long? statusId) =>
-                    statusId.HasValue && statusList.TryGetValue(statusId.Value, out var name)
-                        ? name
-                        : string.Empty;
-
-                if (details == null)
+                var task = await _db.IncidentValidationAssessmentTasks
+                    .Where(p => !p.IsDeleted && p.Id == id)
+                    .FirstOrDefaultAsync();
+                if (task == null)
                     return new IncidentAssessmentReadViewModel();
 
+                var statusList = await _db.Progress.Where(p => !p.IsDeleted).ToDictionaryAsync(p => p.Id, p => p.Name);
+                var roles = await _db.IncidentRoles.Where(p => !p.IsDeleted).ToListAsync();
+                var statusName = task.StatusId.HasValue ? statusList.GetValueOrDefault(task.StatusId.Value) : "";
+                var assignee = (task.RoleIds ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => long.TryParse(s.Trim(), out var rid) ? roles.FirstOrDefault(r => r.Id == rid)?.Name : null)
+                    .FirstOrDefault(n => !string.IsNullOrEmpty(n)) ?? "";
 
-                var allSubsteps = new List<IncidentCommanderDetailViewModel>
-                    {
-                        new()
-                        {
-                            Mainstep = "Incident Commander",
-                            MainstepId = 1,
-                            SubstepId = 1,
-                            Substep = "Create MCR",
-                            StatusId = details.IC_MCR_StatusId,
-                            AssigneeId = details.IC_MCR_AssignId,
-                            ImagesUrl = details.IC_MCR_ImageUrls,
-                            ClockIn = details.IC_MCR_StartTime?.ToString("HH:mm") ?? "-",
-                            ClockOut = details.IC_MCR_ComplateTime?.ToString("HH:mm") ?? "-",
-                            Notes = details.IC_MCR_Notes,
-                            Assignee = GetUserFullName(details.IC_MCR_AssignId),
-                            Status = GetStatusName(details.IC_MCR_StatusId)
-                        },
-                        new()
-                        {
-                            Mainstep = "Incident Commander",
-                            MainstepId = 1,
-                            SubstepId = 2,
-                            Substep = "Notify Claims & Engineering",
-                            StatusId = details.IC_Notify_StatusId,
-                            AssigneeId = details.IC_Notify_AssignId,
-                            ImagesUrl = details.IC_Notify_ImageUrls,
-                            ClockIn = details.IC_Notify_StartTime?.ToString("HH:mm") ?? "-",
-                            ClockOut = details.IC_Notify_ComplateTime?.ToString("HH:mm") ?? "-",
-                            Notes = details.IC_Notify_Notes,
-                            Assignee = GetUserFullName(details.IC_Notify_AssignId),
-                            Status = GetStatusName(details.IC_Notify_StatusId)
-                        },
-                        new()
-                        {
-                            Mainstep = "Incident Commander",
-                            MainstepId = 1,
-                            SubstepId = 3,
-                            Substep = "Establish ICP (site access verified)",
-                            StatusId = details.IC_EstablishICP_StatusId,
-                            AssigneeId = details.IC_EstablishICP_AssignId,
-                            ImagesUrl = details.IC_EstablishICP_ImageUrls,
-                            ClockIn = details.IC_EstablishICP_StartTime?.ToString("HH:mm") ?? "-",
-                            ClockOut = details.IC_EstablishICP_ComplateTime?.ToString("HH:mm") ?? "-",
-                            Notes = details.IC_EstablishICP_Notes,
-                            Assignee = GetUserFullName(details.IC_EstablishICP_AssignId),
-                            Status = GetStatusName(details.IC_EstablishICP_StatusId)
-                        },
-                        new()
-                        {
-                            Mainstep = "Field Environmental Representative",
-                            MainstepId = 2,
-                            SubstepId = 1,
-                            Substep = "Prepare containment area (drums/totes/Baker tank)",
-                            StatusId = details.FER_PCA_StatusId,
-                            AssigneeId = details.FER_PCA_AssignId,
-                            ImagesUrl = details.FER_PCA_ImageUrls,
-                            ClockIn = details.FER_PCA_StartTime?.ToString("HH:mm") ?? "-",
-                            ClockOut = details.FER_PCA_ComplateTime?.ToString("HH:mm") ?? "-",
-                            Notes = details.FER_PCA_Notes,
-                            Assignee = GetUserFullName(details.FER_PCA_AssignId),
-                            Status = GetStatusName(details.FER_PCA_StatusId)
-                        },
-                        new()
-                        {
-                            Mainstep = "Field Environmental Representative",
-                            MainstepId = 2,
-                            SubstepId = 2,
-                            Substep = "Label containers; log IDs and capacity",
-                            StatusId = details.FER_LC_StatusId,
-                            AssigneeId = details.FER_LC_AssignId,
-                            ImagesUrl = details.FER_LC_ImageUrls,
-                            ClockIn = details.FER_LC_StartTime?.ToString("HH:mm") ?? "-",
-                            ClockOut = details.FER_LC_ComplateTime?.ToString("HH:mm") ?? "-",
-                            Notes = details.FER_LC_Notes,
-                            Assignee = GetUserFullName(details.FER_LC_AssignId),
-                            Status = GetStatusName(details.FER_LC_StatusId)
-                        },
-                        new()
-                        {
-                            Mainstep = "Engineering & GEC",
-                            MainstepId = 3,
-                            SubstepId = 1,
-                            Substep = "Retrieve system maps (regulators, BO streets, elevations)",
-                            StatusId = details.EGEC_RSM_StatusId,
-                            AssigneeId = details.EGEC_RSM_AssignId,
-                            ImagesUrl = details.EGEC_RSM_ImageUrls,
-                            ClockIn = details.EGEC_RSM_StartTime?.ToString("HH:mm") ?? "-",
-                            ClockOut = details.EGEC_RSM_ComplateTime?.ToString("HH:mm") ?? "-",
-                            Notes = details.EGEC_RSM_Notes,
-                            Assignee = GetUserFullName(details.EGEC_RSM_AssignId),
-                            Status = GetStatusName(details.EGEC_RSM_StatusId)
-                        },
-                        new()
-                        {
-                            Mainstep = "Engineering & GEC",
-                            MainstepId = 3,
-                            SubstepId = 2,
-                            Substep = "Mark low points & squeeze points",
-                            StatusId = details.EGEC_MLP_StatusId,
-                            AssigneeId = details.EGEC_MLP_AssignId,
-                            ImagesUrl = details.EGEC_MLP_ImageUrls,
-                            ClockIn = details.EGEC_MLP_StartTime?.ToString("HH:mm") ?? "-",
-                            ClockOut = details.EGEC_MLP_ComplateTime?.ToString("HH:mm") ?? "-",
-                            Notes = details.EGEC_MLP_Notes,
-                            Assignee = GetUserFullName(details.EGEC_MLP_AssignId),
-                            Status = GetStatusName(details.EGEC_MLP_StatusId)
-                        },
-                        new()
-                        {
-                            Mainstep = "Engineering & GEC",
-                            MainstepId = 3,
-                            SubstepId = 3,
-                            Substep = "Initiate cost tracking (RBA) for vendors",
-                            StatusId = details.EGEC_ICT_StatusId,
-                            AssigneeId = details.EGEC_ICT_AssignId,
-                            ImagesUrl = details.EGEC_ICT_ImageUrls,
-                            ClockIn = details.EGEC_ICT_StartTime?.ToString("HH:mm") ?? "-",
-                            ClockOut = details.EGEC_ICT_ComplateTime?.ToString("HH:mm") ?? "-",
-                            Notes = details.EGEC_ICT_Notes,
-                            Assignee = GetUserFullName(details.EGEC_ICT_AssignId),
-                            Status = GetStatusName(details.EGEC_ICT_StatusId)
-                        }
-                    };
-
-                // Find the matching substep based on mainstepId and substepId
-                var substep = allSubsteps.FirstOrDefault(s => s.MainstepId == mainstepId && s.SubstepId == substepId);
-
-                if (substep != null)
+                return new IncidentAssessmentReadViewModel
                 {
-                    editViewModel = new IncidentAssessmentReadViewModel
-                    {
-                        StatusId = substep.StatusId,
-                        AssigneeId = substep.AssigneeId,
-                        MainStepId = substep.MainstepId,
-                        SubStepId = substep.SubstepId,
-
-                        MainStep = substep.Mainstep,
-                        SubStep = substep.Substep,
-                        Id = id,
-
-                        Description = substep.Notes,
-                        ImageUrl = substep.ImagesUrl,
-                        CompletedTime = substep.ClockOut,
-                        StartedTime = substep.ClockIn,
-                        Assignee = substep.Assignee,
-                        Status = substep.Status
-                    };
-                }
-
+                    Id = task.Id,
+                    MainStepId = mainstepId,
+                    SubStepId = substepId,
+                    MainStep = "Assessment",
+                    SubStep = task.TaskDescription ?? "",
+                    Description = task.Notes,
+                    ImageUrl = task.ImageUrls,
+                    StatusId = task.StatusId,
+                    Status = statusName,
+                    Assignee = assignee
+                };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in ViewAssessmentDetails for Id: {Id}, MainstepId: {mainstepId}, SubstepId: {substepId}", id, mainstepId, substepId);
+                _logger.LogError(ex, "Error in ViewAssessmentDetails for Id: {Id}", id);
                 return new IncidentAssessmentReadViewModel();
             }
-
-            return editViewModel;
         }
         public async Task<IncidentViewAssessmentAttachmentViewModel> ViewAssessmentAttachment(long id)
         {
-            IncidentViewAssessmentAttachmentViewModel attachmentViewModel = new();
-
+            var attachmentViewModel = new IncidentViewAssessmentAttachmentViewModel();
             try
             {
-                // Fetch the incident assessment
-                var details = await _db.IncidentValidationAssessments
-                                       .Where(p => !p.IsDeleted && p.IncidentId == id)
-                                       .FirstOrDefaultAsync();
+                var tasks = await _db.IncidentValidationAssessmentTasks
+                    .Where(p => !p.IsDeleted && p.IncidentId == id)
+                    .ToListAsync();
 
-                if (details != null)
+                var allImages = new List<string>();
+                foreach (var task in tasks)
                 {
-                    // Sab ImageUrls ko combine kar ke list banaye
-                    var allImages = new List<string>();
-
-                    void AddIfNotNullOrEmpty(string? urls)
+                    if (!string.IsNullOrWhiteSpace(task.ImageUrls))
                     {
-                        if (!string.IsNullOrWhiteSpace(urls))
-                        {
-                            var splitUrls = urls.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                                                .Select(u => Path.GetFileName(u.Trim())); // <-- sirf file name
-                            allImages.AddRange(splitUrls);
-                        }
+                        var splitUrls = task.ImageUrls.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                            .Select(u => Path.GetFileName(u.Trim()));
+                        allImages.AddRange(splitUrls);
                     }
+                }
 
-                    // Har property call karo
-                    AddIfNotNullOrEmpty(details.IC_MCR_ImageUrls);
-                    AddIfNotNullOrEmpty(details.IC_Notify_ImageUrls);
-                    AddIfNotNullOrEmpty(details.IC_EstablishICP_ImageUrls);
-                    AddIfNotNullOrEmpty(details.FER_PCA_ImageUrls);
-                    AddIfNotNullOrEmpty(details.FER_LC_ImageUrls);
-                    AddIfNotNullOrEmpty(details.EGEC_RSM_ImageUrls);
-                    AddIfNotNullOrEmpty(details.EGEC_MLP_ImageUrls);
-                    AddIfNotNullOrEmpty(details.EGEC_ICT_ImageUrls);
+                if (allImages.Count > 0)
 
                     // Result assign karo viewmodel me
                     attachmentViewModel.Image = allImages;
-                }
+                
             }
             catch (Exception ex)
             {
@@ -2163,35 +1634,10 @@ namespace Repositories.Common
 
         }
 
-        public async Task<long> SubmitAssestment(IncidentValidationAssessment request)
+        public Task<long> SubmitAssestment(IncidentValidationAssessment request)
         {
-            await using var transaction = await _db.Database.BeginTransactionAsync();
-            try
-            {
-                #region Incident Validation Assestment
-                if (request != null)
-                {
-                    var incidentValidation = await _db.IncidentValidations.Where(p => p.IncidentId == request.IncidentId && !p.IsDeleted).FirstOrDefaultAsync();
-
-                    request.IncidentValidationId = incidentValidation?.Id;
-                    await _db.IncidentValidationAssessments.AddAsync(request);
-                }
-                #endregion
-
-                #region  Save everything in one go
-                // 6. Save everything in one go
-                await _db.SaveChangesAsync();
-
-                await transaction.CommitAsync();
-                return request.Id;
-                #endregion
-            }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                _logger.LogError(ex, "Error SubmitAssestment.");
-                return 0;
-            }
+            // Assessment is now checklist-based (IncidentValidationAssessmentTasks); default tasks are seeded on validation create.
+            return Task.FromResult(1L);
         }
 
         #endregion
@@ -3118,6 +2564,152 @@ namespace Repositories.Common
             };
         }
 
+        public async Task<List<IncidentViewTaskListViewModel>> GetAssessmentTasksVM(long incidentId)
+        {
+            var roles = await _db.IncidentRoles.AsNoTracking().ToListAsync();
+            var statuses = await _db.Progress.AsNoTracking().ToListAsync();
+            var tasks = await _db.IncidentValidationAssessmentTasks
+                .AsNoTracking()
+                .Where(t => !t.IsDeleted && t.IncidentId == incidentId)
+                .OrderBy(t => t.Id)
+                .ToListAsync();
+            return MapTasksToViewModel(tasks, roles, statuses);
+        }
+
+        public async Task<IncidentViewTaskListViewModel> AddAssessmentTaskAsync(AddIncidentTaskRequest request)
+        {
+            var entity = new IncidentValidationAssessmentTask
+            {
+                IncidentId = request.IncidentId,
+                IncidentValidationId = request.IncidentValidationId,
+                TaskDescription = request.TaskDescription,
+                RoleIds = request.RoleIds,
+                StatusId = request.StatusId,
+                CreatedOn = DateTime.UtcNow,
+                IsDeleted = false
+            };
+            _db.IncidentValidationAssessmentTasks.Add(entity);
+            await _db.SaveChangesAsync();
+            return await MapSingleTaskToViewModel(entity);
+        }
+
+        public async Task<List<IncidentViewTaskListViewModel>> GetRepairTasksVM(long incidentId)
+        {
+            var roles = await _db.IncidentRoles.AsNoTracking().ToListAsync();
+            var statuses = await _db.Progress.AsNoTracking().ToListAsync();
+            var tasks = await _db.IncidentValidationRepairTasks
+                .AsNoTracking()
+                .Where(t => !t.IsDeleted && t.IncidentId == incidentId)
+                .OrderBy(t => t.Id)
+                .ToListAsync();
+            return MapRepairTasksToViewModel(tasks, roles, statuses);
+        }
+
+        public async Task<IncidentViewTaskListViewModel> AddRepairTaskAsync(AddIncidentTaskRequest request)
+        {
+            var entity = new IncidentValidationRepairTask
+            {
+                IncidentId = request.IncidentId,
+                IncidentValidationId = request.IncidentValidationId,
+                TaskDescription = request.TaskDescription,
+                RoleIds = request.RoleIds,
+                StatusId = request.StatusId,
+                CreatedOn = DateTime.UtcNow,
+                IsDeleted = false
+            };
+            _db.IncidentValidationRepairTasks.Add(entity);
+            await _db.SaveChangesAsync();
+            return await MapSingleRepairTaskToViewModel(entity);
+        }
+
+        private static List<IncidentViewTaskListViewModel> MapTasksToViewModel(
+            List<IncidentValidationAssessmentTask> tasks,
+            List<IncidentRole> roles,
+            List<Progress> statuses)
+        {
+            return tasks.Select(x =>
+            {
+                var responsible = string.Join(" / ", (x.RoleIds ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => long.TryParse(s.Trim(), out var rid) ? roles.FirstOrDefault(r => r.Id == rid)?.Name : null).Where(n => !string.IsNullOrEmpty(n)));
+                var statusName = x.StatusId.HasValue ? statuses.FirstOrDefault(s => s.Id == x.StatusId.Value)?.Name ?? "" : "";
+                return new IncidentViewTaskListViewModel
+                {
+                    Id = x.Id,
+                    IncidentId = x.IncidentId ?? 0,
+                    IncidentValidationId = x.IncidentValidationId ?? 0,
+                    Task = x.TaskDescription ?? "",
+                    FieldValue = string.IsNullOrWhiteSpace(responsible) ? "—" : responsible,
+                    Status = string.IsNullOrWhiteSpace(statusName) ? "Pending" : statusName,
+                    ImagesUrl = x?.ImageUrls ?? "",
+                    ImageCount = string.IsNullOrWhiteSpace(x?.ImageUrls) ? 0 : x.ImageUrls.Split(',', StringSplitOptions.RemoveEmptyEntries).Length,
+                    Notes = x?.Notes ?? ""
+                };
+            }).ToList();
+        }
+
+        private static List<IncidentViewTaskListViewModel> MapRepairTasksToViewModel(
+            List<IncidentValidationRepairTask> tasks,
+            List<IncidentRole> roles,
+            List<Progress> statuses)
+        {
+            return tasks.Select(x =>
+            {
+                var responsible = string.Join(" / ", (x.RoleIds ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => long.TryParse(s.Trim(), out var rid) ? roles.FirstOrDefault(r => r.Id == rid)?.Name : null).Where(n => !string.IsNullOrEmpty(n)));
+                var statusName = x.StatusId.HasValue ? statuses.FirstOrDefault(s => s.Id == x.StatusId.Value)?.Name ?? "" : "";
+                return new IncidentViewTaskListViewModel
+                {
+                    Id = x.Id,
+                    IncidentId = x.IncidentId ?? 0,
+                    IncidentValidationId = x.IncidentValidationId ?? 0,
+                    Task = x.TaskDescription ?? "",
+                    FieldValue = string.IsNullOrWhiteSpace(responsible) ? "—" : responsible,
+                    Status = string.IsNullOrWhiteSpace(statusName) ? "Pending" : statusName,
+                    ImagesUrl = x?.ImageUrls ?? "",
+                    ImageCount = string.IsNullOrWhiteSpace(x?.ImageUrls) ? 0 : x.ImageUrls.Split(',', StringSplitOptions.RemoveEmptyEntries).Length,
+                    Notes = x?.Notes ?? ""
+                };
+            }).ToList();
+        }
+
+        private async Task<IncidentViewTaskListViewModel> MapSingleTaskToViewModel(IncidentValidationAssessmentTask entity)
+        {
+            var roles = await _db.IncidentRoles.ToListAsync();
+            var statuses = await _db.Progress.ToListAsync();
+            var roleNames = (entity.RoleIds ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => long.TryParse(s.Trim(), out var id) ? roles.FirstOrDefault(r => r.Id == id)?.Name : null).Where(n => !string.IsNullOrEmpty(n));
+            var statusName = entity.StatusId.HasValue ? statuses.FirstOrDefault(s => s.Id == entity.StatusId.Value)?.Name : null;
+            return new IncidentViewTaskListViewModel
+            {
+                Id = entity.Id,
+                IncidentId = entity.IncidentId,
+                IncidentValidationId = entity.IncidentValidationId,
+                Task = entity.TaskDescription,
+                FieldValue = roleNames.Any() ? string.Join(" / ", roleNames) : "—",
+                Status = string.IsNullOrWhiteSpace(statusName) ? "Not Started" : statusName,
+                Attachment = null
+            };
+        }
+
+        private async Task<IncidentViewTaskListViewModel> MapSingleRepairTaskToViewModel(IncidentValidationRepairTask entity)
+        {
+            var roles = await _db.IncidentRoles.ToListAsync();
+            var statuses = await _db.Progress.ToListAsync();
+            var roleNames = (entity.RoleIds ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => long.TryParse(s.Trim(), out var id) ? roles.FirstOrDefault(r => r.Id == id)?.Name : null).Where(n => !string.IsNullOrEmpty(n));
+            var statusName = entity.StatusId.HasValue ? statuses.FirstOrDefault(s => s.Id == entity.StatusId.Value)?.Name : null;
+            return new IncidentViewTaskListViewModel
+            {
+                Id = entity.Id,
+                IncidentId = entity.IncidentId,
+                IncidentValidationId = entity.IncidentValidationId,
+                Task = entity.TaskDescription,
+                FieldValue = roleNames.Any() ? string.Join(" / ", roleNames) : "—",
+                Status = string.IsNullOrWhiteSpace(statusName) ? "Not Started" : statusName,
+                Attachment = null
+            };
+        }
+
         #region Restoration
         public async Task<IncidentEditTaskListViewModel> EditRestorationDetails(long id)
         {
@@ -3758,167 +3350,33 @@ namespace Repositories.Common
         #region Repair
         public async Task<List<IncidentViewRepairListViewModel>> GetvalidationRepairVM(long id, bool isEdit = false)
         {
-            var roles = await _db.IncidentRoles.ToListAsync();
-            var statuses = await _db.Progress.ToListAsync();
-
-            List<IncidentValidationRepair> repairs;
-
-            if (!isEdit)
-                repairs = await _db.IncidentValidationRepairs
-                    .Where(p => !p.IsDeleted && p.IncidentId == id)
-                    .ToListAsync();
-            else
-                repairs = await _db.IncidentValidationRepairs
-                    .Where(p => !p.IsDeleted && p.Id == id)
-                    .ToListAsync();
-
-            // Base template (3 rows)
-            var baseTemplate = new[]
+            var taskList = await GetRepairTasksVM(id);
+            if (isEdit)
             {
-        new
-        {
-            FieldTypeId = 1,
-            FieldType = "Use \"Identifying Source of Leak\" Checklist (Pg. 4)",
-            GetValue = new Func<IncidentValidationRepair, string?>(r => r?.SourceOfLeak),
-            GetStatus = new Func<IncidentValidationRepair, string?>(r => r?.SourceOfLeakStatus)
-        },
-        new
-        {
-            FieldTypeId = 2,
-            FieldType = "Identify ideal purge locations to prevent further outage (use engineering data)",
-            GetValue = new Func<IncidentValidationRepair, string?>(r => r?.PreventFurtherOutage),
-            GetStatus = new Func<IncidentValidationRepair, string?>(r => r?.PreventFurtherOutageStatus)
-        },
-        new
-        {
-            FieldTypeId = 3,
-            FieldType = "Verify vacuum truck fittings (2\" cam-lock and 2\" → ¾\" adaptors available)",
-            GetValue = new Func<IncidentValidationRepair, string?>(r => r?.VacuumTruckFitting),
-            GetStatus = new Func<IncidentValidationRepair, string?>(r => r?.VacuumTruckFittingStatus)
-        }
-    };
-
-            // Ensure at least 3 rows even if no DB records exist
-            var result = (repairs.Any()
-                ? repairs
-                : new List<IncidentValidationRepair> { new IncidentValidationRepair { IncidentId = id } })
-                .SelectMany(r => baseTemplate.Select(t => new
-                {
-                    r.Id,
-                    r.IncidentId,
-                    r.IncidentValidationId,
-                    FieldTypeId = t.FieldTypeId,
-                    FieldType = t.FieldType,
-                    FieldValue = t.GetValue(r),
-                    FieldStatus = t.GetStatus(r),
-                    r.SourceOfLeak,
-                    r.SOL_Path,
-                    r.VTF_Path,
-                    r.PFO_Path,
-                    r.PreventFurtherOutageStatus,
-                    r.PreventFurtherOutage,
-                    r.VacuumTruckFitting,
-                    r.VacuumTruckFittingStatus,
-                    r.SourceOfLeakStatus
-                }))
-                // Map FieldValue IDs → Role Names
-                .Select(x =>
-                {
-                    string fieldValue = x.FieldValue ?? string.Empty;
-
-                    // If empty, assign default RoleId = 1 (Engineering)
-                    if (string.IsNullOrWhiteSpace(fieldValue))
-                    {
-                        var defaultRole = roles.FirstOrDefault(r => r.Id == 1)?.Name ?? "Engineering";
-                        fieldValue = defaultRole;
-                    }
-                    else
-                    {
-                        // Convert Role IDs to Role Names
-                        fieldValue = string.Join(" / ",
-                            (x.FieldValue ?? "")
-                                .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                                .Select(v => v.Trim())
-                                .Select(v => long.TryParse(v, out var vid)
-                                    ? roles.FirstOrDefault(r => r.Id == vid)?.Name
-                                    : v)
-                                .Where(name => !string.IsNullOrEmpty(name))
-                        );
-                    }
-
-                    return new
-                    {
-                        x.Id,
-                        x.IncidentId,
-                        x.IncidentValidationId,
-                        x.FieldType,
-                        x.FieldTypeId,
-                        FieldValue = fieldValue,
-                        x.FieldStatus,
-                        x.SourceOfLeak,
-                        x.SourceOfLeakStatus,
-                        x.SOL_Path,
-                        x.VTF_Path,
-                        x.PFO_Path,
-                        x.PreventFurtherOutageStatus,
-                        x.PreventFurtherOutage,
-                        x.VacuumTruckFitting,
-                        x.VacuumTruckFittingStatus
-                    };
-                })
-                .OrderBy(x => x.FieldTypeId)
-                .ToList();
-
-            // Map to ViewModel
-            var viewModelList = result.Select(p =>
+                var single = taskList.FirstOrDefault(t => t.Id == id);
+                taskList = single != null ? new List<IncidentViewTaskListViewModel> { single } : new List<IncidentViewTaskListViewModel>();
+            }
+            var idx = 0;
+            return taskList.Select(t =>
             {
-                var repairRec = repairs.FirstOrDefault(r => r.Id == p.Id);
-
-                var sourceOfLeakValue = string.IsNullOrEmpty(p.SourceOfLeak) ? "1" : p.SourceOfLeak;
-                var sourceOfLeakStatusValue = string.IsNullOrEmpty(p.SourceOfLeakStatus) ? "2" : p.SourceOfLeakStatus;
-
-                var preventFurtherOutageValue = string.IsNullOrEmpty(p.PreventFurtherOutage) ? "1" : p.PreventFurtherOutage;
-                var preventFurtherOutageStatusValue = string.IsNullOrEmpty(p.PreventFurtherOutageStatus) ? "2" : p.PreventFurtherOutageStatus;
-
-                var vacuumTruckFittingValue = string.IsNullOrEmpty(p.VacuumTruckFitting) ? "1" : p.VacuumTruckFitting;
-                var vacuumTruckFittingStatusValue = string.IsNullOrEmpty(p.VacuumTruckFittingStatus) ? "2" : p.VacuumTruckFittingStatus;
-
+                idx++;
                 return new IncidentViewRepairListViewModel
                 {
-                    Id = p.Id,
-                    IncidentId = p.IncidentId,
-                    IncidentValidationId = p.IncidentValidationId,
-                    FieldTypeId = p.FieldTypeId,
-                    FieldType = string.IsNullOrEmpty(p.FieldType) ? "-" : p.FieldType,
-
-                    // ✅ Responsible Party (FieldValue)
-                    FieldValue = string.IsNullOrEmpty(p.FieldValue) ? "Engineering" : p.FieldValue,
-
-                    // ✅ Progress Status
-                    FieldStatus = string.IsNullOrEmpty(p.FieldStatus)
-                        ? "Not Started"
-                        : statuses.FirstOrDefault(s => s.Id == Convert.ToInt64(p.FieldStatus ?? "0"))?.Name ?? "Not Started",
-
-                    SOL_Path = repairRec?.SOL_Path,
-                    PFO_Path = repairRec?.PFO_Path,
-                    VTF_Path = repairRec?.VTF_Path,
-
-                    SOL_Count = (repairRec?.SOL_Path)?.Split(',', StringSplitOptions.RemoveEmptyEntries).Length ?? 0,
-                    PFO_Count = (repairRec?.PFO_Path)?.Split(',', StringSplitOptions.RemoveEmptyEntries).Length ?? 0,
-                    VTF_Count = (repairRec?.VTF_Path)?.Split(',', StringSplitOptions.RemoveEmptyEntries).Length ?? 0,
-
-                    SourceOfLeak = sourceOfLeakValue,
-                    SourceOfLeakStatus = sourceOfLeakStatusValue,
-
-                    PreventFurtherOutage = preventFurtherOutageValue,
-                    PreventFurtherOutageStatus = preventFurtherOutageStatusValue,
-
-                    VacuumTruckFitting = vacuumTruckFittingValue,
-                    VacuumTruckFittingStatus = vacuumTruckFittingStatusValue
+                    Id = t.Id,
+                    IncidentId = t.IncidentId,
+                    IncidentValidationId = t.IncidentValidationId ?? 0,
+                    FieldTypeId = idx,
+                    FieldType = t.Task ?? "-",
+                    FieldValue = string.IsNullOrWhiteSpace(t.FieldValue) ? "—" : t.FieldValue,
+                    FieldStatus = t.Status ?? "Not Started",
+                    SOL_Path = t.ImagesUrl,
+                    PFO_Path = null,
+                    VTF_Path = null,
+                    SOL_Count = (int)(t.ImageCount ?? 0),
+                    PFO_Count = 0,
+                    VTF_Count = 0
                 };
             }).ToList();
-
-            return viewModelList;
         }
 
         public async Task<IncidentRepairEditViewModel> EditRepairDetails(long id, long RepairId, long FieldType, long IncidentId, long IncidentValidationId)
@@ -3994,71 +3452,23 @@ namespace Repositories.Common
         }
         public async Task<long> UpdateRepair(IncidentRepairEditViewModel request)
         {
-            await using var transaction = await _db.Database.BeginTransactionAsync();
             try
             {
-                var details = await _db.IncidentValidationRepairs
+                var task = await _db.IncidentValidationRepairTasks
                     .FirstOrDefaultAsync(p => !p.IsDeleted && p.Id == request.Id);
+                if (task == null)
+                    return 0;
 
-
-                if (details == null || details.Id == 0)
-                {
-                    var IncidentValidationRepair = new IncidentValidationRepair
-                    {
-                        IncidentValidationId = Convert.ToInt64(request.IncidentValidationId),
-                        IncidentId = Convert.ToInt64(request.IncidentId),
-                        SourceOfLeak = request.SourceOfLeak,
-                        SourceOfLeakStatus = request.SourceOfLeakStatus,
-                        PreventFurtherOutage = request.PreventFurtherOutage,
-                        PreventFurtherOutageStatus = request.PreventFurtherOutageStatus,
-                        VacuumTruckFitting = request.VacuumTruckFitting,
-                        VacuumTruckFittingStatus = request.VacuumTruckFittingStatus,
-                        SOL_Path = request.SOL_Path,
-                        SOL_Remark = request.SOL_Remark,
-                        PFO_Path = request.PFO_Path,
-                        PFO_Remark = request.PFO_Remark,
-                        VTF_Path = request.VTF_Path,
-                        VTF_Remark = request.VTF_Remark,
-                        ActiveStatus = ActiveStatus.Active
-                    };
-                    await _db.IncidentValidationRepairs.AddAsync(IncidentValidationRepair);
-                    await _db.SaveChangesAsync();
-                    await transaction.CommitAsync();
-                    return IncidentValidationRepair.Id;
-                }
-                else
-                {
-                    if (request.FieldTypeId == 1)
-                    {
-                        details.SourceOfLeak = request.SourceOfLeak;
-                        details.SourceOfLeakStatus = request.SourceOfLeakStatus;
-                        details.SOL_Path = request.SOL_Path;
-                        details.SOL_Remark = request.SOL_Remark;
-                    }
-                    else if (request.FieldTypeId == 2)
-                    {
-                        details.PreventFurtherOutage = request.PreventFurtherOutage;
-                        details.PreventFurtherOutageStatus = request.PreventFurtherOutageStatus;
-                        details.PFO_Path = request.PFO_Path;
-                        details.PFO_Remark = request.PFO_Remark;
-                    }
-                    else if (request.FieldTypeId == 3)
-                    {
-                        details.VacuumTruckFitting = request.VacuumTruckFitting;
-                        details.VacuumTruckFittingStatus = request.VacuumTruckFittingStatus;
-                        details.VTF_Path = request.VTF_Path;
-                        details.VTF_Remark = request.VTF_Remark;
-                    }
-                    await _db.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return details.Id;
-                }
+                var path = request.SOL_Path ?? request.PFO_Path ?? request.VTF_Path;
+                if (!string.IsNullOrEmpty(path))
+                    task.ImageUrls = path;
+                task.UpdatedOn = DateTime.UtcNow;
+                await _db.SaveChangesAsync();
+                return task.Id;
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
-                _logger.LogError(ex, "Error updating Repair");
+                _logger.LogError(ex, "Error updating Repair task");
                 return 0;
             }
         }

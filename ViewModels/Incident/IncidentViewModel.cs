@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 using Models;
@@ -416,6 +416,7 @@ namespace ViewModels.Incident
         public List<IncidentCommanderDetailViewModel> incidentCommanderDetailViewslist { get; set; } = new();
         public Dictionary<string, string> MainStepOwners { get; set; } = new();
         public List<IncidentViewPostViewModel> listIncidentViewPostViewModel { get; set; } = new();
+        public List<IncidentViewTaskListViewModel> AssessmentTasks { get; set; } = new();
     }
     public class IncidentAssessmentEditViewModel
     {

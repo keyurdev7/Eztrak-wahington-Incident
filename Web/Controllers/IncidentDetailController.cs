@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -397,6 +397,52 @@ namespace Web.Controllers
             catch (Exception ex)
             {
                 // log...
+                return StatusCode(500, new { success = false, message = "Save failed." });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveAssessmentTask([FromForm] IncidentViewTaskListViewModel model)
+        {
+            if (model == null || model.IncidentId == 0)
+                return BadRequest(new { success = false, message = "Invalid request." });
+            try
+            {
+                var created = await _iIncidentService.AddAssessmentTaskAsync(new AddIncidentTaskRequest
+                {
+                    IncidentId = model.IncidentId,
+                    IncidentValidationId = model.IncidentValidationId,
+                    TaskDescription = model.Task,
+                    RoleIds = model.RoleIds,
+                    StatusId = model.StatusId
+                });
+                return Ok(new { success = true, data = created });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "Save failed." });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveRepairTask([FromForm] IncidentViewTaskListViewModel model)
+        {
+            if (model == null || model.IncidentId == 0)
+                return BadRequest(new { success = false, message = "Invalid request." });
+            try
+            {
+                var created = await _iIncidentService.AddRepairTaskAsync(new AddIncidentTaskRequest
+                {
+                    IncidentId = model.IncidentId,
+                    IncidentValidationId = model.IncidentValidationId,
+                    TaskDescription = model.Task,
+                    RoleIds = model.RoleIds,
+                    StatusId = model.StatusId
+                });
+                return Ok(new { success = true, data = created });
+            }
+            catch (Exception ex)
+            {
                 return StatusCode(500, new { success = false, message = "Save failed." });
             }
         }
@@ -816,15 +862,10 @@ namespace Web.Controllers
         [HttpPost]
 
         public async Task<PartialViewResult> GetRepairDetails(long id)
-
         {
-
-            IncidentViewModel incidentViewModel = new IncidentViewModel();
-
-            incidentViewModel.IncidentViewRepairViewModel.listIncidentViewRepairViewModel = await _iIncidentService.GetvalidationRepairVM(id);
-
-            return PartialView("_IncidentRepairDetailsPartial", incidentViewModel.IncidentViewRepairViewModel);
-
+            var taskList = await _iIncidentService.GetRepairTasksVM(id);
+            var viewModel = new IncidentViewTaskViewModel { listIncidentViewTaskViewModel = taskList };
+            return PartialView("_IncidentRepairDetailsPartial", viewModel);
         }
 
         #endregion

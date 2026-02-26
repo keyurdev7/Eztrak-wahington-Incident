@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 
 using Azure;
 
@@ -520,43 +520,14 @@ namespace Repositories.Common
                 await SeedDefaultCloseoutTasks(incidentValidation.Id, request.Id);
                 #endregion
 
+                #region IncidentValidationAssessment
+                // 11. Create default Assessment tasks
+                await SeedDefaultAssessmentTasks(incidentValidation.Id, request.Id);
+                #endregion
 
-                #region SaveAssesment
-                IncidentValidationAssessment assessment = new IncidentValidationAssessment()
-                {
-                    ActiveStatus = 0,
-                    CreatedBy = 1,
-                    CreatedOn = DateTime.Now,
-                    UpdatedOn = DateTime.Now,
-                    IncidentId = request.Id,
-
-                    IC_EstablishICP_AssignId =3,
-                    IC_EstablishICP_StatusId = 2,
-                    IC_MCR_AssignId = 3,
-                    IC_MCR_StatusId = 2,
-                    IC_Notify_AssignId = 3,
-                    IC_Notify_StatusId = 2,
-
-
-                    FER_LC_AssignId = 6,
-                    FER_LC_StatusId = 2,
-                    FER_PCA_AssignId = 6,
-                    FER_PCA_StatusId = 2,
-
-                    EGEC_ICT_AssignId = request.assignedRole.GECCoordinatorId,
-                    EGEC_ICT_StatusId = 1,
-                    EGEC_MLP_AssignId = request.assignedRole.GECCoordinatorId,
-                    EGEC_MLP_StatusId = 1,
-                    EGEC_RSM_AssignId = request.assignedRole.GECCoordinatorId,
-                    EGEC_RSM_StatusId = 1,
-
-                    UpdatedBy=1,
-                    IncidentValidationId = incidentValidation.Id,
-
-                };
-
-                //await _incidentService.SubmitAssestment(assessment);
-                await _db.IncidentValidationAssessments.AddAsync(assessment);
+                #region IncidentValidationRepair
+                // 12. Create default Repair tasks
+                await SeedDefaultRepairTasks(incidentValidation.Id, request.Id);
                 #endregion
 
                 #region  Save everything in one go
@@ -713,30 +684,12 @@ namespace Repositories.Common
                 }
                 #endregion
 
-                #region Incident Validation Assestment
-                if (!string.IsNullOrWhiteSpace(request.incidentValidationAssessment))
-                {
-                    request.incidentSubmitValidationAssessment.IncidentId = request.Id;
-                    request.incidentSubmitValidationAssessment.IncidentValidationId = incidentValidation.Id;
-                    await _db.IncidentValidationAssessments.AddAsync(request.incidentSubmitValidationAssessment);
-                }
+                #region IncidentValidationAssessment
+                await SeedDefaultAssessmentTasks(incidentValidation.Id, request.Id);
                 #endregion
 
                 #region IncidentValidationRepair
-                // 8. Save main IncidentValidationAssignedRole
-                var IncidentValidationRepair = new IncidentValidationRepair
-                {
-                    IncidentValidationId = incidentValidation.Id,
-                    IncidentId = request.Id,
-                    SourceOfLeak = request.validationRepair.SourceOfLeak,
-                    SourceOfLeakStatus = request.validationRepair.SourceOfLeakStatus,
-                    PreventFurtherOutage = request.validationRepair.PreventFurtherOutage,
-                    PreventFurtherOutageStatus = request.validationRepair.PreventFurtherOutageStatus,
-                    VacuumTruckFitting = request.validationRepair.VacuumTruckFitting,
-                    VacuumTruckFittingStatus = request.validationRepair.VacuumTruckFittingStatus,
-                    ActiveStatus = ActiveStatus.Active
-                };
-                await _db.IncidentValidationRepairs.AddAsync(IncidentValidationRepair);
+                await SeedDefaultRepairTasks(incidentValidation.Id, request.Id);
                 #endregion
 
                 #region IncidentValidationRestoration
@@ -1306,6 +1259,63 @@ namespace Repositories.Common
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error seeding default Closeout tasks for Incident {IncidentId}", incidentId);
+            }
+        }
+
+        private async Task SeedDefaultAssessmentTasks(long incidentValidationId, long incidentId)
+        {
+            try
+            {
+                var defaultStatus = await _db.Progress
+                    .FirstOrDefaultAsync(p => !p.IsDeleted && p.Name.ToLower().Contains("Not Started"));
+                var defaultStatusId = defaultStatus?.Id ?? 1;
+
+                var icRole = await _db.IncidentRoles.FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("IC"));
+                var ferRole = await _db.IncidentRoles.FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("FER"));
+                var gecRole = await _db.IncidentRoles.FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("GEC"));
+
+                var defaultAssessmentTasks = new List<IncidentValidationAssessmentTask>
+                {
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Create MCR", RoleIds = icRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Notify Claims & Engineering", RoleIds = icRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Establish ICP (site access verified)", RoleIds = icRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Prepare containment area (drums/totes/Baker tank)", RoleIds = ferRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Label containers; log IDs and capacity", RoleIds = ferRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Retrieve system maps (regulators, BO streets, elevations)", RoleIds = gecRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Mark low points & squeeze points", RoleIds = gecRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Initiate cost tracking (RBA) for vendors", RoleIds = gecRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active }
+                };
+                await _db.IncidentValidationAssessmentTasks.AddRangeAsync(defaultAssessmentTasks);
+                await _db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error seeding default Assessment tasks for Incident {IncidentId}", incidentId);
+            }
+        }
+
+        private async Task SeedDefaultRepairTasks(long incidentValidationId, long incidentId)
+        {
+            try
+            {
+                var defaultStatus = await _db.Progress
+                    .FirstOrDefaultAsync(p => !p.IsDeleted && p.Name.ToLower().Contains("Not Started"));
+                var defaultStatusId = defaultStatus?.Id ?? 1;
+
+                var engineeringRole = await _db.IncidentRoles.FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("Engineering"));
+
+                var defaultRepairTasks = new List<IncidentValidationRepairTask>
+                {
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Use \"Identifying Source of Leak\" Checklist (Pg. 4)", RoleIds = engineeringRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Identify ideal purge locations to prevent further outage (use engineering data)", RoleIds = engineeringRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Verify vacuum truck fittings (2\" cam-lock and 2\" → ¾\" adaptors available)", RoleIds = engineeringRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active }
+                };
+                await _db.IncidentValidationRepairTasks.AddRangeAsync(defaultRepairTasks);
+                await _db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error seeding default Repair tasks for Incident {IncidentId}", incidentId);
             }
         }
         #endregion

@@ -1,4 +1,4 @@
-﻿using Centangle.Common.ResponseHelpers.Models;
+using Centangle.Common.ResponseHelpers.Models;
 
 using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 
@@ -77,6 +77,10 @@ namespace Repositories.Common
 
         Task<long> GetTaskClouseOutCompletedCount(long incidentId);
 
+        Task<List<IncidentViewTaskListViewModel>> GetAssessmentTasksVM(long incidentId);
+        Task<IncidentViewTaskListViewModel> AddAssessmentTaskAsync(AddIncidentTaskRequest request);
+        Task<List<IncidentViewTaskListViewModel>> GetRepairTasksVM(long incidentId);
+        Task<IncidentViewTaskListViewModel> AddRepairTaskAsync(AddIncidentTaskRequest request);
         Task<List<IncidentViewRepairListViewModel>> GetvalidationRepairVM(long id, bool isEdit = false);
         Task<IncidentRepairEditViewModel> EditRepairDetails(long id, long RepairId, long FieldType, long IncidentId, long IncidentValidationId);
         Task<long> UpdateRepair(IncidentRepairEditViewModel request);

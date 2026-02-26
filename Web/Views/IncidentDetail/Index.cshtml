@@ -1,4 +1,4 @@
-﻿@model ViewModels.Incident.IncidentViewModel
+@model ViewModels.Incident.IncidentViewModel
 @using Microsoft.AspNetCore.Html
 @using Microsoft.AspNetCore.Identity
 @using Models;
@@ -1674,19 +1674,7 @@
                                 <!-- Pre-Operation Setup -->
                                 <div class="card mb-4">
                                     <div class="card-body p-0">
-
-                                        <div class="d-flex justify-content-between align-items-center mb-0 p-3">
-                                            <h6 class="fw-bold mb-0">Pre-Operation Setup</h6>
-            <button type="button" class="btn btn-add">
-                <i class="fa-solid fa-plus me-2"></i>Add 
-            </button>
-        </div>
-
-                                       @*  <h6 class="fw-bold mb-0 p-3"></h6>
-                                        <button type="button" class="btn btn-add" >
-                                            <i class="fa-solid fa-plus me-2"></i>Add
-                                        </button>
- *@                                        <div class="table-responsive table-rounded custom-scroll">
+                                        <div class="table-responsive table-rounded custom-scroll">
                                             <div id="div_repair_details">
                                             </div>
                                         </div>
@@ -2073,7 +2061,7 @@
                                 <div class="card mb-4">
                                     <div class="card-body p-0">
                                         <div class="d-flex justify-content-between align-items-center mb-0 p-3">
-                                            <h6 class="fw-bold mb-0">Closeout & Reporting Tasks</h6>
+                                            <h6 class="fw-bold mb-0">Closeout & Reporting</h6>
                                             <button class="btn btn-add" onclick="OpenAddCloseOutTaskModal()"><i class="fa-solid fa-plus me-2"></i>Add Report</button>
                                         </div>
                                         <div class="table-responsive table-rounded custom-scroll">
@@ -3603,6 +3591,8 @@
 }
 @Html.Partial("_AddTaskPartial", new ViewModels.Incident.IncidentViewTaskListViewModel())
 @Html.Partial("_AddCloseOutTaskPartial", new ViewModels.Incident.IncidentViewTaskListViewModel())
+@Html.Partial("_AddAssessmentTaskPartial", new ViewModels.Incident.IncidentViewTaskListViewModel())
+@Html.Partial("_AddRepairTaskPartial", new ViewModels.Incident.IncidentViewTaskListViewModel())
 
 <script>
 
@@ -3649,6 +3639,65 @@
             $("#addTaskModal").hide();
             $(".modal-backdrop").remove();
         });
+
+    function OpenAddAssessmentTaskModal() {
+        $("#addAssessmentTaskModal").show();
+        $("body").append('<div class="modal-backdrop fade show"></div>');
+    }
+    $("#formAddAssessmentTask").on("submit", function (e) {
+        e.preventDefault();
+        var formData = $(this).serialize();
+        $("#btnSaveAddAssessmentTask").prop("disabled", true);
+        $.ajax({
+            url: '@Url.Action("SaveAssessmentTask", "IncidentDetail")',
+            method: 'POST',
+            data: formData,
+            success: function (res) {
+                $("#btnSaveAddAssessmentTask").prop("disabled", false);
+                if (res && res.success) {
+                    $("#formAddAssessmentTask")[0].reset();
+                    $("#addAssessmentTaskModal").hide();
+                    $(".modal-backdrop").remove();
+                    var id = @(Model?.Id ?? 0);
+                    if (id) GetAssessmentDetails(null, 0, "");
+                } else { alert(res?.message || "Save failed"); }
+            },
+            error: function () { $("#btnSaveAddAssessmentTask").prop("disabled", false); alert("Error saving task"); }
+        });
+    });
+    $("#btnCancelAddAssessmentTask, #btnCloseAddAssessmentTask").on("click", function () {
+        $("#addAssessmentTaskModal").hide();
+        $(".modal-backdrop").remove();
+    });
+
+    function OpenAddRepairTaskModal() {
+        $("#addRepairTaskModal").show();
+        $("body").append('<div class="modal-backdrop fade show"></div>');
+    }
+    $("#formAddRepairTask").on("submit", function (e) {
+        e.preventDefault();
+        var formData = $(this).serialize();
+        $("#btnSaveAddRepairTask").prop("disabled", true);
+        $.ajax({
+            url: '@Url.Action("SaveRepairTask", "IncidentDetail")',
+            method: 'POST',
+            data: formData,
+            success: function (res) {
+                $("#btnSaveAddRepairTask").prop("disabled", false);
+                if (res && res.success) {
+                    $("#formAddRepairTask")[0].reset();
+                    $("#addRepairTaskModal").hide();
+                    $(".modal-backdrop").remove();
+                    GetRepairDetails();
+                } else { alert(res?.message || "Save failed"); }
+            },
+            error: function () { $("#btnSaveAddRepairTask").prop("disabled", false); alert("Error saving task"); }
+        });
+    });
+    $("#btnCancelAddRepairTask, #btnCloseAddRepairTask").on("click", function () {
+        $("#addRepairTaskModal").hide();
+        $(".modal-backdrop").remove();
+    });
 
        $("#saveValidationBtn").on("click", function () {
            SaveIncidentValidation();
@@ -4059,6 +4108,8 @@
     $(document).ready(function() {
         initMultiselect();
         initMultiselectCloseout();
+        initMultiselectAssessment();
+        initMultiselectRepair();
     });
 
     function initMultiselect() {
@@ -4113,6 +4164,36 @@
       });
       }
 
+    function initMultiselectAssessment() {
+      $("#addAssessmentTaskModal").find('.multiselect-dropdown').each(function () {
+          var $dropdown = $(this);
+          var $btn = $dropdown.find('.dropdown-btn');
+          var $list = $dropdown.find('.dropdown-list');
+          $btn.on('click', function (e) { e.stopPropagation(); $('.dropdown-list').not($list).hide(); $list.toggle(); });
+          $list.on('change', 'input[type="checkbox"]', function () {
+              var selected = $list.find('input[type="checkbox"]').filter(':checked').map(function () { return { id: $(this).val(), name: $(this).data('name') || $(this).parent().text().trim() }; }).get();
+              $btn.text(selected.length ? selected.map(function (s) { return s.name; }).join(', ') : 'Choose roles');
+              var hiddenId = $dropdown.attr('id').replace('chk_', 'hdn_');
+              $('#' + hiddenId).val(selected.map(function (s) { return s.id; }).join(','));
+          });
+          $(document).on('click', function (e) { if (!$dropdown.is(e.target) && $dropdown.has(e.target).length === 0) $list.hide(); });
+      });
+    }
+    function initMultiselectRepair() {
+      $("#addRepairTaskModal").find('.multiselect-dropdown').each(function () {
+          var $dropdown = $(this);
+          var $btn = $dropdown.find('.dropdown-btn');
+          var $list = $dropdown.find('.dropdown-list');
+          $btn.on('click', function (e) { e.stopPropagation(); $('.dropdown-list').not($list).hide(); $list.toggle(); });
+          $list.on('change', 'input[type="checkbox"]', function () {
+              var selected = $list.find('input[type="checkbox"]').filter(':checked').map(function () { return { id: $(this).val(), name: $(this).data('name') || $(this).parent().text().trim() }; }).get();
+              $btn.text(selected.length ? selected.map(function (s) { return s.name; }).join(', ') : 'Choose roles');
+              var hiddenId = $dropdown.attr('id').replace('chk_', 'hdn_');
+              $('#' + hiddenId).val(selected.map(function (s) { return s.id; }).join(','));
+          });
+          $(document).on('click', function (e) { if (!$dropdown.is(e.target) && $dropdown.has(e.target).length === 0) $list.hide(); });
+      });
+    }
     function initMultiselectCloseout() {
       $("#addTaskCloseOutModal").find('.multiselect-dropdown').each(function () {
           var $dropdown = $(this);
