@@ -920,7 +920,7 @@
             console.log("ArcGIS modules loaded ✔");
 
             // Store current basemap type
-            window.currentBasemap = "streets-navigation-vector";
+            window.currentBasemap = "satellite";
             
             var map = new Map({
                 basemap: window.currentBasemap
@@ -1215,14 +1215,9 @@
             });
         }
 
-        // Initialize button states on page load
+        // Initialize button states on page load (default: satellite)
         $(document).ready(function() {
-            var streetBtn = document.getElementById('streetViewBtn');
-            if (streetBtn) {
-                streetBtn.classList.add('active');
-                streetBtn.style.background = 'rgba(245, 78, 0, 0.9)';
-                streetBtn.style.color = 'white';
-            }
+            switchMapView('satellite');
         });
     </script>
 

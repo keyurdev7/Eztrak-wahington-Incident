@@ -1,4 +1,21 @@
 ﻿$(function () {
+    // Default IncidentDetail map to satellite view.
+    // This must run AFTER the ArcGIS Map instance is created in the Razor view,
+    // so we wait until both switchMapView and mapInstance exist.
+    (function initDefaultSatellite(retriesLeft) {
+        try {
+            if (typeof window.switchMapView === "function" && window.mapInstance) {
+                window.switchMapView('satellite');
+                return;
+            }
+        } catch (e) {
+            // ignore
+        }
+
+        if (retriesLeft <= 0) return;
+        setTimeout(function () { initDefaultSatellite(retriesLeft - 1); }, 200);
+    })(25);
+
     GetCloseOutDetails();
     GetRepairDetails();
     $(document).off("change", "#ddlStatus, #ddlOwner");
@@ -41,7 +58,7 @@
         formData.append("Id", document.getElementById("assessmentId").value);
         formData.append("StatusId", document.getElementById("status").value);
         formData.append("AssigneeId", document.getElementById("assignee").value);
-       // formData.append("StartedTime", document.getElementById("startedTime").value);
+        // formData.append("StartedTime", document.getElementById("startedTime").value);
         //formData.append("CompletedTime", document.getElementById("completedTime").value);
         formData.append("Description", document.getElementById("description").value);
         formData.append("MainStepId", document.getElementById("mainstepId").value);
@@ -158,7 +175,7 @@
         formData.append("StatusId", document.getElementById("status").value);
         formData.append("RoleIds", document.getElementById("hdn_UpdateResortationRole").value);
         //formData.append("Started", document.getElementById("startedTime").value);
-       // formData.append("Completed", document.getElementById("completedTime").value);
+        // formData.append("Completed", document.getElementById("completedTime").value);
         formData.append("Description", document.getElementById("description").value);
         formData.append("Task", document.getElementById("task").value);
 
@@ -369,19 +386,19 @@
             formData.append("SourceOfLeak", document.getElementById("hdn_ResponsibleRole").value);
             formData.append("SourceOfLeakStatus", document.getElementById("status").value);
             formData.append("SOL_Remark", document.getElementById("description").value);
-          
+
         }
         else if (document.getElementById("FieldTypeId").value == 2) {
             formData.append("PreventFurtherOutage", document.getElementById("hdn_ResponsibleRole").value);
             formData.append("PreventFurtherOutageStatus", document.getElementById("status").value);
             formData.append("PFO_Remark", document.getElementById("description").value);
-            
+
         }
         else if (document.getElementById("FieldTypeId").value == 3) {
             formData.append("VacuumTruckFitting", document.getElementById("hdn_ResponsibleRole").value);
             formData.append("VacuumTruckFittingStatus", document.getElementById("status").value);
             formData.append("VTF_Remark", document.getElementById("description").value);
-            
+
         }
 
 
@@ -477,15 +494,18 @@
 
 async function GetAssessmentDetails(statusID, ownerId, step) {
     try {
-
+        // normalize optional args
+        statusID = (statusID === null || statusID === undefined || statusID === "") ? 0 : statusID;
+        ownerId = (ownerId === null || ownerId === undefined || ownerId === "") ? 0 : ownerId;
+        step = (step === null || step === undefined) ? "" : step;
 
         let payload = {
-            IncidentId: $("#hdnIncidentID").val(),
+            IncidentId: $("#hdnIncidentID").val() || 0,
             step: step,
             statusID: statusID,
             ownerId: ownerId
         };
-
+        debugger
         showLoader($("#div_assestment_details"));
 
         const response = await fetch("/IncidentDetail/GetAssessmentDetails", {

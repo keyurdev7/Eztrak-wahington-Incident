@@ -1,5 +1,4 @@
-﻿
-#imgPreviewModal.modal {
+﻿#imgPreviewModal.modal {
     display: none;
     position: fixed;
     z-index: 9999;
@@ -826,6 +825,7 @@
 #incidentDetailsModal {
     /* padding: 0 26px; */
     background: #F9FAFB;
+    min-height: 100vh;
 }
 
 .tabHeader {
@@ -833,20 +833,11 @@
     padding: 0 26px;
 }
 
-#incidentDetailsModal .tabBody .section {
-    margin-top: 0;
-}
-
-.titleSec {
-    margin-top: 0;
-    padding: 22px 0 12px 0;
-}
-
 #incidentDetailsModal .tabBody {
     background: #ffffff;
     padding: 16px 16px;
-    margin: 25px;
-    border-radius: 12px;
+    margin: 0;
+    border-radius: 0;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     border: 1px solid #e5e7eb;
 }
@@ -862,6 +853,39 @@
 #overview .section-card {
     margin-top: 0;
 }
+
+#dashboard.tab-content.active {
+    /* remove extra spacing in the Map tab content */
+    padding: 0;
+}
+
+#dashboard .row.g-4 {
+    margin: 0;
+}
+
+#dashboard .col-lg-12 {
+    padding: 0;
+}
+
+#dashboard .card {
+    border-radius: 0 !important;
+}
+
+#dashboard .card-body {
+    padding: 0;
+}
+
+#dashboard #map {
+    height: calc(100vh - 170px) !important; /* tabs/header offset */
+    width: 100% !important;
+}
+
+@media (max-width: 768px) {
+    #dashboard #map {
+        height: calc(100vh - 210px) !important;
+    }
+}
+
 /********************Personnal design*********************/
 
 #personnel .stat-card {
