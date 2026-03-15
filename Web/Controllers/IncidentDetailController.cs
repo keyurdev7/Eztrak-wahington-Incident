@@ -242,6 +242,20 @@ namespace Web.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> UpdateAssessmentTaskOrder([FromBody] List<long> taskIds)
+        {
+            try
+            {
+                var result = await _iIncidentService.UpdateAssessmentTaskOrder(taskIds);
+                return Json(new { success = result });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
         #endregion
 
         #region Personnel
@@ -557,6 +571,20 @@ namespace Web.Controllers
             return PartialView("_ViewRestorationPartial", model);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> UpdateRestorationTaskOrder([FromBody] List<long> taskIds)
+        {
+            try
+            {
+                var result = await _iIncidentService.UpdateRestorationTaskOrder(taskIds);
+                return Json(new { success = result });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
         //[HttpGet]
         //public async Task<PartialViewResult> AddRestorationDetails()
         //{
@@ -705,6 +733,20 @@ namespace Web.Controllers
         {
             var model = await _iIncidentService.ViewClouseOutDetails(id);
             return PartialView("_ViewClouseOutPartial", model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateCloseoutTaskOrder([FromBody] List<long> taskIds)
+        {
+            try
+            {
+                var result = await _iIncidentService.UpdateCloseoutTaskOrder(taskIds);
+                return Json(new { success = result });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         //[HttpGet]
@@ -866,6 +908,20 @@ namespace Web.Controllers
             var taskList = await _iIncidentService.GetRepairTasksVM(id);
             var viewModel = new IncidentViewTaskViewModel { listIncidentViewTaskViewModel = taskList };
             return PartialView("_IncidentRepairDetailsPartial", viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateRepairTaskOrder([FromBody] List<long> taskIds)
+        {
+            try
+            {
+                var result = await _iIncidentService.UpdateRepairTaskOrder(taskIds);
+                return Json(new { success = result });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         #endregion

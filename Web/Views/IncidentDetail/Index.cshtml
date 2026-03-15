@@ -1547,12 +1547,12 @@
                                     <div><i class="fa-solid fa-list-check me-2 text-warning"></i> Assessment Notes</div>
                                     <a class="text-decoration-none text-warning small fw-semibold"
                                        data-bs-toggle="collapse" href="#assessmentNotesCollapse" role="button"
-                                       aria-expanded="false" aria-controls="assessmentNotesCollapse" id="assessmentNotesCollapseToggle">
+                                       aria-expanded="true" aria-controls="assessmentNotesCollapse" id="assessmentNotesCollapseToggle">
                                         <i class="fa-solid fa-angle-down me-1"></i>
                                     </a>
                                 </div>
 
-                                <div class="collapse" id="assessmentNotesCollapse">
+                                <div class="collapse show" id="assessmentNotesCollapse">
                                     <div class="card-body p-3">
                                         @{
                                             Model.IncidentViewPostType = 3; // assessment
@@ -1800,7 +1800,7 @@
                             </a>
                         </div>
 
-                        <div class="collapse" id="repairNotesCollapse">
+                        <div class="collapse show" id="repairNotesCollapse">
                             <div class="card-body p-3">
                                 @{
                                     Model.IncidentViewPostType = 1; // Repair
@@ -1841,7 +1841,7 @@
                                 <div class="info-card text-center text-md-start"
                                      style="background-color:#dff7df; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
                                     <div class="info-title" style="font-weight:600; color:#333;">Completed:</div>
-                                    <div><span class="info-value" id="completedTaskCount" style="font-size:22px; font-weight:700; color:#198754;">@Model.IncidentViewTaskViewModel?.listIncidentViewTaskViewModel?.Count(t => t.Status?.ToLower() == "complete")<span></div>
+                                    <div><span class="info-value" id="completedTaskCount" style="font-size:22px; font-weight:700; color:#198754;">@Model.IncidentViewTaskViewModel?.listIncidentViewTaskViewModel?.Count(t => t.Status?.ToLower() == "complete")</span></div>
                                 </div>
                             </div>
 
@@ -1992,7 +1992,7 @@
                                 <div class="info-card text-center text-md-start"
                                      style="background-color:#e8f0fe; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
                                     <div class="info-title" style="font-weight:600; color:#333;">Open:</div>
-                                    <div><span class="info-value" id="openTaskCount" style="font-size:22px; font-weight:700; color:#1a73e8;">5</span></div>
+                                    <div><span class="info-value" id="openTaskCount" style="font-size:22px; font-weight:700; color:#1a73e8;">@Model.IncidentViewTaskViewModel?.listIncidentViewTaskCloseOutViewModel?.Count(t => string.IsNullOrWhiteSpace(t.Status) || t.Status.ToLower() == "not started" || t.Status.ToLower() == "started")</span></div>
                                 </div>
                             </div>
 
@@ -2000,7 +2000,7 @@
                                 <div class="info-card text-center text-md-start"
                                      style="background-color:#dff7df; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
                                     <div class="info-title" style="font-weight:600; color:#333;">Completed:</div>
-                                    <div><span class="info-value" id="completedTaskCount" style="font-size:22px; font-weight:700; color:#198754;">@Model.IncidentViewTaskViewModel?.listIncidentViewTaskViewModel?.Count(t => t.Status?.ToLower() == "complete")</span></div>
+                                    <div><span class="info-value" id="completedTaskCount" style="font-size:22px; font-weight:700; color:#198754;">@Model.IncidentViewTaskViewModel?.listIncidentViewTaskCloseOutViewModel?.Count(t => t.Status?.ToLower() == "complete")</span></div>
                                 </div>
                             </div>
 
@@ -2008,7 +2008,7 @@
                                 <div class="info-card text-center text-md-start"
                                      style="background-color:#fff3cd; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
                                     <div class="info-title" style="font-weight:600; color:#333;">Total:</div>
-                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#c58a00;">@Model.IncidentViewTaskViewModel?.listIncidentViewTaskViewModel?.Count()</span></div>
+                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#c58a00;">@Model.IncidentViewTaskViewModel?.listIncidentViewTaskCloseOutViewModel?.Count()</span></div>
                                 </div>
                             </div>
 
@@ -2989,7 +2989,7 @@
             // update icon when collapse hides/shows
             collapseEl.addEventListener('hidden.bs.collapse', function () {
                 toggle.innerHTML = '<i class="fa-solid fa-angle-down me-1"></i>';
-                toggle.setAttribute('aria-expanded', 'false');
+                toggle.setAttribute('aria-expanded', 'true');
             });
 
             collapseEl.addEventListener('shown.bs.collapse', function () {
@@ -3003,7 +3003,7 @@
                 toggle.setAttribute('aria-expanded', 'true');
             } else {
                 toggle.innerHTML = '<i class="fa-solid fa-angle-down me-1"></i>';
-                toggle.setAttribute('aria-expanded', 'false');
+                toggle.setAttribute('aria-expanded', 'true');
             }
         });
     })();

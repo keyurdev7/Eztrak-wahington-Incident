@@ -474,6 +474,7 @@ namespace ViewModels.Incident
         public string Description { get; set; } = string.Empty;
         public string Assignee { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
+        public int SortOrder { get; set; }
     }
 
     public class IncidentViewAssessmentAttachmentViewModel
@@ -551,6 +552,7 @@ namespace ViewModels.Incident
         public string ImagesUrl { get; set; } = string.Empty;
         public string Notes { get; set; } = string.Empty;
         public long? ImageCount { get; set; }
+        public int SortOrder { get; set; }
     }
     public class IncidentEditTaskListViewModel
     {

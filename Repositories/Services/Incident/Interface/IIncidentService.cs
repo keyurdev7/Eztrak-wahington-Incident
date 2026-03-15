@@ -60,6 +60,10 @@ namespace Repositories.Common
         Task<IncidentAssessmentAddViewModel> AddAssessmentDetails();
         Task<long> SubmitAssestment(IncidentValidationAssessment request);
         Task<IncidentViewTaskListViewModel> AddIncidentTaskAsync(AddIncidentTaskRequest request);
+        Task<bool> UpdateAssessmentTaskOrder(List<long> taskIds);
+        Task<bool> UpdateRestorationTaskOrder(List<long> taskIds);
+        Task<bool> UpdateRepairTaskOrder(List<long> taskIds);
+        Task<bool> UpdateCloseoutTaskOrder(List<long> taskIds);
 
         Task<IncidentEditTaskListViewModel> EditRestorationDetails(long id);
         Task<long> UpdateRestoration(IncidentEditTaskListViewModel request);

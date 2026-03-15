@@ -1,52 +1,21 @@
-using AutoMapper;
-
-using Azure;
-
-using Centangle.Common.ResponseHelpers;
-using Centangle.Common.ResponseHelpers.Models;
-
 using DataLibrary;
-
-using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Drawing.Spreadsheet;
-using DocumentFormat.OpenXml.EMMA;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
-using DocumentFormat.OpenXml.Wordprocessing;
 
 using Enums;
 
 using Helpers.Extensions;
-using Helpers.File;
 
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 using Models;
-using Models.Common.Interfaces;
-
-using Pagination;
-
-using Repositories.Services.ArcGis;
-using Repositories.Services.ArcGis.Interface;
-using Repositories.Shared.UserInfoServices.Interface;
-
-using System.Linq;
-using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 using ViewModels;
 using ViewModels.Dashboard;
 using ViewModels.Incident;
-using ViewModels.Shared;
-
-using static ViewModels.Incident.IncidentViewModel;
 
 namespace Repositories.Common
 {
@@ -454,8 +423,8 @@ namespace Repositories.Common
                         RelationShipName = item.Relationship?.Name ?? string.Empty,
                         RelationShipId = item?.RelationshipId,
                         AdditionalLocationCount = addCount,
-                        Phase= !string.IsNullOrEmpty(item?.Phase) ? item?.Phase : "Validation",
-                        Progress= !string.IsNullOrEmpty(item?.Progress) ? item?.Progress : "0",
+                        Phase = !string.IsNullOrEmpty(item?.Phase) ? item?.Phase : "Validation",
+                        Progress = !string.IsNullOrEmpty(item?.Progress) ? item?.Progress : "0",
                         ImageUrl = item.ImageUrl ?? string.Empty,
                     });
                 }
@@ -1532,7 +1501,8 @@ namespace Repositories.Common
             try
             {
                 var task = await _db.IncidentValidationAssessmentTasks
-                    .Where(p => !p.IsDeleted && p.Id == id)
+                    .Where(p => !p.IsDeleted && p.Id == id).OrderBy(p => p.SortOrder)
+
                     .FirstOrDefaultAsync();
                 if (task == null)
                     return new IncidentAssessmentReadViewModel();
@@ -1555,7 +1525,9 @@ namespace Repositories.Common
                     ImageUrl = task.ImageUrls,
                     StatusId = task.StatusId,
                     Status = statusName,
-                    Assignee = assignee
+                    Assignee = assignee,
+                    SortOrder = task.SortOrder
+
                 };
             }
             catch (Exception ex)
@@ -1570,7 +1542,7 @@ namespace Repositories.Common
             try
             {
                 var tasks = await _db.IncidentValidationAssessmentTasks
-                    .Where(p => !p.IsDeleted && p.IncidentId == id)
+                    .Where(p => !p.IsDeleted && p.IncidentId == id).OrderBy(i => i.SortOrder)
                     .ToListAsync();
 
                 var allImages = new List<string>();
@@ -1588,7 +1560,7 @@ namespace Repositories.Common
 
                     // Result assign karo viewmodel me
                     attachmentViewModel.Image = allImages;
-                
+
             }
             catch (Exception ex)
             {
@@ -1655,13 +1627,13 @@ namespace Repositories.Common
 
                 // Ensure IncidentValidation exists for this incident
                 long incidentValidationId = request.IncidentValidationId;
-                
+
                 if (incidentValidationId <= 0)
                 {
                     // Try to get existing IncidentValidation for this incident
                     var existingValidation = await _db.IncidentValidations
                         .FirstOrDefaultAsync(iv => iv.IncidentId == request.IncidentId && !iv.IsDeleted);
-                    
+
                     if (existingValidation != null)
                     {
                         incidentValidationId = existingValidation.Id;
@@ -1702,10 +1674,10 @@ namespace Repositories.Common
                     // Verify that the provided IncidentValidationId exists and belongs to this incident
                     var validationExists = await _db.IncidentValidations
                         .AnyAsync(iv => iv.Id == incidentValidationId && iv.IncidentId == request.IncidentId && !iv.IsDeleted);
-                    
+
                     if (!validationExists)
                     {
-                        _logger.LogWarning("IncidentValidation {ValidationId} does not exist or does not belong to Incident {IncidentId}", 
+                        _logger.LogWarning("IncidentValidation {ValidationId} does not exist or does not belong to Incident {IncidentId}",
                             incidentValidationId, request.IncidentId);
                         return 0;
                     }
@@ -3436,7 +3408,7 @@ namespace Repositories.Common
                         PreventFurtherOutage = i.PreventFurtherOutage,
                         VacuumTruckFitting = i.VacuumTruckFitting,
                         VacuumTruckFittingStatus = i.VacuumTruckFittingStatus,
-                        SourceOfLeakStatus= i.SourceOfLeakStatus
+                        SourceOfLeakStatus = i.SourceOfLeakStatus
 
 ,
                     }).FirstOrDefault()!;
@@ -3630,6 +3602,130 @@ namespace Repositories.Common
             {
                 _logger.LogError(ex, "Error UpdateValidationGates");
                 return 0;
+            }
+        }
+        public async Task<bool> UpdateAssessmentTaskOrder(List<long> taskIds)
+        {
+            // Example implementation: update the order of tasks by setting a "SortOrder" property if it exists.
+            // If your IncidentValidationAssessmentTask entity has a SortOrder or similar property, update it here.
+            // If not, adjust this logic to fit your data model.
+
+            if (taskIds == null || !taskIds.Any())
+                return false;
+
+            try
+            {
+                var tasks = await _db.IncidentValidationAssessmentTasks
+                    .Where(t => taskIds.Contains(t.Id))
+                    .ToListAsync();
+
+                for (int i = 0; i < taskIds.Count; i++)
+                {
+                    var task = tasks.FirstOrDefault(t => t.Id == taskIds[i]);
+                    if (task != null)
+                    {
+                        // If you have a SortOrder or Order property, set it here.
+                        task.SortOrder = i;
+                        // For now, do nothing if no such property exists.
+                    }
+                }
+
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating assessment task order.");
+                return false;
+            }
+        }
+        public async Task<bool> UpdateRestorationTaskOrder(List<long> taskIds)
+        {
+            if (taskIds == null || !taskIds.Any())
+                return false;
+
+            try
+            {
+                var tasks = await _db.IncidentValidationTasks
+                    .Where(t => taskIds.Contains(t.Id))
+                    .ToListAsync();
+
+                for (int i = 0; i < taskIds.Count; i++)
+                {
+                    var task = tasks.FirstOrDefault(t => t.Id == taskIds[i]);
+                    if (task != null)
+                    {
+                        task.SortOrder = i;
+                    }
+                }
+
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating restoration task order.");
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateRepairTaskOrder(List<long> taskIds)
+        {
+            if (taskIds == null || !taskIds.Any())
+                return false;
+
+            try
+            {
+                var tasks = await _db.IncidentValidationRepairTasks
+                    .Where(t => taskIds.Contains(t.Id))
+                    .ToListAsync();
+
+                for (int i = 0; i < taskIds.Count; i++)
+                {
+                    var task = tasks.FirstOrDefault(t => t.Id == taskIds[i]);
+                    if (task != null)
+                    {
+                        task.SortOrder = i;
+                    }
+                }
+
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating repair task order.");
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateCloseoutTaskOrder(List<long> taskIds)
+        {
+            if (taskIds == null || !taskIds.Any())
+                return false;
+
+            try
+            {
+                var tasks = await _db.ValidationCloseouts
+                    .Where(t => taskIds.Contains(t.Id))
+                    .ToListAsync();
+
+                for (int i = 0; i < taskIds.Count; i++)
+                {
+                    var task = tasks.FirstOrDefault(t => t.Id == taskIds[i]);
+                    if (task != null)
+                    {
+                        task.SortOrder = i;
+                    }
+                }
+
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating closeout task order.");
+                return false;
             }
         }
         #endregion

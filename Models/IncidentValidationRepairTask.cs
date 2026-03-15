@@ -18,5 +18,10 @@ namespace Models
         public string TaskDescription { get; set; }
         public string? Notes { get; set; }
         public string? ImageUrls { get; set; }
+
+        /// <summary>
+        /// User-defined ordering for display in the Repair tab.
+        /// </summary>
+        public int SortOrder { get; set; }
     }
 }

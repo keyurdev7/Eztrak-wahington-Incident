@@ -26,5 +26,10 @@ namespace Models
         public string? ImageUrls { get; set; }
         //public DateTime? StartTime { get; set; }
         //public DateTime? ComplateTime { get; set; }
+
+        /// <summary>
+        /// User-defined ordering for display in the Restoration tab.
+        /// </summary>
+        public int SortOrder { get; set; }
     }
 }

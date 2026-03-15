@@ -946,3 +946,76 @@ async function EditRepairDetails(id, RepairId, FieldType, IncidentId, IncidentVa
 
 }
 
+// Drag and Drop functions for Assessment Tasks
+let draggedElement = null;
+
+function dragStart(event) {
+    draggedElement = event.target;
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/html', event.target.outerHTML);
+    event.target.style.opacity = '0.5';
+}
+
+function dragOver(event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    return false;
+}
+
+function drop(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (draggedElement != event.target.closest('tr')) {
+        const tableBody = event.target.closest('tbody');
+        const rows = Array.from(tableBody.querySelectorAll('tr'));
+        const draggedIndex = rows.indexOf(draggedElement);
+        const targetIndex = rows.indexOf(event.target.closest('tr'));
+
+        if (draggedIndex < targetIndex) {
+            tableBody.insertBefore(draggedElement, event.target.closest('tr').nextSibling);
+        } else {
+            tableBody.insertBefore(draggedElement, event.target.closest('tr'));
+        }
+
+        // Update the sort order on the server
+        updateAssessmentTaskOrder();
+    }
+
+    draggedElement.style.opacity = '1';
+    draggedElement = null;
+    return false;
+}
+
+async function updateAssessmentTaskOrder() {
+    const table = document.getElementById('assessmentTable');
+    const rows = table.querySelectorAll('tbody tr');
+    const taskIds = Array.from(rows).map(row => parseInt(row.getAttribute('data-id')));
+
+    try {
+        const response = await fetch('/IncidentDetail/UpdateAssessmentTaskOrder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(taskIds)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update task order');
+        }
+
+        const result = await response.json();
+        if (!result.success) {
+            console.error('Failed to update task order:', result.message);
+            // Optionally, refresh the table to revert changes
+            GetAssessmentDetails(0, 0, '');
+        }
+    } catch (error) {
+        console.error('Error updating task order:', error);
+        // Refresh the table to revert changes
+        GetAssessmentDetails(0, 0, '');
+    }
+}
+
