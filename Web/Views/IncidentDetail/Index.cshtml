@@ -5,12 +5,32 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 @{
+    // Calculate assessment percentages
+    var assessmentList = Model.IncidentAssessmentDetails?.AssessmentTasks;
+    var totalassessment = assessmentList?.Count() ?? 0;
+    var completedassessment = assessmentList?.Count(t => t.Status?.ToLower() == "complete") ?? 0;
+    var assessmentpr = totalassessment > 0 ? Math.Round((double)completedassessment / totalassessment * 100) : 0;
+
     // Calculate Closeout percentages
     var closeOutList = Model.IncidentViewTaskViewModel?.listIncidentViewTaskCloseOutViewModel;
     var totalCloseOut = closeOutList?.Count() ?? 0;
     var completedCloseOut = closeOutList?.Count(t => t.Status?.ToLower() == "complete") ?? 0;
     var percentCloseOut = totalCloseOut > 0 ? Math.Round((double)completedCloseOut / totalCloseOut * 100) : 0;
+
+    // Calculate restorationpr percentages
+    var restorationprList = Model.IncidentViewTaskViewModel?.listIncidentViewTaskViewModel;
+    var totalrestorationpr = restorationprList?.Count() ?? 0;
+    var completedrestorationpr = restorationprList?.Count(t => t.Status?.ToLower() == "complete") ?? 0;
+    var restorationpr = totalrestorationpr > 0 ? Math.Round((double)completedrestorationpr / totalrestorationpr * 100) : 0;
+
+    // Calculate Repair percentages
+    var RepairList = Model.IncidentViewRepairViewModel?.listIncidentViewRepairViewModel;
+    var totalRepair = RepairList?.Count() ?? 0;
+    var completedRepair = RepairList?.Count(t => t.FieldStatus?.ToLower() == "complete") ?? 0;
+    var RepairPr  = totalRepair > 0 ? Math.Round((double)completedRepair / totalRepair * 100) : 0;
+    var totalpr = (assessmentpr + percentCloseOut + restorationpr + RepairPr) / 4;
 }
+  
 <link href="~/css/custom/views/incident/detail.css" rel="stylesheet" />
 <link href="~/css/custom/views/incident/validation-index.css" rel="stylesheet" />
 <link href="~/css/custom/views/incident/validation.css" rel="stylesheet" />
@@ -201,7 +221,7 @@
                         <div class="progress-icon-compact"><i class="fa fa-pie-chart"></i></div>
                         <div class="progress-text-compact">
                             <span class="progress-label">Progress:</span>
-                            <span class="progress-value">0% Complete</span>
+                            <span class="progress-value">@totalpr% Complete</span>
                         </div>
                     </div>
                 </div>
@@ -1470,7 +1490,7 @@
                                 <div class="info-card text-center text-md-start"
                                      style="background-color:#e8f0fe; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
                                     <div class="info-title" style="font-weight:600; color:#333;">Open:</div>
-                                    <div><span class="info-value" id="openTaskCount" style="font-size:22px; font-weight:700; color:#1a73e8;">8</span></div>
+                                    <div><span class="info-value" id="openTaskCount" style="font-size:22px; font-weight:700; color:#1a73e8;">@Model.IncidentAssessmentDetails?.AssessmentTasks?.Count(t => t.Status?.ToLower() != "complete")</span></div>
                                 </div>
                             </div>
 
@@ -1478,7 +1498,7 @@
                                 <div class="info-card text-center text-md-start"
                                      style="background-color:#dff7df; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
                                     <div class="info-title" style="font-weight:600; color:#333;">Completed:</div>
-                                    <div><span class="info-value" id="completedTaskCount" style="font-size:22px; font-weight:700; color:#198754;">@Model.IncidentViewTaskViewModel?.listIncidentViewTaskViewModel?.Count(t => t.Status?.ToLower() == "complete")</span></div>
+                                    <div><span class="info-value" id="completedTaskCount" style="font-size:22px; font-weight:700; color:#198754;">@Model.IncidentAssessmentDetails?.AssessmentTasks?.Count(t => t.Status?.ToLower() == "complete")</span></div>
                                 </div>
                             </div>
 
@@ -1494,7 +1514,7 @@
                                 <div class="info-card text-center text-md-start"
                                      style="background-color:#f2f2f2; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
                                     <div class="info-title" style="font-weight:600; color:#333;">% Complete:</div>
-                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#6c757d;">0%</span></div>
+                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#6c757d;">@assessmentpr %</span></div>
                                 </div>
                             </div>
 
@@ -1644,7 +1664,7 @@
                                 <div class="info-card text-center text-md-start"
                                      style="background-color:#e8f0fe; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
                                     <div class="info-title" style="font-weight:600; color:#333;">Open:</div>
-                                    <div><span class="info-value" id="openTaskCount" style="font-size:22px; font-weight:700; color:#1a73e8;">3</span></div>
+                                    <div><span class="info-value" id="openTaskCount" style="font-size:22px; font-weight:700; color:#1a73e8;">@Model.IncidentViewRepairViewModel?.listIncidentViewRepairViewModel?.Count(t => t.FieldStatus?.ToLower() != "complete")</span></div>
                                 </div>
                             </div>
 
@@ -1652,7 +1672,7 @@
                                 <div class="info-card text-center text-md-start"
                                      style="background-color:#dff7df; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
                                     <div class="info-title" style="font-weight:600; color:#333;">Completed:</div>
-                                    <div><span class="info-value" id="completedTaskCount" style="font-size:22px; font-weight:700; color:#198754;">@Model.IncidentViewTaskViewModel?.listIncidentViewTaskViewModel?.Count(t => t.Status?.ToLower() == "complete")</span></div>
+                                    <div><span class="info-value" id="completedTaskCount" style="font-size:22px; font-weight:700; color:#198754;">@Model.IncidentViewRepairViewModel?.listIncidentViewRepairViewModel?.Count(t => t.FieldStatus?.ToLower() == "complete")</span></div>
                                 </div>
                             </div>
 
@@ -1660,7 +1680,7 @@
                                 <div class="info-card text-center text-md-start"
                                      style="background-color:#fff3cd; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
                                     <div class="info-title" style="font-weight:600; color:#333;">Total:</div>
-                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#c58a00;">3</span></div>
+                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#c58a00;">@Model.IncidentViewRepairViewModel?.listIncidentViewRepairViewModel?.Count()</span></div>
                                 </div>
                             </div>
 
@@ -1668,7 +1688,7 @@
                                 <div class="info-card text-center text-md-start"
                                      style="background-color:#f2f2f2; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
                                     <div class="info-title" style="font-weight:600; color:#333;">% Complete:</div>
-                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#6c757d;">0%</span></div>
+                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#6c757d;">@RepairPr %</span></div>
                                 </div>
                             </div>
 
@@ -1839,7 +1859,7 @@
                                 <div class="info-card text-center text-md-start"
                                      style="background-color:#e8f0fe; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
                                     <div class="info-title" style="font-weight:600; color:#333;">Open:</div>
-                                    <div><span class="info-value" id="openTaskCount" style="font-size:22px; font-weight:700; color:#1a73e8;">5</span></div>
+                                    <div><span class="info-value" id="openTaskCount" style="font-size:22px; font-weight:700; color:#1a73e8;">@Model.IncidentViewTaskViewModel?.listIncidentViewTaskViewModel?.Count(t => t.Status?.ToLower() != "complete")</span></div>
                                 </div>
                             </div>
 
@@ -1863,7 +1883,7 @@
                                 <div class="info-card text-center text-md-start"
                                      style="background-color:#f2f2f2; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
                                     <div class="info-title" style="font-weight:600; color:#333;">% Complete:</div>
-                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#6c757d;">0%</span></div>
+                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#6c757d;">@restorationpr %</span></div>
                                 </div>
                             </div>
 
@@ -1998,7 +2018,7 @@
                                 <div class="info-card text-center text-md-start"
                                      style="background-color:#e8f0fe; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
                                     <div class="info-title" style="font-weight:600; color:#333;">Open:</div>
-                                    <div><span class="info-value" id="openTaskCount" style="font-size:22px; font-weight:700; color:#1a73e8;">@Model.IncidentViewTaskViewModel?.listIncidentViewTaskCloseOutViewModel?.Count(t => string.IsNullOrWhiteSpace(t.Status) || t.Status.ToLower() == "not started" || t.Status.ToLower() == "started")</span></div>
+                                    <div><span class="info-value" id="openTaskCount" style="font-size:22px; font-weight:700; color:#1a73e8;">@Model.IncidentViewTaskViewModel?.listIncidentViewTaskCloseOutViewModel?.Count(t => t.Status?.ToLower() != "complete")</span></div>
                                 </div>
                             </div>
 
