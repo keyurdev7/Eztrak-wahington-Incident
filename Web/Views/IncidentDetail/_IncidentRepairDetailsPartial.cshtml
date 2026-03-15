@@ -29,7 +29,7 @@
                 </button>
             </div>
             <div class="table-responsive table-rounded custom-scroll">
-                <table class="table align-middle text-left">
+                <table id="repairTable" class="table align-middle text-left">
                     <thead class="table-light">
                         <tr>
                             <th>Task</th>
@@ -38,12 +38,12 @@
                             <th>Evidence</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody ondragover="dragOver(event)" ondrop="drop(event)">
                         @if (Model.listIncidentViewTaskViewModel != null && Model.listIncidentViewTaskViewModel.Any())
                         {
                             foreach (var task in Model.listIncidentViewTaskViewModel)
                             {
-                                <tr>
+                                <tr draggable="true" data-id="@task.Id" ondragstart="dragStart(event)">
                                     <td>@task.Task</td>
                                     <td>@(string.IsNullOrWhiteSpace(task.FieldValue) ? "—" : task.FieldValue)</td>
                                     <td>
@@ -95,9 +95,9 @@ else
                 </button>
             </div>
             <div class="table-responsive table-rounded custom-scroll">
-                <table class="table align-middle text-left">
+                <table id="repairTable" class="table align-middle text-left">
                     <thead class="table-light"><tr><th>Task</th><th>Responsible Party</th><th>Status</th><th>Evidence</th></tr></thead>
-                    <tbody><tr><td colspan="4" class="text-center">No tasks found</td></tr></tbody>
+                    <tbody ondragover="dragOver(event)" ondrop="drop(event)"><tr><td colspan="4" class="text-center">No tasks found</td></tr></tbody>
                 </table>
             </div>
         </div>

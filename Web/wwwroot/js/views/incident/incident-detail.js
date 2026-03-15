@@ -979,7 +979,17 @@ function drop(event) {
         }
 
         // Update the sort order on the server
-        updateAssessmentTaskOrder();
+        const table = event.target.closest('table');
+        const tableId = table.id;
+        if (tableId === 'assessmentTable') {
+            updateAssessmentTaskOrder();
+        } else if (tableId === 'restorationTable') {
+            updateRestorationTaskOrder();
+        } else if (tableId === 'closeoutTable') {
+            updateCloseoutTaskOrder();
+        } else if (tableId === 'repairTable') {
+            updateRepairTaskOrder();
+        }
     }
 
     draggedElement.style.opacity = '1';
@@ -1016,6 +1026,102 @@ async function updateAssessmentTaskOrder() {
         console.error('Error updating task order:', error);
         // Refresh the table to revert changes
         GetAssessmentDetails(0, 0, '');
+    }
+}
+
+async function updateRestorationTaskOrder() {
+    const table = document.getElementById('restorationTable');
+    const rows = table.querySelectorAll('tbody tr');
+    const taskIds = Array.from(rows).map(row => parseInt(row.getAttribute('data-id')));
+
+    try {
+        const response = await fetch('/IncidentDetail/UpdateRestorationTaskOrder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(taskIds)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update task order');
+        }
+
+        const result = await response.json();
+        if (!result.success) {
+            console.error('Failed to update task order:', result.message);
+            // Optionally, refresh the table to revert changes
+            GetRestorationDetails();
+        }
+    } catch (error) {
+        console.error('Error updating task order:', error);
+        // Refresh the table to revert changes
+        GetRestorationDetails();
+    }
+}
+
+async function updateCloseoutTaskOrder() {
+    const table = document.getElementById('closeoutTable');
+    const rows = table.querySelectorAll('tbody tr');
+    const taskIds = Array.from(rows).map(row => parseInt(row.getAttribute('data-id')));
+
+    try {
+        const response = await fetch('/IncidentDetail/UpdateCloseoutTaskOrder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(taskIds)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update task order');
+        }
+
+        const result = await response.json();
+        if (!result.success) {
+            console.error('Failed to update task order:', result.message);
+            // Optionally, refresh the table to revert changes
+            GetCloseOutDetails();
+        }
+    } catch (error) {
+        console.error('Error updating task order:', error);
+        // Refresh the table to revert changes
+        GetCloseOutDetails();
+    }
+}
+
+async function updateRepairTaskOrder() {
+    const table = document.getElementById('repairTable');
+    const rows = table.querySelectorAll('tbody tr');
+    const taskIds = Array.from(rows).map(row => parseInt(row.getAttribute('data-id')));
+
+    try {
+        const response = await fetch('/IncidentDetail/UpdateRepairTaskOrder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(taskIds)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update task order');
+        }
+
+        const result = await response.json();
+        if (!result.success) {
+            console.error('Failed to update task order:', result.message);
+            // Optionally, refresh the table to revert changes
+            GetRepairDetails();
+        }
+    } catch (error) {
+        console.error('Error updating task order:', error);
+        // Refresh the table to revert changes
+        GetRepairDetails();
     }
 }
 

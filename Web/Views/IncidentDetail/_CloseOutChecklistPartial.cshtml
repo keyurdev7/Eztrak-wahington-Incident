@@ -42,7 +42,7 @@
     }
 }
 
-<table class="table align-middle text-left">
+<table id="closeoutTable" class="table align-middle text-left">
     <thead class="table-light">
         <tr>
             <th>Task</th>
@@ -53,14 +53,14 @@
           @*   <th>Action</th> *@
         </tr>
     </thead>
-    <tbody>
+    <tbody ondragover="dragOver(event)" ondrop="drop(event)">
 
         @if (Model.listIncidentViewTaskCloseOutViewModel.Count > 0)
         {
 
             @foreach (var closeout in Model.listIncidentViewTaskCloseOutViewModel)
             {
-                <tr>
+                <tr draggable="true" data-id="@closeout.Id" ondragstart="dragStart(event)">
                     <td>@closeout.Task</td>
                     <td>@closeout.FieldValue</td>
 

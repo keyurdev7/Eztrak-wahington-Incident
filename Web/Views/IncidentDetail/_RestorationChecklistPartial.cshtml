@@ -52,7 +52,7 @@
         </div>
 
         <div class="table-responsive table-rounded custom-scroll">
-            <table class="table align-middle text-left">
+            <table id="restorationTable" class="table align-middle text-left">
                 <thead class="table-light">
                     <tr>
                         <th>Task</th>
@@ -64,12 +64,12 @@
                       
                     </tr>
                 </thead>
-                <tbody>
+                <tbody ondragover="dragOver(event)" ondrop="drop(event)">
                     @if (Model?.listIncidentViewTaskViewModel != null && Model.listIncidentViewTaskViewModel.Any())
                     {
                         foreach (var task in Model.listIncidentViewTaskViewModel)
                         {
-                            <tr>
+                            <tr draggable="true" data-id="@task.Id" ondragstart="dragStart(event)">
                                 <td>@task.Task</td>
                                 <td>@(string.IsNullOrWhiteSpace(task.FieldValue) ? "—" : task.FieldValue)</td>
 
