@@ -1,8 +1,5 @@
-using DocumentFormat.OpenXml.Office2010.Excel;
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.VisualBasic;
 
 using Models;
 
@@ -46,6 +43,7 @@ namespace Web.Controllers
             model.incidentViewRestorationAttachmentView = await _iIncidentService.ViewRestorationAttachment(id);
             model.incidentViewCloseOutAttachmentView = await _iIncidentService.ViewClouseOutAttachment(id);
             model.TotalCompletedCloseOut = await _iIncidentService.GetTaskClouseOutCompletedCount(id);
+
             #region Personnel
             var companies = await _iIncidentService.GetAllCompanies();
             ViewBag.Companies = new SelectList(companies, "CompanyId", "CompanyName");
@@ -67,7 +65,11 @@ namespace Web.Controllers
                 Text = s.StatusName
             }).ToList();
             #endregion
-
+            model.IncidentViewTaskViewModel = new IncidentViewTaskViewModel
+            {
+                listIncidentViewTaskCloseOutViewModel = await _iIncidentService.GetvalidationTaskClouseOut(id),
+                listIncidentViewTaskViewModel = await _iIncidentService.GetvalidationTaskVM(id),
+            };
             return View(model);
         }
 
@@ -935,7 +937,7 @@ namespace Web.Controllers
                 var model = await _iIncidentService.GetIncidentDetailsById(incidentId);
                 ViewBag.IncidentId = incidentId;
                 ViewBag.IncidentValidationId = model.incidentValidationsDetailsViewModel?.IncidentValidationId ?? 0;
-                
+
                 // Get severity levels for dropdown
                 var severityLevels = await _iIncidentService.GetAllSeverityLevels();
                 ViewBag.SeverityLevels = severityLevels.Select(s => new SelectListItem
@@ -943,7 +945,7 @@ namespace Web.Controllers
                     Value = s.Id.ToString(),
                     Text = s.Name
                 }).ToList();
-                
+
                 return PartialView("_EditIncidentDetailsPartial", model.IncidentValidationLocations);
             }
             catch (Exception ex)
@@ -960,11 +962,11 @@ namespace Web.Controllers
                 var model = await _iIncidentService.GetIncidentDetailsById(incidentId);
                 ViewBag.IncidentId = incidentId;
                 ViewBag.IncidentValidationId = model.incidentValidationsDetailsViewModel?.IncidentValidationId ?? 0;
-                
+
                 // Get user list for dropdown
                 var userList = await _iIncidentService.GetAllUsersDrop();
                 ViewBag.UserList = userList;
-                
+
                 return PartialView("_EditAssignedRolesPartial", model.incidentValidationAssignedRolesViewModel);
             }
             catch (Exception ex)
@@ -981,7 +983,7 @@ namespace Web.Controllers
                 var model = await _iIncidentService.GetIncidentDetailsById(incidentId);
                 ViewBag.IncidentId = incidentId;
                 ViewBag.IncidentValidationId = model.incidentValidationsDetailsViewModel?.IncidentValidationId ?? 0;
-                
+
                 return PartialView("_EditValidationGatesPartial", model.incidentValidationGatesViewModel);
             }
             catch (Exception ex)

@@ -4,7 +4,13 @@
 @using Models;
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
-
+@{
+    // Calculate Closeout percentages
+    var closeOutList = Model.IncidentViewTaskViewModel?.listIncidentViewTaskCloseOutViewModel;
+    var totalCloseOut = closeOutList?.Count() ?? 0;
+    var completedCloseOut = closeOutList?.Count(t => t.Status?.ToLower() == "complete") ?? 0;
+    var percentCloseOut = totalCloseOut > 0 ? Math.Round((double)completedCloseOut / totalCloseOut * 100) : 0;
+}
 <link href="~/css/custom/views/incident/detail.css" rel="stylesheet" />
 <link href="~/css/custom/views/incident/validation-index.css" rel="stylesheet" />
 <link href="~/css/custom/views/incident/validation.css" rel="stylesheet" />
@@ -2016,7 +2022,7 @@
                                 <div class="info-card text-center text-md-start"
                                      style="background-color:#f2f2f2; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
                                     <div class="info-title" style="font-weight:600; color:#333;">% Complete:</div>
-                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#6c757d;">0%</span></div>
+                                    <div><span class="info-value" style="font-size:22px; font-weight:700; color:#6c757d;">@percentCloseOut %</span></div>
                                 </div>
                             </div>
 
