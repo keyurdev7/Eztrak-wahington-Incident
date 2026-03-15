@@ -220,7 +220,7 @@
                     <div class="progress-indicator-compact">
                         <div class="progress-icon-compact"><i class="fa fa-pie-chart"></i></div>
                         <div class="progress-text-compact">
-                            <span class="progress-label">Progress:</span>
+                            <span class="progress-label">Incident Progress:</span>
                             <span class="progress-value">@totalpr% Complete</span>
                         </div>
                     </div>
@@ -1571,11 +1571,7 @@
                             <div class="card shadow-sm border-0 rounded-4">
                                 <div class="card-header bg-white-note fw-semibold  d-flex justify-content-between align-items-center">
                                     <div><i class="fa-solid fa-list-check me-2 text-warning"></i> Assessment Notes</div>
-                                    <a class="text-decoration-none text-warning small fw-semibold"
-                                       data-bs-toggle="collapse" href="#assessmentNotesCollapse" role="button"
-                                       aria-expanded="true" aria-controls="assessmentNotesCollapse" id="assessmentNotesCollapseToggle">
-                                        <i class="fa-solid fa-angle-down me-1"></i>
-                                    </a>
+                                    
                                 </div>
 
                                 <div class="collapse show" id="assessmentNotesCollapse">
@@ -1819,11 +1815,7 @@
                     <div class="card shadow-sm border-0 rounded-4">
                                 <div class="card-header bg-white-note fw-semibold d-flex justify-content-between align-items-center">
                             <div><i class="fa-solid fa-screwdriver-wrench me-2 text-warning"></i> Repair Notes</div>
-                            <a class="text-decoration-none text-warning small fw-semibold"
-                               data-bs-toggle="collapse" href="#repairNotesCollapse" role="button"
-                               aria-expanded="false" aria-controls="repairNotesCollapse" id="repairNotesCollapseToggle">
-                                <i class="fa-solid fa-angle-down me-1"></i>
-                            </a>
+                             
                         </div>
 
                         <div class="collapse show" id="repairNotesCollapse">
@@ -1951,14 +1943,10 @@
                     <div class="card shadow-sm border-0 rounded-4">
                                 <div class="card-header bg-white-note fw-semibold d-flex justify-content-between align-items-center">
                             <div><i class="fa-solid fa-rotate me-2 text-warning"></i> Restoration Notes</div>
-                            <a class="text-decoration-none text-warning small fw-semibold"
-                               data-bs-toggle="collapse" href="#restorationNotesCollapse" role="button"
-                               aria-expanded="false" aria-controls="restorationNotesCollapse" id="restorationNotesCollapseToggle">
-                                <i class="fa-solid fa-angle-down me-1"></i>
-                            </a>
+                            
                         </div>
 
-                        <div class="collapse" id="restorationNotesCollapse">
+                        <div class="collapse show" id="restorationNotesCollapse">
                             <div class="card-body p-3">
                                 @{
                                     Model.IncidentViewPostType = 4; // restoration
@@ -2155,14 +2143,10 @@
                     <div class="card shadow-sm border-0 rounded-4">
                                 <div class="card-header bg-white-note fw-semibold  d-flex justify-content-between align-items-center">
                             <div><i class="fa-regular fa-circle-check me-2 text-warning"></i> Closeout Notes</div>
-                            <a class="text-decoration-none text-warning small fw-semibold"
-                               data-bs-toggle="collapse" href="#closeoutNotesCollapse" role="button"
-                               aria-expanded="false" aria-controls="closeoutNotesCollapse" id="closeoutNotesCollapseToggle">
-                                <i class="fa-solid fa-angle-down me-1"></i>
-                            </a>
+                             
                         </div>
 
-                        <div class="collapse" id="closeoutNotesCollapse">
+                        <div class="collapse show" id="closeoutNotesCollapse">
                             <div class="card-body p-3">
                                 @{
                                     Model.IncidentViewPostType = 2; // Close out
@@ -3007,30 +2991,7 @@
         ];
 
         pairs.forEach(function (p) {
-            const toggle = document.getElementById(p.toggleId);
-            const collapseEl = document.getElementById(p.collapseId);
-
-            if (!toggle || !collapseEl) return;
-
-            // update icon when collapse hides/shows
-            collapseEl.addEventListener('hidden.bs.collapse', function () {
-                toggle.innerHTML = '<i class="fa-solid fa-angle-down me-1"></i>';
-                toggle.setAttribute('aria-expanded', 'true');
-            });
-
-            collapseEl.addEventListener('shown.bs.collapse', function () {
-                toggle.innerHTML = '<i class="fa-solid fa-angle-up me-1"></i>';
-                toggle.setAttribute('aria-expanded', 'true');
-            });
-
-            // initialize icon based on current state
-            if (collapseEl.classList.contains('show')) {
-                toggle.innerHTML = '<i class="fa-solid fa-angle-up me-1"></i>';
-                toggle.setAttribute('aria-expanded', 'true');
-            } else {
-                toggle.innerHTML = '<i class="fa-solid fa-angle-down me-1"></i>';
-                toggle.setAttribute('aria-expanded', 'true');
-            }
+           
         });
     })();
       (function () {
