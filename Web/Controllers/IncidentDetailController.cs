@@ -68,7 +68,7 @@ namespace Web.Controllers
             model.IncidentViewTaskViewModel = new IncidentViewTaskViewModel
             {
                 listIncidentViewTaskCloseOutViewModel = await _iIncidentService.GetvalidationTaskClouseOut(id),
-                listIncidentViewTaskViewModel = await _iIncidentService.GetvalidationTaskVM(id),
+                listIncidentViewTaskViewModel = (await _iIncidentService.GetvalidationTaskVM(id)).OrderBy(t => t.SortOrder).ToList(),
             };
             return View(model);
         }

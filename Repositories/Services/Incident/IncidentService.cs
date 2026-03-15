@@ -2440,7 +2440,7 @@ namespace Repositories.Common
             var tasks = await _db.IncidentValidationTasks
                 .AsNoTracking()
                 .Where(t => !t.IsDeleted && t.IncidentId == incidentId)
-                .OrderBy(t => t.Id)
+                .OrderBy(t => t.SortOrder)
                 .ToListAsync();
 
             var result = tasks
@@ -2543,7 +2543,7 @@ namespace Repositories.Common
             var tasks = await _db.IncidentValidationAssessmentTasks
                 .AsNoTracking()
                 .Where(t => !t.IsDeleted && t.IncidentId == incidentId)
-                .OrderBy(t => t.Id)
+                .OrderBy(t => t.SortOrder)
                 .ToListAsync();
             return MapTasksToViewModel(tasks, roles, statuses);
         }
@@ -2572,7 +2572,7 @@ namespace Repositories.Common
             var tasks = await _db.IncidentValidationRepairTasks
                 .AsNoTracking()
                 .Where(t => !t.IsDeleted && t.IncidentId == incidentId)
-                .OrderBy(t => t.Id)
+                .OrderBy(t => t.SortOrder)
                 .ToListAsync();
             return MapRepairTasksToViewModel(tasks, roles, statuses);
         }
@@ -3060,7 +3060,7 @@ namespace Repositories.Common
                 var tasks = await _db.ValidationCloseouts
                     .AsNoTracking()
                     .Where(t => !t.IsDeleted && t.IncidentId == incidentId)
-                    .OrderBy(t => t.Id)
+                    .OrderBy(t => t.SortOrder)
                     .ToListAsync();
 
                 var result = tasks
