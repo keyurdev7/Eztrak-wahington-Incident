@@ -31,10 +31,14 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Status</label>
-                        <select name="StatusId" class="form-select" disabled>
+                        @{
+                            var notStartedStatus = ((IEnumerable<SelectListItem>)ViewBag.Statuses ?? new List<SelectListItem>())
+                                .FirstOrDefault(s => s.Text == "Not Started");
+                        }
+                        <select name="StatusIdDisplay" class="form-select" disabled>
                             @foreach (var s in (IEnumerable<SelectListItem>)ViewBag.Statuses ?? new List<SelectListItem>())
                             {
-                                @if (s.Text == "Not Started")
+                                if (s.Text == "Not Started")
                                 {
                                     <option value="@s.Value" selected>@s.Text</option>
                                 }
@@ -44,6 +48,7 @@
                                 }
                             }
                         </select>
+                        <input type="hidden" name="StatusId" value="@notStartedStatus?.Value" />
                     </div>
                 </div>
                 <div class="modal-footer">

@@ -46,28 +46,42 @@
                                     <td>@task.Task</td>
                                     <td>@(string.IsNullOrWhiteSpace(task.FieldValue) ? "—" : task.FieldValue)</td>
                                     <td>
-                                        @if (!string.IsNullOrWhiteSpace(task.Status))
-                                        {
-                                            @if (task.Status.ToLower() == "started")
-                                            { <span class="status-badge progressing">@task.Status</span> }
-                                            else if (task.Status.ToLower() == "not started")
-                                            { <span class="status-badge not-started">@task.Status</span> }
-                                            else if (task.Status.ToLower() == "complete")
-                                            { <span class="status-badge done">@task.Status</span> }
+                                        <a href="#" onclick="EditAssessmentTask('@task.Id')">
+                                            @if (!string.IsNullOrWhiteSpace(task.Status))
+                                            {
+                                                if (task.Status.ToLower() == "started")
+                                                {
+                                                    <span class="status-badge progressing">@task.Status</span>
+                                                }
+                                                else if (task.Status.ToLower() == "not started")
+                                                {
+                                                    <span class="status-badge not-started">@task.Status</span>
+                                                }
+                                                else if (task.Status.ToLower() == "complete")
+                                                {
+                                                    <span class="status-badge done">@task.Status</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="status-badge not-started">@task.Status</span>
+                                                }
+                                            }
                                             else
-                                            { <span class="status-badge not-started">@task.Status</span> }
-                                        }
-                                        else
-                                        { <span class="status-badge not-started">Not Started</span> }
+                                            {
+                                                <span class="status-badge not-started">Not Started</span>
+                                            }
+                                        </a>
                                     </td>
                                     <td>
                                         @if (task.ImageCount > 0)
                                         {
-                                            <i class="fa @GetFileTypeIcon(task.ImagesUrl ?? "") me-1"></i>@(task.ImageCount) @("file")
+                                            <a href="#" onclick="ViewAssessmentTask('@task.Id')">
+                                                <i class="fa @GetFileTypeIcon(task.ImagesUrl ?? "") me-1"></i>@(task.ImageCount) @("file")
+                                            </a>
                                         }
                                         else
                                         {
-                                            <i class="fa fa-file-alt text-muted me-1"></i>@("0 file")
+                                            <span>--</span>
                                         }
                                     </td>
                                 </tr>

@@ -1,0 +1,206 @@
+@model ViewModels.Incident.IncidentEditTaskListViewModel
+
+<div class="modal fade" id="updateAssessmentTaskModal" tabindex="-1" aria-labelledby="updateAssessmentTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateAssessmentTaskModalLabel">Update Assessment Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="UpdateAssessmentTaskForm">
+                    <input type="hidden" id="assessmentTaskId" value="@Model.Id" />
+                    <input type="hidden" id="assessmentIncidentId" value="@Model.IncidentId" />
+                    <input type="hidden" id="assessmentIncidentValidationId" value="@Model.IncidentValidationId" />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Task</label>
+                                <textarea class="form-control" id="assessmentTask" rows="3" asp-for="@Model.Task" placeholder="Enter task description"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" id="assessmentStatus" asp-for="@Model.StatusId">
+                                    <option value="">Select status</option>
+                                    @foreach (var item in Model.StatusList)
+                                    {
+                                        if (Model.StatusId == null)
+                                        {
+                                            if (item.Text == "Not Started")
+                                            {
+                                                <option value="@item.Value" selected>@item.Text</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (item.Value == Model.StatusId.ToString())
+                                            {
+                                                <option value="@item.Value" selected>@item.Text</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" id="assessmentDescription" rows="3" asp-for="@Model.Description" placeholder="Enter description or notes"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3" id="div_UpdateAssessmentRole">
+                                <input type="hidden" id="hdn_UpdateAssessmentRole" asp-for="@Model.RoleIds" name="RoleIds" />
+                                <label>Responsible Role (Multiple)</label>
+                                <div class="multiselect-dropdown" id="chk_UpdateAssessmentRole">
+                                    <div class="dropdown-btn">Choose roles</div>
+                                    <div class="dropdown-list">
+                                        @foreach (var item in Model.RoleList)
+                                        {
+                                            var isChecked = Model.RoleIds != null && Model.RoleIds.Contains(item.Value);
+                                            <label>
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       value="@item.Value"
+                                                       data-name="@item.Text"
+                                                       @(isChecked ? "checked" : "") />
+                                                @item.Text
+                                            </label>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Evidence</label>
+                                <input type="hidden" id="assessment_hdnImgUrl" value="@Model.ImageUrl" />
+                                <input type="file" id="fileInputAssessmentTask" multiple class="file-upload" asp-for="@Model.File">
+                                <div id="previewContainerAssessmentTask" class="d-flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer d-flex justify-content-end">
+                <button type="submit" class="btn btn-success" id="btnUpdateAssessmentTask">
+                    <i class="fas fa-check"></i> Update
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        initMultiselectAssessmentTask();
+        updateAssessmentRoleDropdown();
+
+        $(document).off("click", "#btnUpdateAssessmentTask");
+        $(document).on("click", "#btnUpdateAssessmentTask", async function (e) {
+            e.preventDefault();
+            await submitAssessmentTaskUpdate();
+        });
+    });
+
+    function initMultiselectAssessmentTask() {
+        const $dropdown = $('#chk_UpdateAssessmentRole');
+        const $btn = $dropdown.find('.dropdown-btn');
+        const $list = $dropdown.find('.dropdown-list');
+
+        $btn.on('click', function (e) {
+            e.stopPropagation();
+            $('.dropdown-list').not($list).hide();
+            $list.toggle();
+        });
+
+        $list.on('change', 'input[type=\"checkbox\"]', function () {
+            const $checkboxes = $list.find('input[type=\"checkbox\"]');
+            const selected = $checkboxes.filter(':checked').map(function () {
+                return {
+                    id: $(this).val(),
+                    name: $(this).data('name') || $(this).parent().text().trim()
+                };
+            }).get();
+
+            const selectedNames = selected.map(function (s) { return s.name; });
+            $btn.text(selectedNames.length ? selectedNames.join(', ') : 'Choose roles');
+
+            const ids = selected.map(function (s) { return s.id; }).join(',');
+            $('#hdn_UpdateAssessmentRole').val(ids);
+        });
+
+        $(document).on('click', function (e) {
+            if (!$dropdown.is(e.target) && $dropdown.has(e.target).length === 0) {
+                $list.hide();
+            }
+        });
+    }
+
+    function updateAssessmentRoleDropdown() {
+        const selectedNames = [];
+        const selectedValues = [];
+
+        $("#chk_UpdateAssessmentRole input[type='checkbox']:checked").each(function () {
+            selectedNames.push($(this).data("name"));
+            selectedValues.push($(this).val());
+        });
+
+        const displayText = selectedNames.length > 0 ? selectedNames.join(", ") : "Choose roles";
+        $("#chk_UpdateAssessmentRole .dropdown-btn").text(displayText);
+        $("#hdn_UpdateAssessmentRole").val(selectedValues.join(","));
+    }
+
+    async function submitAssessmentTaskUpdate() {
+        try {
+            showLoader($("#updateAssessmentTaskModal"));
+
+            const formData = new FormData();
+            formData.append("Id", document.getElementById("assessmentTaskId").value);
+            formData.append("IncidentId", document.getElementById("assessmentIncidentId").value);
+            formData.append("IncidentValidationId", document.getElementById("assessmentIncidentValidationId").value);
+            formData.append("Task", document.getElementById("assessmentTask").value);
+            formData.append("StatusId", document.getElementById("assessmentStatus").value);
+            formData.append("RoleIds", document.getElementById("hdn_UpdateAssessmentRole").value);
+            formData.append("Description", document.getElementById("assessmentDescription").value);
+            formData.append("ImageUrl", document.getElementById("assessment_hdnImgUrl").value);
+
+            const files = document.getElementById("fileInputAssessmentTask").files;
+            for (let i = 0; i < files.length; i++) {
+                formData.append("Files", files[i]);
+            }
+
+            const response = await fetch("/IncidentDetail/UpdateAssessmentTask", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!response.ok) throw new Error("Failed to update assessment task");
+
+            const result = await response.json();
+            if (result.success) {
+                SwalSuccessAlert("Updated Successfully");
+                $("#updateAssessmentTaskModal").modal("hide");
+                const statusID = $("#ddlStatus").val() || 0;
+                const ownerId = $("#ddlOwner").val() || 0;
+                const step = $("#global_search_value").val() || "";
+                GetAssessmentDetails(statusID, ownerId, step);
+            } else {
+                SwalErrorAlert(result.message || "Update failed.");
+            }
+        } catch (error) {
+            console.error("Error updating assessment task:", error);
+            SwalErrorAlert("Update failed.");
+        } finally {
+            hideLoader($("#updateAssessmentTaskModal"));
+        }
+    }
+</script>
+

@@ -1,4 +1,4 @@
-﻿@using ViewModels.Incident
+@using ViewModels.Incident
 @using System.IO
 @model IncidentViewTaskViewModel
 @{
@@ -125,13 +125,13 @@
                                 {
                                     <td>
                                         <a href="#" onclick="ViewRestorationDetails('@task.Id')" class="text-decoration-none">
-                                        <i class="fa @GetFileTypeIcon(task.ImagesUrl ?? "") me-1"></i>@(task.ImageCount) file</a>
-                                        
+                                            <i class="fa @GetFileTypeIcon(task.ImagesUrl ?? "") me-1"></i>@(task.ImageCount) @("file")
+                                        </a>
                                     </td>
                                 }
                                 else
                                 {
-                                    <td><i class="fa fa-file-alt text-muted me-1"></i>@("0 file")</td>
+                                    <td><span>--</span></td>
                                 }
 
                               @*   @if (!string.IsNullOrWhiteSpace(task.Status) && task.Status == "Complete")
@@ -148,7 +148,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="7" class="text-center">No tasks found</td>
+                            <td colspan="4" class="text-center">No tasks found</td>
                         </tr>
                     }
                 </tbody>

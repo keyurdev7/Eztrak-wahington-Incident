@@ -1,4 +1,4 @@
-﻿@model ViewModels.Incident.IncidentViewTaskListViewModel
+@model ViewModels.Incident.IncidentViewTaskListViewModel
 <style>
     /* Start Multiple dropdown list for Repair */
     .multiselect-dropdown {
@@ -89,7 +89,11 @@
 
                     <div class="mb-3">
                         <label class="form-label">Status</label>
-                        <select name="StatusId" class="form-select" disabled>
+                        @{
+                            var notStartedStatus = ((IEnumerable<SelectListItem>)ViewBag.Statuses ?? new List<SelectListItem>())
+                                .FirstOrDefault(s => s.Text == "Not Started");
+                        }
+                        <select name="StatusIdDisplay" class="form-select" disabled>
                             <option value="">Select Status</option>
                             @foreach (var s in (IEnumerable<SelectListItem>)ViewBag.Statuses ?? new List<SelectListItem>())
                             {
@@ -103,6 +107,7 @@
                                 }
                             }
                         </select>
+                        <input type="hidden" name="StatusId" value="@notStartedStatus?.Value" />
                     </div>
 
                 </div>

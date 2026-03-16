@@ -88,7 +88,11 @@ namespace Repositories.Common
         Task<List<IncidentViewRepairListViewModel>> GetvalidationRepairVM(long id, bool isEdit = false);
         Task<IncidentRepairEditViewModel> EditRepairDetails(long id, long RepairId, long FieldType, long IncidentId, long IncidentValidationId);
         Task<long> UpdateRepair(IncidentRepairEditViewModel request);
-        
+        Task<IncidentEditTaskListViewModel> EditAssessmentTask(long id);
+        Task<IncidentEditTaskListViewModel> EditRepairTask(long id);
+        Task<long> UpdateAssessmentTask(IncidentEditTaskListViewModel model);
+        Task<long> UpdateRepairTask(IncidentEditTaskListViewModel model);
+
         Task<List<SeverityLevelModifyViewModel>> GetAllSeverityLevels();
         Task<long> UpdateIncidentDetails(UpdateIncidentDetailsRequest request);
         Task<long> UpdateAssignedRoles(UpdateAssignedRolesRequest request);

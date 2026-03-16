@@ -2553,7 +2553,10 @@ namespace Repositories.Common
             var entity = new IncidentValidationAssessmentTask
             {
                 IncidentId = request.IncidentId,
-                IncidentValidationId = request.IncidentValidationId,
+                // If IncidentValidationId comes through as 0 or invalid, store it as null
+                IncidentValidationId = (request.IncidentValidationId.HasValue && request.IncidentValidationId.Value > 0)
+                    ? request.IncidentValidationId
+                    : null,
                 TaskDescription = request.TaskDescription,
                 RoleIds = request.RoleIds,
                 StatusId = request.StatusId,
@@ -2582,7 +2585,10 @@ namespace Repositories.Common
             var entity = new IncidentValidationRepairTask
             {
                 IncidentId = request.IncidentId,
-                IncidentValidationId = request.IncidentValidationId,
+                // If IncidentValidationId comes through as 0 or invalid, store it as null
+                IncidentValidationId = (request.IncidentValidationId.HasValue && request.IncidentValidationId.Value > 0)
+                    ? request.IncidentValidationId
+                    : null,
                 TaskDescription = request.TaskDescription,
                 RoleIds = request.RoleIds,
                 StatusId = request.StatusId,
@@ -2830,6 +2836,188 @@ namespace Repositories.Common
             }
 
             return attachmentViewModel;
+        }
+
+        public async Task<IncidentEditTaskListViewModel> EditAssessmentTask(long id)
+        {
+            IncidentEditTaskListViewModel editViewModel = new();
+            try
+            {
+                var details = await _db.IncidentValidationAssessmentTasks
+                    .Where(p => !p.IsDeleted && p.Id == id)
+                    .FirstOrDefaultAsync();
+
+                var roles = await _db.IncidentRoles
+                    .Where(p => !p.IsDeleted)
+                    .AsNoTracking()
+                    .ToListAsync() ?? new List<IncidentRole>();
+
+                var statusList = await _db.Progress
+                    .Where(p => !p.IsDeleted)
+                    .ToDictionaryAsync(p => p.Id, p => p.Name) ?? new Dictionary<long, string>();
+
+                editViewModel = new IncidentEditTaskListViewModel
+                {
+                    Id = details?.Id ?? 0,
+                    IncidentId = details?.IncidentId ?? 0,
+                    IncidentValidationId = details?.IncidentValidationId ?? 0,
+                    Task = details?.TaskDescription ?? string.Empty,
+                    RoleIds = details?.RoleIds ?? string.Empty,
+                    StatusId = details?.StatusId,
+                    ImageUrl = details?.ImageUrls ?? string.Empty,
+                    Description = details?.Notes ?? string.Empty,
+                    StatusList = statusList
+                        .Select(p => new SelectListItem
+                        {
+                            Text = p.Value,
+                            Value = p.Key.ToString()
+                        })
+                        .ToList(),
+                    RoleList = roles
+                        .Select(p => new SelectListItem
+                        {
+                            Text = p.Name,
+                            Value = p.Id.ToString()
+                        })
+                        .ToList(),
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in EditAssessmentTask");
+                return new IncidentEditTaskListViewModel();
+            }
+
+            return editViewModel;
+        }
+
+        public async Task<IncidentEditTaskListViewModel> EditRepairTask(long id)
+        {
+            IncidentEditTaskListViewModel editViewModel = new();
+            try
+            {
+                var details = await _db.IncidentValidationRepairTasks
+                    .Where(p => !p.IsDeleted && p.Id == id)
+                    .FirstOrDefaultAsync();
+
+                var roles = await _db.IncidentRoles
+                    .Where(p => !p.IsDeleted)
+                    .AsNoTracking()
+                    .ToListAsync() ?? new List<IncidentRole>();
+
+                var statusList = await _db.Progress
+                    .Where(p => !p.IsDeleted)
+                    .ToDictionaryAsync(p => p.Id, p => p.Name) ?? new Dictionary<long, string>();
+
+                editViewModel = new IncidentEditTaskListViewModel
+                {
+                    Id = details?.Id ?? 0,
+                    IncidentId = details?.IncidentId ?? 0,
+                    IncidentValidationId = details?.IncidentValidationId ?? 0,
+                    Task = details?.TaskDescription ?? string.Empty,
+                    RoleIds = details?.RoleIds ?? string.Empty,
+                    StatusId = details?.StatusId,
+                    ImageUrl = details?.ImageUrls ?? string.Empty,
+                    Description = details?.Notes ?? string.Empty,
+                    StatusList = statusList
+                        .Select(p => new SelectListItem
+                        {
+                            Text = p.Value,
+                            Value = p.Key.ToString()
+                        })
+                        .ToList(),
+                    RoleList = roles
+                        .Select(p => new SelectListItem
+                        {
+                            Text = p.Name,
+                            Value = p.Id.ToString()
+                        })
+                        .ToList(),
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in EditRepairTask");
+                return new IncidentEditTaskListViewModel();
+            }
+
+            return editViewModel;
+        }
+
+        public async Task<long> UpdateAssessmentTask(IncidentEditTaskListViewModel request)
+        {
+            await using var transaction = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                var details = await _db.IncidentValidationAssessmentTasks
+                    .FirstOrDefaultAsync(p => !p.IsDeleted && p.Id == request.Id);
+
+                if (details == null)
+                    return 0;
+
+                details.TaskDescription = request?.Task ?? string.Empty;
+                details.RoleIds = request?.RoleIds ?? string.Empty;
+                details.StatusId = request?.StatusId ?? 0;
+                details.ImageUrls = request?.ImageUrl ?? string.Empty;
+                details.Notes = request?.Description ?? string.Empty;
+                details.UpdatedOn = DateTime.UtcNow;
+
+                try
+                {
+                    await _db.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                }
+
+                return details.Id;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _logger.LogError(ex, "Error updating assessment task");
+                return 0;
+            }
+        }
+
+        public async Task<long> UpdateRepairTask(IncidentEditTaskListViewModel request)
+        {
+            await using var transaction = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                var details = await _db.IncidentValidationRepairTasks
+                    .FirstOrDefaultAsync(p => !p.IsDeleted && p.Id == request.Id);
+
+                if (details == null)
+                    return 0;
+
+                details.TaskDescription = request?.Task ?? string.Empty;
+                details.RoleIds = request?.RoleIds ?? string.Empty;
+                details.StatusId = request?.StatusId ?? 0;
+                details.ImageUrls = request?.ImageUrl ?? string.Empty;
+                details.Notes = request?.Description ?? string.Empty;
+                details.UpdatedOn = DateTime.UtcNow;
+
+                try
+                {
+                    await _db.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                }
+
+                return details.Id;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _logger.LogError(ex, "Error updating repair task");
+                return 0;
+            }
         }
 
         public async Task<IncidentEditTaskListViewModel> ViewRestorationDetails(long id)

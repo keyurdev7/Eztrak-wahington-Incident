@@ -130,6 +130,13 @@ namespace Web.Controllers
             return PartialView("_ViewAssestmentPartial", model);
         }
 
+        [HttpGet]
+        public async Task<PartialViewResult> EditAssessmentTask(long id)
+        {
+            var model = await _iIncidentService.EditAssessmentTask(id);
+            return PartialView("_UpdateAssessmentTaskPartial", model);
+        }
+
         [HttpPost]
         public async Task<IActionResult> UpdateAssessment(IncidentAssessmentEditViewModel model, List<IFormFile> Files)
         {
@@ -203,6 +210,63 @@ namespace Web.Controllers
                 // log ex here if needed
                 return Json(new { success = false, message = "Save failed. " + ex.Message });
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateAssessmentTask(IncidentEditTaskListViewModel model, List<IFormFile> Files)
+        {
+            try
+            {
+                var fileUrls = new List<string>();
+
+                if (Files != null && Files.Count > 0)
+                {
+                    var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "Storage", "uploads", "Assessment");
+
+                    if (!Directory.Exists(uploadsPath))
+                        Directory.CreateDirectory(uploadsPath);
+
+                    foreach (var file in Files)
+                    {
+                        if (file.Length > 0)
+                        {
+                            var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
+                            var filePath = Path.Combine(uploadsPath, fileName);
+
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await file.CopyToAsync(stream);
+                            }
+
+                            var relativeUrl = $"/Storage/uploads/Assessment/{fileName}";
+                            fileUrls.Add(relativeUrl);
+                        }
+                    }
+
+                    // append new files to existing ones if any
+                    var existing = string.IsNullOrWhiteSpace(model.ImageUrl)
+                        ? string.Empty
+                        : model.ImageUrl;
+                    model.ImageUrl = string.IsNullOrWhiteSpace(existing)
+                        ? string.Join(",", fileUrls)
+                        : string.Join(",", existing, string.Join(",", fileUrls));
+                }
+
+                var result = await _iIncidentService.UpdateAssessmentTask(model);
+                return Ok(new { success = result > 0 });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { success = false, message = "Failed to update assessment task." });
+            }
+        }
+
+        [HttpGet]
+        public async Task<PartialViewResult> ViewAssessmentTask(long id)
+        {
+            var model = await _iIncidentService.EditAssessmentTask(id);
+            return PartialView("_ViewAssessmentTaskPartial", model);
         }
 
 
@@ -436,7 +500,7 @@ namespace Web.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { success = false, message = "Save failed." });
+                return StatusCode(500, new { success = false, message = "Save failed.", detail = ex.ToString() });
             }
         }
 
@@ -910,6 +974,69 @@ namespace Web.Controllers
             var taskList = await _iIncidentService.GetRepairTasksVM(id);
             var viewModel = new IncidentViewTaskViewModel { listIncidentViewTaskViewModel = taskList };
             return PartialView("_IncidentRepairDetailsPartial", viewModel);
+        }
+
+        [HttpGet]
+        public async Task<PartialViewResult> EditRepairTask(long id)
+        {
+            var model = await _iIncidentService.EditRepairTask(id);
+            return PartialView("_UpdateRepairTaskPartial", model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateRepairTask(IncidentEditTaskListViewModel model, List<IFormFile> Files)
+        {
+            try
+            {
+                var fileUrls = new List<string>();
+
+                if (Files != null && Files.Count > 0)
+                {
+                    var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "Storage", "uploads", "Repair");
+
+                    if (!Directory.Exists(uploadsPath))
+                        Directory.CreateDirectory(uploadsPath);
+
+                    foreach (var file in Files)
+                    {
+                        if (file.Length > 0)
+                        {
+                            var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
+                            var filePath = Path.Combine(uploadsPath, fileName);
+
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await file.CopyToAsync(stream);
+                            }
+
+                            var relativeUrl = $"/Storage/uploads/Repair/{fileName}";
+                            fileUrls.Add(relativeUrl);
+                        }
+                    }
+
+                    var existing = string.IsNullOrWhiteSpace(model.ImageUrl)
+                        ? string.Empty
+                        : model.ImageUrl;
+                    model.ImageUrl = string.IsNullOrWhiteSpace(existing)
+                        ? string.Join(",", fileUrls)
+                        : string.Join(",", existing, string.Join(",", fileUrls));
+                }
+
+                var result = await _iIncidentService.UpdateRepairTask(model);
+                return Ok(new { success = result > 0 });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { success = false, message = "Failed to update repair task." });
+            }
+        }
+
+        [HttpGet]
+        public async Task<PartialViewResult> ViewRepairTask(long id)
+        {
+            var model = await _iIncidentService.EditRepairTask(id);
+            return PartialView("_ViewRepairTaskPartial", model);
         }
 
         [HttpPost]

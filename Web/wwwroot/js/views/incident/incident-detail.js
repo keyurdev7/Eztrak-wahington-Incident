@@ -1,4 +1,4 @@
-﻿$(function () {
+$(function () {
     // Default IncidentDetail map to satellite view.
     // This must run AFTER the ArcGIS Map instance is created in the Razor view,
     // so we wait until both switchMapView and mapInstance exist.
@@ -521,6 +521,7 @@ async function GetAssessmentDetails(statusID, ownerId, step) {
 
         const content = await response.text();
         $("#div_assestment_details").empty().html(content);
+        updateAssessmentSummaryFromDom();
 
     } catch (error) {
         console.error("Error loading incident list:", error);
@@ -549,6 +550,24 @@ async function EditAssessmentDetails(id, mainstepId, substepId) {
 
     } catch (error) {
         console.error("Error loading incident details:", error);
+    } finally {
+        hideLoader($("#div_assestment_details"));
+    }
+}
+
+async function EditAssessmentTask(id) {
+    try {
+        showLoader($("#div_assestment_details"));
+        const response = await fetch(`/IncidentDetail/EditAssessmentTask?id=${id}`, {
+            method: "GET",
+            headers: { "Accept": "text/html" }
+        });
+        if (!response.ok) throw new Error("Failed to load assessment task");
+        const content = await response.text();
+        $("#div_assestment_modal").empty().html(content);
+        $("#updateAssessmentTaskModal").modal("show");
+    } catch (error) {
+        console.error("Error loading assessment task:", error);
     } finally {
         hideLoader($("#div_assestment_details"));
     }
@@ -762,6 +781,26 @@ async function ViewRestorationDetails(id) {
     }
 }
 
+async function ViewAssessmentTask(id) {
+    try {
+        showLoader($("#div_assestment_details"));
+        const response = await fetch(`/IncidentDetail/ViewAssessmentTask?id=${id}`, {
+            method: "GET",
+            headers: {
+                "Accept": "text/html"
+            }
+        });
+        if (!response.ok) throw new Error("Failed to load assessment task details");
+        const content = await response.text();
+        $("#div_assestment_view_modal").empty().html(content);
+        $("#viewIncidentAssessmentTaskModal").modal("show");
+    } catch (error) {
+        console.error("Error loading assessment task details:", error);
+    } finally {
+        hideLoader($("#div_assestment_details"));
+    }
+}
+
 async function GetRestorationDetails() {
     try {
 
@@ -781,6 +820,7 @@ async function GetRestorationDetails() {
 
         const content = await response.text();
         $("#div_restoration_checklist").empty().html(content);
+        updateRestorationSummaryFromDom();
 
     } catch (error) {
         console.error("Error loading incident list:", error);
@@ -807,6 +847,7 @@ async function GetCloseOutDetails() {
 
         const content = await response.text();
         $("#div_closeout_details").empty().html(content);
+        updateCloseoutSummaryFromDom();
 
     } catch (error) {
         console.error("Error loading incident list:", error);
@@ -865,6 +906,26 @@ async function ViewCloseOutDetails(id) {
     }
 }
 
+async function ViewRepairTask(id) {
+    try {
+        showLoader($("#div_repair_details"));
+        const response = await fetch(`/IncidentDetail/ViewRepairTask?id=${id}`, {
+            method: "GET",
+            headers: {
+                "Accept": "text/html"
+            }
+        });
+        if (!response.ok) throw new Error("Failed to load repair task details");
+        const content = await response.text();
+        $("#div_repair_view_modal").empty().html(content);
+        $("#viewIncidentRepairTaskModal").modal("show");
+    } catch (error) {
+        console.error("Error loading repair task details:", error);
+    } finally {
+        hideLoader($("#div_repair_details"));
+    }
+}
+
 async function GetRepairDetails() {
 
     try {
@@ -893,6 +954,7 @@ async function GetRepairDetails() {
         const content = await response.text();
 
         $("#div_repair_details").empty().html(content);
+        updateRepairSummaryFromDom();
 
     } catch (error) {
 
@@ -944,6 +1006,24 @@ async function EditRepairDetails(id, RepairId, FieldType, IncidentId, IncidentVa
 
     }
 
+}
+
+async function EditRepairTask(id) {
+    try {
+        showLoader($("#div_repair_details"));
+        const response = await fetch(`/IncidentDetail/EditRepairTask?id=${id}`, {
+            method: "GET",
+            headers: { "Accept": "text/html" }
+        });
+        if (!response.ok) throw new Error("Failed to load repair task");
+        const content = await response.text();
+        $("#div_repair_modal").empty().html(content);
+        $("#updateIncidentRepairModal").modal("show");
+    } catch (error) {
+        console.error("Error loading repair task:", error);
+    } finally {
+        hideLoader($("#div_repair_details"));
+    }
 }
 
 // Drag and Drop functions for Assessment Tasks
@@ -1123,5 +1203,77 @@ async function updateRepairTaskOrder() {
         // Refresh the table to revert changes
         GetRepairDetails();
     }
+}
+
+function updateAssessmentSummaryFromDom() {
+    const $rows = $("#assessmentTable tbody tr").filter(function () {
+        return !$(this).find("td[colspan]").length;
+    });
+    const total = $rows.length;
+    let completed = 0;
+    $rows.each(function () {
+        const status = ($(this).find("td:nth-child(3) .status-badge").text() || "").trim().toLowerCase();
+        if (status === "complete") completed++;
+    });
+    const open = total - completed;
+    const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+    $("#assessmentOpenCount").text(open);
+    $("#assessmentCompletedCount").text(completed);
+    $("#assessmentTotalCount").text(total);
+    $("#assessmentPercent").text(percent + " %");
+}
+
+function updateRepairSummaryFromDom() {
+    const $rows = $("#repairTable tbody tr").filter(function () {
+        return !$(this).find("td[colspan]").length;
+    });
+    const total = $rows.length;
+    let completed = 0;
+    $rows.each(function () {
+        const status = ($(this).find("td:nth-child(3) .status-badge").text() || "").trim().toLowerCase();
+        if (status === "complete") completed++;
+    });
+    const open = total - completed;
+    const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+    $("#repairOpenCount").text(open);
+    $("#repairCompletedCount").text(completed);
+    $("#repairTotalCount").text(total);
+    $("#repairPercent").text(percent + " %");
+}
+
+function updateRestorationSummaryFromDom() {
+    const $rows = $("#restorationTable tbody tr").filter(function () {
+        return !$(this).find("td[colspan]").length;
+    });
+    const total = $rows.length;
+    let completed = 0;
+    $rows.each(function () {
+        const status = ($(this).find("td:nth-child(3) .status-badge").text() || "").trim().toLowerCase();
+        if (status === "complete") completed++;
+    });
+    const open = total - completed;
+    const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+    $("#restorationOpenCount").text(open);
+    $("#restorationCompletedCount").text(completed);
+    $("#restorationTotalCount").text(total);
+    $("#restorationPercent").text(percent + " %");
+}
+
+function updateCloseoutSummaryFromDom() {
+    const $rows = $("#closeoutTable tbody tr").filter(function () {
+        return !$(this).find("td[colspan]").length;
+    });
+    const total = $rows.length;
+    let completed = 0;
+    $rows.each(function () {
+        const status = ($(this).find("td:nth-child(3) .status-badge").text() || "").trim().toLowerCase();
+        if (status === "complete") completed++;
+    });
+    const open = total - completed;
+    const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+    $("#closeoutOpenCount").text(open);
+    $("#closeoutCompletedCount").text(completed);
+    $("#closeoutTotalCount").text(total);
+    $("#closeoutPercent").text(percent + " %");
 }
 
