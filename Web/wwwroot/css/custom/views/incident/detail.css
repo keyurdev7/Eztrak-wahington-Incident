@@ -2378,3 +2378,43 @@
     border: 1px solid #e7e7e7;
     border-radius: 12px;
 }
+
+/* Allow text wrapping in Responsible Party column */
+#restorationTable td:nth-child(2) {
+    white-space: normal;
+}
+
+/* Allow text wrapping in Task column */
+#restorationTable td:nth-child(1) {
+    white-space: normal;
+}
+
+/* Allow text wrapping in Task column for repair table */
+#repairTable td:nth-child(1) {
+    white-space: normal;
+}
+
+/* Allow text wrapping in Responsible Party column for repair table */
+#repairTable td:nth-child(2) {
+    white-space: normal;
+}
+
+/* Allow text wrapping in Task column for closeout table */
+#closeoutTable td:nth-child(1) {
+    white-space: normal;
+}
+
+/* Allow text wrapping in Responsible Party column for closeout table */
+#closeoutTable td:nth-child(2) {
+    white-space: normal;
+}
+
+/* Allow text wrapping in Task column for assessment table */
+#assessmentTable td:nth-child(1) {
+    white-space: normal;
+}
+
+/* Allow text wrapping in Responsible Party column for assessment table */
+#assessmentTable td:nth-child(2) {
+    white-space: normal;
+}

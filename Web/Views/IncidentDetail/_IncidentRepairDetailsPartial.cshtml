@@ -29,13 +29,13 @@
                 </button>
             </div>
             <div class="table-responsive table-rounded custom-scroll">
-                <table id="repairTable" class="table align-middle text-left">
+                <table id="repairTable" class="table align-middle text-left" style="table-layout: fixed;">
                     <thead class="table-light">
                         <tr>
-                            <th>Task</th>
-                            <th>Responsible Party</th>
-                            <th>Status</th>
-                            <th>Evidence</th>
+                            <th style="width: 40%;">Task</th>
+                            <th style="width: 40%;">Responsible Party</th>
+                            <th style="width: 10%;">Status</th>
+                            <th style="width: 10%;">Evidence</th>
                         </tr>
                     </thead>
                     <tbody ondragover="dragOver(event)" ondrop="drop(event)">
@@ -109,8 +109,15 @@ else
                 </button>
             </div>
             <div class="table-responsive table-rounded custom-scroll">
-                <table id="repairTable" class="table align-middle text-left">
-                    <thead class="table-light"><tr><th>Task</th><th>Responsible Party</th><th>Status</th><th>Evidence</th></tr></thead>
+                <table id="repairTable" class="table align-middle text-left" style="table-layout: fixed;">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 40%;">Task</th>
+                            <th style="width: 40%;">Responsible Party</th>
+                            <th style="width: 10%;">Status</th>
+                            <th style="width: 10%;">Evidence</th>
+                        </tr>
+                    </thead>
                     <tbody ondragover="dragOver(event)" ondrop="drop(event)"><tr><td colspan="4" class="text-center">No tasks found</td></tr></tbody>
                 </table>
             </div>
