@@ -207,6 +207,9 @@
                         <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "disabled" : "")" data-tab="closeout">
                             <i class="fa-regular fa-circle-check"></i> Closeout
                         </div>
+                        <div class="tab-item @(Model.incidentDetailByIdViewModel.StatusLegendId == 1 ? "disabled" : "")" data-tab="verification">
+                            <i class="fa-solid fa-user-check"></i> Verification
+                        </div>
 
                         @* <div class="tab-item" data-tab="worksteps">
                             <i class="fas fa-tasks"></i> Policies
@@ -1447,6 +1450,39 @@
                     </div>
                 </div>
 
+                <div id="verification" class="tab-content">
+                    <div class="card shadow-sm border-0 rounded-4">
+                        <div class="card-header bg-white fw-semibold border-bottom d-flex align-items-center justify-content-between">
+                            <div><i class="fa-solid fa-file-import me-2 text-warning"></i>Verification Import</div>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="file" id="verificationImportFile" class="form-control form-control-sm" style="max-width: 280px;" accept=".xlsx,.xls" />
+                                <button type="button" class="btn btn-sm btn-primary" id="btnImportVerificationLocations">Import</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info mb-3">
+                                Excel required column: <strong>LocationAddress</strong> (Latitude/Longitude optional). Imported points show as <strong>red</strong> on the map until verified, then <strong>green</strong>.
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped align-middle" id="verificationLocationsTable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width:60%;">Address</th>
+                                            <th style="width:15%;">Status</th>
+                                            <th style="width:15%;">Service Account</th>
+                                            <th style="width:10%;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td colspan="4" class="text-muted">No imported verification locations yet.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="assessment" class="tab-content">
                   
                     @* <div class="topCard mb-3">
@@ -2332,6 +2368,8 @@
 </div>
 <div id="div_repair_view_modal">
 </div>
+<div id="div_verification_modal">
+</div>
 
 <!-- Edit Incident Details Modal -->
 <div class="modal fade" id="editIncidentDetailsModal" tabindex="-1" aria-hidden="true">
@@ -2789,6 +2827,7 @@
 
         // make available globally
         window.Graphic = Graphic;
+        window.GraphicsLayer = GraphicsLayer;
         window.Circle = Circle;
 
         console.log("ArcGIS modules loaded ✔");
@@ -2918,18 +2957,34 @@
             }
         });
 
-        // Zoom to circle when clicking on marker
+        // Click behavior:
+        // 1) If a verification point was clicked, open the verify modal.
+        // 2) Otherwise, keep the existing "zoom to circle" behavior for incident markers.
         view.on("click", function (event) {
             view.hitTest(event).then(function (response) {
-                if (response.results.length > 0) {
-                    var g = response.results[0].graphic;
-                    if (g.geometry.type === "point") {
-                        var incId = g.attributes.IncidentID;
-                        var circle = incidentCircles[incId];
-                        if (circle) {
-                            // Expand extent so it's not too zoomed-in
-                            view.goTo(circle.extent.expand(1.5));
+                if (!response || !response.results || response.results.length === 0) return;
+
+                // Prefer verification points if present
+                if (window.verificationLayer) {
+                    var verificationHit = response.results.find(function (r) {
+                        return r && r.graphic && r.graphic.layer === window.verificationLayer;
+                    });
+                    if (verificationHit && window.openVerifyLocationModal) {
+                        var vid = verificationHit.graphic.attributes && verificationHit.graphic.attributes.VerificationLocationId;
+                        if (vid) {
+                            window.openVerifyLocationModal(vid);
+                            return;
                         }
+                    }
+                }
+
+                // Default: zoom to incident circle
+                var g = response.results[0].graphic;
+                if (g && g.geometry && g.geometry.type === "point") {
+                    var incId = g.attributes && g.attributes.IncidentID;
+                    var circle = incidentCircles[incId];
+                    if (circle) {
+                        view.goTo(circle.extent.expand(1.5));
                     }
                 }
             });

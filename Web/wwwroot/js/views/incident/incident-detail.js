@@ -1277,3 +1277,223 @@ function updateCloseoutSummaryFromDom() {
     $("#closeoutPercent").text(percent + " %");
 }
 
+// -------------------------------
+// Verification (Import + Map dots)
+// -------------------------------
+
+function ensureVerificationLayer() {
+    if (window.verificationLayer) return true;
+    if (!window.mapInstance || !window.GraphicsLayer) return false;
+
+    try {
+        window.verificationLayer = new window.GraphicsLayer();
+        window.mapInstance.add(window.verificationLayer);
+        return true;
+    } catch (e) {
+        console.error("Failed to create verification layer:", e);
+        return false;
+    }
+}
+
+function getVerificationSymbol(status) {
+    const st = (status || "Pending").toString().trim().toLowerCase();
+    const isVerified = st === "verified";
+    return {
+        type: "simple-marker",
+        style: "circle",
+        color: isVerified ? "#198754" : "#dc3545", // green/red
+        size: "12px",
+        outline: { color: "#ffffff", width: 1 }
+    };
+}
+
+async function loadVerificationLocations() {
+    const incidentId = $("#hdnIncidentID").val();
+    if (!incidentId) return;
+
+    // Render table
+    try {
+        const resp = await fetch(`/IncidentDetail/GetVerificationLocations?incidentId=${incidentId}`, {
+            method: "GET",
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        });
+        const json = await resp.json();
+        if (!json || !json.success) return;
+
+        const items = json.items || [];
+        renderVerificationTable(items);
+        renderVerificationDots(items);
+    } catch (e) {
+        console.error("Failed to load verification locations:", e);
+    }
+}
+
+function escapeHtml(s) {
+    return (s || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function renderVerificationTable(items) {
+    const $tbody = $("#verificationLocationsTable tbody");
+    $tbody.empty();
+
+    if (!items || items.length === 0) {
+        $tbody.append(`<tr><td colspan="4" class="text-muted">No imported verification locations yet.</td></tr>`);
+        return;
+    }
+
+    items.forEach(function (x) {
+        const status = (x.status || "Pending");
+        const badgeClass = status.toString().toLowerCase() === "verified" ? "bg-success" :
+            status.toString().toLowerCase() === "rejected" ? "bg-secondary" : "bg-danger";
+
+        $tbody.append(`
+            <tr data-id="${x.id}">
+                <td>${escapeHtml(x.address)}</td>
+                <td><span class="badge ${badgeClass}">${escapeHtml(status)}</span></td>
+                <td>${escapeHtml(x.serviceAccount || "")}</td>
+                <td><button type="button" class="btn btn-sm btn-outline-primary btn-verify-location" data-id="${x.id}">Verify</button></td>
+            </tr>
+        `);
+    });
+}
+
+function renderVerificationDots(items) {
+    if (!ensureVerificationLayer() || !window.Graphic) return;
+
+    window.verificationLayer.removeAll();
+    if (!items || items.length === 0) return;
+
+    items.forEach(function (x) {
+        if (!x || !x.lat || !x.lon) return;
+
+        const point = {
+            type: "point",
+            latitude: x.lat,
+            longitude: x.lon
+        };
+
+        const graphic = new window.Graphic({
+            geometry: point,
+            symbol: getVerificationSymbol(x.status),
+            attributes: {
+                VerificationLocationId: x.id,
+                IncidentID: x.incidentId // keep compatible with existing click handler
+            }
+        });
+
+        window.verificationLayer.add(graphic);
+    });
+}
+
+window.openVerifyLocationModal = async function (id) {
+    try {
+        const resp = await fetch(`/IncidentDetail/VerifyLocation?id=${id}`, {
+            method: "GET",
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        });
+        const html = await resp.text();
+        $("#div_verification_modal").empty().html(html);
+        $("#verifyLocationModal").modal("show");
+    } catch (e) {
+        console.error("Failed to open verify modal:", e);
+    }
+};
+
+$(document).off("click", "#btnImportVerificationLocations");
+$(document).on("click", "#btnImportVerificationLocations", async function () {
+    const incidentId = $("#hdnIncidentID").val();
+    const fileInput = document.getElementById("verificationImportFile");
+    const file = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+
+    if (!incidentId || !file) {
+        SwalErrorAlert("Please select an Excel file to import.");
+        return;
+    }
+
+    const fd = new FormData();
+    fd.append("incidentId", incidentId);
+    fd.append("file", file);
+
+    try {
+        const resp = await fetch(`/IncidentDetail/ImportVerificationLocations?incidentId=${incidentId}`, {
+            method: "POST",
+            body: fd
+        });
+        const json = await resp.json();
+        if (json && json.success) {
+            SwalSuccessAlert(`Imported ${json.imported} location(s).`);
+            fileInput.value = "";
+            await loadVerificationLocations();
+        } else {
+            SwalErrorAlert((json && json.message) || "Import failed.");
+        }
+    } catch (e) {
+        console.error(e);
+        SwalErrorAlert("Import failed.");
+    }
+});
+
+$(document).off("click", ".btn-verify-location");
+$(document).on("click", ".btn-verify-location", function () {
+    const id = $(this).data("id");
+    if (id) window.openVerifyLocationModal(id);
+});
+
+$(document).off("click", "#btnUpdateVerificationLocation");
+$(document).on("click", "#btnUpdateVerificationLocation", async function () {
+    const id = $("#verificationLocationId").val();
+    const incidentId = $("#verificationIncidentId").val();
+    const status = $("#verificationStatus").val();
+    const notes = $("#verificationNotes").val();
+    const serviceAccount = $("#verificationServiceAccount").val();
+
+    // multi-select assets -> comma-separated
+    const assetIds = ($("#verificationAssetIds").val() || []).join(",");
+
+    const fd = new FormData();
+    fd.append("Id", id);
+    fd.append("IncidentId", incidentId);
+    fd.append("VerificationStatus", status);
+    fd.append("VerificationNotes", notes);
+    fd.append("ServiceAccount", serviceAccount);
+    fd.append("AssetIDs", assetIds);
+
+    const files = document.getElementById("verificationFiles").files;
+    for (let i = 0; i < files.length; i++) {
+        fd.append("Files", files[i]);
+    }
+
+    try {
+        const resp = await fetch("/IncidentDetail/UpdateVerificationLocation", {
+            method: "POST",
+            body: fd
+        });
+        const json = await resp.json();
+        if (json && json.success) {
+            SwalSuccessAlert("Verification saved.");
+            $("#verifyLocationModal").modal("hide");
+            await loadVerificationLocations();
+        } else {
+            SwalErrorAlert((json && json.message) || "Save failed.");
+        }
+    } catch (e) {
+        console.error(e);
+        SwalErrorAlert("Save failed.");
+    }
+});
+
+// Load verification points after page init (poll until ArcGIS map is ready)
+(function initVerification(retriesLeft) {
+    if (ensureVerificationLayer()) {
+        loadVerificationLocations();
+        return;
+    }
+    if (retriesLeft <= 0) return;
+    setTimeout(function () { initVerification(retriesLeft - 1); }, 250);
+})(40);
+

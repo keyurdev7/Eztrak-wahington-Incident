@@ -1257,7 +1257,10 @@ namespace Repositories.Common
             try
             {
                 var additionalLocations = await _db.AdditionalLocations
-                    .Where(al => !al.IsDeleted && al.IncidentID.HasValue && al.IncidentID.Value == incidentId)
+                    .Where(al => !al.IsDeleted
+                                 && al.IncidentID.HasValue
+                                 && al.IncidentID.Value == incidentId
+                                 && !al.IsVerificationPoint)
                     .OrderBy(al => al.Id)
                     .ToListAsync();
 
@@ -1278,7 +1281,15 @@ namespace Repositories.Common
                         PerimeterTypeDigit = al.PerimeterTypeDigit,
                         AssetIDs = al.AssetIds ?? string.Empty,
                         AssetNames = new List<string>(),
-                        IsPrimaryLocation = al.IsPrimaryLocation
+                        IsPrimaryLocation = al.IsPrimaryLocation,
+                        IsVerificationPoint = al.IsVerificationPoint,
+                        VerificationStatus = al.VerificationStatus,
+                        VerificationNotes = al.VerificationNotes,
+                        VerificationPhotoUrl = al.VerificationPhotoUrl,
+                        VerifiedOn = al.VerifiedOn,
+                        VerifiedByUserId = al.VerifiedByUserId,
+                        VerifiedByUserName = al.VerifiedByUserName,
+                        ImportBatchId = al.ImportBatchId
                     };
 
                     // Resolve asset names if AssetIds present (re-using your GetAssets helper)

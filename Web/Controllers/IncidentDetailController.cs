@@ -6,10 +6,13 @@ using Models;
 using Newtonsoft.Json;
 
 using Repositories.Common;
+using Repositories.Services.ArcGis.Interface;
+using Repositories.Services.ExcelHelper.Interface;
 
 using ViewModels.Incident;
 
 using Web.Extensions;
+using System.Security.Claims;
 
 namespace Web.Controllers
 {
@@ -17,13 +20,24 @@ namespace Web.Controllers
     {
         private readonly IIncidentService _iIncidentService;
         private readonly IIncidentValidationService _iIIncidentValidationService;
+        private readonly IAdditionalLocationsService _iAdditionalLocationsService;
+        private readonly IExcelHelper _excelHelper;
+        private readonly IArcGisGeocodingService _arcGisGeocodingService;
 
         public object JsonRequestBehavior { get; private set; }
 
-        public IncidentDetailController(IIncidentService incidentService, IIncidentValidationService iIIncidentValidationService)
+        public IncidentDetailController(
+            IIncidentService incidentService,
+            IIncidentValidationService iIIncidentValidationService,
+            IAdditionalLocationsService additionalLocationsService,
+            IExcelHelper excelHelper,
+            IArcGisGeocodingService arcGisGeocodingService)
         {
             _iIncidentService = incidentService;
             _iIIncidentValidationService = iIIncidentValidationService;
+            _iAdditionalLocationsService = additionalLocationsService;
+            _excelHelper = excelHelper;
+            _arcGisGeocodingService = arcGisGeocodingService;
         }
         public async Task<IActionResult> Index(long id)
         {
@@ -1160,6 +1174,202 @@ namespace Web.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+
+        #region Verification (Import + Verify)
+
+        [HttpGet]
+        public async Task<IActionResult> GetVerificationLocations(long incidentId)
+        {
+            var locations = await _iAdditionalLocationsService.GetVerificationLocationsByIncidentId(incidentId);
+            var data = locations.Select(l => new
+            {
+                id = l.Id,
+                incidentId = l.IncidentId,
+                address = l.LocationAddress,
+                lat = l.Latitude,
+                lon = l.Longitude,
+                status = string.IsNullOrWhiteSpace(l.VerificationStatus) ? "Pending" : l.VerificationStatus,
+                notes = l.VerificationNotes,
+                serviceAccount = l.ServiceAccount,
+                assetIds = l.AssetIDs,
+                photoUrl = l.VerificationPhotoUrl
+            });
+
+            return Json(new { success = true, items = data });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ImportVerificationLocations(long incidentId, IFormFile file)
+        {
+            if (incidentId <= 0) return BadRequest(new { success = false, message = "Invalid incident." });
+            if (file == null || file.Length == 0) return BadRequest(new { success = false, message = "Excel file is required." });
+
+            try
+            {
+                List<System.Data.DataTable> tables;
+                using (var stream = file.OpenReadStream())
+                {
+                    tables = _excelHelper.GetData(stream);
+                }
+
+                if (tables == null || tables.Count == 0 || tables[0].Rows.Count == 0)
+                    return BadRequest(new { success = false, message = "Excel has no data." });
+
+                var dt = tables[0];
+
+                int FindCol(string name)
+                {
+                    for (int i = 0; i < dt.Columns.Count; i++)
+                    {
+                        var col = dt.Columns[i].ColumnName?.Trim();
+                        if (!string.IsNullOrWhiteSpace(col) && col.Equals(name, StringComparison.OrdinalIgnoreCase))
+                            return i;
+                    }
+                    return -1;
+                }
+
+                var idxAddress = FindCol("LocationAddress");
+                if (idxAddress < 0) idxAddress = FindCol("Address");
+                if (idxAddress < 0) return BadRequest(new { success = false, message = "Missing required column: LocationAddress" });
+
+                var idxLat = FindCol("Latitude");
+                var idxLon = FindCol("Longitude");
+                var idxNearest = FindCol("NearestIntersection");
+
+                var batchId = Guid.NewGuid();
+                var list = new List<AdditionalLocationViewModel>();
+                int skipped = 0;
+
+                foreach (System.Data.DataRow row in dt.Rows)
+                {
+                    var address = (row[idxAddress]?.ToString() ?? string.Empty).Trim();
+                    if (string.IsNullOrWhiteSpace(address))
+                    {
+                        skipped++;
+                        continue;
+                    }
+
+                    double lat = 0, lon = 0;
+                    if (idxLat >= 0) double.TryParse((row[idxLat]?.ToString() ?? "").Trim(), out lat);
+                    if (idxLon >= 0) double.TryParse((row[idxLon]?.ToString() ?? "").Trim(), out lon);
+
+                    // If coordinates not supplied, geocode using ArcGIS SingleLine
+                    if (Math.Abs(lat) < 0.000001 && Math.Abs(lon) < 0.000001)
+                    {
+                        var geo = await _arcGisGeocodingService.GeocodeSingleLineAsync(address);
+                        if (geo.HasValue)
+                        {
+                            lat = geo.Value.lat;
+                            lon = geo.Value.lon;
+                        }
+                    }
+
+                    list.Add(new AdditionalLocationViewModel
+                    {
+                        IncidentId = incidentId,
+                        LocationAddress = address,
+                        Latitude = lat,
+                        Longitude = lon,
+                        NearestIntersection = idxNearest >= 0 ? (row[idxNearest]?.ToString() ?? "").Trim() : null,
+                        IsVerificationPoint = true,
+                        VerificationStatus = "Pending",
+                        ImportBatchId = batchId
+                    });
+                }
+
+                var inserted = await _iAdditionalLocationsService.AddVerificationLocations(incidentId, list, batchId);
+
+                return Json(new
+                {
+                    success = inserted > 0,
+                    imported = inserted,
+                    skipped,
+                    batchId,
+                    message = inserted > 0 ? "Imported successfully." : "No rows imported."
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Import failed. " + ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<PartialViewResult> VerifyLocation(long id)
+        {
+            var model = await _iAdditionalLocationsService.GetVerificationLocationById(id) ?? new AdditionalLocationViewModel();
+
+            // Populate asset list for multi-select
+            var drop = await _iIncidentService.GetIncidentDropDown();
+            model.AssetsIncidentList = drop?.incidentiLocation?.AssetsIncidentList ?? new List<SelectListItem>();
+
+            return PartialView("_VerifyLocationPartial", model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateVerificationLocation([FromForm] VerificationLocationUpdateViewModel model, List<IFormFile> Files)
+        {
+            if (model == null || model.Id <= 0)
+                return BadRequest(new { success = false, message = "Invalid request." });
+
+            try
+            {
+                var uploadedUrls = new List<string>();
+                if (Files != null && Files.Count > 0)
+                {
+                    var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "Storage", "uploads", "Verification");
+                    if (!Directory.Exists(uploadsPath))
+                        Directory.CreateDirectory(uploadsPath);
+
+                    foreach (var file in Files)
+                    {
+                        if (file.Length <= 0) continue;
+                        var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
+                        var filePath = Path.Combine(uploadsPath, fileName);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+                        uploadedUrls.Add($"/Storage/uploads/Verification/{fileName}");
+                    }
+                }
+
+                var userIdStr = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+                long? userId = null;
+                if (!string.IsNullOrWhiteSpace(userIdStr) && long.TryParse(userIdStr, out var parsed))
+                    userId = parsed;
+
+                var userName = User?.Identity?.Name;
+
+                var ok = await _iAdditionalLocationsService.UpdateVerificationLocation(
+                    model.Id,
+                    model.VerificationStatus,
+                    model.VerificationNotes,
+                    model.ServiceAccount,
+                    model.AssetIDs,
+                    uploadedUrls.Count > 0 ? string.Join("|", uploadedUrls) : null,
+                    userId,
+                    userName);
+
+                if (!ok)
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { success = false, message = "Failed to update verification." });
+
+                return Json(new
+                {
+                    success = true,
+                    id = model.Id,
+                    status = model.VerificationStatus,
+                    files = uploadedUrls
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Save failed. " + ex.Message });
+            }
+        }
+
+        #endregion
+
         #endregion
     }
 }

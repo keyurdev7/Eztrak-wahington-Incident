@@ -1,4 +1,4 @@
-﻿#imgPreviewModal.modal {
+#imgPreviewModal.modal {
     display: none;
     position: fixed;
     z-index: 9999;
@@ -718,14 +718,17 @@
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid #e5e7eb;
-    gap: 30px;
+    gap: 12px;
     padding: 0 1rem;
+    flex-wrap: wrap; /* allow progress to stay visible */
 }
 
 #incidentDetailsModal .tabs .tabs-container {
     display: flex;
-    gap: 30px;
+    gap: 18px;
     flex: 1;
+    flex-wrap: wrap;
+    min-width: 0;
 }
 
 /* Compact progress indicator inline with tabs */
@@ -735,6 +738,17 @@
     gap: 0.4rem;
     padding: 0.35rem 0.6rem;
     margin-left: auto;
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+@media (max-width: 1200px) {
+    /* On narrower widths, put progress on its own row to avoid clipping */
+    .progress-indicator-compact {
+        width: 100%;
+        justify-content: flex-end;
+        padding-bottom: 0.5rem;
+    }
 }
 
 .progress-icon-compact {
@@ -1250,6 +1264,68 @@
     text-overflow: ellipsis;
 }
 
+/* Prevent Status and Evidence columns from overlapping: use auto layout so min-widths are respected */
+#assessmentTable,
+#repairTable,
+#restorationTable,
+#closeoutTable {
+    table-layout: auto;
+    min-width: 100%;
+}
+
+/* Responsible Party column (2nd): allow wrapping when text is long */
+#assessment table th:nth-child(2),
+#repair table th:nth-child(2),
+#restoration table th:nth-child(2),
+#closeout table th:nth-child(2) {
+    min-width: 120px;
+}
+
+#assessment table td:nth-child(2),
+#repair table td:nth-child(2),
+#restoration table td:nth-child(2),
+#closeout table td:nth-child(2) {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    word-break: break-word;
+    vertical-align: middle;
+}
+
+/* Status column: show full badge text (Not Started, Complete, etc.) in all 4 task tables */
+#assessment table th:nth-child(3),
+#repair table th:nth-child(3),
+#restoration table th:nth-child(3),
+#closeout table th:nth-child(3) {
+    min-width: 110px;
+}
+
+#assessment table td:nth-child(3),
+#repair table td:nth-child(3),
+#restoration table td:nth-child(3),
+#closeout table td:nth-child(3) {
+    overflow: visible;
+    text-overflow: clip;
+    min-width: 110px;
+    vertical-align: middle;
+}
+
+/* Evidence column (4th): min-width so it doesn't collapse or overlap Status; keep centered */
+#assessment table th:nth-child(4),
+#repair table th:nth-child(4),
+#restoration table th:nth-child(4),
+#closeout table th:nth-child(4) {
+    min-width: 90px;
+}
+
+#assessment table td:nth-child(4),
+#repair table td:nth-child(4),
+#restoration table td:nth-child(4),
+#closeout table td:nth-child(4) {
+    min-width: 90px;
+    vertical-align: middle;
+}
+
 #assessment .status-badge {
     padding: 3px 10px;
     border-radius: 12px;
@@ -1584,8 +1660,6 @@
     white-space: nowrap; /* Prevent text wrapping */
     overflow: hidden; /* Hide overflowed text */
     text-overflow: ellipsis; /* Add "..." if too long */
-
-    text-align: left;
 }
 
 #repair .badge-status,

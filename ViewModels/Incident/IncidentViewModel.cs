@@ -294,6 +294,16 @@ namespace ViewModels.Incident
         public string AssetIDs { get; set; } = default!;
         public List<SelectListItem> AssetsIncidentList { get; set; } = new();
         public List<string> AssetNames { get; set; } = new();
+
+        // Verification/import support (per-incident)
+        public bool IsVerificationPoint { get; set; }
+        public string? VerificationStatus { get; set; } // Pending / Verified / Rejected
+        public string? VerificationNotes { get; set; }
+        public string? VerificationPhotoUrl { get; set; } // '|' separated URLs
+        public DateTime? VerifiedOn { get; set; }
+        public long? VerifiedByUserId { get; set; }
+        public string? VerifiedByUserName { get; set; }
+        public Guid? ImportBatchId { get; set; }
     }
 
     public class IncidentAdditionalLocationViewModel

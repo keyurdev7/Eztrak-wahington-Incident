@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Bibliography;
 
 using Microsoft.Extensions.Configuration;
 
@@ -102,6 +102,39 @@ namespace Repositories.Services.ArcGis
                 address = addrProp.GetString() ?? string.Empty;
 
             return (lat, lon, address);
+        }
+
+        // Geocode a plain address string (no magicKey) to lat/lon
+        public async Task<(double lat, double lon, string address)?> GeocodeSingleLineAsync(string address)
+        {
+            if (string.IsNullOrWhiteSpace(address)) return null;
+
+            var url = $"https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates" +
+                      $"?f=json&SingleLine={Uri.EscapeDataString(address)}&outFields=Match_addr&maxLocations=1&apiKey={_apiKey}";
+
+            var response = await _httpClient.GetStringAsync(url);
+            using var doc = JsonDocument.Parse(response);
+
+            if (!doc.RootElement.TryGetProperty("candidates", out var candidates) || candidates.GetArrayLength() == 0)
+                return null;
+
+            var first = candidates[0];
+            if (!first.TryGetProperty("location", out var location))
+                return null;
+
+            double lat = 0, lon = 0;
+            string matchAddr = address;
+
+            if (location.TryGetProperty("y", out var yProp))
+                lat = yProp.GetDouble();
+
+            if (location.TryGetProperty("x", out var xProp))
+                lon = xProp.GetDouble();
+
+            if (first.TryGetProperty("address", out var addrProp))
+                matchAddr = addrProp.GetString() ?? address;
+
+            return (lat, lon, matchAddr);
         }
 
         public async Task<List<(string Text, string MagicKey)>> GetSuggestionsAsyncWithMagicKey(string text)
