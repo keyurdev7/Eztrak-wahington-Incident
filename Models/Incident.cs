@@ -1,4 +1,4 @@
-﻿using Models.Models.Shared;
+using Models.Models.Shared;
 
 using System;
 using System.Collections.Generic;
@@ -22,6 +22,18 @@ namespace Models
         //public EventType EventType { get; set; }
 
         public string? EventTypeIds { get; set; }
+
+        // New single-select Incident Type/Sub-Type (EventTypes + EventSubTypes)
+        [ForeignKey("EventType")]
+        public long? EventTypeId { get; set; }
+        public EventType? EventType { get; set; }
+
+        [ForeignKey("EventSubType")]
+        public long? EventSubTypeId { get; set; }
+        public EventSubType? EventSubType { get; set; }
+
+        // Impact Scope: Single / Multiple / Unknown
+        public string? ImpactScope { get; set; }
 
         [ForeignKey("SeverityLevelId")]
         public long? SeverityLevelId { get; set; }

@@ -159,8 +159,23 @@ namespace Repositories.Common
                     return new IncidentValidationDetailViewModel();
                 }
 
-                // Run async calls in parallel
-                var eventTypesTask = await GetEventTypes(incident.EventTypeIds ?? string.Empty);
+                // Incident Type/Sub-Type (new) with fallback to legacy EventTypeIds
+                var incidentType =
+                    incident.EventTypeId.HasValue
+                        ? await _db.EventTypes.Where(et => !et.IsDeleted && et.Id == incident.EventTypeId.Value).Select(et => et.Name).FirstOrDefaultAsync()
+                        : await GetEventTypes(incident.EventTypeIds ?? string.Empty);
+
+                if (incident.EventSubTypeId.HasValue)
+                {
+                    var subType = await _db.EventSubTypes
+                        .Where(st => !st.IsDeleted && st.Id == incident.EventSubTypeId.Value)
+                        .Select(st => st.Name)
+                        .FirstOrDefaultAsync();
+
+                    if (!string.IsNullOrWhiteSpace(subType))
+                        incidentType = $"{incidentType} - {subType}";
+                }
+
                 var assetsTask = await GetAssets(incident.AssetIds ?? string.Empty);
 
 
@@ -171,7 +186,7 @@ namespace Repositories.Common
                     CallerContact = incident.CallerPhoneNumber ?? string.Empty,
                     CallerDateTime = GetDate(incident.CallTime.ToString()),
                     CallerName = incident.CallerName ?? string.Empty,
-                    EventType = eventTypesTask,
+                    EventType = incidentType ?? string.Empty,
                     IncidentId = incident.IncidentID,
                     IncidentLocation = incident.LocationAddress ?? string.Empty,
                     NearestIntersection = incident.Landmark ?? string.Empty,

@@ -107,6 +107,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     public DbSet<IncidentValidationPolicy> IncidentValidationPolicies { get; set; }
     public DbSet<Progress> Progress { get; set; }
     public DbSet<AdditionalLocations> AdditionalLocations { get; set; }
+    public DbSet<EventSubType> EventSubTypes { get; set; }
     public DbSet<EquipmentFields> EquipmentFields { get; set; }
     public DbSet<IncidentValidationAssignedRole> IncidentValidationAssignedRoles { get; set; }
     public DbSet<IncidentValidationGate> IncidentValidationGates { get; set; }

@@ -1210,7 +1210,8 @@
                 <h3>Configuration</h3>
                 <ul>
                     <li class="active settingAllTab" data-tab="source"><i class="fa-solid fa-user-group"></i> Source</li>
-                    <li class="settingAllTab" data-tab="event"><i class="fa-regular fa-file-lines"></i> Event Types</li>
+                    <li class="settingAllTab" data-tab="event"><i class="fa-regular fa-file-lines"></i> Incident Types</li>
+                    <li class="settingAllTab" data-tab="eventSubType"><i class="fa-regular fa-file-lines"></i> Incident Sub-Types</li>
                     <li class="settingAllTab" data-tab="severity"><i class="fa-solid fa-triangle-exclamation"></i> Severity Levels</li>
                     <li class="settingAllTab" data-tab="asset"><i class="fa-solid fa-barcode"></i> Asset Types</li>
                     @* <li class="settingAllTab" data-tab="type"><i class="fa-solid fa-building"></i> Asset Types</li> *@
@@ -1244,7 +1245,7 @@
                 </div>
                 <div id="event" class="setting-tab-content">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3>Event Type</h3>
+                        <h3>Incident Type</h3>
                         <button class="btn btn-primary btnAddNewEvent">
                             <i class="fa-solid fa-plus"></i> Add New
                         </button>
@@ -1254,6 +1255,17 @@
                     </div>
                     <div id="eventTypeList">
                     </div>
+                </div>
+
+                <div id="eventSubType" class="setting-tab-content">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3>Incident Sub-Type</h3>
+                        <button class="btn btn-primary btnAddNewEventSubType">
+                            <i class="fa-solid fa-plus"></i> Add New
+                        </button>
+                    </div>
+                    <div id="addEventSubType"></div>
+                    <div id="eventSubTypeList"></div>
                 </div>
                 <div id="severity" class="setting-tab-content">
                     <div class="d-flex justify-content-between align-items-center mb-3">

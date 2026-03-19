@@ -413,7 +413,7 @@
                                     <div class="section-body">
                                         <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
                                             <div class="info-sec">
-                                                <span class="info-title">Event Type : </span>
+                                                <span class="info-title">Incident Type : </span>
                                             </div>
                                             <div class="fw-bold font-colr">@Model.IVDetails.EventType</div>
                                         </div>
@@ -1062,25 +1062,49 @@
                                                 <div class="info-sec">
                                                 <span class="info-title">Incident Commander : </span>
                                                 </div>
-                                            <div class="fw-bold font-colr">@Model.incidentValidationAssignedRolesViewModel.IncidentCommanderName</div>
+                                            <div class="fw-bold font-colr">
+                                                @Model.incidentValidationAssignedRolesViewModel.IncidentCommanderName
+                                                @if (!string.IsNullOrWhiteSpace(Model.incidentValidationAssignedRolesViewModel.IncidentCommanderSecondaryName))
+                                                {
+                                                    <span class="text-muted"> / @Model.incidentValidationAssignedRolesViewModel.IncidentCommanderSecondaryName</span>
+                                                }
+                                            </div>
                                             </div>
                                             <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
                                                 <div class="info-sec">
                                                 <span class="info-title">Field Env. Rep (FER) : </span>
                                                 </div>
-                                            <div class="fw-bold font-colr">@Model.incidentValidationAssignedRolesViewModel.FieldEnvRepName</div>
+                                            <div class="fw-bold font-colr">
+                                                @Model.incidentValidationAssignedRolesViewModel.FieldEnvRepName
+                                                @if (!string.IsNullOrWhiteSpace(Model.incidentValidationAssignedRolesViewModel.FieldEnvRepSecondaryName))
+                                                {
+                                                    <span class="text-muted"> / @Model.incidentValidationAssignedRolesViewModel.FieldEnvRepSecondaryName</span>
+                                                }
+                                            </div>
                                             </div>
                                             <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
                                                 <div class="info-sec">
                                                 <span class="info-title">GEC Coordinator : </span>
                                                 </div>
-                                            <div class="fw-bold font-colr">@Model.incidentValidationAssignedRolesViewModel.GEC_CoordinatorName</div>
+                                            <div class="fw-bold font-colr">
+                                                @Model.incidentValidationAssignedRolesViewModel.GEC_CoordinatorName
+                                                @if (!string.IsNullOrWhiteSpace(Model.incidentValidationAssignedRolesViewModel.GEC_CoordinatorSecondaryName))
+                                                {
+                                                    <span class="text-muted"> / @Model.incidentValidationAssignedRolesViewModel.GEC_CoordinatorSecondaryName</span>
+                                                }
+                                            </div>
                                             </div>
                                             <div class="detailInfoSec d-flex align-items-center gap-5 mb-2">
                                                 <div class="info-sec">
                                                 <span class="info-title">Engineering Lead : </span>
                                                 </div>
-                                            <div class="fw-bold font-colr">@Model.incidentValidationAssignedRolesViewModel.EngineeringLeadName</div>
+                                            <div class="fw-bold font-colr">
+                                                @Model.incidentValidationAssignedRolesViewModel.EngineeringLeadName
+                                                @if (!string.IsNullOrWhiteSpace(Model.incidentValidationAssignedRolesViewModel.EngineeringLeadSecondaryName))
+                                                {
+                                                    <span class="text-muted"> / @Model.incidentValidationAssignedRolesViewModel.EngineeringLeadSecondaryName</span>
+                                                }
+                                            </div>
                                             </div>
 
                                         </div>
@@ -2908,7 +2932,7 @@
                 content: `
                     <b>Incident Number:</b> {IncidentID}<br>
                     <b>Severity:</b> {Severity}<br>
-                    <b>Event Type:</b> {EventType}<br>
+                    <b>Incident Type:</b> {EventType}<br>
                     <b>Asset Type:</b> {AssetType}<br>
                     <b>Description:</b> {Description}<br>
                     <b>Intersection:</b> {Intersection}<br>

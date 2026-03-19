@@ -17,11 +17,29 @@ namespace Repositories.Services.ArcGis
     {
         private readonly HttpClient _httpClient;
         private readonly string _apiKey;
+        private readonly string? _countryCode;
+        private readonly string? _searchExtent;
 
         public ArcGisGeocodingService(HttpClient httpClient, IConfiguration config)
         {
             _httpClient = httpClient;
             _apiKey = config["ArcGIS:ApiKey"];
+            _countryCode = config["ArcGIS:CountryCode"];
+            _searchExtent = config["ArcGIS:SearchExtent"];
+        }
+
+        private string BuildCommonBiasParams()
+        {
+            var parts = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(_countryCode))
+                parts.Add($"countryCode={Uri.EscapeDataString(_countryCode)}");
+
+            // Optional: "xmin,ymin,xmax,ymax" (WGS84) to bias results (e.g. California)
+            if (!string.IsNullOrWhiteSpace(_searchExtent))
+                parts.Add($"searchExtent={Uri.EscapeDataString(_searchExtent)}");
+
+            return parts.Count > 0 ? "&" + string.Join("&", parts) : string.Empty;
         }
 
         //public async Task<string> GetTokenAsync()
@@ -48,7 +66,8 @@ namespace Repositories.Services.ArcGis
         public async Task<List<string>> GetSuggestionsAsync(string text)
         {
             var url = $"https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/suggest" +
-                      $"?f=json&text={Uri.EscapeDataString(text)}&maxSuggestions=5&apiKey={_apiKey}";
+                      $"?f=json&text={Uri.EscapeDataString(text)}&maxSuggestions=5&apiKey={_apiKey}" +
+                      BuildCommonBiasParams();
 
             var response = await _httpClient.GetStringAsync(url);
 
@@ -75,7 +94,9 @@ namespace Repositories.Services.ArcGis
         public async Task<(double lat, double lon, string address)?> GetCoordinatesAsync(string magicKey)
         {
             var url = $"https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates" +
-                      $"?f=json&magicKey={Uri.EscapeDataString(magicKey)}&outFields=Match_addr&apiKey={_apiKey}";
+                      $"?f=json&magicKey={Uri.EscapeDataString(magicKey)}&outFields=Match_addr&apiKey={_apiKey}" +
+                      (!string.IsNullOrWhiteSpace(_countryCode) ? $"&sourceCountry={Uri.EscapeDataString(_countryCode)}" : string.Empty) +
+                      (!string.IsNullOrWhiteSpace(_searchExtent) ? $"&searchExtent={Uri.EscapeDataString(_searchExtent)}" : string.Empty);
 
             var response = await _httpClient.GetStringAsync(url);
             using var doc = JsonDocument.Parse(response);
@@ -110,7 +131,9 @@ namespace Repositories.Services.ArcGis
             if (string.IsNullOrWhiteSpace(address)) return null;
 
             var url = $"https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates" +
-                      $"?f=json&SingleLine={Uri.EscapeDataString(address)}&outFields=Match_addr&maxLocations=1&apiKey={_apiKey}";
+                      $"?f=json&SingleLine={Uri.EscapeDataString(address)}&outFields=Match_addr&maxLocations=1&apiKey={_apiKey}" +
+                      (!string.IsNullOrWhiteSpace(_countryCode) ? $"&sourceCountry={Uri.EscapeDataString(_countryCode)}" : string.Empty) +
+                      (!string.IsNullOrWhiteSpace(_searchExtent) ? $"&searchExtent={Uri.EscapeDataString(_searchExtent)}" : string.Empty);
 
             var response = await _httpClient.GetStringAsync(url);
             using var doc = JsonDocument.Parse(response);
@@ -140,7 +163,8 @@ namespace Repositories.Services.ArcGis
         public async Task<List<(string Text, string MagicKey)>> GetSuggestionsAsyncWithMagicKey(string text)
         {
             var suggestionsUrl = $"https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/suggest" +
-                                 $"?f=json&text={Uri.EscapeDataString(text)}&maxSuggestions=5&apiKey={_apiKey}";
+                                 $"?f=json&text={Uri.EscapeDataString(text)}&maxSuggestions=5&apiKey={_apiKey}" +
+                                 BuildCommonBiasParams();
 
             var suggestionsResponse = await _httpClient.GetStringAsync(suggestionsUrl);
             using var doc = JsonDocument.Parse(suggestionsResponse);
@@ -168,7 +192,8 @@ namespace Repositories.Services.ArcGis
         public async Task<List<(string Text, double Lat, double Lng)>> GetSuggestionsAsynclat(string text)
         {
             var suggestionsUrl = $"https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/suggest" +
-                                 $"?f=json&text={Uri.EscapeDataString(text)}&maxSuggestions=5&apiKey={_apiKey}";
+                                 $"?f=json&text={Uri.EscapeDataString(text)}&maxSuggestions=5&apiKey={_apiKey}" +
+                                 BuildCommonBiasParams();
 
             var suggestionsResponse = await _httpClient.GetStringAsync(suggestionsUrl);
             using var doc = JsonDocument.Parse(suggestionsResponse);
@@ -184,7 +209,9 @@ namespace Repositories.Services.ArcGis
 
                     // Now call the findAddressCandidates API to get lat/lng for this suggestion
                     var detailsUrl = $"https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates" +
-                                     $"?f=json&magicKey={Uri.EscapeDataString(magicKey)}&text={Uri.EscapeDataString(suggestionText)}&apiKey={_apiKey}";
+                                     $"?f=json&magicKey={Uri.EscapeDataString(magicKey)}&text={Uri.EscapeDataString(suggestionText)}&apiKey={_apiKey}" +
+                                     (!string.IsNullOrWhiteSpace(_countryCode) ? $"&sourceCountry={Uri.EscapeDataString(_countryCode)}" : string.Empty) +
+                                     (!string.IsNullOrWhiteSpace(_searchExtent) ? $"&searchExtent={Uri.EscapeDataString(_searchExtent)}" : string.Empty);
 
                     var detailsResponse = await _httpClient.GetStringAsync(detailsUrl);
                     using var detailsDoc = JsonDocument.Parse(detailsResponse);

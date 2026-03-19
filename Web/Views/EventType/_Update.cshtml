@@ -1,4 +1,4 @@
-﻿@using Enums
+@using Enums
 @using ViewModels;
 @model EventTypeModifyViewModel
 @{
@@ -17,11 +17,11 @@
                 </div>
             </div>
 
-            <!-- Description Field -->
+            <!-- Sort Order Field -->
             <div class="mb-3 form-group">
-                <label asp-for="Description" class="form-label fw-600"></label>
-                <input asp-for="Description" type="text" class="form-control" />
-                <span asp-validation-for="Description" class="validation-invalid-label"></span>
+                <label asp-for="SortOrder" class="form-label fw-600"></label>
+                <input asp-for="SortOrder" type="number" class="form-control" min="0" />
+                <span asp-validation-for="SortOrder" class="validation-invalid-label"></span>
             </div>
 
         </div>

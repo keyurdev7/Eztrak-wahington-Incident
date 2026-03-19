@@ -1,4 +1,4 @@
-﻿using Helpers.Extensions;
+using Helpers.Extensions;
 using ViewModels.Shared;
 
 namespace ViewModels
@@ -7,7 +7,7 @@ namespace ViewModels
     {
         public long Id { get; set; }
         public string Name { get; set; }
-        public string? Description { get; set; }
+        public int SortOrder { get; set; }
         public DateTime CreatedOn { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿@using ViewModels.Dashboard
+@using ViewModels.Dashboard
 @model List<IncidentLocationMapViewModel>
 
 <div class="modal fade" id="MapIncidentModal" tabindex="-1" aria-labelledby="MapIncidentModal" aria-hidden="true">
@@ -106,7 +106,7 @@
                 content: `
                     <b>Incident Number:</b> {IncidentID}<br>
                     <b>Severity:</b> {Severity}<br>
-                    <b>Event Type:</b> {EventType}<br>
+                    <b>Incident Type:</b> {EventType}<br>
                     <b>Asset Type:</b> {AssetType}<br>
                     <b>Description:</b> {Description}<br>
                     <b>Intersection:</b> {Intersection}<br>
@@ -246,7 +246,7 @@
              content: `
                  <b>Incident Number:</b> {IncidentID}<br>
                  <b>Severity:</b> {Severity}<br>
-                 <b>Event Type:</b> {EventType}<br>
+                 <b>Incident Type:</b> {EventType}<br>
                  <b>Asset Type:</b> {AssetType}<br>
                  <b>Description:</b> {Description}<br>
                  <b>Intersection:</b> {Intersection}<br>

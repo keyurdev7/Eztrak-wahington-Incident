@@ -91,9 +91,7 @@ namespace Repositories.Common
                                     .Select(it => new SelectListItem
                                     {
                                         Value = it.Id.ToString(),
-                                        Text = !string.IsNullOrWhiteSpace(it.Description)
-                                               ? it.Name + " (" + it.Description + ")"
-                                               : it.Name
+                                        Text = it.Name
                                     })
                                     .ToListAsync();
 
@@ -119,16 +117,12 @@ namespace Repositories.Common
 
                 var eventTypes = await _db.EventTypes
                                 .Where(it => !it.IsDeleted)
-                                .OrderByDescending(it =>
-                                    !string.IsNullOrWhiteSpace(it.Name) &&
-                                    it.Name.Trim().ToLower() == "water intrusion")
+                                .OrderBy(it => it.SortOrder)
                                 .ThenBy(it => it.Name)
                                 .Select(it => new SelectListItem
                                 {
                                     Value = it.Id.ToString(),
-                                    Text = !string.IsNullOrWhiteSpace(it.Description)
-                                        ? it.Name + " (" + it.Description + ")"
-                                        : it.Name
+                                    Text = it.Name
                                 })
                                 .ToListAsync();
 
@@ -148,6 +142,7 @@ namespace Repositories.Common
                 incidentViewModel.incidentCellerInformation.Relationships = relationships;
                 incidentViewModel.incidentiLocation.AssetsIncidentList = assetIncidents;
                 incidentViewModel.incidentDetails.EventTypes = eventTypes;
+                incidentViewModel.incidentDetails.EventSubTypes = new List<SelectListItem>();
 
                 return incidentViewModel;
             }
@@ -191,7 +186,13 @@ namespace Repositories.Common
                     CallTime = viewModel.incidentCellerInformation?.CallTime ?? DateTime.Now,
                     RelationshipId = viewModel.incidentCellerInformation?.RelationshipId,
 
-                    EventTypeIds = viewModel.incidentDetails?.EventTypeIds,
+                    // New single-select
+                    EventTypeId = viewModel.incidentDetails?.EventTypeId,
+                    EventSubTypeId = viewModel.incidentDetails?.EventSubTypeId,
+                    ImpactScope = viewModel.incidentDetails?.ImpactScope,
+
+                    // Legacy (keep a single value for backward compatibility)
+                    EventTypeIds = viewModel.incidentDetails?.EventTypeId?.ToString(),
                     IsOtherEvent = viewModel.incidentDetails.IsOtherEvent,
                     OtherEventDetail = viewModel.incidentDetails?.OtherEventDetail,
 
@@ -300,7 +301,10 @@ namespace Repositories.Common
                 incident.RelationshipId = caller?.RelationshipId;
 
                 var details = viewModel.incidentDetails;
-                incident.EventTypeIds = details?.EventTypeIds;
+                incident.EventTypeId = details?.EventTypeId;
+                incident.EventSubTypeId = details?.EventSubTypeId;
+                incident.ImpactScope = details?.ImpactScope;
+                incident.EventTypeIds = details?.EventTypeId?.ToString();
                 incident.IsOtherEvent = details?.IsOtherEvent ?? false;
                 incident.OtherEventDetail = details?.OtherEventDetail;
 
@@ -389,6 +393,22 @@ namespace Repositories.Common
                 var incidentsList = await query.ToListAsync();
                 var incidentIds = incidentsList.Select(i => i.Id).ToList();
 
+                // Preload Incident Type/Sub-Type names to avoid per-row queries
+                var typeIds = incidentsList.Where(i => i.EventTypeId.HasValue).Select(i => i.EventTypeId!.Value).Distinct().ToList();
+                var subTypeIds = incidentsList.Where(i => i.EventSubTypeId.HasValue).Select(i => i.EventSubTypeId!.Value).Distinct().ToList();
+
+                var typeDict = typeIds.Count == 0
+                    ? new Dictionary<long, string>()
+                    : await _db.EventTypes.AsNoTracking()
+                        .Where(t => !t.IsDeleted && typeIds.Contains(t.Id))
+                        .ToDictionaryAsync(t => t.Id, t => t.Name);
+
+                var subTypeDict = subTypeIds.Count == 0
+                    ? new Dictionary<long, string>()
+                    : await _db.EventSubTypes.AsNoTracking()
+                        .Where(st => !st.IsDeleted && subTypeIds.Contains(st.Id))
+                        .ToDictionaryAsync(st => st.Id, st => st.Name);
+
                 var additionalCounts = new List<(long IncidentId, int Count)>();
                 if (incidentIds.Any())
                 {
@@ -410,7 +430,14 @@ namespace Repositories.Common
                         CallTime = GetTime(Convert.ToString(item.CallTime)),
                         AssetId = await GetAssets(item.AssetIds ?? string.Empty),
                         DescriptionIssue = item.DescriptionIssue ?? string.Empty,
-                        EventTypeId = await GetEventTypes(item.EventTypeIds ?? string.Empty),
+                        // Display: Incident Type - Sub-Type (fallback to legacy string)
+                        EventTypeId =
+                            (item.EventTypeId.HasValue && typeDict.TryGetValue(item.EventTypeId.Value, out var tName)
+                                ? tName
+                                : await GetEventTypes(item.EventTypeIds ?? string.Empty))
+                            + (item.EventSubTypeId.HasValue && subTypeDict.TryGetValue(item.EventSubTypeId.Value, out var stName)
+                                ? " - " + stName
+                                : string.Empty),
                         GasESIndicator = GetIndicator(item.GasPresentId),
                         Id = item.Id,
                         Intersection = item.Landmark ?? string.Empty,
@@ -558,9 +585,33 @@ namespace Repositories.Common
                 incidentViewModel.incidentiLocation.ServiceAccount = incident?.ServiceAccount;
                 incidentViewModel.incidentiLocation.IsSameCallerAddress = incident.IsSameCallerAddress;
 
+                // New single-select fields (fallback to legacy comma string if needed)
+                incidentViewModel.incidentDetails.EventTypeId = incident.EventTypeId;
+                if (!incidentViewModel.incidentDetails.EventTypeId.HasValue && !string.IsNullOrWhiteSpace(incident.EventTypeIds))
+                {
+                    var first = incident.EventTypeIds.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).FirstOrDefault();
+                    if (long.TryParse(first, out var parsed)) incidentViewModel.incidentDetails.EventTypeId = parsed;
+                }
+
+                incidentViewModel.incidentDetails.EventSubTypeId = incident.EventSubTypeId;
+                incidentViewModel.incidentDetails.ImpactScope = incident.ImpactScope ?? "Unknown";
+
+                // legacy
                 incidentViewModel.incidentDetails.EventTypeIds = incident?.EventTypeIds;
                 incidentViewModel.incidentDetails.OtherEventDetail = incident?.OtherEventDetail;
                 incidentViewModel.incidentDetails.IsOtherEvent = incident.IsOtherEvent;
+
+                // Populate subtypes dropdown for selected type
+                if (incidentViewModel.incidentDetails.EventTypeId.HasValue && incidentViewModel.incidentDetails.EventTypeId.Value > 0)
+                {
+                    var subTypes = await _db.EventSubTypes
+                        .AsNoTracking()
+                        .Where(x => !x.IsDeleted && x.EventTypeId == incidentViewModel.incidentDetails.EventTypeId.Value)
+                        .OrderBy(x => x.Name)
+                        .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name })
+                        .ToListAsync();
+                    incidentViewModel.incidentDetails.EventSubTypes = subTypes;
+                }
 
                 incidentViewModel.incidentCellerInformation.CallerPhoneNumber = incident.CallerPhoneNumber;
                 incidentViewModel.incidentCellerInformation.CallerAddress = incident.CallerAddress;
@@ -666,7 +717,13 @@ namespace Repositories.Common
                                           .ToListAsync();
 
                 var userIds = roles
-                            .SelectMany(r => new long?[] { r.EngineeringLead, r.FieldEnvRep, r.GEC_Coordinator, r.IncidentCommander })
+                            .SelectMany(r => new long?[]
+                            {
+                                r.EngineeringLead, r.EngineeringLeadSecondary,
+                                r.FieldEnvRep, r.FieldEnvRepSecondary,
+                                r.GEC_Coordinator, r.GEC_CoordinatorSecondary,
+                                r.IncidentCommander, r.IncidentCommanderSecondary
+                            })
                             .Where(x => x.HasValue)
                             .Select(x => x!.Value)
                             .Distinct()
@@ -701,15 +758,23 @@ namespace Repositories.Common
 
                     EngineeringLeadId = p.EngineeringLead,
                     EngineeringLeadName = GetFullName(p.EngineeringLead),
+                    EngineeringLeadSecondaryId = p.EngineeringLeadSecondary,
+                    EngineeringLeadSecondaryName = GetFullName(p.EngineeringLeadSecondary),
 
                     FieldEnvRepId = p.FieldEnvRep,
                     FieldEnvRepName = GetFullName(p.FieldEnvRep),
+                    FieldEnvRepSecondaryId = p.FieldEnvRepSecondary,
+                    FieldEnvRepSecondaryName = GetFullName(p.FieldEnvRepSecondary),
 
                     GEC_CoordinatorId = p.GEC_Coordinator,
                     GEC_CoordinatorName = GetFullName(p.GEC_Coordinator),
+                    GEC_CoordinatorSecondaryId = p.GEC_CoordinatorSecondary,
+                    GEC_CoordinatorSecondaryName = GetFullName(p.GEC_CoordinatorSecondary),
 
                     IncidentCommanderId = p.IncidentCommander,
-                    IncidentCommanderName = GetFullName(p.IncidentCommander)
+                    IncidentCommanderName = GetFullName(p.IncidentCommander),
+                    IncidentCommanderSecondaryId = p.IncidentCommanderSecondary,
+                    IncidentCommanderSecondaryName = GetFullName(p.IncidentCommanderSecondary)
                 }).ToList();
                 #endregion
 
@@ -871,9 +936,7 @@ namespace Repositories.Common
                                    .Select(it => new SelectListItem
                                    {
                                        Value = it.Id.ToString(),
-                                       Text = !string.IsNullOrWhiteSpace(it.Description)
-                                              ? it.Name + " (" + it.Description + ")"
-                                              : it.Name
+                                       Text = it.Name
                                    })
                                    .ToListAsync();
                 #endregion
@@ -948,7 +1011,10 @@ namespace Repositories.Common
 
                     incidentDetails = new IncidentDetailsViewModel
                     {
-                        EventTypeIds = incident.EventTypeIds ?? string.Empty,
+                        EventTypeIds = incident.EventTypeIds,
+                        EventTypeId = incident.EventTypeId,
+                        EventSubTypeId = incident.EventSubTypeId,
+                        ImpactScope = incident.ImpactScope ?? "Unknown",
                         IsOtherEvent = incident.IsOtherEvent,
                         OtherEventDetail = incident.OtherEventDetail ?? string.Empty,
                         EventTypes = new List<SelectListItem>()
@@ -1083,14 +1149,30 @@ namespace Repositories.Common
                     }
                 }
 
-                // ✅ Resolve EventType names
-                if (!string.IsNullOrWhiteSpace(incident.EventTypeIds))
+                // ✅ Resolve Incident Type/Sub-Type names (new), fallback to legacy EventTypeIds if needed
+                if (incident.EventTypeId.HasValue)
                 {
-                    var ids = incident.EventTypeIds.Split(',').Select(long.Parse).ToList();
+                    viewModel.incidentDetails.EventTypeName = await _db.EventTypes
+                        .Where(et => !et.IsDeleted && et.Id == incident.EventTypeId.Value)
+                        .Select(et => et.Name)
+                        .FirstOrDefaultAsync();
+                }
+                else if (!string.IsNullOrWhiteSpace(incident.EventTypeIds))
+                {
+                    var ids = incident.EventTypeIds.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(long.Parse).ToList();
                     viewModel.incidentDetails.EventTypeNames = await _db.EventTypes
                         .Where(et => ids.Contains(et.Id))
                         .Select(et => et.Name)
                         .ToListAsync();
+                    viewModel.incidentDetails.EventTypeName = viewModel.incidentDetails.EventTypeNames.FirstOrDefault();
+                }
+
+                if (incident.EventSubTypeId.HasValue)
+                {
+                    viewModel.incidentDetails.EventSubTypeName = await _db.EventSubTypes
+                        .Where(st => !st.IsDeleted && st.Id == incident.EventSubTypeId.Value)
+                        .Select(st => st.Name)
+                        .FirstOrDefaultAsync();
                 }
 
                 // ✅ Resolve Asset names
@@ -1200,7 +1282,13 @@ namespace Repositories.Common
                     incidentid = incident.IncidentID,
                     assettype = await GetAssets(incident.AssetIds ?? string.Empty),
                     description = incident.DescriptionIssue ?? string.Empty,
-                    eventtype = await GetEventTypes(incident.EventTypeIds ?? string.Empty),
+                    eventtype =
+                        (incident.EventTypeId.HasValue
+                            ? await _db.EventTypes.Where(et => !et.IsDeleted && et.Id == incident.EventTypeId.Value).Select(et => et.Name).FirstOrDefaultAsync()
+                            : await GetEventTypes(incident.EventTypeIds ?? string.Empty))
+                        + (incident.EventSubTypeId.HasValue
+                            ? " - " + (await _db.EventSubTypes.Where(st => !st.IsDeleted && st.Id == incident.EventSubTypeId.Value).Select(st => st.Name).FirstOrDefaultAsync())
+                            : string.Empty),
                     intersection = incident.Landmark ?? string.Empty,
                     perimeter = incidentValidation != null ? GetPerimeter(incidentValidation.DiscoveryPerimeterId) : ""
                 });
@@ -1791,6 +1879,8 @@ namespace Repositories.Common
 
             var eventTypes = await _db.EventTypes
                                       .Where(a => idArray.Contains(a.Id))
+                                      .OrderBy(a => a.SortOrder)
+                                      .ThenBy(a => a.Name)
                                       .Select(a => a.Name)
                                       .ToListAsync();
 
@@ -3727,9 +3817,13 @@ namespace Repositories.Common
                         IncidentId = request.IncidentId,
                         IncidentValidationId = request.IncidentValidationId,
                         IncidentCommander = request.IncidentCommanderId,
+                        IncidentCommanderSecondary = request.IncidentCommanderSecondaryId,
                         FieldEnvRep = request.FieldEnvRepId,
+                        FieldEnvRepSecondary = request.FieldEnvRepSecondaryId,
                         GEC_Coordinator = request.GEC_CoordinatorId,
+                        GEC_CoordinatorSecondary = request.GEC_CoordinatorSecondaryId,
                         EngineeringLead = request.EngineeringLeadId,
+                        EngineeringLeadSecondary = request.EngineeringLeadSecondaryId,
                         CreatedOn = DateTime.UtcNow,
                         IsDeleted = false,
                         ActiveStatus = ActiveStatus.Active
@@ -3740,9 +3834,13 @@ namespace Repositories.Common
                 {
                     // Update existing
                     assignedRole.IncidentCommander = request.IncidentCommanderId;
+                    assignedRole.IncidentCommanderSecondary = request.IncidentCommanderSecondaryId;
                     assignedRole.FieldEnvRep = request.FieldEnvRepId;
+                    assignedRole.FieldEnvRepSecondary = request.FieldEnvRepSecondaryId;
                     assignedRole.GEC_Coordinator = request.GEC_CoordinatorId;
+                    assignedRole.GEC_CoordinatorSecondary = request.GEC_CoordinatorSecondaryId;
                     assignedRole.EngineeringLead = request.EngineeringLeadId;
+                    assignedRole.EngineeringLeadSecondary = request.EngineeringLeadSecondaryId;
                     assignedRole.UpdatedOn = DateTime.UtcNow;
                 }
 

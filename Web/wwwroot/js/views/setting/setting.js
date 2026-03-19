@@ -14,6 +14,9 @@ $(function () {
         else if (tab === "event") {
             GetAllEventTypes();
         }
+        else if (tab === "eventSubType") {
+            GetAllEventSubTypes();
+        }
         else if (tab === "severity") {
             GetAllSeverity();
         }
@@ -1220,6 +1223,147 @@ function DeleteEventTypeItem(id) {   // <-- accept id
     });
 }
 // End Event Type
+
+// Start Event Sub-Type
+async function GetAllEventSubTypes(eventTypeId) {
+    try {
+        showLoader($(".setting"));
+
+        const url = eventTypeId
+            ? `/Settings/GetAllEventSubTypes?eventTypeId=${eventTypeId}`
+            : `/Settings/GetAllEventSubTypes`;
+
+        const response = await fetch(url, {
+            method: "GET",
+            headers: { "Accept": "text/html" }
+        });
+
+        if (!response.ok) throw new Error("Failed to load sub-type list");
+        const content = await response.text();
+        $("#eventSubTypeList").empty().html(content);
+    } catch (e) {
+        console.error(e);
+    } finally {
+        hideLoader($(".setting"));
+    }
+}
+
+async function AddEventSubType() {
+    try {
+        showLoader($(".setting"));
+        const response = await fetch("/Settings/AddEventSubType", { method: "GET", headers: { "Accept": "text/html" } });
+        if (!response.ok) throw new Error("Failed to load sub-type form");
+        const content = await response.text();
+        $("#addEventSubType").empty().html(content);
+    } catch (e) {
+        console.error(e);
+    } finally {
+        hideLoader($(".setting"));
+    }
+}
+
+async function GetEventSubTypeById(id) {
+    try {
+        showLoader($(".setting"));
+        const response = await fetch("/Settings/GetEventSubTypeById?id=" + id, { method: "GET", headers: { "Accept": "text/html" } });
+        if (!response.ok) throw new Error("Failed to load sub-type");
+        const content = await response.text();
+        $("#addEventSubType").empty().html(content);
+    } catch (e) {
+        console.error(e);
+    } finally {
+        hideLoader($(".setting"));
+    }
+}
+
+async function SaveEventSubType() {
+    try {
+        const obj = $("#NewEventSubTypeForm")[0];
+        if (!obj) return;
+
+        const formData = new FormData(obj);
+        showLoader($(".setting"));
+
+        const response = await fetch("/Settings/SaveEventSubType", { method: "POST", body: formData });
+        const result = await response.json();
+        if (result.success) {
+            $("#addEventSubType").html("");
+            SwalSuccessAlert(result.data);
+            GetAllEventSubTypes();
+        } else {
+            SwalErrorAlert(result.message || "Failed to save sub-type.");
+        }
+    } catch (e) {
+        console.error(e);
+        SwalErrorAlert("Error while saving sub-type!");
+    } finally {
+        hideLoader($(".setting"));
+    }
+}
+
+async function DeleteEventSubTypeById(id) {
+    try {
+        showLoader($(".setting"));
+        const response = await fetch("/Settings/DeleteEventSubTypeById?id=" + id, { method: "GET", headers: { "Accept": "application/json" } });
+        const result = await response.json();
+        if (result.success) {
+            SwalSuccessAlert("Sub-Type deleted successfully!");
+            GetAllEventSubTypes();
+        } else {
+            SwalErrorAlert(result.message || "Failed to delete sub-type.");
+        }
+    } catch (e) {
+        console.error(e);
+        SwalErrorAlert("Error while deleting sub-type!");
+    } finally {
+        hideLoader($(".setting"));
+    }
+}
+
+function DeleteEventSubTypeItem(id) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "No, cancel!",
+        confirmButtonClass: 'btn btn-success me-2',
+        cancelButtonClass: 'btn btn-danger',
+        buttonsStyling: false
+    }).then(function (result) {
+        if (result.isConfirmed) {
+            DeleteEventSubTypeById(id);
+        }
+    });
+}
+
+$(document).off("click", ".btnAddNewEventSubType");
+$(document).on("click", ".btnAddNewEventSubType", function (e) {
+    e.preventDefault();
+    AddEventSubType();
+});
+
+$(document).off("click", ".editEventSubType");
+$(document).on("click", ".editEventSubType", function () {
+    GetEventSubTypeById($(this).attr("id"));
+});
+
+$(document).off("click", ".deleteEventSubType");
+$(document).on("click", ".deleteEventSubType", function () {
+    DeleteEventSubTypeItem($(this).attr("id"));
+});
+
+$(document).off("click", "#btnSaveEventSubType");
+$(document).on("click", "#btnSaveEventSubType", function () {
+    SaveEventSubType();
+});
+
+$(document).off("click", "#btnCancelEventSubType");
+$(document).on("click", "#btnCancelEventSubType", function () {
+    $("#addEventSubType").html("");
+});
+// End Event Sub-Type
 
 
 

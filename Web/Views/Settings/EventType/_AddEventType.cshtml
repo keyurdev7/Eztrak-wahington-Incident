@@ -1,4 +1,4 @@
-﻿@using System.Web
+@using System.Web
 @using ViewModels
 @model EventTypeModifyViewModel
 
@@ -7,7 +7,7 @@
         <input type="hidden" value="@Model.Id" name="Id" id="eventtype_@Model.Id" />
         <div class="input-container type">
             <input type="text" placeholder="Enter type name" asp-for="Name">
-            <textarea type="text" placeholder="Enter type description" asp-for="Description"></textarea>
+            <input type="number" placeholder="Sort order" asp-for="SortOrder" min="0">
             <div class="actions">
                 <button class="btn check saveEventType"><i class="fa-solid fa-check"></i></button>
                 <button class="btn cancel cancelEventType"><i class="fa-solid fa-xmark"></i></button>

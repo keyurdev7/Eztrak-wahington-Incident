@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 
 using Centangle.Common.ResponseHelpers.Models;
 
@@ -71,7 +71,11 @@ namespace Repositories.Common
             List<EventTypeModifyViewModel> eventTypes = new();
             try
             {
-                var eventTypesList = await _db.EventTypes.Where(p => !p.IsDeleted).ToListAsync();
+                var eventTypesList = await _db.EventTypes
+                    .Where(p => !p.IsDeleted)
+                    .OrderBy(p => p.SortOrder)
+                    .ThenBy(p => p.Name)
+                    .ToListAsync();
 
                 foreach (var eventType in eventTypesList)
                 {
@@ -79,7 +83,7 @@ namespace Repositories.Common
                     {
                         Id = eventType.Id,
                         Name = eventType.Name,
-                        Description = eventType.Description
+                        SortOrder = eventType.SortOrder
                     });
                 }
             }
@@ -99,7 +103,7 @@ namespace Repositories.Common
                 var eventType = new EventType
                 {
                     Name = viewModel.Name,
-                    Description = viewModel.Description
+                    SortOrder = viewModel.SortOrder
                 };
 
                 // Save
@@ -132,7 +136,7 @@ namespace Repositories.Common
                 await using var transaction = await _db.Database.BeginTransactionAsync();
 
                 eventType.Name = viewModel.Name;
-                eventType.Description = viewModel.Description;
+                eventType.SortOrder = viewModel.SortOrder;
 
                 try
                 {
@@ -167,7 +171,7 @@ namespace Repositories.Common
                 }
 
                 eventTypeView.Name = eventType.Name;
-                eventTypeView.Description = eventType.Description;
+                eventTypeView.SortOrder = eventType.SortOrder;
                 eventTypeView.Id = eventType.Id;
             }
             catch (Exception ex)

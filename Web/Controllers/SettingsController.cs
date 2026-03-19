@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 using Repositories.Common;
+using Repositories.Services.EventSubType.Interface;
 
 using ViewModels;
+using ViewModels.EventSubType;
 using ViewModels.Incident;
 using ViewModels.Policy;
 using ViewModels.Users;
@@ -29,6 +31,7 @@ namespace Web.Controllers
         private readonly IIncidentRoleService<IncidentRoleModifyViewModel, IncidentRoleModifyViewModel, IncidentRoleDetailViewModel> _iIncidentRoleService;
         private readonly ICompanyService<CompanyModifyViewModel, CompanyModifyViewModel, CompanyDetailViewModel> _iCompanyService;
         private readonly IIncidentShiftService<IncidentShiftModifyViewModel, IncidentShiftModifyViewModel, IncidentShiftDetailViewModel> _iIncidentShiftService;
+        private readonly IEventSubTypeService _eventSubTypeService;
         #endregion
 
         #region Ctor
@@ -37,7 +40,8 @@ namespace Web.Controllers
             IUserManagementService<UserManagementModifyViewModel, UserManagementModifyViewModel, UserDetailViewModel> iUserManagementService,
             IPolicyService<PolicyModifyViewModel, PolicyModifyViewModel, PolicyDetailViewModel> iPolicyService, IUsersinService<UserModifyViewModel, UserModifyViewModel, UserDetailViewModel> iusersinService,
             IProgressService<ProgressModifyViewModel, ProgressModifyViewModel, ProgressDetailViewModel> iProgressService, IMaterialService<MaterialModifyViewModel, MaterialModifyViewModel, MaterialDetailViewModel> iMaterialService, IEquipmentFieldsService<EquipmentFieldsModifyViewModel, EquipmentFieldsModifyViewModel, EquipmentFieldsDetailViewModel> iEquipmentFieldsService, IIncidentRoleService<IncidentRoleModifyViewModel, IncidentRoleModifyViewModel, IncidentRoleDetailViewModel> iIncidentRoleService,
-            ICompanyService<CompanyModifyViewModel, CompanyModifyViewModel, CompanyDetailViewModel> iCompanyService, IIncidentShiftService<IncidentShiftModifyViewModel, IncidentShiftModifyViewModel, IncidentShiftDetailViewModel> iIncidentShiftService)
+            ICompanyService<CompanyModifyViewModel, CompanyModifyViewModel, CompanyDetailViewModel> iCompanyService, IIncidentShiftService<IncidentShiftModifyViewModel, IncidentShiftModifyViewModel, IncidentShiftDetailViewModel> iIncidentShiftService,
+            IEventSubTypeService eventSubTypeService)
         {
             _iRelationshipService = iRelationshipService;
             _iEventTypeService = iEventTypeService;
@@ -55,6 +59,7 @@ namespace Web.Controllers
             _iMaterialService = iMaterialService;
             _iIncidentRoleService = iIncidentRoleService;
             _iIncidentShiftService = iIncidentShiftService;
+            _eventSubTypeService = eventSubTypeService;
         }
         #endregion
 
@@ -226,6 +231,81 @@ namespace Web.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     new { success = false, message = "An unexpected error occurred." });
             }
+        }
+        #endregion
+
+        #region EventSubType
+        [HttpGet]
+        public async Task<IActionResult> GetAllEventSubTypes(long? eventTypeId)
+        {
+            var model = await _eventSubTypeService.GetAll(eventTypeId);
+            return PartialView("~/Views/Settings/EventSubType/_ListEventSubType.cshtml", model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AddEventSubType()
+        {
+            var model = new EventSubTypeModifyViewModel();
+            ViewBag.EventTypes = await _iEventTypeService.GetAllEventTypes();
+            return PartialView("~/Views/Settings/EventSubType/_AddEventSubType.cshtml", model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEventSubTypeById(long id)
+        {
+            var model = await _eventSubTypeService.GetById(id);
+            ViewBag.EventTypes = await _iEventTypeService.GetAllEventTypes();
+            return PartialView("~/Views/Settings/EventSubType/_AddEventSubType.cshtml", model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveEventSubType([FromForm] EventSubTypeModifyViewModel vm)
+        {
+            if (vm == null)
+                return BadRequest(new { success = false, message = "Invalid request data." });
+
+            try
+            {
+                long id = vm.Id > 0 ? await _eventSubTypeService.Update(vm) : await _eventSubTypeService.Save(vm);
+                if (id == 0)
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                        new { success = false, message = "Failed to save sub-type." });
+
+                return Ok(new { success = true, data = "Sub-Type saved successfully!" });
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { success = false, message = "An unexpected error occurred." });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DeleteEventSubTypeById(long id)
+        {
+            if (id == 0) return BadRequest(new { success = false, message = "Invalid request data." });
+            try
+            {
+                var deleted = await _eventSubTypeService.Delete(id);
+                if (deleted == 0)
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                        new { success = false, message = "Failed to delete sub-type." });
+
+                return Ok(new { success = true, data = "Sub-Type deleted successfully!" });
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { success = false, message = "An unexpected error occurred." });
+            }
+        }
+
+        // For Incident form cascading dropdown
+        [HttpGet]
+        public async Task<IActionResult> GetSubTypesByEventTypeId(long eventTypeId)
+        {
+            var items = await _eventSubTypeService.GetForDropdown(eventTypeId);
+            return Json(items.Select(x => new { id = x.Id, name = x.Name }));
         }
         #endregion
 

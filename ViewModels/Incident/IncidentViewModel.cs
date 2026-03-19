@@ -108,11 +108,21 @@ namespace ViewModels.Incident
     }
     public class IncidentDetailsViewModel
     {
-        public string EventTypeIds { get; set; } = default!;
+        // Legacy multi-select (kept for backward compatibility)
+        public string? EventTypeIds { get; set; }
+
+        // New single-select Incident Type/Sub-Type
+        public long? EventTypeId { get; set; }
+        public long? EventSubTypeId { get; set; }
+        public string? ImpactScope { get; set; } // Single / Multiple / Unknown
+
         public bool IsOtherEvent { get; set; } = default!;
         public string OtherEventDetail { get; set; } = default!;
         public List<SelectListItem> EventTypes { get; set; } = new();
+        public List<SelectListItem> EventSubTypes { get; set; } = new();
         public List<string> EventTypeNames { get; set; } = new();
+        public string? EventTypeName { get; set; }
+        public string? EventSubTypeName { get; set; }
     }
     public class IncidentEnvironmentalViewModel
     {
@@ -342,14 +352,22 @@ namespace ViewModels.Incident
         public long IncidentId { get; set; }
         public long IncidentValidationId { get; set; }
         public long? IncidentCommanderId { get; set; }
+        public long? IncidentCommanderSecondaryId { get; set; }
         public long? FieldEnvRepId { get; set; }
+        public long? FieldEnvRepSecondaryId { get; set; }
         public long? GEC_CoordinatorId { get; set; }
+        public long? GEC_CoordinatorSecondaryId { get; set; }
         public long? EngineeringLeadId { get; set; }
+        public long? EngineeringLeadSecondaryId { get; set; }
 
         public string? IncidentCommanderName { get; set; }
+        public string? IncidentCommanderSecondaryName { get; set; }
         public string? FieldEnvRepName { get; set; }
+        public string? FieldEnvRepSecondaryName { get; set; }
         public string? GEC_CoordinatorName { get; set; }
+        public string? GEC_CoordinatorSecondaryName { get; set; }
         public string? EngineeringLeadName { get; set; }
+        public string? EngineeringLeadSecondaryName { get; set; }
     }
 
     public class IncidentValidationGatesViewModel
@@ -686,9 +704,13 @@ namespace ViewModels.Incident
         public long IncidentId { get; set; }
         public long IncidentValidationId { get; set; }
         public long? IncidentCommanderId { get; set; }
+        public long? IncidentCommanderSecondaryId { get; set; }
         public long? FieldEnvRepId { get; set; }
+        public long? FieldEnvRepSecondaryId { get; set; }
         public long? GEC_CoordinatorId { get; set; }
+        public long? GEC_CoordinatorSecondaryId { get; set; }
         public long? EngineeringLeadId { get; set; }
+        public long? EngineeringLeadSecondaryId { get; set; }
     }
 
     public class UpdateValidationGatesRequest

@@ -1,4 +1,4 @@
-﻿@using ViewModels
+@using ViewModels
 @model EventTypeDetailViewModel
 @{
     Layout = null;
@@ -17,12 +17,12 @@
             </div>
         </div>
 
-        <!-- Description -->
+        <!-- Sort Order -->
         <div class="row">
             <div class="col-lg-12">
                 <div class="mb-3 form-group">
-                    <label asp-for="Description" class="form-label fw-600"></label>
-                    <div>@(string.IsNullOrEmpty(Model.Description) ? "-" : Model.Description)</div>
+                    <label asp-for="SortOrder" class="form-label fw-600"></label>
+                    <div>@Model.SortOrder</div>
                 </div>
             </div>
         </div>

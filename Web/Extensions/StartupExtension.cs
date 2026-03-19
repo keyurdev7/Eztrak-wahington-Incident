@@ -1,4 +1,4 @@
-﻿using Authorization.Providers;
+using Authorization.Providers;
 
 using BoilerPlate.Authorization;
 using BoilerPlate.Authorization.Handlers;
@@ -57,6 +57,8 @@ using Repositories.Common.Users;
 using Repositories.Common.Users.Interface;
 using Repositories.Services.ArcGis;
 using Repositories.Services.ArcGis.Interface;
+using Repositories.Services.EventSubType;
+using Repositories.Services.EventSubType.Interface;
 using Repositories.Services.AttachmentService;
 using Repositories.Services.AttachmentService.Interface;
 using Repositories.Services.AuthenticationService;
@@ -163,6 +165,7 @@ namespace Web.Extensions
 
             services.AddScoped<IFileHelper, FileHelper>();
             services.AddScoped<IExcelHelper, ExcelHelper>();
+            services.AddScoped<IEventSubTypeService, EventSubTypeService>();
             services.AddScoped(typeof(IPermissionService<,,>), typeof(PermissionService<,,>));
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<IUserInfoService, UserInfoService>();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
@@ -20,9 +20,13 @@ namespace Models
         public long IncidentValidationId { get; set; }
 
         public long? IncidentCommander { get; set; }
+        public long? IncidentCommanderSecondary { get; set; }
         public long? FieldEnvRep { get; set; }
+        public long? FieldEnvRepSecondary { get; set; }
         public long? GEC_Coordinator { get; set; }
+        public long? GEC_CoordinatorSecondary { get; set; }
         public long? EngineeringLead { get; set; }
+        public long? EngineeringLeadSecondary { get; set; }
 
     }
 }

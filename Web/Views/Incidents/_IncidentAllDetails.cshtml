@@ -856,7 +856,13 @@
                                 <div class="card">
                                     <h4><i class="fa-solid fa-triangle-exclamation orange"></i> Severity</h4>
                                     <div class="value" style="color:@Model.incidentDetailByIdViewModel?.SeverityColor">@Model.incidentDetailByIdViewModel?.SeverityName</div>
-                                    <div class="subtext">@Model.incidentDetails.EventTypeNames.FirstOrDefault()</div>
+                                    <div class="subtext">
+                                        @Model.incidentDetails.EventTypeName
+                                        @if (!string.IsNullOrWhiteSpace(Model.incidentDetails.EventSubTypeName))
+                                        {
+                                            <span> - @Model.incidentDetails.EventSubTypeName</span>
+                                        }
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -949,7 +955,13 @@
                                 <div class="fixwidth">
                                     <div>
                                         <strong>Event Type</strong>
-                                        <div class="subtext">@Model.incidentDetails.EventTypeNames.FirstOrDefault()</div>
+                                        <div class="subtext">
+                                            @Model.incidentDetails.EventTypeName
+                                            @if (!string.IsNullOrWhiteSpace(Model.incidentDetails.EventSubTypeName))
+                                            {
+                                                <span> - @Model.incidentDetails.EventSubTypeName</span>
+                                            }
+                                        </div>
                                     </div>
                                     <div>
                                         <strong>Description </strong>

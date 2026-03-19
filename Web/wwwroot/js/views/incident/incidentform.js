@@ -1,4 +1,4 @@
-﻿$(function () {
+$(function () {
 
 
     $("#statusSelect").val('');
@@ -720,7 +720,7 @@ async function LoadIncidentModal(id = 0) {
     } finally {
         hideLoader($(".main-content"));
         maskTelephone(".input-telephone");
-        $("#addIncidentModalModalLabel").text(id > 0 ? "Update Incident" : "Add Incident");
+        $("#addIncidentModalModalLabel").text(id > 0 ? "Update Incident" : "New Incident");
 
         //if (id > 0) {
         //    displaySavedAttachments($.makeArray($("#hidden-image-url").val()));

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Repositories.Common;
 using ViewModels;
@@ -19,7 +19,7 @@ namespace Web.Controllers
             return new List<DataTableViewModel>()
             {
                 new DataTableViewModel { title = "Name", data = "Name", orderable = true },
-                new DataTableViewModel { title = "Description", data = "Description", orderable = true },
+                new DataTableViewModel { title = "Sort Order", data = "SortOrder", orderable = true },
                 new DataTableViewModel { title = "Action", data = null, className = "action text-right exclude-form-export" }
             };
         }

@@ -4,6 +4,7 @@ using DataLibrary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLibrary.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260318072242_AddSecondaryAssignedRoles")]
+    partial class AddSecondaryAssignedRoles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1444,49 +1447,6 @@ namespace DataLibrary.Migrations
                     b.ToTable("EquipmentTransactions");
                 });
 
-            modelBuilder.Entity("Models.EventSubType", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<int>("ActiveStatus")
-                        .HasColumnType("int");
-
-                    b.Property<long>("CreatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("EventTypeId")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("UpdatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("UpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventTypeId");
-
-                    b.ToTable("EventSubTypes");
-                });
-
             modelBuilder.Entity("Models.EventType", b =>
                 {
                     b.Property<long>("Id")
@@ -1504,15 +1464,16 @@ namespace DataLibrary.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int");
 
                     b.Property<long>("UpdatedBy")
                         .HasColumnType("bigint");
@@ -1566,12 +1527,6 @@ namespace DataLibrary.Migrations
                     b.Property<long?>("EvacuationRequiredId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("EventSubTypeId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("EventTypeId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("EventTypeIds")
                         .HasColumnType("nvarchar(max)");
 
@@ -1582,9 +1537,6 @@ namespace DataLibrary.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImpactScope")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IncidentID")
@@ -1652,10 +1604,6 @@ namespace DataLibrary.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EventSubTypeId");
-
-                    b.HasIndex("EventTypeId");
 
                     b.HasIndex("RelationshipId");
 
@@ -5317,27 +5265,8 @@ namespace DataLibrary.Migrations
                     b.Navigation("Supplier");
                 });
 
-            modelBuilder.Entity("Models.EventSubType", b =>
-                {
-                    b.HasOne("Models.EventType", "EventType")
-                        .WithMany()
-                        .HasForeignKey("EventTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("EventType");
-                });
-
             modelBuilder.Entity("Models.Incident", b =>
                 {
-                    b.HasOne("Models.EventSubType", "EventSubType")
-                        .WithMany()
-                        .HasForeignKey("EventSubTypeId");
-
-                    b.HasOne("Models.EventType", "EventType")
-                        .WithMany()
-                        .HasForeignKey("EventTypeId");
-
                     b.HasOne("Models.Relationship", "Relationship")
                         .WithMany()
                         .HasForeignKey("RelationshipId");
@@ -5349,10 +5278,6 @@ namespace DataLibrary.Migrations
                     b.HasOne("Models.StatusLegend", "StatusLegend")
                         .WithMany()
                         .HasForeignKey("StatusLegendId");
-
-                    b.Navigation("EventSubType");
-
-                    b.Navigation("EventType");
 
                     b.Navigation("Relationship");
 

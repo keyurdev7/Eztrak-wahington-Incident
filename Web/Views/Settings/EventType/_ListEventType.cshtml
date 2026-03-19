@@ -1,4 +1,4 @@
-﻿@using System.Web
+@using System.Web
 @using ViewModels
 @model List<EventTypeModifyViewModel>
 
@@ -9,7 +9,7 @@
         <div class="list-item">
             <div class="item-info">
                 <strong>@eventType.Name</strong>
-                <p>@eventType.Description</p>
+                <p class="mb-0 text-muted small">Order: @eventType.SortOrder</p>
             </div>
             <div class="actions">
                 <i class="fa-regular fa-edit edit editEventType" id="@eventType.Id"></i>

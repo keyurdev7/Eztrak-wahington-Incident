@@ -1,4 +1,4 @@
-﻿@using System.Web
+@using System.Web
 @using ViewModels.Incident
 @model IncidentViewModel
 
@@ -1173,7 +1173,7 @@
                 </div>
                 <div class="right-sec">
 
-                    <a href="#" class="btn btn-primary AddIncident" id="btnAddIncident"><i class="fa fa-plus"></i>Incident</a>
+                    <a href="#" class="btn btn-primary AddIncident" id="btnAddIncident"><i class="fa fa-plus"></i>New Incident</a>
                     @* <button data-bs-toggle="modal" data-bs-target="#ValidateIncidentModal" class="btn btn-primary ValidateIncident" id="btnValidatedIncident"><i class="fa fa-plus"></i>Validation (0)</button> *@
                 </div>
 
@@ -1408,26 +1408,40 @@
           }
         });
 
+        // Incident Type/Sub-Type cascading dropdowns (single-select)
         const eventSelect = document.getElementById('eventTypeId');
+        const subTypeSelect = document.getElementById('eventSubTypeId');
 
-        const eventSections  = {
-            gas: document.getElementById('gasOptions'),
-            equipment: document.getElementById('equipmentOptions'),
-            thirdparty: document.getElementById('thirdpartyOptions'),
-            natural: document.getElementById('naturalOptions'),
-            other: document.getElementById('otherInputWrapper')
-        };
+        async function loadSubTypesForSelectedType() {
+            if (!eventSelect || !subTypeSelect) return;
 
-        eventSelect.addEventListener('change', function () {
-            // hide all first
-            Object.values(eventSections).forEach(sec => sec.classList.add('d-none'));
+            const typeId = eventSelect.value;
+            subTypeSelect.innerHTML = `<option value="">Select Sub-Type</option>`;
 
-            // show selected
-            const selected = this.value;
-            if (eventSections[selected]) {
-                eventSections[selected].classList.remove('d-none');
+            if (!typeId) return;
+
+            try {
+                const resp = await fetch(`/Settings/GetSubTypesByEventTypeId?eventTypeId=${typeId}`, {
+                    method: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                const items = await resp.json();
+                (items || []).forEach(function (it) {
+                    const opt = document.createElement('option');
+                    opt.value = it.id;
+                    opt.textContent = it.name;
+                    subTypeSelect.appendChild(opt);
+                });
+            } catch (err) {
+                console.error('Failed to load sub-types', err);
             }
-        });
+        }
+
+        if (eventSelect) {
+            eventSelect.addEventListener('change', loadSubTypesForSelectedType);
+            // initial load (for Edit mode)
+            loadSubTypesForSelectedType();
+        }
 
         const severitySelect  = document.getElementById('severity');
 
