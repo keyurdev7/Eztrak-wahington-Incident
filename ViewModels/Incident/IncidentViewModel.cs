@@ -26,6 +26,7 @@ namespace ViewModels.Incident
         public long? severityLevelId { get; set; } = default!;
         public long? Id { get; set; } = default!;
         public string DescriptionIssue { get; set; } = default!;
+        public List<string> DescriptionChecklistItems { get; set; } = new();
 
         public List<IncidentLocationMapViewModel> ListIncidentLocationMapViewModel { get; set; } = new();
         public AdditionalLocationViewModel additionalLocation { get; set; } = new();
@@ -146,6 +147,7 @@ namespace ViewModels.Incident
     {
         public List<IFormFile>? File { get; set; }
         public string Notes { get; set; } = default!;
+        public List<string> SupportingInformationChecklistItems { get; set; } = new();
         public string? ImageUrl { get; set; } = default!;
         public List<string> ImageUrls { get; set; } = new();
     }

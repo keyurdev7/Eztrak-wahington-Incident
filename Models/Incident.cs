@@ -52,6 +52,7 @@ namespace Models
         public string? ServiceAccount { get; set; }
         public string? AssetIds { get; set; }
         public string? DescriptionIssue { get; set; }
+        public string? DescriptionChecklistJson { get; set; }
         public long? GasPresentId { get; set; }
         public long? WaterPresentId { get; set; }
         public long? HissingPresentId { get; set; }
@@ -61,6 +62,7 @@ namespace Models
         public long? EmergencyResponseNotifiedId { get; set; }
         public string? ImageUrl { get; set; }
         public string? SupportInfoNotes { get; set; }
+        public string? SupportInfoChecklistJson { get; set; }
         public bool IsSameCallerAddress { get; set; }
         public bool IsOtherEvent { get; set; }
         public string? OtherEventDetail { get; set; }

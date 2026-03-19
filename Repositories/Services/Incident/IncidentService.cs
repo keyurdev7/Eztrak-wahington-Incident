@@ -179,6 +179,9 @@ namespace Repositories.Common
                     StatusLegendId = (int)StatusLegendEnum.Submitted,
                     SeverityLevelId = viewModel.severityLevelId,
                     DescriptionIssue = viewModel.DescriptionIssue,
+                    DescriptionChecklistJson = viewModel.DescriptionChecklistItems != null && viewModel.DescriptionChecklistItems.Count > 0
+                        ? JsonSerializer.Serialize(viewModel.DescriptionChecklistItems)
+                        : null,
 
                     CallerAddress = viewModel.incidentCellerInformation?.CallerAddress,
                     CallerPhoneNumber = viewModel.incidentCellerInformation?.CallerPhoneNumber,
@@ -212,6 +215,10 @@ namespace Repositories.Common
 
                     ImageUrl = viewModel.incidentSupportingInfoViewModel?.ImageUrl,
                     SupportInfoNotes = viewModel.incidentSupportingInfoViewModel?.Notes,
+                    SupportInfoChecklistJson = viewModel.incidentSupportingInfoViewModel?.SupportingInformationChecklistItems != null
+                        && viewModel.incidentSupportingInfoViewModel.SupportingInformationChecklistItems.Count > 0
+                        ? JsonSerializer.Serialize(viewModel.incidentSupportingInfoViewModel.SupportingInformationChecklistItems)
+                        : null,
 
                     Lat = latLong?.Lat ?? 0,
                     Lng = latLong?.Lng ?? 0,
@@ -292,6 +299,9 @@ namespace Repositories.Common
                 // Update entity from ViewModel
                 incident.SeverityLevelId = viewModel.severityLevelId;
                 incident.DescriptionIssue = viewModel.DescriptionIssue;
+                incident.DescriptionChecklistJson = viewModel.DescriptionChecklistItems != null && viewModel.DescriptionChecklistItems.Count > 0
+                    ? JsonSerializer.Serialize(viewModel.DescriptionChecklistItems)
+                    : null;
 
                 var caller = viewModel.incidentCellerInformation;
                 incident.CallerAddress = caller?.CallerAddress;
@@ -327,6 +337,10 @@ namespace Repositories.Common
                 var support = viewModel.incidentSupportingInfoViewModel;
                 incident.ImageUrl = support?.ImageUrl ?? incident.ImageUrl;
                 incident.SupportInfoNotes = support?.Notes;
+                incident.SupportInfoChecklistJson = support?.SupportingInformationChecklistItems != null
+                    && support.SupportingInformationChecklistItems.Count > 0
+                    ? JsonSerializer.Serialize(support.SupportingInformationChecklistItems)
+                    : null;
 
                 incident.Lat = latLong?.Lat ?? 0;
                 incident.Lng = latLong?.Lng ?? 0;
@@ -578,6 +592,18 @@ namespace Repositories.Common
                 incidentViewModel.Id = incident?.Id;
 
                 incidentViewModel.DescriptionIssue = incident?.DescriptionIssue;
+                if (!string.IsNullOrWhiteSpace(incident?.DescriptionChecklistJson))
+                {
+                    try
+                    {
+                        incidentViewModel.DescriptionChecklistItems =
+                            JsonSerializer.Deserialize<List<string>>(incident.DescriptionChecklistJson) ?? new List<string>();
+                    }
+                    catch
+                    {
+                        incidentViewModel.DescriptionChecklistItems = new List<string>();
+                    }
+                }
                 incidentViewModel.severityLevelId = incident?.SeverityLevelId;
                 incidentViewModel.incidentiLocation.Address = incident?.LocationAddress;
                 incidentViewModel.incidentiLocation.AssetIDs = incident?.AssetIds;
@@ -629,6 +655,18 @@ namespace Repositories.Common
 
                 incidentViewModel.incidentSupportingInfoViewModel.ImageUrl = incident.ImageUrl;
                 incidentViewModel.incidentSupportingInfoViewModel.Notes = incident.SupportInfoNotes;
+                if (!string.IsNullOrWhiteSpace(incident.SupportInfoChecklistJson))
+                {
+                    try
+                    {
+                        incidentViewModel.incidentSupportingInfoViewModel.SupportingInformationChecklistItems =
+                            JsonSerializer.Deserialize<List<string>>(incident.SupportInfoChecklistJson) ?? new List<string>();
+                    }
+                    catch
+                    {
+                        incidentViewModel.incidentSupportingInfoViewModel.SupportingInformationChecklistItems = new List<string>();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -1079,6 +1117,7 @@ namespace Repositories.Common
                     {
                         Notes = incident.SupportInfoNotes ?? string.Empty,
                         ImageUrl = incident.ImageUrl, // keep original value
+                        SupportingInformationChecklistItems = DeserializeStringListSafe(incident.SupportInfoChecklistJson),
 
                         // ✅ split comma-separated image URLs
                         ImageUrls = !string.IsNullOrEmpty(incident.ImageUrl)
@@ -1839,6 +1878,24 @@ namespace Repositories.Common
                 2 => "N/A",
                 _ => string.Empty
             };
+
+        private List<string> DeserializeStringListSafe(string? json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                return new List<string>();
+            }
+
+            try
+            {
+                return JsonSerializer.Deserialize<List<string>>(json) ?? new List<string>();
+            }
+            catch
+            {
+                return new List<string>();
+            }
+        }
+
         private string GetPerimeter(long? value) =>
            value switch
            {

@@ -1,10 +1,44 @@
-﻿@using System.Web
+@using System.Web
 @using ViewModels.Incident
 @model IncidentViewModel
 
 
 <div class="shadow-sm border border-gray-200 card-body InfoCard">
-    <h6 class="fw-bold mb-3">Supporting Information</h6>
+    <h6 class="fw-bold mb-3">Photos and Notes</h6>
+
+    <div class="mb-3">
+        <label class="form-label d-block mb-2">Supporting Information</label>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="supportChkWaterLeakNearby" name="incidentSupportingInfoViewModel.SupportingInformationChecklistItems" value="Water leak nearby" checked="@(Model.incidentSupportingInfoViewModel.SupportingInformationChecklistItems.Contains("Water leak nearby"))">
+                    <label class="form-check-label" for="supportChkWaterLeakNearby">Water leak nearby</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="supportChkWaterMainBreakNearby" name="incidentSupportingInfoViewModel.SupportingInformationChecklistItems" value="Water main break nearby" checked="@(Model.incidentSupportingInfoViewModel.SupportingInformationChecklistItems.Contains("Water main break nearby"))">
+                    <label class="form-check-label" for="supportChkWaterMainBreakNearby">Water main break nearby</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="supportChkRecentDiggingNearby" name="incidentSupportingInfoViewModel.SupportingInformationChecklistItems" value="Recent digging nearby" checked="@(Model.incidentSupportingInfoViewModel.SupportingInformationChecklistItems.Contains("Recent digging nearby"))">
+                    <label class="form-check-label" for="supportChkRecentDiggingNearby">Recent digging nearby</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="supportChkContractorWorkingNearby" name="incidentSupportingInfoViewModel.SupportingInformationChecklistItems" value="Contractor working nearby" checked="@(Model.incidentSupportingInfoViewModel.SupportingInformationChecklistItems.Contains("Contractor working nearby"))">
+                    <label class="form-check-label" for="supportChkContractorWorkingNearby">Contractor working nearby</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="supportChkStormOrFlooding" name="incidentSupportingInfoViewModel.SupportingInformationChecklistItems" value="Storm or flooding" checked="@(Model.incidentSupportingInfoViewModel.SupportingInformationChecklistItems.Contains("Storm or flooding"))">
+                    <label class="form-check-label" for="supportChkStormOrFlooding">Storm or flooding</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="supportChkUnknown" name="incidentSupportingInfoViewModel.SupportingInformationChecklistItems" value="Unknown" checked="@(Model.incidentSupportingInfoViewModel.SupportingInformationChecklistItems.Contains("Unknown"))">
+                    <label class="form-check-label" for="supportChkUnknown">Unknown</label>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="mb-3">
         <div class="form-group">

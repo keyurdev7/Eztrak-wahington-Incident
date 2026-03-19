@@ -1,4 +1,4 @@
-﻿@using System.Web
+@using System.Web
 @using ViewModels.Incident
 @model IncidentViewModel
 
@@ -8,6 +8,47 @@
     <div class="row">
         <div class="col-md-12">
             <div class="mb-3">
+                <label class="form-label d-block mb-2">Checklist</label>
+                <div class="row descChecklist">
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="descChkNoGas" name="DescriptionChecklistItems" value="No gas" checked="@(Model.DescriptionChecklistItems.Contains("No gas"))">
+                            <label class="form-check-label" for="descChkNoGas">No gas</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="descChkLowGas" name="DescriptionChecklistItems" value="Low gas" checked="@(Model.DescriptionChecklistItems.Contains("Low gas"))">
+                            <label class="form-check-label" for="descChkLowGas">Low gas</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="descChkIntermittentGas" name="DescriptionChecklistItems" value="Intermittent gas" checked="@(Model.DescriptionChecklistItems.Contains("Intermittent gas"))">
+                            <label class="form-check-label" for="descChkIntermittentGas">Intermittent gas</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="descChkWaterNearMeter" name="DescriptionChecklistItems" value="Water seen near meter" checked="@(Model.DescriptionChecklistItems.Contains("Water seen near meter"))">
+                            <label class="form-check-label" for="descChkWaterNearMeter">Water seen near meter</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="descChkWaterFromEquipment" name="DescriptionChecklistItems" value="Water seen coming from gas equipment" checked="@(Model.DescriptionChecklistItems.Contains("Water seen coming from gas equipment"))">
+                            <label class="form-check-label" for="descChkWaterFromEquipment">Water seen coming from gas equipment</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="descChkApplianceNotWorking" name="DescriptionChecklistItems" value="Appliance not working after water issue" checked="@(Model.DescriptionChecklistItems.Contains("Appliance not working after water issue"))">
+                            <label class="form-check-label" for="descChkApplianceNotWorking">Appliance not working after water issue</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="descChkUnusualSound" name="DescriptionChecklistItems" value="Unusual sound or bubbling" checked="@(Model.DescriptionChecklistItems.Contains("Unusual sound or bubbling"))">
+                            <label class="form-check-label" for="descChkUnusualSound">Unusual sound or bubbling</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="descChkGasOdor" name="DescriptionChecklistItems" value="Gas odor" checked="@(Model.DescriptionChecklistItems.Contains("Gas odor"))">
+                            <label class="form-check-label" for="descChkGasOdor">Gas odor</label>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-3" />
                 <label class="form-label" asp-for="DescriptionIssue">Description<span class="text-danger">*</span></label>
                 <textarea type="text" class="form-control" rows="4" id="description" placeholder="Provide detailed description of the incident..." required asp-for="DescriptionIssue"></textarea>
             </div>

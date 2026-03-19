@@ -1,5 +1,8 @@
 using CorrelationId;
 
+using DataLibrary;
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Identity.Web.UI;
 
@@ -47,6 +50,51 @@ builder.Services.AddHostedService<NotificationWorker>();
 Microsoft.Extensions.Configuration.ConfigurationManager configuration = builder.Configuration; // allows both to access and to set up the config
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("SchemaGuard");
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var requiredIncidentColumns = new[]
+        {
+            "DescriptionChecklistJson",
+            "SupportInfoChecklistJson"
+        };
+
+        using var connection = db.Database.GetDbConnection();
+        if (connection.State != System.Data.ConnectionState.Open)
+        {
+            connection.Open();
+        }
+
+        var existingColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        using (var command = connection.CreateCommand())
+        {
+            command.CommandText =
+                "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Incidents'";
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                existingColumns.Add(reader.GetString(0));
+            }
+        }
+
+        var missingColumns = requiredIncidentColumns.Where(c => !existingColumns.Contains(c)).ToList();
+        if (missingColumns.Count > 0)
+        {
+            logger.LogCritical(
+                "Database schema mismatch detected. Missing Incidents columns: {MissingColumns}. " +
+                "Apply EF migrations or add columns before using Incident screens.",
+                string.Join(", ", missingColumns));
+        }
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Failed to validate incident schema at startup.");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

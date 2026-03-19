@@ -1,4 +1,4 @@
-﻿@using System.Web
+@using System.Web
 @using ViewModels.Incident
 @model IncidentViewModel
 
@@ -17,16 +17,8 @@
                         <label class="form-check-label" for="WaterPresentYes">Yes</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        @if (Model.Id > 0)
-                        {
-                            <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.WaterPresentID"
-                                   id="WaterPresentNo" value="0" asp-for="incidentEnvironmentalViewModel.WaterPresentID">
-                        }
-                        else
-                        {
-                            <input class="form-check-input" type="radio" checked name="incidentEnvironmentalViewModel.WaterPresentID"
-                                   id="WaterPresentNo" value="0" asp-for="incidentEnvironmentalViewModel.WaterPresentID">
-                        }
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.WaterPresentID"
+                               id="WaterPresentNo" value="0" asp-for="incidentEnvironmentalViewModel.WaterPresentID">
                         <label class="form-check-label" for="WaterPresentNo">No</label>
                     </div>
                     <div class="form-check form-check-inline">
@@ -48,18 +40,8 @@
                         <label class="form-check-label" for="gasOdorYes">Yes</label>
                     </div>
                     <div class="form-check form-check-inline">
-
-                        @if (Model.Id > 0)
-                        {
-                            <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.GasodorpresentID"
-                                   id="gasOdorNo" value="0" asp-for="incidentEnvironmentalViewModel.GasodorpresentID">
-                        }
-                        else
-                        {
-                            <input class="form-check-input" type="radio" checked name="incidentEnvironmentalViewModel.GasodorpresentID"
-                                   id="gasOdorNo" value="0" asp-for="incidentEnvironmentalViewModel.GasodorpresentID">
-                        }
-                       
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.GasodorpresentID"
+                               id="gasOdorNo" value="0" asp-for="incidentEnvironmentalViewModel.GasodorpresentID">
                         <label class="form-check-label" for="gasOdorNo">No</label>
                     </div>
                     <div class="form-check form-check-inline">
@@ -81,18 +63,8 @@
                         <label class="form-check-label" for="hissingYes">Yes</label>
                     </div>
                     <div class="form-check form-check-inline">
-
-                        @if (Model.Id > 0)
-                        {
-                            <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.HissingSoundPresentID"
-                                   id="hissingNo" value="0" asp-for="incidentEnvironmentalViewModel.HissingSoundPresentID">
-                        }
-                        else
-                        {
-                            <input class="form-check-input" type="radio" checked name="incidentEnvironmentalViewModel.HissingSoundPresentID"
-                                   id="hissingNo" value="0" asp-for="incidentEnvironmentalViewModel.HissingSoundPresentID">
-                        }
-                       
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.HissingSoundPresentID"
+                               id="hissingNo" value="0" asp-for="incidentEnvironmentalViewModel.HissingSoundPresentID">
                         <label class="form-check-label" for="hissingNo">No</label>
                     </div>
                     <div class="form-check form-check-inline">
@@ -112,14 +84,7 @@
                         <label class="form-check-label" for="damageYes">Yes</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        @if (Model.Id > 0)
-                        {
-                            <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.VisibleDamageID" id="damageNo" value="0" asp-for="incidentEnvironmentalViewModel.VisibleDamageID">
-                        }
-                        else
-                        {
-                            <input class="form-check-input" type="radio" checked name="incidentEnvironmentalViewModel.VisibleDamageID" id="damageNo" value="0" asp-for="incidentEnvironmentalViewModel.VisibleDamageID">
-                        }
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.VisibleDamageID" id="damageNo" value="0" asp-for="incidentEnvironmentalViewModel.VisibleDamageID">
                         <label class="form-check-label" for="damageNo">No</label>
                     </div>
                     <div class="form-check form-check-inline">
@@ -138,14 +103,7 @@
                         <label class="form-check-label" for="injuredYes">Yes</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        @if (Model.Id > 0)
-                        {
-                            <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.PeopleInjuredID" id="injuredNo" value="0" asp-for="incidentEnvironmentalViewModel.PeopleInjuredID">
-                        }
-                        else
-                        {
-                            <input class="form-check-input" type="radio" checked name="incidentEnvironmentalViewModel.PeopleInjuredID" id="injuredNo" value="0" asp-for="incidentEnvironmentalViewModel.PeopleInjuredID">
-                        }
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.PeopleInjuredID" id="injuredNo" value="0" asp-for="incidentEnvironmentalViewModel.PeopleInjuredID">
                         <label class="form-check-label" for="injuredNo">No</label>
                     </div>
                     <div class="form-check form-check-inline">
@@ -164,14 +122,7 @@
                         <label class="form-check-label" for="evacYes">Yes</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        @if (Model.Id > 0)
-                        {
-                            <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.EvacuationRequiredID" id="evacNo" value="0" asp-for="incidentEnvironmentalViewModel.EvacuationRequiredID">
-                        }
-                        else
-                        {
-                            <input class="form-check-input" type="radio" checked name="incidentEnvironmentalViewModel.EvacuationRequiredID" id="evacNo" value="0" asp-for="incidentEnvironmentalViewModel.EvacuationRequiredID">
-                        }
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.EvacuationRequiredID" id="evacNo" value="0" asp-for="incidentEnvironmentalViewModel.EvacuationRequiredID">
                         <label class="form-check-label" for="evacNo">No</label>
                     </div>
                     <div class="form-check form-check-inline">
@@ -190,14 +141,7 @@
                         <label class="form-check-label" for="evacYes">Yes</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        @if (Model.Id > 0)
-                        {
-                            <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.EmergencyResponseNotifiedID" id="evacNo" value="0" asp-for="incidentEnvironmentalViewModel.EmergencyResponseNotifiedID">
-                        }
-                        else
-                        {
-                            <input class="form-check-input" type="radio" checked name="incidentEnvironmentalViewModel.EmergencyResponseNotifiedID" id="evacNo" value="0" asp-for="incidentEnvironmentalViewModel.EmergencyResponseNotifiedID">
-                        }
+                        <input class="form-check-input" type="radio" name="incidentEnvironmentalViewModel.EmergencyResponseNotifiedID" id="evacNo" value="0" asp-for="incidentEnvironmentalViewModel.EmergencyResponseNotifiedID">
                         <label class="form-check-label" for="evacNo">No</label>
                     </div>
                     <div class="form-check form-check-inline">
