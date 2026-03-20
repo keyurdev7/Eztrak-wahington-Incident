@@ -417,6 +417,22 @@
                                             </div>
                                             <div class="fw-bold font-colr">@Model.IVDetails.EventType</div>
                                         </div>
+                                        <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
+                                            <div class="info-sec">
+                                                <span class="info-title">Incident Sub-Type : </span>
+                                            </div>
+                                            <div class="fw-bold font-colr">
+                                                @(string.IsNullOrWhiteSpace(Model.incidentDetails?.EventSubTypeName) ? "" : Model.incidentDetails.EventSubTypeName)
+                                            </div>
+                                        </div>
+                                        <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
+                                            <div class="info-sec">
+                                                <span class="info-title">Impact Scope : </span>
+                                            </div>
+                                            <div class="fw-bold font-colr">
+                                                @(string.IsNullOrWhiteSpace(Model.incidentDetails?.ImpactScope) ? "-" : Model.incidentDetails.ImpactScope)
+                                            </div>
+                                        </div>
                                          <div class="detailInfoSec d-flex align-items-center border-bottm gap-5 mb-2">
                                             <div class="info-sec">
                                                 <span class="info-title">Reported Severity : </span>
@@ -437,6 +453,15 @@
                                                 <div class="desc-box">
                                                     @Model.IVDetails.DescriptionIssue
                                                 </div>
+                                                @if (Model.DescriptionChecklistItems?.Any() == true)
+                                                {
+                                                    <ul class="mb-0 mt-2" style="padding-left: 18px; list-style: disc;">
+                                                        @foreach (var item in Model.DescriptionChecklistItems)
+                                                        {
+                                                            <li>@item</li>
+                                                        }
+                                                    </ul>
+                                                }
                                              
                                         </div>
                                      </div>
@@ -472,6 +497,15 @@
                                         <div class="section-body">
                                             
                                             <div class="note-boxtext">@Model.incidentSupportingInfoViewModel.Notes</div>
+                                            @if (Model.incidentSupportingInfoViewModel?.SupportingInformationChecklistItems?.Any() == true)
+                                            {
+                                                <ul class="mb-0 mt-2" style="padding-left: 18px; list-style: disc;">
+                                                    @foreach (var item in Model.incidentSupportingInfoViewModel.SupportingInformationChecklistItems)
+                                                    {
+                                                        <li>@item</li>
+                                                    }
+                                                </ul>
+                                            }
  
                                         </div>
                                     </div>

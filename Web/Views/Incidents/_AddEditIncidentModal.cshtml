@@ -169,6 +169,21 @@
                             </div>
                         </div>
                         <div class="col-md-8">
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="fw-semibold">Status Completion</small>
+                                    <small id="incidentCompletionText">0%</small>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div id="incidentCompletionBar"
+                                         class="progress-bar bg-success"
+                                         role="progressbar"
+                                         style="width: 0%;"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100"
+                                         aria-valuenow="0"></div>
+                                </div>
+                            </div>
                             <div class="tab-content" id="newIncidentTabContent">
                                 <div class="tab-pane fade show active" id="pills-caller" role="tabpanel" aria-labelledby="caller-tab">
                                     @await Html.PartialAsync("~/Views/Incidents/_CallerInformation.cshtml", Model)

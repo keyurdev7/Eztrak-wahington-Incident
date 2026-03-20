@@ -620,7 +620,7 @@ namespace Repositories.Common
                 }
 
                 incidentViewModel.incidentDetails.EventSubTypeId = incident.EventSubTypeId;
-                incidentViewModel.incidentDetails.ImpactScope = incident.ImpactScope ?? "Unknown";
+                incidentViewModel.incidentDetails.ImpactScope = incident.ImpactScope ?? string.Empty;
 
                 // legacy
                 incidentViewModel.incidentDetails.EventTypeIds = incident?.EventTypeIds;
@@ -1043,6 +1043,7 @@ namespace Repositories.Common
                 {
                     Id = incident.Id,
                     DescriptionIssue = incident.DescriptionIssue ?? string.Empty,
+                    DescriptionChecklistItems = DeserializeStringListSafe(incident.DescriptionChecklistJson),
                     severityLevelId = incident.SeverityLevelId,
                     //severityLevelId = incident.StatusLegendId,
 
@@ -1052,7 +1053,7 @@ namespace Repositories.Common
                         EventTypeIds = incident.EventTypeIds,
                         EventTypeId = incident.EventTypeId,
                         EventSubTypeId = incident.EventSubTypeId,
-                        ImpactScope = incident.ImpactScope ?? "Unknown",
+                        ImpactScope = incident.ImpactScope ?? string.Empty,
                         IsOtherEvent = incident.IsOtherEvent,
                         OtherEventDetail = incident.OtherEventDetail ?? string.Empty,
                         EventTypes = new List<SelectListItem>()

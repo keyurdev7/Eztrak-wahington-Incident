@@ -1,4 +1,128 @@
 $(function () {
+    const wizardSteps = [
+        { tabId: "#pills-caller-tab", target: "#pills-caller" },
+        { tabId: "#pills-location-tab", target: "#pills-location" },
+        { tabId: "#pills-additional-tab", target: "#pills-additionallocation" },
+        { tabId: "#pills-detail-tab", target: "#pills-detail" },
+        { tabId: "#pills-description-tab", target: "#pills-description" },
+        { tabId: "#pills-safety-tab", target: "#pills-safety" },
+        { tabId: "#pills-support-tab", target: "#pills-support" }
+    ];
+
+    const requiredStepTargets = [
+        "#pills-caller",
+        "#pills-location",
+        "#pills-detail",
+        "#pills-description",
+        "#pills-support"
+    ];
+
+    function validateRequiredFields($container, selector, markErrors = true) {
+        let isValid = true;
+        $container.find(selector).each(function () {
+            const $field = $(this);
+            const value = $.trim($field.val());
+            const isInvalidSelect = $field.is("select") && (value === "" || value === "--Select--");
+            const isInvalid = isInvalidSelect || value === "";
+
+            if (isInvalid) {
+                isValid = false;
+                if (markErrors) showError($field);
+            } else if (markErrors) {
+                clearError($field);
+            }
+        });
+        return isValid;
+    }
+
+    function validateCallerStep(markErrors = true) {
+        return validateRequiredFields(
+            $("#pills-caller"),
+            "input[data-val-required], select[data-val-required], textarea[data-val-required], #relationaship, #CallTimedatetime",
+            markErrors
+        );
+    }
+
+    function validateLocationStep(markErrors = true) {
+        return validateRequiredFields(
+            $("#pills-location"),
+            "input[data-val-required]:not(#serviceAct), textarea[data-val-required], select[data-val-required]",
+            markErrors
+        );
+    }
+
+    function validateAdditionalLocationStep(markErrors = true) {
+        if ($("#locationForm").is(":visible") && $("#addlocAddress").val() === "") {
+            if (markErrors) showError($("#addlocAddress"));
+            return false;
+        }
+        return true;
+    }
+
+    function validateDetailStep(markErrors = true) {
+        let isValid = validateRequiredFields(
+            $("#pills-detail"),
+            "input[data-val-required], select[data-val-required], textarea[data-val-required]",
+            markErrors
+        );
+
+        // Backward compatibility with legacy event checkbox flow.
+        if ($("#IsOtherEvent").length) {
+            if (!$("#IsOtherEvent").is(":checked")) {
+                const $eventChecks = $(".eventCheck input[type='checkbox']");
+                if ($eventChecks.length > 0 && $eventChecks.filter(":checked").length === 0) {
+                    isValid = false;
+                    if (markErrors) $eventChecks.css("outline", "2px solid red");
+                } else if (markErrors) {
+                    $eventChecks.css("outline", "none");
+                }
+            } else if ($("#OtherEventDetail").length && $.trim($("#OtherEventDetail").val()) === "") {
+                isValid = false;
+                if (markErrors) showError($("#OtherEventDetail"));
+            } else if (markErrors && $("#OtherEventDetail").length) {
+                clearError($("#OtherEventDetail"));
+            }
+        }
+
+        return isValid;
+    }
+
+    function validateDescriptionStep(markErrors = true) {
+        return validateRequiredFields($("#pills-description"), "textarea[data-val-required]", markErrors);
+    }
+
+    function validateSafetyStep() {
+        // Environmental / Safety Indicators are intentionally optional.
+        return true;
+    }
+
+    function validateSupportStep(markErrors = true) {
+        return validateRequiredFields($("#pills-support"), "select[data-val-required], textarea[data-val-required]", markErrors);
+    }
+
+    function validateStepByTarget(target, markErrors = true) {
+        switch (target) {
+            case "#pills-caller": return validateCallerStep(markErrors);
+            case "#pills-location": return validateLocationStep(markErrors);
+            case "#pills-additionallocation": return validateAdditionalLocationStep(markErrors);
+            case "#pills-detail": return validateDetailStep(markErrors);
+            case "#pills-description": return validateDescriptionStep(markErrors);
+            case "#pills-safety": return validateSafetyStep(markErrors);
+            case "#pills-support": return validateSupportStep(markErrors);
+            default: return true;
+        }
+    }
+
+    function updateCompletionBar() {
+        const total = requiredStepTargets.length;
+        const completed = requiredStepTargets.filter(t => validateStepByTarget(t, false)).length;
+        const percentage = Math.round((completed / total) * 100);
+
+        $("#incidentCompletionBar")
+            .css("width", percentage + "%")
+            .attr("aria-valuenow", percentage);
+        $("#incidentCompletionText").text(percentage + "%");
+    }
 
 
     $("#statusSelect").val('');
@@ -9,109 +133,38 @@ $(function () {
     $(document).off("click", "#nextToIncidentLocation");
     $(document).on("click", "#nextToIncidentLocation", function (e) {
         e.preventDefault();
-
-        var isValid = true;
-
-        // Loop through all required fields
-        $("#pills-caller").find("input[data-val-required], select[data-val-required], textarea[data-val-required], #relationaship, #CallTimedatetime").each(function () {
-            var $field = $(this);
-            var value = $.trim($field.val());
-
-            // Dropdown special check
-            if ($field.is("select") && (value === "" || value === "--Select--")) {
-                isValid = false;
-                showError($field);
-            }
-            else if (value === "") {
-                isValid = false;
-                showError($field);
-            }
-            else {
-                clearError($field);
-            }
-        });
-
-        if (isValid) {
+        if (validateCallerStep()) {
             $("#pills-location-tab").trigger("click");
         }
+        updateCompletionBar();
     });
 
     $(document).off("click", "#nextToAdditionalLocations");
     $(document).on("click", "#nextToAdditionalLocations", function (e) {
         e.preventDefault();
-
-        var isValid = true;
-
-        // Loop through all required fields, excluding the serviceAct field
-        $("#pills-location").find("input[data-val-required]:not(#serviceAct), textarea[data-val-required]").each(function () {
-            var $field = $(this);
-            var value = $.trim($field.val());
-
-            // Dropdown special check
-            if ($field.is("select") && (value === "" || value === "--Select--")) {
-                isValid = false;
-                showError($field);
-            }
-            else if (value === "") {
-                isValid = false;
-                showError($field);
-            }
-            else {
-                clearError($field);
-            }
-        });
-
-        if (isValid) {
+        if (validateLocationStep()) {
             $("#pills-additional-tab").trigger("click");
         }
+        updateCompletionBar();
     });
 
     $(document).off("click", "#nextToIncidentDetials");
     $(document).on("click", "#nextToIncidentDetials", function (e) {
         e.preventDefault();
-        var isValid = true;
-        if ($("#locationForm").is(":visible")) {
-            if ($("#addlocAddress").val() === "") {
-                showError($("#addlocAddress"));
-                isValid = false;
-            }
-        }
-
-        if (isValid) {
+        if (validateAdditionalLocationStep()) {
             $("#pills-detail-tab").trigger("click");
         }
+        updateCompletionBar();
     });
 
 
     $(document).off("click", "#nextToDescriptionIssue");
     $(document).on("click", "#nextToDescriptionIssue", function (e) {
         e.preventDefault();
-
-        var isValid = true;
-
-        if (!$("#IsOtherEvent").is(":checked")) {
-            if ($(".eventCheck input[type='checkbox']:checked").length === 0) {
-                isValid = false;
-                $(".eventCheck input[type='checkbox']").css("outline", "2px solid red");
-            } else {
-                $(".eventCheck input[type='checkbox']").css("outline", "none");
-            }
-        }
-        else {
-            $(".eventCheck input[type='checkbox']").css("outline", "none");
-            var OtherEventDetailText = $("#OtherEventDetail").val();
-            if (OtherEventDetailText == "") {
-                isValid = false;
-                showError($("#OtherEventDetail"));
-            }
-            else {
-                clearError($("#OtherEventDetail"));
-            }
-        }
-
-        if (isValid) {
+        if (validateDetailStep()) {
             $("#pills-description-tab").trigger("click");
         }
+        updateCompletionBar();
     });
 
     $(document).off("click", "#nextToSeverity");
@@ -147,105 +200,59 @@ $(function () {
     $(document).off("click", "#nextToEnvironmental");
     $(document).on("click", "#nextToEnvironmental", function (e) {
         e.preventDefault();
-
-        var isValid = true;
-
-        // Loop through all required fields
-        //$("#pills-severity").find("#severity").each(function () {
-        //    var $field = $(this);
-        //    var value = $.trim($field.val());
-
-        //    // Dropdown special check
-        //    if ($field.is("select") && (value === "" || value === "--Select--")) {
-        //        isValid = false;
-        //        showError($field);
-        //    }
-        //    else if (value === "") {
-        //        isValid = false;
-        //        showError($field);
-        //    }
-        //    else {
-        //        clearError($field);
-        //    }
-        //});
-
-        // Loop through all required fields
-        $("#pills-description").find("textarea[data-val-required]").each(function () {
-            var $field = $(this);
-            var value = $.trim($field.val());
-
-            if (value === "") {
-                isValid = false;
-                showError($field);
-            }
-            else {
-                clearError($field);
-            }
-        });
-
-        if (isValid) {
+        if (validateDescriptionStep()) {
             $("#pills-safety-tab").trigger("click");
         }
+        updateCompletionBar();
     });
 
     $(document).off("click", "#nextToSupportInfo");
     $(document).on("click", "#nextToSupportInfo", function (e) {
         e.preventDefault();
-
-        var isValid = true;
-
-        // Loop through all required fields
-        $("#pills-safety").find("input[data-val-required], select[data-val-required], textarea[data-val-required]").each(function () {
-            var $field = $(this);
-            var value = $.trim($field.val());
-
-            // Dropdown special check
-            if ($field.is("select") && (value === "" || value === "--Select--")) {
-                isValid = false;
-                showError($field);
-            }
-            else if (value === "") {
-                isValid = false;
-                showError($field);
-            }
-            else {
-                clearError($field);
-            }
-        });
-
-        if (isValid) {
+        if (validateSafetyStep()) {
             $("#pills-support-tab").trigger("click");
         }
+        updateCompletionBar();
     });
 
     $(document).on("click", "#btn_Incident_Save", function (e) {
         e.preventDefault();
-
-        var isValid = true;
-
-        // Loop through all required fields
-        $("#pills-support").find("select[data-val-required], textarea[data-val-required]").each(function () {
-            var $field = $(this);
-            var value = $.trim($field.val());
-
-            // Dropdown special check
-            if ($field.is("select") && (value === "" || value === "--Select--")) {
-                isValid = false;
-                showError($field);
-            }
-            else if (value === "") {
-                isValid = false;
-                showError($field);
-            }
-            else {
-                clearError($field);
-            }
-        });
-
-        if (isValid) {
+        if (validateSupportStep()) {
             SaveIncidentForm();
         }
+        updateCompletionBar();
     });
+
+    // Prevent jumping forward via sidebar tabs unless prior steps are valid.
+    $(document).off("click", ".CustomTab .nav-link");
+    $(document).on("click", ".CustomTab .nav-link", function (e) {
+        const target = $(this).attr("data-bs-target");
+        const targetIndex = wizardSteps.findIndex(s => s.target === target);
+        const activeTabId = $(".CustomTab .nav-link.active").attr("id");
+        const currentIndex = wizardSteps.findIndex(s => s.tabId === "#" + activeTabId);
+
+        if (targetIndex > currentIndex) {
+            for (let i = 0; i < targetIndex; i++) {
+                if (!validateStepByTarget(wizardSteps[i].target, true)) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    $(wizardSteps[i].tabId).trigger("click");
+                    updateCompletionBar();
+                    return false;
+                }
+            }
+        }
+
+        setTimeout(updateCompletionBar, 0);
+    });
+
+    // Keep completion status live while user types/selects.
+    $(document).off("input change", "#NewIncidentForm input, #NewIncidentForm select, #NewIncidentForm textarea");
+    $(document).on("input change", "#NewIncidentForm input, #NewIncidentForm select, #NewIncidentForm textarea", function () {
+        updateCompletionBar();
+    });
+
+    updateCompletionBar();
 
     //$(document).off("click", ".statusLegendli");
     //$(document).on("click", ".statusLegendli", function (e) {

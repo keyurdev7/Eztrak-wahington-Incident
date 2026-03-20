@@ -1390,32 +1390,39 @@
 <script>
         document.addEventListener("DOMContentLoaded", function () {
 
-               const photoInput1 = document.getElementById('photoInput1');
-        const photoPreview = document.getElementById('photoPreview1');
+        const photoInput1 = document.getElementById('photoInput1');
+        const photoPreview1 = document.getElementById('photoPreview1');
 
-        photoInput1.addEventListener('change', function() {
-          const file = this.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-              photoPreview.src = e.target.result;
-              photoPreview.classList.remove('d-none');
-            }
-            reader.readAsDataURL(file);
-          } else {
-            photoPreview.src = "";
-            photoPreview.classList.add('d-none');
-          }
-        });
+        if (photoInput1 && photoPreview1) {
+            photoInput1.addEventListener('change', function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        photoPreview1.src = e.target.result;
+                        photoPreview1.classList.remove('d-none');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    photoPreview1.src = "";
+                    photoPreview1.classList.add('d-none');
+                }
+            });
+        }
 
         // Incident Type/Sub-Type cascading dropdowns (single-select)
-        const eventSelect = document.getElementById('eventTypeId');
-        const subTypeSelect = document.getElementById('eventSubTypeId');
-
+        // NOTE: event/DOM for the modal can be injected after page load, so we must use
+        // delegated listeners (not direct element listeners captured during DOMContentLoaded).
         async function loadSubTypesForSelectedType() {
+            const eventSelect = document.getElementById('eventTypeId');
+            const subTypeSelect = document.getElementById('eventSubTypeId');
             if (!eventSelect || !subTypeSelect) return;
 
             const typeId = eventSelect.value;
+
+            // Preserve current selection (e.g. edit mode) before we rebuild options.
+            const previousSelectedSubTypeId = subTypeSelect.value;
+
             subTypeSelect.innerHTML = `<option value="">Select Sub-Type</option>`;
 
             if (!typeId) return;
@@ -1426,22 +1433,34 @@
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 });
                 const items = await resp.json();
+
                 (items || []).forEach(function (it) {
                     const opt = document.createElement('option');
                     opt.value = it.id;
                     opt.textContent = it.name;
                     subTypeSelect.appendChild(opt);
                 });
+
+                // Restore selection if it still exists under the selected type.
+                if (previousSelectedSubTypeId) {
+                    subTypeSelect.value = previousSelectedSubTypeId;
+                }
             } catch (err) {
                 console.error('Failed to load sub-types', err);
             }
         }
 
-        if (eventSelect) {
-            eventSelect.addEventListener('change', loadSubTypesForSelectedType);
-            // initial load (for Edit mode)
+        // When user changes Incident Type in the dynamically-injected modal
+        document.addEventListener('change', function (e) {
+            if (e && e.target && e.target.id === 'eventTypeId') {
+                loadSubTypesForSelectedType();
+            }
+        });
+
+        // When modal opens (edit mode / initial values)
+        $(document).on('shown.bs.modal', '#addIncidentModal', function () {
             loadSubTypesForSelectedType();
-        }
+        });
 
         const severitySelect  = document.getElementById('severity');
 
@@ -1463,23 +1482,25 @@
           }
         });
 
-        //   const photoInput = document.getElementById('photoInput');
-        // const photoPreview = document.getElementById('photoPreview');
+        const photoInput = document.getElementById('photoInput');
+        const photoPreview = document.getElementById('photoPreview');
 
-        photoInput.addEventListener('change', function() {
-          const file = this.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-              photoPreview.src = e.target.result;
-              photoPreview.classList.remove('d-none');
-            }
-            reader.readAsDataURL(file);
-          } else {
-            photoPreview.src = "";
-            photoPreview.classList.add('d-none');
-          }
-        });
+        if (photoInput && photoPreview) {
+            photoInput.addEventListener('change', function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        photoPreview.src = e.target.result;
+                        photoPreview.classList.remove('d-none');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    photoPreview.src = "";
+                    photoPreview.classList.add('d-none');
+                }
+            });
+        }
              // ✅ Dynamic Incident View Loader
 
          $('#historyIncidentModal').on('shown.bs.modal', function () {
