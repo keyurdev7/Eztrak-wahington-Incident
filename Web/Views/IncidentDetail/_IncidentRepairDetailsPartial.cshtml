@@ -18,109 +18,173 @@
     }
 }
 
-@if (Model != null)
-{
-    <div class="card mb-4">
-        <div class="card-body p-0">
-            <div class="d-flex justify-content-between align-items-center mb-0 p-3">
-                <h6 class="fw-bold mb-0">Pre-Operation Setup</h6>
+@{
+    var repairTasks = Model?.listIncidentViewTaskViewModel ?? new List<IncidentViewTaskListViewModel>();
+    var repairOwners = repairTasks
+        .Select(t => t.FieldValue)
+        .Where(v => !string.IsNullOrWhiteSpace(v) && v.Trim() != "—")
+        .Distinct()
+        .OrderBy(v => v)
+        .ToList();
+
+    var repairStatuses = repairTasks
+        .Select(t => string.IsNullOrWhiteSpace(t.Status) ? "Not Started" : t.Status)
+        .Where(v => !string.IsNullOrWhiteSpace(v))
+        .Distinct()
+        .OrderBy(v => v)
+        .ToList();
+}
+
+<div class="card mb-4">
+    <div class="card-body p-0">
+        <div class="d-flex align-items-center justify-content-between mb-0 p-3">
+            <h6 class="fw-bold mb-0">Repair Checklist</h6>
+        </div>
+
+        <div class="checklist-toolbar w-100 p-3">
+            <div class="checklist-toolbar-left d-flex align-items-center justify-content-start flex-wrap gap-2">
+                <input type="text" class="form-control" id="repair_global_search_value" placeholder="Search steps..." style="max-width:180px;">
+
+                <select class="form-select" style="max-width:150px;" id="repair_ddlOwner">
+                    <option value="">All owners</option>
+                    @foreach (var owner in repairOwners)
+                    {
+                        <option value="@owner">@owner</option>
+                    }
+                </select>
+
+                <select class="form-select" style="max-width:150px;" id="repair_ddlStatus">
+                    <option value="">Status: All</option>
+                    @foreach (var st in repairStatuses)
+                    {
+                        <option value="@st">@st</option>
+                    }
+                </select>
+
+            </div>
+            <div class="checklist-toolbar-right d-flex align-items-center gap-2">
+                <div class="filter-link">Filter</div>
                 <button type="button" class="btn btn-add" onclick="OpenAddRepairTaskModal()">
                     <i class="fa-solid fa-plus me-2"></i>Add Task
                 </button>
             </div>
-            <div class="table-responsive table-rounded custom-scroll">
-                <table id="repairTable" class="table align-middle text-left">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width: 40%;">Task</th>
-                            <th style="width: 40%;">Responsible Party</th>
-                            <th style="width: 10%;">Status</th>
-                            <th style="width: 10%;">Evidence</th>
-                        </tr>
-                    </thead>
-                    <tbody ondragover="dragOver(event)" ondrop="drop(event)">
-                        @if (Model.listIncidentViewTaskViewModel != null && Model.listIncidentViewTaskViewModel.Any())
+        </div>
+
+        <div class="status-legend checklist-status-legend px-3 pt-0 pb-2">
+            <span class="legend-item">
+                <span class="status-dot status-dot-complete"></span>
+                Complete
+            </span>
+            <span class="legend-item">
+                <span class="status-dot status-dot-incomplete"></span>
+                Incomplete
+            </span>
+            <span class="legend-item">
+                <span class="status-dot status-dot-na"></span>
+                N/A
+            </span>
+        </div>
+
+        <div class="table-responsive table-rounded custom-scroll">
+            <table id="repairTable" class="table align-middle text-left checklist-table">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 100px;">Status</th>
+                        <th style="width: 220px;">Party</th>
+                        <th style="width: 340px;">Task</th>
+                        <th style="width: 110px;">Evidence</th>
+                        <th style="width: 170px;">Last Updated</th>
+                        <th style="width: 170px;">Updated By</th>
+                        <th style="width: 220px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody ondragover="dragOver(event)" ondrop="drop(event)">
+                    @if (repairTasks != null && repairTasks.Any())
+                    {
+                        foreach (var task in repairTasks)
                         {
-                            foreach (var task in Model.listIncidentViewTaskViewModel)
-                            {
-                                <tr draggable="true" data-id="@task.Id" ondragstart="dragStart(event)">
-                                    <td>@task.Task</td>
-                                    <td>@(string.IsNullOrWhiteSpace(task.FieldValue) ? "—" : task.FieldValue)</td>
-                                    <td>
-                                        <a href="#" onclick="EditRepairTask('@task.Id')">
-                                            @if (!string.IsNullOrWhiteSpace(task.Status))
-                                            {
-                                                if (task.Status.ToLower() == "started")
-                                                {
-                                                    <span class="status-badge progressing">@task.Status</span>
-                                                }
-                                                else if (task.Status.ToLower() == "not started")
-                                                {
-                                                    <span class="status-badge not-started">@task.Status</span>
-                                                }
-                                                else if (task.Status.ToLower() == "complete")
-                                                {
-                                                    <span class="status-badge done">@task.Status</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="status-badge not-started">@task.Status</span>
-                                                }
-                                            }
-                                            else
-                                            {
-                                                <span class="status-badge not-started">Not Started</span>
-                                            }
+                            var statusText = string.IsNullOrWhiteSpace(task.Status) ? "Not Started" : task.Status;
+                            var statusLower = statusText.Trim().ToLowerInvariant();
+                            var dotClass = statusLower == "complete"
+                                ? "status-dot-complete"
+                                : (statusLower == "n/a" || statusLower == "na")
+                                    ? "status-dot-na"
+                                    : "status-dot-incomplete";
+                            <tr draggable="true" data-id="@task.Id" ondragstart="dragStart(event)">
+                                <td>
+                                    <span class="status-cell">
+                                        <span class="status-dot @dotClass"></span>
+                                        <span class="status-text d-none">@statusText</span>
+                                    </span>
+                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(task.FieldValue) ? "—" : task.FieldValue)</td>
+                                <td>@(task.Task ?? "")</td>
+                                <td>
+                                    @if (task.ImageCount > 0)
+                                    {
+                                        <a href="#" onclick="ViewRepairTask('@task.Id'); return false;" class="text-decoration-none">
+                                            <i class="fa @GetFileTypeIcon(task.ImagesUrl ?? "") me-1"></i>@(task.ImageCount) file
                                         </a>
-                                    </td>
-                                    <td>
-                                        @if (task.ImageCount > 0)
-                                        {
-                                            <a href="#" onclick="ViewRepairTask('@task.Id')">
-                                                <i class="fa @GetFileTypeIcon(task.ImagesUrl ?? "") me-1"></i>@(task.ImageCount) @("file")
-                                            </a>
-                                        }
-                                        else
-                                        {
-                                            <span>--</span>
-                                        }
-                                    </td>
-                                </tr>
-                            }
+                                    }
+                                    else
+                                    {
+                                        <span>--</span>
+                                    }
+                                </td>
+                                <td>@(!string.IsNullOrWhiteSpace(task.LastUpdated) ? task.LastUpdated : "--")</td>
+                                <td>@(!string.IsNullOrWhiteSpace(task.UpdatedBy) ? task.UpdatedBy : "--")</td>
+                                <td>
+                                    <div class="checklist-actions">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit" aria-label="Edit" onclick="EditRepairTask('@task.Id'); return false;">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-info" title="History" aria-label="History" onclick="ViewRepairTask('@task.Id'); return false;">
+                                            <i class="fas fa-history"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
                         }
-                        else
-                        {
-                            <tr><td colspan="4" class="text-center">No tasks found</td></tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                    else
+                    {
+                        <tr><td colspan="7" class="text-center">No tasks found</td></tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
-}
-else
-{
-    <div class="card mb-4">
-        <div class="card-body p-0">
-            <div class="d-flex justify-content-between align-items-center mb-0 p-3">
-                <h6 class="fw-bold mb-0">Pre-Operation Setup</h6>
-                <button type="button" class="btn btn-add" onclick="OpenAddRepairTaskModal()">
-                    <i class="fa-solid fa-plus me-2"></i>Add Task
-                </button>
-            </div>
-            <div class="table-responsive table-rounded custom-scroll">
-                <table id="repairTable" class="table align-middle text-left">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width: 40%;">Task</th>
-                            <th style="width: 40%;">Responsible Party</th>
-                            <th style="width: 10%;">Status</th>
-                            <th style="width: 10%;">Evidence</th>
-                        </tr>
-                    </thead>
-                    <tbody ondragover="dragOver(event)" ondrop="drop(event)"><tr><td colspan="4" class="text-center">No tasks found</td></tr></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-}
+</div>
+
+<script>
+    (function () {
+        function applyRepairFilters() {
+            var q = ($('#repair_global_search_value').val() || '').toString().trim().toLowerCase();
+            var owner = $('#repair_ddlOwner').val();
+            var status = $('#repair_ddlStatus').val();
+
+            $('#repairTable tbody tr').each(function () {
+                var $row = $(this);
+                var statusText = $row.find('td:nth-child(1) .status-text').text().trim();
+                var ownerText = $row.find('td:nth-child(2)').text().trim();
+                var taskText = $row.find('td:nth-child(3)').text().trim().toLowerCase();
+
+                var ok = true;
+                if (q) ok = ok && taskText.indexOf(q) !== -1;
+                if (owner) ok = ok && ownerText === owner;
+                if (status) ok = ok && statusText === status;
+
+                $row.toggle(ok);
+            });
+        }
+
+        $(document)
+            .off('input.repairFilter', '#repair_global_search_value')
+            .on('input.repairFilter', '#repair_global_search_value', applyRepairFilters);
+        $(document)
+            .off('change.repairFilter', '#repair_ddlOwner, #repair_ddlStatus')
+            .on('change.repairFilter', '#repair_ddlOwner, #repair_ddlStatus', applyRepairFilters);
+
+        applyRepairFilters();
+    })();
+</script>

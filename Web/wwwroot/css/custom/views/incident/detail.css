@@ -1088,6 +1088,9 @@
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     border: 1px solid #e5e7eb;
+    /* Make all validation cards visually the same size (edit + view modes). */
+    display: flex;
+    flex-direction: column;
 }
 
 #validation .phase-header {
@@ -1110,7 +1113,10 @@
 }
 .section-body-part {
     overflow: auto;
+    /* Keep notes area consistent across edit + view modes. */
     height: 300px;
+    flex: 1 1 auto;
+    min-height: 0;
 }
 #validation .section-body i {
     color: #f54e00 !important;
@@ -1208,10 +1214,51 @@
 }
 
 #validation .section-header {
-    padding: 20px 14px;
+    /* Same visual header treatment as .section-title (view mode). */
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 0;
+    padding: 16px;
+    background-color: #f9fafb;
     border-radius: 12px;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+}
+
+/* Force Edit link placement consistency after Validate (view mode). */
+#validation .section-header {
+    position: relative;
+}
+
+#validation .validation-card-edit {
+    position: absolute !important;
+    top: 50% !important;
+    right: 14px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    transform: translateY(-50%) !important; /* stable even if header wraps/rerenders */
+}
+
+#validation .validation-card-edit small {
+    line-height: 1;
+    display: inline-block;
+}
+
+/* Keep the cards flexible by content (no equal-height stretching). */
+#validation .row.g-3 {
+    align-items: flex-start !important;
+}
+
+/* Ensure consistent vertical spacing between cards (edit + view mode). */
+#validation .row.g-3 > .col-md-4 > .card-custom.mt-3 {
+    margin-top: 16px !important;
+}
+
+/* Keep the notes card aligned with other cards vertically. */
+#validation .card-custom.validation-notes {
+    margin-top: 16px !important;
 }
 
 #validation .footer-section .status-btn {
@@ -1373,15 +1420,46 @@
         margin-right: 8px;
     }
 
-#assessment .filter-link {
+#assessment .filter-link,
+#repair .filter-link,
+#restoration .filter-link,
+#closeout .filter-link {
     color: #ff7f32;
     font-weight: 500;
     text-decoration: none;
 }
 
-    #assessment .filter-link:hover {
+    #assessment .filter-link:hover,
+    #repair .filter-link:hover,
+    #restoration .filter-link:hover,
+    #closeout .filter-link:hover {
         text-decoration: underline;
     }
+
+/* Keep filters and Add Task on one toolbar row */
+#assessment .checklist-toolbar,
+#repair .checklist-toolbar,
+#restoration .checklist-toolbar,
+#closeout .checklist-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+#assessment .checklist-toolbar-left,
+#repair .checklist-toolbar-left,
+#restoration .checklist-toolbar-left,
+#closeout .checklist-toolbar-left {
+    flex: 1;
+}
+
+#assessment .checklist-toolbar-right,
+#repair .checklist-toolbar-right,
+#restoration .checklist-toolbar-right,
+#closeout .checklist-toolbar-right {
+    flex-shrink: 0;
+}
 
 #assessment .updates {
     background: #fff;
@@ -1692,21 +1770,25 @@
     color: #fff;
 }
 
+#assessment .btn-add,
 #repair .btn-add,
 #restoration .btn-add,
 #closeout .btn-add {
-    background-color: #f97316;
-    color: #fff;
+    background-color: #f97316 !important;
+    border-color: #f97316 !important;
+    color: #fff !important;
     border-radius: 0.5rem;
     padding: 6px 14px;
     font-weight: 500;
 }
 
+    #assessment .btn-add:hover,
     #repair .btn-add:hover,
     #restoration .btn-add:hover,
     #closeout .btn-add:hover {
-        background-color: #ea580c;
-        color: #fff;
+        background-color: #ea580c !important;
+        border-color: #ea580c !important;
+        color: #fff !important;
     }
 
 #repair .fa-check-circle,
@@ -2453,42 +2535,104 @@
     border-radius: 12px;
 }
 
-/* Allow text wrapping in Responsible Party column */
-#restorationTable td:nth-child(2) {
-    white-space: normal;
+/* Checklist tables: keep columns stable */
+.checklist-table {
+    table-layout: fixed;
 }
 
-/* Allow text wrapping in Task column */
-#restorationTable td:nth-child(1) {
-    white-space: normal;
+/* Status legend + dot */
+.checklist-status-legend {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    flex-wrap: wrap;
+    color: #6b6b6b;
+    font-weight: 600;
+    font-size: 0.85rem;
 }
 
-/* Allow text wrapping in Task column for repair table */
-#repairTable td:nth-child(1) {
-    white-space: normal;
+.checklist-status-legend .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
-/* Allow text wrapping in Responsible Party column for repair table */
-#repairTable td:nth-child(2) {
-    white-space: normal;
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
 }
 
-/* Allow text wrapping in Task column for closeout table */
-#closeoutTable td:nth-child(1) {
-    white-space: normal;
+.status-dot-complete {
+    background: #198754;
 }
 
-/* Allow text wrapping in Responsible Party column for closeout table */
+.status-dot-incomplete {
+    background: #d93025;
+}
+
+.status-dot-na {
+    background: #9aa0a6;
+}
+
+.status-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 90px;
+}
+
+.status-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+    font-size: 0.85rem;
+}
+
+/* Actions inside the last column */
+.checklist-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+}
+
+.checklist-actions .btn {
+    padding: 2px 6px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+/* Task column: don't let it break width/height */
+#assessmentTable td:nth-child(3),
+#repairTable td:nth-child(3),
+#restorationTable td:nth-child(3),
+#closeoutTable td:nth-child(3) {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Party column: allow wrapping but keep it reasonable */
+#assessmentTable td:nth-child(2),
+#repairTable td:nth-child(2),
+#restorationTable td:nth-child(2),
 #closeoutTable td:nth-child(2) {
     white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Allow text wrapping in Task column for assessment table */
-#assessmentTable td:nth-child(1) {
-    white-space: normal;
-}
-
-/* Allow text wrapping in Responsible Party column for assessment table */
-#assessmentTable td:nth-child(2) {
-    white-space: normal;
+/* Evidence + Actions should stay on one line */
+#assessmentTable td:nth-child(4),
+#repairTable td:nth-child(4),
+#restorationTable td:nth-child(4),
+#closeoutTable td:nth-child(4),
+#assessmentTable td:nth-child(7),
+#repairTable td:nth-child(7),
+#restorationTable td:nth-child(7),
+#closeoutTable td:nth-child(7) {
+    white-space: nowrap;
 }

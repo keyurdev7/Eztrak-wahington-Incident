@@ -85,9 +85,11 @@ namespace Repositories.Common
 
                 var severityLevels = await _db.SeverityLevels
                                     .Where(it => !it.IsDeleted)
-                                    .OrderBy(it => it.Name == "High" ? 1 :
-                                                   it.Name == "Moderate" ? 2 :
-                                                   it.Name == "Low" ? 3 : 4)
+                                    .OrderBy(it => it.Name == "Severe" ? 1 :
+                                                   it.Name == "High" ? 2 :
+                                                   it.Name == "Moderate" ? 3 :
+                                                   it.Name == "Low" ? 4 :
+                                                   it.Name == "Non-Incident" ? 5 : 99)
                                     .Select(it => new SelectListItem
                                     {
                                         Value = it.Id.ToString(),
@@ -144,6 +146,9 @@ namespace Repositories.Common
                 incidentViewModel.incidentDetails.EventTypes = eventTypes;
                 incidentViewModel.incidentDetails.EventSubTypes = new List<SelectListItem>();
 
+                // Caller datetime-local rejects DateTime.MinValue; seed US Pacific wall clock for new incidents.
+                incidentViewModel.incidentCellerInformation.CallTime = GetDefaultCallerCallTimeUsPacific();
+
                 return incidentViewModel;
             }
             catch (Exception ex)
@@ -188,6 +193,7 @@ namespace Repositories.Common
                     CallerName = viewModel.incidentCellerInformation?.CallerName,
                     CallTime = viewModel.incidentCellerInformation?.CallTime ?? DateTime.Now,
                     RelationshipId = viewModel.incidentCellerInformation?.RelationshipId,
+                    CallerPhoneNumberTypes = SerializeCallerPhoneNumberType(viewModel.incidentCellerInformation?.CallerPhoneNumberType),
 
                     // New single-select
                     EventTypeId = viewModel.incidentDetails?.EventTypeId,
@@ -309,6 +315,7 @@ namespace Repositories.Common
                 incident.CallerName = caller?.CallerName;
                 incident.CallTime = caller?.CallTime ?? incident.CallTime;
                 incident.RelationshipId = caller?.RelationshipId;
+                incident.CallerPhoneNumberTypes = SerializeCallerPhoneNumberType(caller?.CallerPhoneNumberType);
 
                 var details = viewModel.incidentDetails;
                 incident.EventTypeId = details?.EventTypeId;
@@ -644,6 +651,8 @@ namespace Repositories.Common
                 incidentViewModel.incidentCellerInformation.CallerName = incident.CallerName;
                 incidentViewModel.incidentCellerInformation.CallTime = incident.CallTime;
                 incidentViewModel.incidentCellerInformation.RelationshipId = incident.RelationshipId;
+                incidentViewModel.incidentCellerInformation.CallerPhoneNumberType =
+                    ParseCallerPhoneNumberType(incident.CallerPhoneNumberTypes);
 
                 incidentViewModel.incidentEnvironmentalViewModel.PeopleInjuredID = incident.PeopleInjuredId;
                 incidentViewModel.incidentEnvironmentalViewModel.HissingSoundPresentID = incident.HissingPresentId;
@@ -687,36 +696,86 @@ namespace Repositories.Common
                     .Include(i => i.Relationship)
                     .FirstOrDefaultAsync(i => i.Id == id);
 
-                var incidentValidation = (from i in _db.IncidentValidations
-                                          join s in _db.SeverityLevels on i.ConfirmedSeverityLevelId equals s.Id
-                                          where i.IncidentId == id
-                                          select new IncidentValidationsDetailsViewModel
-                                          {
-                                              // IncidentValidation properties
-                                              IncidentValidationId = i.Id,
-                                              ConfirmedSeverityLevelId = i.ConfirmedSeverityLevelId,
-                                              DiscoveryPerimeterId = i.DiscoveryPerimeterId,
-                                              ValidationNotes = i.ValidationNotes,
-                                              CreatedBy = i.UpdatedBy,
-                                              CreatedOn = i.UpdatedOn,
+                List<IncidentValidationsDetailsViewModel> incidentValidation;
+                try
+                {
+                    // New dropdown columns may not exist yet in the DB (pending migrations),
+                    // so we fall back to loading without them if the SQL fails.
+                    incidentValidation = (from i in _db.IncidentValidations
+                                            join s in _db.SeverityLevels on i.ConfirmedSeverityLevelId equals s.Id
+                                            where i.IncidentId == id
+                                            select new IncidentValidationsDetailsViewModel
+                                            {
+                                                // IncidentValidation properties
+                                                IncidentValidationId = i.Id,
+                                                ConfirmedSeverityLevelId = i.ConfirmedSeverityLevelId,
+                                                DiscoveryPerimeterId = i.DiscoveryPerimeterId,
+                                                ValidationNotes = i.ValidationNotes,
+                                                ValidationDecision = i.ValidationDecision ?? string.Empty,
+                                                BasisForValidation = i.BasisForValidation ?? string.Empty,
+                                                CriticalCustomerPresent = i.CriticalCustomerPresent ?? string.Empty,
+                                                CreatedBy = i.UpdatedBy,
+                                                CreatedOn = i.UpdatedOn,
 
-                                              SeverityLevelName = s.Name,
-                                              SeverityLevelColor = s.Color,
+                                                SeverityLevelName = s.Name,
+                                                SeverityLevelColor = s.Color,
 
-                                              IncidentValidationCommunicationHistoriesViewModelList = _db.IncidentValidationCommunicationHistories
-                                                   .Where(ih => ih.IncidentId == i.IncidentId)
-                                                   .OrderByDescending(ih => ih.CreatedOn)
-                                                   .Select(ih => new IncidentValidationCommunicationHistoriesViewModel
-                                                   {
-                                                       UserName = ih.UserName,
-                                                       Message = ih.Message,
-                                                       TimeStamp = ih.TimeStamp,
-                                                       ReceipientsIds = ih.RecipientsIds,
-                                                       ImageUrl = ih.ImageUrl,
-                                                       MessageType = ih.MessageType
-                                                   })
-                                                   .ToList()
-                                          }).ToList() ?? new List<IncidentValidationsDetailsViewModel>();
+                                                IncidentValidationCommunicationHistoriesViewModelList = _db.IncidentValidationCommunicationHistories
+                                                     .Where(ih => ih.IncidentId == i.IncidentId)
+                                                     .OrderByDescending(ih => ih.CreatedOn)
+                                                     .Select(ih => new IncidentValidationCommunicationHistoriesViewModel
+                                                     {
+                                                         UserName = ih.UserName,
+                                                         Message = ih.Message,
+                                                         TimeStamp = ih.TimeStamp,
+                                                         ReceipientsIds = ih.RecipientsIds,
+                                                         ImageUrl = ih.ImageUrl,
+                                                         MessageType = ih.MessageType
+                                                     })
+                                                     .ToList()
+                                            }).ToList() ?? new List<IncidentValidationsDetailsViewModel>();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(
+                        ex,
+                        "IncidentValidations new columns missing; falling back to older projection (incidentId={IncidentId}).",
+                        id);
+
+                    incidentValidation = (from i in _db.IncidentValidations
+                                            join s in _db.SeverityLevels on i.ConfirmedSeverityLevelId equals s.Id
+                                            where i.IncidentId == id
+                                            select new IncidentValidationsDetailsViewModel
+                                            {
+                                                IncidentValidationId = i.Id,
+                                                ConfirmedSeverityLevelId = i.ConfirmedSeverityLevelId,
+                                                DiscoveryPerimeterId = i.DiscoveryPerimeterId,
+                                                ValidationNotes = i.ValidationNotes,
+                                                // Leave new dropdown values empty until migrations are applied.
+                                                ValidationDecision = string.Empty,
+                                                BasisForValidation = string.Empty,
+                                                CriticalCustomerPresent = string.Empty,
+                                                CreatedBy = i.UpdatedBy,
+                                                CreatedOn = i.UpdatedOn,
+
+                                                SeverityLevelName = s.Name,
+                                                SeverityLevelColor = s.Color,
+
+                                                IncidentValidationCommunicationHistoriesViewModelList = _db.IncidentValidationCommunicationHistories
+                                                     .Where(ih => ih.IncidentId == i.IncidentId)
+                                                     .OrderByDescending(ih => ih.CreatedOn)
+                                                     .Select(ih => new IncidentValidationCommunicationHistoriesViewModel
+                                                     {
+                                                         UserName = ih.UserName,
+                                                         Message = ih.Message,
+                                                         TimeStamp = ih.TimeStamp,
+                                                         ReceipientsIds = ih.RecipientsIds,
+                                                         ImageUrl = ih.ImageUrl,
+                                                         MessageType = ih.MessageType
+                                                     })
+                                                     .ToList()
+                                            }).ToList() ?? new List<IncidentValidationsDetailsViewModel>();
+                }
 
                 var incidentPolicies = await _db.IncidentValidationPolicies
                     .Where(ivp => ivp.IncidentId == id)
@@ -817,22 +876,106 @@ namespace Repositories.Common
                 #endregion
 
                 #region IncidentValidationGates
-                var validationGates = await _db.IncidentValidationGates
-                                         .AsNoTracking()
-                                         .Where(p => !p.IsDeleted && p.IncidentId == id)
-                                         .ToListAsync();
-
-                var validationGatesVM = validationGates.Select(p => new IncidentValidationGatesViewModel
+                List<IncidentValidationGate> validationGates;
+                List<IncidentValidationGatesViewModel> validationGatesVM;
+                try
                 {
-                    Id = p.Id,
-                    IncidentId = p.IncidentId,
-                    IncidentValidationId = p.IncidentValidationId,
-                    ContainmentAcknowledgement = p.ContainmentAcknowledgement.Value ? "FER Signed" : "No",
-                    Exception = p.Exception.Value ? "Yes" : "No",
-                    IndependentInspection = p.IndependentInspection.Value ? "Yes" : "No",
-                    Regulatory = GetRegulatory(p.Regulatory ?? string.Empty)
+                    // Project into a lightweight entity shape so we can selectively omit
+                    // the new column(s) when they aren't present in the DB yet.
+                    validationGates = await _db.IncidentValidationGates
+                        .AsNoTracking()
+                        .Where(p => !p.IsDeleted && p.IncidentId == id)
+                        .Select(p => new
+                        {
+                            p.Id,
+                            p.IncidentId,
+                            p.IncidentValidationId,
+                            p.ContainmentAcknowledgement,
+                            p.Exception,
+                            p.IndependentInspection,
+                            p.Regulatory,
+                            p.IsOtherEvent,
+                            p.OtherEventDetail,
+                            p.ContainmentStatus
+                        })
+                        .Select(p => new IncidentValidationGate
+                        {
+                            Id = p.Id,
+                            IncidentId = p.IncidentId,
+                            IncidentValidationId = p.IncidentValidationId,
+                            ContainmentAcknowledgement = p.ContainmentAcknowledgement,
+                            Exception = p.Exception,
+                            IndependentInspection = p.IndependentInspection,
+                            Regulatory = p.Regulatory,
+                            IsOtherEvent = p.IsOtherEvent,
+                            OtherEventDetail = p.OtherEventDetail,
+                            ContainmentStatus = p.ContainmentStatus
+                        })
+                        .ToListAsync();
 
-                }).ToList();
+                    validationGatesVM = validationGates.Select(p => new IncidentValidationGatesViewModel
+                        {
+                            Id = p.Id,
+                            IncidentId = p.IncidentId,
+                            IncidentValidationId = p.IncidentValidationId,
+                            ContainmentAcknowledgement = p.ContainmentAcknowledgement == true ? "FER Signed" : "No",
+                            Exception = p.Exception == true ? "Yes" : "No",
+                            IndependentInspection = p.IndependentInspection == true ? "Yes" : "No",
+                            ContainmentStatus = p.ContainmentStatus ?? string.Empty,
+                            Regulatory = GetRegulatory(p.Regulatory ?? string.Empty)
+                        })
+                        .ToList();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(
+                        ex,
+                        "IncidentValidationGates new columns missing; falling back to older gate projection (incidentId={IncidentId}).",
+                        id);
+
+                    validationGates = await _db.IncidentValidationGates
+                        .AsNoTracking()
+                        .Where(p => !p.IsDeleted && p.IncidentId == id)
+                        .Select(p => new
+                        {
+                            p.Id,
+                            p.IncidentId,
+                            p.IncidentValidationId,
+                            p.ContainmentAcknowledgement,
+                            p.Exception,
+                            p.IndependentInspection,
+                            p.Regulatory,
+                            p.IsOtherEvent,
+                            p.OtherEventDetail
+                        })
+                        .Select(p => new IncidentValidationGate
+                        {
+                            Id = p.Id,
+                            IncidentId = p.IncidentId,
+                            IncidentValidationId = p.IncidentValidationId,
+                            ContainmentAcknowledgement = p.ContainmentAcknowledgement,
+                            Exception = p.Exception,
+                            IndependentInspection = p.IndependentInspection,
+                            Regulatory = p.Regulatory,
+                            IsOtherEvent = p.IsOtherEvent,
+                            OtherEventDetail = p.OtherEventDetail,
+                            ContainmentStatus = string.Empty
+                        })
+                        .ToListAsync();
+
+                    validationGatesVM = validationGates.Select(p => new IncidentValidationGatesViewModel
+                        {
+                            Id = p.Id,
+                            IncidentId = p.IncidentId,
+                            IncidentValidationId = p.IncidentValidationId,
+                            ContainmentAcknowledgement = p.ContainmentAcknowledgement == true ? "FER Signed" : "No",
+                            Exception = p.Exception == true ? "Yes" : "No",
+                            IndependentInspection = p.IndependentInspection == true ? "Yes" : "No",
+                            ContainmentStatus = p.ContainmentStatus ?? string.Empty,
+                            Regulatory = GetRegulatory(p.Regulatory ?? string.Empty)
+                        })
+                        .ToList();
+                }
                 #endregion
 
                 #region IncidentAdditionalLocation
@@ -859,15 +1002,38 @@ namespace Repositories.Common
 
                 if (validationAdditionalLocation != null)
                 {
+                    var confirmedSev = severityLevels
+                        .FirstOrDefault(s => s.Id == validationAdditionalLocation.ConfirmedSeverityLevelId);
                     validationAdditionalLocationVM = new IncidentValidationLocationViewModel
                     {
                         DiscoveryPerimeter = validationAdditionalLocation.DiscoveryPerimeterId,
+                        DiscoveryPerimeterName = GetPerimeter(validationAdditionalLocation.DiscoveryPerimeterId),
                         ICPLocation = validationAdditionalLocation.ICPLocation ?? string.Empty,
                         LocationId = validationAdditionalLocation.AdditionalLocationId,
                         SeverityID = validationAdditionalLocation.ConfirmedSeverityLevelId,
                         Source = validationAdditionalLocation.Source ?? string.Empty,
-                        SeverityName = severityLevels
-                            .FirstOrDefault(s => s.Id == validationAdditionalLocation.ConfirmedSeverityLevelId)?.Name
+                        Lat = (float)(validationAdditionalLocation.Lat ?? 0),
+                        Lon = (float)(validationAdditionalLocation.Lng ?? 0),
+                        SeverityName = confirmedSev?.Name ?? string.Empty,
+                        SeverityColor = confirmedSev?.Color ?? string.Empty
+                    };
+                }
+                else
+                {
+                    // If validation location row doesn't exist yet, fall back to the core incident fields
+                    // so the Validation tab can still show ICP location/map + incident severity.
+                    validationAdditionalLocationVM = new IncidentValidationLocationViewModel
+                    {
+                        DiscoveryPerimeter = 0,
+                        DiscoveryPerimeterName = string.Empty,
+                        ICPLocation = incident.LocationAddress ?? string.Empty,
+                        LocationId = null,
+                        SeverityID = incident.SeverityLevelId,
+                        Source = string.Empty,
+                        Lat = (float)incident.Lat,
+                        Lon = (float)incident.Lng,
+                        SeverityName = incident.SeverityLevel?.Name ?? string.Empty,
+                        SeverityColor = incident.SeverityLevel?.Color ?? string.Empty
                     };
                 }
                 #endregion
@@ -968,9 +1134,11 @@ namespace Repositories.Common
 
                 var severityLevelsTask = await _db.SeverityLevels
                                    .Where(it => !it.IsDeleted)
-                                   .OrderBy(it => it.Name == "High" ? 1 :
-                                                  it.Name == "Moderate" ? 2 :
-                                                  it.Name == "Low" ? 3 : 4)
+                                   .OrderBy(it => it.Name == "Severe" ? 1 :
+                                                  it.Name == "High" ? 2 :
+                                                  it.Name == "Moderate" ? 3 :
+                                                  it.Name == "Low" ? 4 :
+                                                  it.Name == "Non-Incident" ? 5 : 99)
                                    .Select(it => new SelectListItem
                                    {
                                        Value = it.Id.ToString(),
@@ -1077,6 +1245,7 @@ namespace Repositories.Common
                     {
                         CallerName = incident.CallerName ?? string.Empty,
                         CallerPhoneNumber = incident.CallerPhoneNumber ?? string.Empty,
+                        CallerPhoneNumberType = ParseCallerPhoneNumberType(incident.CallerPhoneNumberTypes),
                         CallerAddress = incident.CallerAddress ?? string.Empty,
                         CallTime = incident.CallTime,
                         RelationshipId = incident.RelationshipId,
@@ -1137,6 +1306,9 @@ namespace Repositories.Common
                         DiscoveryPerimeterId = incidentValidation.FirstOrDefault() != null ? incidentValidation.FirstOrDefault().DiscoveryPerimeterId : 0,
                         DiscoveryPerimeterName = GetPerimeter(incidentValidation.FirstOrDefault()?.DiscoveryPerimeterId),
                         ValidationNotes = incidentValidation.FirstOrDefault()?.ValidationNotes,
+                        ValidationDecision = incidentValidation.FirstOrDefault()?.ValidationDecision ?? string.Empty,
+                        BasisForValidation = incidentValidation.FirstOrDefault()?.BasisForValidation ?? string.Empty,
+                        CriticalCustomerPresent = incidentValidation.FirstOrDefault()?.CriticalCustomerPresent ?? string.Empty,
                         CreatedBy = incidentValidation.FirstOrDefault() != null ? incidentValidation.FirstOrDefault().CreatedBy : 0,
                         CreatedDateInFormat = GetDate(Convert.ToString(incidentValidation.FirstOrDefault()?.CreatedOn)),
                         CreatedTimeInFormat = GetTime(Convert.ToString(incidentValidation.FirstOrDefault()?.CreatedOn)),
@@ -1153,6 +1325,41 @@ namespace Repositories.Common
 
                     //IncidentValidationLocations = validationAdditionalLocationVM ?? new List<IncidentValidationLocationViewModel>(),
                     IncidentValidationLocations = validationAdditionalLocationVM ?? new IncidentValidationLocationViewModel(),
+
+                    // Populate IVValidation for edit-mode bindings in the Incident Details page
+                    IVValidation = new IncidentValidationViewModel
+                    {
+                        severityLevelId = incidentValidation.FirstOrDefault()?.ConfirmedSeverityLevelId ?? 0,
+                        RadiusId = incidentValidation.FirstOrDefault()?.DiscoveryPerimeterId ?? 0,
+                        IncidentLocation = validationAdditionalLocationVM?.ICPLocation ?? string.Empty,
+                        Source = validationAdditionalLocationVM?.Source ?? string.Empty,
+                        Lat = validationAdditionalLocationVM?.Lat ?? 0,
+                        Long = validationAdditionalLocationVM?.Lon ?? 0,
+
+                        ValidationDecision = incidentValidation.FirstOrDefault()?.ValidationDecision ?? string.Empty,
+                        BasisForValidation = incidentValidation.FirstOrDefault()?.BasisForValidation ?? string.Empty,
+                        CriticalCustomerPresent = incidentValidation.FirstOrDefault()?.CriticalCustomerPresent ?? string.Empty,
+                        ImpactScope = incident.ImpactScope ?? string.Empty,
+
+                        assignedRole = new IncidentValidationAssignedRoleViewModel
+                        {
+                            IncidentCommanderId = IncidentValidationAssignedRoles.FirstOrDefault()?.IncidentCommanderId,
+                            FieldEnvRepId = IncidentValidationAssignedRoles.FirstOrDefault()?.FieldEnvRepId,
+                            GECCoordinatorId = IncidentValidationAssignedRoles.FirstOrDefault()?.GEC_CoordinatorId,
+                            EngineeringLeadId = IncidentValidationAssignedRoles.FirstOrDefault()?.EngineeringLeadId
+                        },
+
+                        validationGates = new IncidentValidationValidationGatesViewModel
+                        {
+                            ContainmentAcknowledgement = validationGates.FirstOrDefault()?.ContainmentAcknowledgement ?? false,
+                            Exception = validationGates.FirstOrDefault()?.Exception ?? false,
+                            IndependentInspection = validationGates.FirstOrDefault()?.IndependentInspection ?? false,
+                            Regulatory = validationGates.FirstOrDefault()?.Regulatory ?? string.Empty,
+                            IsOtherEvent = validationGates.FirstOrDefault()?.IsOtherEvent ?? false,
+                            OtherEventDetail = validationGates.FirstOrDefault()?.OtherEventDetail ?? string.Empty,
+                            ContainmentStatus = validationGates.FirstOrDefault()?.ContainmentStatus ?? string.Empty
+                        }
+                    },
 
                     #region Personnel
                     incidentValidationPersonnelsViewModel = IncidentValidationPersonnels,
@@ -1494,7 +1701,6 @@ namespace Repositories.Common
             {
 
                 var statusList = await _db.Progress
-                    .Where(p => !p.IsDeleted)
                     .ToDictionaryAsync(p => p.Id, p => p.Name);
 
                 var roleList = await _db.IncidentRoles
@@ -1582,7 +1788,7 @@ namespace Repositories.Common
                 if (task == null)
                     return new IncidentAssessmentEditViewModel();
 
-                var statusList = await _db.Progress.Where(p => !p.IsDeleted).ToDictionaryAsync(p => p.Id, p => p.Name);
+                var statusList = await _db.Progress.ToDictionaryAsync(p => p.Id, p => p.Name);
                 var rolesList = await _db.IncidentRoles.Where(it => !it.IsDeleted).ToDictionaryAsync(p => p.Id, p => p.Name);
                 var firstRoleId = (task.RoleIds ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).FirstOrDefault();
                 long? assigneeId = long.TryParse(firstRoleId, out var rid) ? rid : (long?)null;
@@ -1646,7 +1852,7 @@ namespace Repositories.Common
                 if (task == null)
                     return new IncidentAssessmentReadViewModel();
 
-                var statusList = await _db.Progress.Where(p => !p.IsDeleted).ToDictionaryAsync(p => p.Id, p => p.Name);
+                var statusList = await _db.Progress.ToDictionaryAsync(p => p.Id, p => p.Name);
                 var roles = await _db.IncidentRoles.Where(p => !p.IsDeleted).ToListAsync();
                 var statusName = task.StatusId.HasValue ? statusList.GetValueOrDefault(task.StatusId.Value) : "";
                 var assignee = (task.RoleIds ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries)
@@ -1848,6 +2054,33 @@ namespace Repositories.Common
         }
 
         #region private methods
+        private static string? SerializeCallerPhoneNumberType(string? type)
+        {
+            if (string.IsNullOrWhiteSpace(type))
+                return null;
+            return JsonSerializer.Serialize(new List<string> { type.Trim() });
+        }
+
+        private static string? ParseCallerPhoneNumberType(string? stored)
+        {
+            if (string.IsNullOrWhiteSpace(stored))
+                return null;
+            try
+            {
+                var list = JsonSerializer.Deserialize<List<string>>(stored);
+                var v = list?.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
+                if (!string.IsNullOrEmpty(v))
+                    return v;
+            }
+            catch
+            {
+                // fall through — may be a legacy plain value
+            }
+
+            var trimmed = stored.Trim();
+            return trimmed is "Mobile" or "Home" or "Office" ? trimmed : null;
+        }
+
         private bool TryParseCallTime(string callTime, out DateTime dateTime)
         {
             return DateTime.TryParse(callTime, out dateTime);
@@ -2130,12 +2363,14 @@ namespace Repositories.Common
             try
             {
                 var statuses = await _db.Progress
-                    .Where(s => !s.IsDeleted)
+                    // Some rows (e.g., "Not Started") can be marked IsDeleted=1 in DB
+                    // but still need to show up in the UI dropdowns.
                     .Select(s => new IncidentViewModel.ProgressStatusViewModel
                     {
                         StatusId = s.Id,
                         StatusName = s.Name
                     })
+                    .OrderBy(s => s.StatusId)
                     .ToListAsync();
 
                 return statuses;
@@ -2594,6 +2829,8 @@ namespace Repositories.Common
             // lookup tables
             var roles = await _db.IncidentRoles.AsNoTracking().ToListAsync();
             var statuses = await _db.Progress.AsNoTracking().ToListAsync(); // status table
+            var users = await _db.IncidentUsers.AsNoTracking().ToListAsync();
+            var userNames = users.ToDictionary(u => u.Id, u => $"{(u.FirstName ?? string.Empty).Trim()} {(u.LastName ?? string.Empty).Trim()}".Trim());
 
             // tasks table (columns shown in your screenshot)
             var tasks = await _db.IncidentValidationTasks
@@ -2612,6 +2849,8 @@ namespace Repositories.Common
                     RoleIds = x.RoleIds,
                     StatusId = x.StatusId,
                     CreatedOn = x.CreatedOn,
+                    UpdatedOn = x.UpdatedOn,
+                    UpdatedBy = x.UpdatedBy,
                     //StartTime = x.StartTime,
                     // x.ComplateTime,
                     x.ImageUrls,
@@ -2650,7 +2889,13 @@ namespace Repositories.Common
                     ImageCount = string.IsNullOrWhiteSpace(p?.ImageUrls ?? string.Empty)
                         ? 0
                         : p.ImageUrls.Split(',', StringSplitOptions.RemoveEmptyEntries).Length,
-                    Notes = p?.Notes ?? string.Empty
+                    Notes = p?.Notes ?? string.Empty,
+                    LastUpdated = p.UpdatedOn == default(DateTime)
+                        ? "--"
+                        : p.UpdatedOn.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt"),
+                    UpdatedBy = userNames.TryGetValue(p.UpdatedBy, out var updatedByName) && !string.IsNullOrWhiteSpace(updatedByName)
+                        ? updatedByName
+                        : p.UpdatedBy.ToString()
                 };
             }).ToList();
         }
@@ -2699,12 +2944,14 @@ namespace Repositories.Common
         {
             var roles = await _db.IncidentRoles.AsNoTracking().ToListAsync();
             var statuses = await _db.Progress.AsNoTracking().ToListAsync();
+            var users = await _db.IncidentUsers.AsNoTracking().ToListAsync();
+            var userNames = users.ToDictionary(u => u.Id, u => $"{(u.FirstName ?? string.Empty).Trim()} {(u.LastName ?? string.Empty).Trim()}".Trim());
             var tasks = await _db.IncidentValidationAssessmentTasks
                 .AsNoTracking()
                 .Where(t => !t.IsDeleted && t.IncidentId == incidentId)
                 .OrderBy(t => t.SortOrder)
                 .ToListAsync();
-            return MapTasksToViewModel(tasks, roles, statuses);
+            return MapTasksToViewModel(tasks, roles, statuses, userNames);
         }
 
         public async Task<IncidentViewTaskListViewModel> AddAssessmentTaskAsync(AddIncidentTaskRequest request)
@@ -2731,12 +2978,14 @@ namespace Repositories.Common
         {
             var roles = await _db.IncidentRoles.AsNoTracking().ToListAsync();
             var statuses = await _db.Progress.AsNoTracking().ToListAsync();
+            var users = await _db.IncidentUsers.AsNoTracking().ToListAsync();
+            var userNames = users.ToDictionary(u => u.Id, u => $"{(u.FirstName ?? string.Empty).Trim()} {(u.LastName ?? string.Empty).Trim()}".Trim());
             var tasks = await _db.IncidentValidationRepairTasks
                 .AsNoTracking()
                 .Where(t => !t.IsDeleted && t.IncidentId == incidentId)
                 .OrderBy(t => t.SortOrder)
                 .ToListAsync();
-            return MapRepairTasksToViewModel(tasks, roles, statuses);
+            return MapRepairTasksToViewModel(tasks, roles, statuses, userNames);
         }
 
         public async Task<IncidentViewTaskListViewModel> AddRepairTaskAsync(AddIncidentTaskRequest request)
@@ -2762,7 +3011,8 @@ namespace Repositories.Common
         private static List<IncidentViewTaskListViewModel> MapTasksToViewModel(
             List<IncidentValidationAssessmentTask> tasks,
             List<IncidentRole> roles,
-            List<Progress> statuses)
+            List<Progress> statuses,
+            Dictionary<long, string> userNames)
         {
             return tasks.Select(x =>
             {
@@ -2779,7 +3029,13 @@ namespace Repositories.Common
                     Status = string.IsNullOrWhiteSpace(statusName) ? "Pending" : statusName,
                     ImagesUrl = x?.ImageUrls ?? "",
                     ImageCount = string.IsNullOrWhiteSpace(x?.ImageUrls) ? 0 : x.ImageUrls.Split(',', StringSplitOptions.RemoveEmptyEntries).Length,
-                    Notes = x?.Notes ?? ""
+                    Notes = x?.Notes ?? "",
+                    LastUpdated = x.UpdatedOn == default(DateTime)
+                        ? "--"
+                        : x.UpdatedOn.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt"),
+                    UpdatedBy = userNames.TryGetValue(x.UpdatedBy, out var updatedByName) && !string.IsNullOrWhiteSpace(updatedByName)
+                        ? updatedByName
+                        : x.UpdatedBy.ToString()
                 };
             }).ToList();
         }
@@ -2787,7 +3043,8 @@ namespace Repositories.Common
         private static List<IncidentViewTaskListViewModel> MapRepairTasksToViewModel(
             List<IncidentValidationRepairTask> tasks,
             List<IncidentRole> roles,
-            List<Progress> statuses)
+            List<Progress> statuses,
+            Dictionary<long, string> userNames)
         {
             return tasks.Select(x =>
             {
@@ -2804,7 +3061,13 @@ namespace Repositories.Common
                     Status = string.IsNullOrWhiteSpace(statusName) ? "Pending" : statusName,
                     ImagesUrl = x?.ImageUrls ?? "",
                     ImageCount = string.IsNullOrWhiteSpace(x?.ImageUrls) ? 0 : x.ImageUrls.Split(',', StringSplitOptions.RemoveEmptyEntries).Length,
-                    Notes = x?.Notes ?? ""
+                    Notes = x?.Notes ?? "",
+                    LastUpdated = x.UpdatedOn == default(DateTime)
+                        ? "--"
+                        : x.UpdatedOn.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt"),
+                    UpdatedBy = userNames.TryGetValue(x.UpdatedBy, out var updatedByName) && !string.IsNullOrWhiteSpace(updatedByName)
+                        ? updatedByName
+                        : x.UpdatedBy.ToString()
                 };
             }).ToList();
         }
@@ -2813,6 +3076,8 @@ namespace Repositories.Common
         {
             var roles = await _db.IncidentRoles.ToListAsync();
             var statuses = await _db.Progress.ToListAsync();
+            var users = await _db.IncidentUsers.AsNoTracking().ToListAsync();
+            var userNames = users.ToDictionary(u => u.Id, u => $"{(u.FirstName ?? string.Empty).Trim()} {(u.LastName ?? string.Empty).Trim()}".Trim());
             var roleNames = (entity.RoleIds ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries)
                 .Select(s => long.TryParse(s.Trim(), out var id) ? roles.FirstOrDefault(r => r.Id == id)?.Name : null).Where(n => !string.IsNullOrEmpty(n));
             var statusName = entity.StatusId.HasValue ? statuses.FirstOrDefault(s => s.Id == entity.StatusId.Value)?.Name : null;
@@ -2824,7 +3089,13 @@ namespace Repositories.Common
                 Task = entity.TaskDescription,
                 FieldValue = roleNames.Any() ? string.Join(" / ", roleNames) : "—",
                 Status = string.IsNullOrWhiteSpace(statusName) ? "Not Started" : statusName,
-                Attachment = null
+                Attachment = null,
+                LastUpdated = entity.UpdatedOn == default(DateTime)
+                    ? "--"
+                    : entity.UpdatedOn.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt"),
+                UpdatedBy = userNames.TryGetValue(entity.UpdatedBy, out var updatedByName) && !string.IsNullOrWhiteSpace(updatedByName)
+                    ? updatedByName
+                    : entity.UpdatedBy.ToString()
             };
         }
 
@@ -2832,6 +3103,8 @@ namespace Repositories.Common
         {
             var roles = await _db.IncidentRoles.ToListAsync();
             var statuses = await _db.Progress.ToListAsync();
+            var users = await _db.IncidentUsers.AsNoTracking().ToListAsync();
+            var userNames = users.ToDictionary(u => u.Id, u => $"{(u.FirstName ?? string.Empty).Trim()} {(u.LastName ?? string.Empty).Trim()}".Trim());
             var roleNames = (entity.RoleIds ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries)
                 .Select(s => long.TryParse(s.Trim(), out var id) ? roles.FirstOrDefault(r => r.Id == id)?.Name : null).Where(n => !string.IsNullOrEmpty(n));
             var statusName = entity.StatusId.HasValue ? statuses.FirstOrDefault(s => s.Id == entity.StatusId.Value)?.Name : null;
@@ -2843,7 +3116,13 @@ namespace Repositories.Common
                 Task = entity.TaskDescription,
                 FieldValue = roleNames.Any() ? string.Join(" / ", roleNames) : "—",
                 Status = string.IsNullOrWhiteSpace(statusName) ? "Not Started" : statusName,
-                Attachment = null
+                Attachment = null,
+                LastUpdated = entity.UpdatedOn == default(DateTime)
+                    ? "--"
+                    : entity.UpdatedOn.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt"),
+                UpdatedBy = userNames.TryGetValue(entity.UpdatedBy, out var updatedByName) && !string.IsNullOrWhiteSpace(updatedByName)
+                    ? updatedByName
+                    : entity.UpdatedBy.ToString()
             };
         }
 
@@ -2862,7 +3141,6 @@ namespace Repositories.Common
                 var roles = await _db.IncidentRoles.Where(p => !p.IsDeleted).AsNoTracking().ToListAsync() ?? new List<IncidentRole>();
 
                 var statusList = await _db.Progress
-                                .Where(p => !p.IsDeleted)
                                 .ToDictionaryAsync(p => p.Id, p => p.Name) ?? new Dictionary<long, string>();
 
 
@@ -2932,6 +3210,9 @@ namespace Repositories.Common
                 //details.StartTime = ParseTime(request?.Started ?? string.Empty);
                 //details.ComplateTime = ParseTime(request?.Completed ?? string.Empty);
                 details.Notes = request?.Description;
+                var userId = _httpContextAccessor?.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userIdParsed = !string.IsNullOrEmpty(userId) && long.TryParse(userId, out var parsed) ? parsed : 0L;
+                details.UpdatedBy = userIdParsed;
                 details.UpdatedOn = DateTime.UtcNow; // optional if you track update time
 
                 try
@@ -3012,7 +3293,6 @@ namespace Repositories.Common
                     .ToListAsync() ?? new List<IncidentRole>();
 
                 var statusList = await _db.Progress
-                    .Where(p => !p.IsDeleted)
                     .ToDictionaryAsync(p => p.Id, p => p.Name) ?? new Dictionary<long, string>();
 
                 editViewModel = new IncidentEditTaskListViewModel
@@ -3065,7 +3345,6 @@ namespace Repositories.Common
                     .ToListAsync() ?? new List<IncidentRole>();
 
                 var statusList = await _db.Progress
-                    .Where(p => !p.IsDeleted)
                     .ToDictionaryAsync(p => p.Id, p => p.Name) ?? new Dictionary<long, string>();
 
                 editViewModel = new IncidentEditTaskListViewModel
@@ -3119,6 +3398,9 @@ namespace Repositories.Common
                 details.StatusId = request?.StatusId ?? 0;
                 details.ImageUrls = request?.ImageUrl ?? string.Empty;
                 details.Notes = request?.Description ?? string.Empty;
+                var userId = _httpContextAccessor?.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userIdParsed = !string.IsNullOrEmpty(userId) && long.TryParse(userId, out var parsed) ? parsed : 0L;
+                details.UpdatedBy = userIdParsed;
                 details.UpdatedOn = DateTime.UtcNow;
 
                 try
@@ -3157,6 +3439,9 @@ namespace Repositories.Common
                 details.StatusId = request?.StatusId ?? 0;
                 details.ImageUrls = request?.ImageUrl ?? string.Empty;
                 details.Notes = request?.Description ?? string.Empty;
+                var userId = _httpContextAccessor?.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userIdParsed = !string.IsNullOrEmpty(userId) && long.TryParse(userId, out var parsed) ? parsed : 0L;
+                details.UpdatedBy = userIdParsed;
                 details.UpdatedOn = DateTime.UtcNow;
 
                 try
@@ -3356,7 +3641,6 @@ namespace Repositories.Common
                 var roles = await _db.IncidentRoles.Where(p => !p.IsDeleted).AsNoTracking().ToListAsync() ?? new List<IncidentRole>();
 
                 var statusList = await _db.Progress
-                                .Where(p => !p.IsDeleted)
                                 .ToDictionaryAsync(p => p.Id, p => p.Name) ?? new Dictionary<long, string>();
 
 
@@ -3400,6 +3684,11 @@ namespace Repositories.Common
             // lookup tables
             var roles = await _db.IncidentRoles.AsNoTracking().ToListAsync();
             var statuses = await _db.Progress.AsNoTracking().ToListAsync(); // status table
+            var users = await _db.IncidentUsers.AsNoTracking().ToListAsync();
+            var userNames = users.ToDictionary(
+                u => u.Id,
+                u => $"{(u.FirstName ?? string.Empty).Trim()} {(u.LastName ?? string.Empty).Trim()}".Trim()
+            );
 
             try
             {
@@ -3420,6 +3709,8 @@ namespace Repositories.Common
                         RoleIds = x.Role,
                         StatusId = x.Status,
                         CreatedOn = x.CreatedOn,
+                        UpdatedOn = x.UpdatedOn,
+                        UpdatedBy = x.UpdatedBy,
                         StartTime = x.StartTime,
                         x.ComplateTime,
                         x.ImageUrls,
@@ -3461,7 +3752,13 @@ namespace Repositories.Common
                         ImageCount = string.IsNullOrWhiteSpace(p?.ImageUrls ?? string.Empty)
             ? 0
             : p.ImageUrls.Split(',', StringSplitOptions.RemoveEmptyEntries).Length,
-                        Notes = p?.Notes ?? string.Empty
+                        Notes = p?.Notes ?? string.Empty,
+                        LastUpdated = p.UpdatedOn == default(DateTime)
+                            ? "--"
+                            : p.UpdatedOn.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt"),
+                        UpdatedBy = userNames.TryGetValue(p.UpdatedBy, out var updatedByName) && !string.IsNullOrWhiteSpace(updatedByName)
+                            ? updatedByName
+                            : p.UpdatedBy.ToString()
                     };
 
                 }).ToList();
@@ -3497,6 +3794,9 @@ namespace Repositories.Common
                 //details.StartTime = ParseTime(request?.Started ?? string.Empty);
                 // details.ComplateTime = ParseTime(request?.Completed ?? string.Empty);
                 details.Notes = request?.Description;
+                var userId = _httpContextAccessor?.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userIdParsed = !string.IsNullOrEmpty(userId) && long.TryParse(userId, out var parsed) ? parsed : 0L;
+                details.UpdatedBy = userIdParsed;
                 details.UpdatedOn = DateTime.UtcNow; // optional if you track update time
 
                 try
@@ -3800,7 +4100,11 @@ namespace Repositories.Common
             {
                 var severityLevels = await _db.SeverityLevels
                     .Where(s => !s.IsDeleted)
-                    .OrderBy(s => s.Name == "High" ? 1 : s.Name == "Moderate" ? 2 : s.Name == "Low" ? 3 : 4)
+                    .OrderBy(s => s.Name == "Severe" ? 1 :
+                                  s.Name == "High" ? 2 :
+                                  s.Name == "Moderate" ? 3 :
+                                  s.Name == "Low" ? 4 :
+                                  s.Name == "Non-Incident" ? 5 : 99)
                     .Select(s => new SeverityLevelModifyViewModel
                     {
                         Id = s.Id,
@@ -3848,6 +4152,27 @@ namespace Repositories.Common
                     validationLocation.DiscoveryPerimeterId = request.DiscoveryPerimeterId;
                     validationLocation.ICPLocation = request.ICPLocation;
                     validationLocation.UpdatedOn = DateTime.UtcNow;
+                }
+
+                // Cards read confirmed severity from IncidentValidations when present; keep that row in sync with this edit.
+                IncidentValidation incidentValidation = null;
+                if (request.IncidentValidationId.HasValue && request.IncidentValidationId.Value > 0)
+                {
+                    incidentValidation = await _db.IncidentValidations
+                        .FirstOrDefaultAsync(v => !v.IsDeleted && v.Id == request.IncidentValidationId.Value);
+                }
+                if (incidentValidation == null)
+                {
+                    incidentValidation = await _db.IncidentValidations
+                        .FirstOrDefaultAsync(v => !v.IsDeleted && v.IncidentId == request.IncidentId);
+                }
+                if (incidentValidation != null)
+                {
+                    if (request.SeverityLevelId.HasValue)
+                        incidentValidation.ConfirmedSeverityLevelId = request.SeverityLevelId.Value;
+                    if (request.DiscoveryPerimeterId.HasValue)
+                        incidentValidation.DiscoveryPerimeterId = request.DiscoveryPerimeterId.Value;
+                    incidentValidation.UpdatedOn = DateTime.UtcNow;
                 }
 
                 await _db.SaveChangesAsync();
@@ -4084,6 +4409,23 @@ namespace Repositories.Common
             }
         }
         #endregion
+
+        private static DateTime GetDefaultCallerCallTimeUsPacific()
+        {
+            try
+            {
+                var tzId = OperatingSystem.IsWindows()
+                    ? "Pacific Standard Time"
+                    : "America/Los_Angeles";
+                var tz = TimeZoneInfo.FindSystemTimeZoneById(tzId);
+                var pacific = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tz);
+                return new DateTime(pacific.Year, pacific.Month, pacific.Day, pacific.Hour, pacific.Minute, 0, DateTimeKind.Unspecified);
+            }
+            catch
+            {
+                return DateTime.UtcNow;
+            }
+        }
 
     }
 }

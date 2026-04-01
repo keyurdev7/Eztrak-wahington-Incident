@@ -1,4 +1,4 @@
-﻿using Models.Models.Shared;
+using Models.Models.Shared;
 
 using System;
 using System.Collections.Generic;
@@ -19,5 +19,10 @@ namespace Models
         public string AssignResponseTeams { get; set; }
         public string ValidationNotes { get; set; }
         public bool IsMarkFalseAlarm { get; set; }
+
+        // Validation workflow metadata (persisted from dropdowns)
+        public string? ValidationDecision { get; set; }
+        public string? BasisForValidation { get; set; }
+        public string? CriticalCustomerPresent { get; set; }
     }
 }

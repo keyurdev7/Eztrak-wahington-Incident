@@ -167,12 +167,18 @@ $(function () {
         showLoader($("#updateIncidentRestorationModal"));
 
         e.preventDefault();
+        const selectedStatus = document.querySelector('input[name="restorationStatusAction"]:checked');
+        if (!selectedStatus || !selectedStatus.value) {
+            SwalErrorAlert("Please select a status action: Mark Complete or Mark N/A.");
+            hideLoader($("#updateIncidentRestorationModal"));
+            return;
+        }
 
         const formData = new FormData();
 
         // Collect basic fields
         formData.append("Id", document.getElementById("restorationId").value);
-        formData.append("StatusId", document.getElementById("status").value);
+        formData.append("StatusId", selectedStatus.value);
         formData.append("RoleIds", document.getElementById("hdn_UpdateResortationRole").value);
         //formData.append("Started", document.getElementById("startedTime").value);
         // formData.append("Completed", document.getElementById("completedTime").value);
@@ -266,12 +272,18 @@ $(function () {
         showLoader($("#updateIncidentCloseOutModal"));
 
         e.preventDefault();
+        const selectedStatus = document.querySelector('input[name="closeoutStatusAction"]:checked');
+        if (!selectedStatus || !selectedStatus.value) {
+            SwalErrorAlert("Please select a status action: Mark Complete or Mark N/A.");
+            hideLoader($("#updateIncidentCloseOutModal"));
+            return;
+        }
 
         const formData = new FormData();
 
         // Collect basic fields
         formData.append("Id", document.getElementById("CloseOutId").value);
-        formData.append("StatusId", document.getElementById("status").value);
+        formData.append("StatusId", selectedStatus.value);
         formData.append("RoleIds", document.getElementById("hdn_UpdateCloseOutRole").value);
         //formData.append("Started", document.getElementById("startedTime").value);
         //formData.append("Completed", document.getElementById("completedTime").value);
@@ -1212,7 +1224,7 @@ function updateAssessmentSummaryFromDom() {
     const total = $rows.length;
     let completed = 0;
     $rows.each(function () {
-        const status = ($(this).find("td:nth-child(3) .status-badge").text() || "").trim().toLowerCase();
+        const status = ($(this).find("td:nth-child(1) .status-text").text() || "").trim().toLowerCase();
         if (status === "complete") completed++;
     });
     const open = total - completed;
@@ -1230,7 +1242,7 @@ function updateRepairSummaryFromDom() {
     const total = $rows.length;
     let completed = 0;
     $rows.each(function () {
-        const status = ($(this).find("td:nth-child(3) .status-badge").text() || "").trim().toLowerCase();
+        const status = ($(this).find("td:nth-child(1) .status-text").text() || "").trim().toLowerCase();
         if (status === "complete") completed++;
     });
     const open = total - completed;
@@ -1248,7 +1260,7 @@ function updateRestorationSummaryFromDom() {
     const total = $rows.length;
     let completed = 0;
     $rows.each(function () {
-        const status = ($(this).find("td:nth-child(3) .status-badge").text() || "").trim().toLowerCase();
+        const status = ($(this).find("td:nth-child(1) .status-text").text() || "").trim().toLowerCase();
         if (status === "complete") completed++;
     });
     const open = total - completed;
@@ -1266,7 +1278,7 @@ function updateCloseoutSummaryFromDom() {
     const total = $rows.length;
     let completed = 0;
     $rows.each(function () {
-        const status = ($(this).find("td:nth-child(3) .status-badge").text() || "").trim().toLowerCase();
+        const status = ($(this).find("td:nth-child(1) .status-text").text() || "").trim().toLowerCase();
         if (status === "complete") completed++;
     });
     const open = total - completed;

@@ -1,4 +1,8 @@
 @model ViewModels.Incident.IncidentEditTaskListViewModel
+@{
+    var completeStatusId = Model.StatusList?.FirstOrDefault(s => string.Equals((s.Text ?? string.Empty).Trim(), "Complete", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
+    var naStatusId = Model.StatusList?.FirstOrDefault(s => string.Equals((s.Text ?? string.Empty).Trim(), "N/A", StringComparison.OrdinalIgnoreCase) || string.Equals((s.Text ?? string.Empty).Trim(), "NA", StringComparison.OrdinalIgnoreCase))?.Value ?? "";
+}
 
 <div class="modal fade" id="updateIncidentRepairModal" tabindex="-1" aria-labelledby="updateRepairTaskModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -16,65 +20,31 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label">Task</label>
-                                <textarea class="form-control" id="repairTask" rows="3" asp-for="@Model.Task" placeholder="Enter task description"></textarea>
+                                <textarea class="form-control" id="repairTask" rows="3" asp-for="@Model.Task" readonly></textarea>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Status</label>
-                                <select class="form-select" id="repairStatus" asp-for="@Model.StatusId">
-                                    <option value="">Select status</option>
-                                    @foreach (var item in Model.StatusList)
-                                    {
-                                        if (Model.StatusId == null)
-                                        {
-                                            if (item.Text == "Not Started")
-                                            {
-                                                <option value="@item.Value" selected>@item.Text</option>
-                                            }
-                                            else
-                                            {
-                                                <option value="@item.Value">@item.Text</option>
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (item.Value == Model.StatusId.ToString())
-                                            {
-                                                <option value="@item.Value" selected>@item.Text</option>
-                                            }
-                                            else
-                                            {
-                                                <option value="@item.Value">@item.Text</option>
-                                            }
-                                        }
-                                    }
-                                </select>
+                                <div class="d-flex gap-4 align-items-center py-1">
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" type="radio" name="repairStatusAction" id="repairMarkComplete" value="@completeStatusId">
+                                        <label class="form-check-label" for="repairMarkComplete">Mark Complete</label>
+                                    </div>
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" type="radio" name="repairStatusAction" id="repairMarkNa" value="@naStatusId">
+                                        <label class="form-check-label" for="repairMarkNa">Mark N/A</label>
+                                    </div>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Notes</label>
-                                <textarea class="form-control" id="repairDescription" rows="3" asp-for="@Model.Description" placeholder="Enter description or notes"></textarea>
+                                <textarea class="form-control" id="repairDescription" rows="3" asp-for="@Model.Description" readonly></textarea>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3" id="div_UpdateRepairRole">
                                 <input type="hidden" id="hdn_UpdateRepairRole" asp-for="@Model.RoleIds" name="RoleIds" />
                                 <label>Responsible Role (Multiple)</label>
-                                <div class="multiselect-dropdown" id="chk_UpdateRepairRole">
-                                    <div class="dropdown-btn">Choose roles</div>
-                                    <div class="dropdown-list">
-                                        @foreach (var item in Model.RoleList)
-                                        {
-                                            var isChecked = Model.RoleIds != null && Model.RoleIds.Contains(item.Value);
-                                            <label>
-                                                <input class="form-check-input"
-                                                       type="checkbox"
-                                                       value="@item.Value"
-                                                       data-name="@item.Text"
-                                                       @(isChecked ? "checked" : "") />
-                                                @item.Text
-                                            </label>
-                                        }
-                                    </div>
-                                </div>
+                                <input type="text" class="form-control" value="@Model.RoleName" readonly />
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Evidence</label>
@@ -100,9 +70,6 @@
 
 <script>
     $(document).ready(function () {
-        initMultiselectRepairTask();
-        updateRepairRoleDropdown();
-
         $(document).off("click", "#btnUpdateRepairTask");
         $(document).on("click", "#btnUpdateRepairTask", async function (e) {
             e.preventDefault();
@@ -110,64 +77,22 @@
         });
     });
 
-    function initMultiselectRepairTask() {
-        const $dropdown = $('#chk_UpdateRepairRole');
-        const $btn = $dropdown.find('.dropdown-btn');
-        const $list = $dropdown.find('.dropdown-list');
-
-        $btn.on('click', function (e) {
-            e.stopPropagation();
-            $('.dropdown-list').not($list).hide();
-            $list.toggle();
-        });
-
-        $list.on('change', 'input[type=\"checkbox\"]', function () {
-            const $checkboxes = $list.find('input[type=\"checkbox\"]');
-            const selected = $checkboxes.filter(':checked').map(function () {
-                return {
-                    id: $(this).val(),
-                    name: $(this).data('name') || $(this).parent().text().trim()
-                };
-            }).get();
-
-            const selectedNames = selected.map(function (s) { return s.name; });
-            $btn.text(selectedNames.length ? selectedNames.join(', ') : 'Choose roles');
-
-            const ids = selected.map(function (s) { return s.id; }).join(',');
-            $('#hdn_UpdateRepairRole').val(ids);
-        });
-
-        $(document).on('click', function (e) {
-            if (!$dropdown.is(e.target) && $dropdown.has(e.target).length === 0) {
-                $list.hide();
-            }
-        });
-    }
-
-    function updateRepairRoleDropdown() {
-        const selectedNames = [];
-        const selectedValues = [];
-
-        $("#chk_UpdateRepairRole input[type='checkbox']:checked").each(function () {
-            selectedNames.push($(this).data("name"));
-            selectedValues.push($(this).val());
-        });
-
-        const displayText = selectedNames.length > 0 ? selectedNames.join(", ") : "Choose roles";
-        $("#chk_UpdateRepairRole .dropdown-btn").text(displayText);
-        $("#hdn_UpdateRepairRole").val(selectedValues.join(","));
-    }
-
     async function submitRepairTaskUpdate() {
         try {
             showLoader($("#updateIncidentRepairModal"));
+
+            const selectedStatus = document.querySelector('input[name="repairStatusAction"]:checked');
+            if (!selectedStatus || !selectedStatus.value) {
+                SwalErrorAlert("Please select a status action: Mark Complete or Mark N/A.");
+                return;
+            }
 
             const formData = new FormData();
             formData.append("Id", document.getElementById("repairTaskId").value);
             formData.append("IncidentId", document.getElementById("repairIncidentId").value);
             formData.append("IncidentValidationId", document.getElementById("repairIncidentValidationId").value);
             formData.append("Task", document.getElementById("repairTask").value);
-            formData.append("StatusId", document.getElementById("repairStatus").value);
+            formData.append("StatusId", selectedStatus.value);
             formData.append("RoleIds", document.getElementById("hdn_UpdateRepairRole").value);
             formData.append("Description", document.getElementById("repairDescription").value);
             formData.append("ImageUrl", document.getElementById("repair_hdnImgUrl").value);

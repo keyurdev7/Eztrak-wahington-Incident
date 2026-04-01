@@ -1,4 +1,4 @@
-﻿@using ViewModels
+@using ViewModels
 @model IncidentTeamModifyViewModel
 <style>
 
@@ -113,12 +113,12 @@
 </style>
 <form id="NewIncidentTeamForm" autocomplete="off">
     <div id="saveIncidentTeamDiv" class="form-container addNewTeam">
-        <h3>Add New Team</h3>
+        <h3>Add New Company</h3>
 
-        <!-- Team name -->
+        <!-- Company name -->
         @*  <div class="mb-3"> *@
         <input type="hidden" asp-for="Id" name="Id" id="incidentTeam_@Model.Id" />
-        <input type="text" class="form-control" placeholder="Team name (e.g., Distribution Emergency Team)" asp-for="Name" data-val-required="Required" />
+        <input type="text" class="form-control" placeholder="Company name (e.g., Distribution Emergency Company)" asp-for="Name" data-val-required="Required" />
         @* </div> *@
 
         <!-- Department -->
@@ -194,13 +194,13 @@
 
         <!-- Buttons row: equal width -->
         <div class="d-flex align-items-center addCancelIcons justify-content-end mt-3">
-            <button type="button" class="btn btn-green saveIncidentTeam">@(Model?.Id > 0 ? "Update Team" : "Add Team")</button>
+            <button type="button" class="btn btn-green saveIncidentTeam">@(Model?.Id > 0 ? "Update Company" : "Add Company")</button>
             <button type="button" class="btn btn-gray cancelIncidentTeam">Cancel</button>
         </div>
         @*   <div class="mt-3 d-flex gap-2">
             <div class="flex-fill">
                 <button type="button" class="btn btn-orange w-100 saveIncidentTeam action-btn">
-                    <i class="fa-solid fa-check"></i> @(Model?.Id > 0 ? "Update Team" : "Add Team")
+                    <i class="fa-solid fa-check"></i> @(Model?.Id > 0 ? "Update Company" : "Add Company")
                 </button>
             </div>
             <div class="flex-fill">

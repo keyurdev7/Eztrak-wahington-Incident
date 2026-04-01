@@ -22,19 +22,31 @@
 {
     <div class="card mb-4">
         <div class="card-body p-0">
-            <div class="d-flex justify-content-end align-items-center mb-0 p-3">
-                <button type="button" class="btn btn-add" onclick="OpenAddAssessmentTaskModal()">
-                    <i class="fa-solid fa-plus me-2"></i>Add Task
-                </button>
+            <div class="status-legend checklist-status-legend px-3 pt-3 pb-2">
+                <span class="legend-item">
+                    <span class="status-dot status-dot-complete"></span>
+                    Complete
+                </span>
+                <span class="legend-item">
+                    <span class="status-dot status-dot-incomplete"></span>
+                    Incomplete
+                </span>
+                <span class="legend-item">
+                    <span class="status-dot status-dot-na"></span>
+                    N/A
+                </span>
             </div>
             <div class="table-responsive table-rounded custom-scroll">
-                <table id="assessmentTable" class="table align-middle text-left">
+                <table id="assessmentTable" class="table align-middle text-left checklist-table">
                     <thead class="table-light">
                         <tr>
-                            <th style="width: 40%;">Task</th>
-                            <th style="width: 40%;">Responsible Party</th>
-                            <th style="width: 10%;">Status</th>
-                            <th style="width: 10%;">Evidence</th>
+                            <th style="width: 100px;">Status</th>
+                            <th style="width: 220px;">Party</th>
+                            <th style="width: 340px;">Task</th>
+                            <th style="width: 110px;">Evidence</th>
+                            <th style="width: 170px;">Last Updated</th>
+                            <th style="width: 170px;">Updated By</th>
+                            <th style="width: 220px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody ondragover="dragOver(event)" ondrop="drop(event)">
@@ -42,41 +54,27 @@
                         {
                             foreach (var task in Model.AssessmentTasks)
                             {
+                                var statusText = string.IsNullOrWhiteSpace(task.Status) ? "Not Started" : task.Status;
+                                var statusLower = statusText.Trim().ToLowerInvariant();
+                                var dotClass = statusLower == "complete"
+                                    ? "status-dot-complete"
+                                    : (statusLower == "n/a" || statusLower == "na")
+                                        ? "status-dot-na"
+                                        : "status-dot-incomplete";
                                 <tr draggable="true" data-id="@task.Id" ondragstart="dragStart(event)">
-                                    <td>@task.Task</td>
-                                    <td>@(string.IsNullOrWhiteSpace(task.FieldValue) ? "—" : task.FieldValue)</td>
                                     <td>
-                                        <a href="#" onclick="EditAssessmentTask('@task.Id')">
-                                            @if (!string.IsNullOrWhiteSpace(task.Status))
-                                            {
-                                                if (task.Status.ToLower() == "started")
-                                                {
-                                                    <span class="status-badge progressing">@task.Status</span>
-                                                }
-                                                else if (task.Status.ToLower() == "not started")
-                                                {
-                                                    <span class="status-badge not-started">@task.Status</span>
-                                                }
-                                                else if (task.Status.ToLower() == "complete")
-                                                {
-                                                    <span class="status-badge done">@task.Status</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="status-badge not-started">@task.Status</span>
-                                                }
-                                            }
-                                            else
-                                            {
-                                                <span class="status-badge not-started">Not Started</span>
-                                            }
-                                        </a>
+                                        <span class="status-cell">
+                                            <span class="status-dot @dotClass"></span>
+                                            <span class="status-text d-none">@statusText</span>
+                                        </span>
                                     </td>
+                                    <td>@(string.IsNullOrWhiteSpace(task.FieldValue) ? "—" : task.FieldValue)</td>
+                                    <td>@(task.Task ?? "")</td>
                                     <td>
                                         @if (task.ImageCount > 0)
                                         {
-                                            <a href="#" onclick="ViewAssessmentTask('@task.Id')">
-                                                <i class="fa @GetFileTypeIcon(task.ImagesUrl ?? "") me-1"></i>@(task.ImageCount) @("file")
+                                            <a href="#" onclick="ViewAssessmentTask('@task.Id'); return false;" class="text-decoration-none">
+                                                <i class="fa @GetFileTypeIcon(task.ImagesUrl ?? "") me-1"></i>@(task.ImageCount) file
                                             </a>
                                         }
                                         else
@@ -84,12 +82,24 @@
                                             <span>--</span>
                                         }
                                     </td>
+                                    <td>@(!string.IsNullOrWhiteSpace(task.LastUpdated) ? task.LastUpdated : "--")</td>
+                                    <td>@(!string.IsNullOrWhiteSpace(task.UpdatedBy) ? task.UpdatedBy : "--")</td>
+                                    <td>
+                                        <div class="checklist-actions">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit" aria-label="Edit" onclick="EditAssessmentTask('@task.Id'); return false;">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-info" title="History" aria-label="History" onclick="ViewAssessmentTask('@task.Id'); return false;">
+                                                <i class="fas fa-history"></i>
+                                            </button>
+                                        </div>
+                                    </td>
                                 </tr>
                             }
                         }
                         else
                         {
-                            <tr><td colspan="4" class="text-center">No tasks found</td></tr>
+                            <tr><td colspan="7" class="text-center">No tasks found</td></tr>
                         }
                     </tbody>
                 </table>
@@ -101,22 +111,20 @@ else
 {
     <div class="card mb-4">
         <div class="card-body p-0">
-            <div class="d-flex justify-content-end align-items-center mb-0 p-3">
-                <button type="button" class="btn btn-add" onclick="OpenAddAssessmentTaskModal()">
-                    <i class="fa-solid fa-plus me-2"></i>Add Task
-                </button>
-            </div>
             <div class="table-responsive table-rounded custom-scroll">
-                <table id="assessmentTable" class="table align-middle text-left">
+                <table id="assessmentTable" class="table align-middle text-left checklist-table">
                     <thead class="table-light">
                         <tr>
-                            <th style="width: 40%;">Task</th>
-                            <th style="width: 40%;">Responsible Party</th>
-                            <th style="width: 10%;">Status</th>
-                            <th style="width: 10%;">Evidence</th>
+                            <th style="width: 100px;">Status</th>
+                            <th style="width: 220px;">Party</th>
+                            <th style="width: 340px;">Task</th>
+                            <th style="width: 110px;">Evidence</th>
+                            <th style="width: 170px;">Last Updated</th>
+                            <th style="width: 170px;">Updated By</th>
+                            <th style="width: 220px;">Actions</th>
                         </tr>
                     </thead>
-                    <tbody ondragover="dragOver(event)" ondrop="drop(event)"><tr><td colspan="4" class="text-center">No tasks found</td></tr></tbody>
+                    <tbody ondragover="dragOver(event)" ondrop="drop(event)"><tr><td colspan="7" class="text-center">No tasks found</td></tr></tbody>
                 </table>
             </div>
         </div>

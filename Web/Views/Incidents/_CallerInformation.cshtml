@@ -1,4 +1,5 @@
-﻿@using System.Web
+@using System.Globalization
+@using System.Web
 @using ViewModels.Incident
 @model IncidentViewModel
 
@@ -21,6 +22,26 @@
                 <label class="form-label" asp-for="incidentCellerInformation.CallerPhoneNumber">Caller Phone Number <span class="text-danger">*</span></label>
                 <input class="form-control input-telephone" id="callerPhoneNumber" placeholder="XXX-XXX-XXXX" asp-for="incidentCellerInformation.CallerPhoneNumber" />
                 <div class="invalid-feedback"></div>
+                <div class="mt-2">
+                    <span class="form-label d-block small text-muted mb-1">Number Type</span>
+                    <div class="d-flex flex-wrap gap-3" role="radiogroup" aria-label="Caller phone number type">
+                        <div class="form-check form-check-inline mb-0">
+                            <input class="form-check-input" type="radio" id="callerPhoneTypeMobile"
+                                   asp-for="incidentCellerInformation.CallerPhoneNumberType" value="Mobile" />
+                            <label class="form-check-label" for="callerPhoneTypeMobile">Mobile</label>
+                        </div>
+                        <div class="form-check form-check-inline mb-0">
+                            <input class="form-check-input" type="radio" id="callerPhoneTypeHome"
+                                   asp-for="incidentCellerInformation.CallerPhoneNumberType" value="Home" />
+                            <label class="form-check-label" for="callerPhoneTypeHome">Home</label>
+                        </div>
+                        <div class="form-check form-check-inline mb-0">
+                            <input class="form-check-input" type="radio" id="callerPhoneTypeOffice"
+                                   asp-for="incidentCellerInformation.CallerPhoneNumberType" value="Office" />
+                            <label class="form-check-label" for="callerPhoneTypeOffice">Office</label>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -51,11 +72,16 @@
         </div>
         <div class="col-md-6">
             <div class="mb-3">
+                @{
+                    var ct = Model.incidentCellerInformation.CallTime;
+                    var callerCallTimeLocal = ct != default
+                        ? ct.ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture)
+                        : string.Empty;
+                }
                 <label class="form-label" asp-for="incidentCellerInformation.CallTime">Caller Date & Time <span class="text-danger">*</span></label>
-                <input type="datetime-local" disabled id="CallTimedatetime" value="@(Model.Id > 0 ? Model.incidentCellerInformation.CallTime.ToString("yyyy-MM-ddTHH:mm") : DateTime.Now.ToString("yyyy-MM-ddTHH:mm"))"
-                       class="form-control" asp-for="incidentCellerInformation.CallTime" />
-                <input type="hidden" id="hdnCallTimedatetime" name="incidentCellerInformation.CallTime"
-                       value="@(Model.Id > 0 ? Model.incidentCellerInformation.CallTime.ToString("yyyy-MM-ddTHH:mm") : DateTime.Now.ToString("yyyy-MM-ddTHH:mm"))" />
+                <input type="datetime-local" disabled id="CallTimedatetime" class="form-control" value="@callerCallTimeLocal" />
+                <input type="hidden" id="hdnCallTimedatetime" name="incidentCellerInformation.CallTime" value="@callerCallTimeLocal" />
+                <div class="form-text small text-muted">@(Model.Id > 0 ? "" : "US Pacific Time (automatically adjusts for daylight saving).")</div>
                 <div class="invalid-feedback"></div>
             </div>
         </div>

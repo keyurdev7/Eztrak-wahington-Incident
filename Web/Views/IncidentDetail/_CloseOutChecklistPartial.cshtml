@@ -42,15 +42,31 @@
     }
 }
 
-<table id="closeoutTable" class="table align-middle text-left">
+<div class="status-legend checklist-status-legend px-3 pt-0 pb-2">
+    <span class="legend-item">
+        <span class="status-dot status-dot-complete"></span>
+        Complete
+    </span>
+    <span class="legend-item">
+        <span class="status-dot status-dot-incomplete"></span>
+        Incomplete
+    </span>
+    <span class="legend-item">
+        <span class="status-dot status-dot-na"></span>
+        N/A
+    </span>
+</div>
+
+<table id="closeoutTable" class="table align-middle text-left checklist-table">
     <thead class="table-light">
         <tr>
-            <th style="width: 40%;">Task</th>
-            <th style="width: 40%;">Responsible Party</th>
-            <th style="width: 10%;">Status</th>
-            @* <th>Completed</th> *@
-            <th style="width: 10%;">Evidence</th>
-          @*   <th>Action</th> *@
+            <th style="width: 100px;">Status</th>
+            <th style="width: 220px;">Party</th>
+            <th style="width: 340px;">Task</th>
+            <th style="width: 110px;">Evidence</th>
+            <th style="width: 170px;">Last Updated</th>
+            <th style="width: 170px;">Updated By</th>
+            <th style="width: 220px;">Actions</th>
         </tr>
     </thead>
     <tbody ondragover="dragOver(event)" ondrop="drop(event)">
@@ -60,8 +76,20 @@
 
             @foreach (var closeout in Model.listIncidentViewTaskCloseOutViewModel)
             {
+                var statusText = string.IsNullOrWhiteSpace(closeout.Status) ? "Not Started" : closeout.Status;
+                var statusLower = statusText.Trim().ToLowerInvariant();
+                var dotClass = statusLower == "complete"
+                    ? "status-dot-complete"
+                    : (statusLower == "n/a" || statusLower == "na")
+                        ? "status-dot-na"
+                        : "status-dot-incomplete";
                 <tr draggable="true" data-id="@closeout.Id" ondragstart="dragStart(event)">
-                    <td>@closeout.Task</td>
+                    <td>
+                        <span class="status-cell">
+                            <span class="status-dot @dotClass"></span>
+                            <span class="status-text d-none">@statusText</span>
+                        </span>
+                    </td>
                     <td>@closeout.FieldValue</td>
 
                     @if (!string.IsNullOrWhiteSpace(closeout.Status))
@@ -69,42 +97,42 @@
                         @if (closeout.Status.ToLower() == "started")
                         {
                             <td>
-                                <a href="#" class="text-primary text-decoration-none" onclick="EditCloseOutDetails('@closeout.Id')">
-                                    <span class="status-badge progressing">@closeout.Status</span>
-                                </a>
+                                <span class="text-primary text-decoration-none">
+                                    <span>@(closeout.Task ?? "")</span>
+                                </span>
                             </td>
                         }
                         else if (closeout.Status.ToLower() == "not started")
                         {
                             <td>
-                                <a href="#" class="text-primary text-decoration-none" onclick="EditCloseOutDetails('@closeout.Id')">
-                                    <span class="status-badge not-started">@closeout.Status</span>
-                                </a>
+                                <span class="text-primary text-decoration-none">
+                                    <span>@(closeout.Task ?? "")</span>
+                                </span>
                             </td>
                         }
                         else if (closeout.Status.ToLower() == "complete")
                         {
                             <td>
                                
-                                <span class="status-badge done">@closeout.Status</span>
+                                <span>@(closeout.Task ?? "")</span>
                              
                             </td>
                         }
                         else
                         {
                             <td>
-                                <a href="#" class="text-primary text-decoration-none" onclick="EditCloseOutDetails('@closeout.Id')">
-                                <span class="status-badge not-started">@closeout.Status</span>
-                                </a>
+                                <span class="text-primary text-decoration-none">
+                                <span>@(closeout.Task ?? "")</span>
+                                </span>
                             </td>
                         }
                     }
                     else
                     {
                         <td>
-                            <a href="#" class="text-primary text-decoration-none" onclick="EditCloseOutDetails('@closeout.Id')">
-                            <span class="status-badge not-started">Not Started</span>
-                            </a>
+                            <span class="text-primary text-decoration-none">
+                            <span>@(closeout.Task ?? "")</span>
+                            </span>
                         </td>
                     }
 
@@ -122,6 +150,19 @@
                         <td><span>--</span></td>
                     }
 
+                    <td>@(!string.IsNullOrWhiteSpace(closeout.LastUpdated) ? closeout.LastUpdated : "--")</td>
+                    <td>@(!string.IsNullOrWhiteSpace(closeout.UpdatedBy) ? closeout.UpdatedBy : "--")</td>
+                    <td>
+                        <div class="checklist-actions">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit" aria-label="Edit" onclick="EditCloseOutDetails('@closeout.Id'); return false;">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-info" title="History" aria-label="History" onclick="ViewCloseOutDetails('@closeout.Id'); return false;">
+                                <i class="fas fa-history"></i>
+                            </button>
+                        </div>
+                    </td>
+
                   
 
                 </tr>
@@ -130,10 +171,47 @@
         else
         {
             <tr>
-                <td colspan="4" style=" text-align:center">
+                <td colspan="7" style=" text-align:center">
                     No records found
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<script>
+    (function () {
+        function applyCloseoutFilters() {
+            var $table = $('#closeoutTable');
+            if (!$table.length) return;
+
+            var q = ($('#closeout_global_search_value').val() || '').toString().trim().toLowerCase();
+            var owner = $('#closeout_ddlOwner').val();
+            var status = $('#closeout_ddlStatus').val();
+
+            $table.find('tbody tr').each(function () {
+                var $row = $(this);
+                var statusText = $row.find('td:nth-child(1) .status-text').text().trim();
+                var ownerText = $row.find('td:nth-child(2)').text().trim();
+                var taskText = $row.find('td:nth-child(3)').text().trim().toLowerCase();
+
+                var ok = true;
+                if (q) ok = ok && taskText.indexOf(q) !== -1;
+                if (owner) ok = ok && ownerText === owner;
+                if (status) ok = ok && statusText === status;
+
+                $row.toggle(ok);
+            });
+        }
+
+        $(document)
+            .off('input.closeoutFilter', '#closeout_global_search_value')
+            .on('input.closeoutFilter', '#closeout_global_search_value', applyCloseoutFilters);
+
+        $(document)
+            .off('change.closeoutFilter', '#closeout_ddlOwner, #closeout_ddlStatus')
+            .on('change.closeoutFilter', '#closeout_ddlOwner, #closeout_ddlStatus', applyCloseoutFilters);
+
+        applyCloseoutFilters();
+    })();
+</script>

@@ -223,9 +223,11 @@ namespace Repositories.Common
 
                 var severityLevelsTask = await _db.SeverityLevels
                                    .Where(it => !it.IsDeleted)
-                                   .OrderBy(it => it.Name == "High" ? 1 :
-                                                  it.Name == "Moderate" ? 2 :
-                                                  it.Name == "Low" ? 3 : 4)
+                                   .OrderBy(it => it.Name == "Severe" ? 1 :
+                                                  it.Name == "High" ? 2 :
+                                                  it.Name == "Moderate" ? 3 :
+                                                  it.Name == "Low" ? 4 :
+                                                  it.Name == "Non-Incident" ? 5 : 99)
                                    .Select(it => new SelectListItem
                                    {
                                        Value = it.Id.ToString(),
@@ -437,6 +439,9 @@ namespace Repositories.Common
                     AssignResponseTeams = "1",//request.AssignResponseTeams,
                     ConfirmedSeverityLevelId = request.ConfirmedSeverityLevelId,
                     DiscoveryPerimeterId = request.DiscoveryPerimeterId,
+                    ValidationDecision = request.ValidationDecision,
+                    BasisForValidation = request.BasisForValidation,
+                    CriticalCustomerPresent = request.CriticalCustomerPresent
                 };
 
                 await _db.IncidentValidations.AddAsync(incidentValidation);
@@ -472,9 +477,13 @@ namespace Repositories.Common
                     IncidentValidationId = incidentValidation.Id,
                     IncidentId = request.Id,
                     IncidentCommander = request.assignedRole.IncidentCommanderId,
+                    IncidentCommanderSecondary = request.assignedRole.IncidentCommanderSecondaryId,
                     FieldEnvRep = request.assignedRole.FieldEnvRepId,
+                    FieldEnvRepSecondary = request.assignedRole.FieldEnvRepSecondaryId,
                     GEC_Coordinator = request.assignedRole.GECCoordinatorId,
+                    GEC_CoordinatorSecondary = request.assignedRole.GECCoordinatorSecondaryId,
                     EngineeringLead = request.assignedRole.EngineeringLeadId,
+                    EngineeringLeadSecondary = request.assignedRole.EngineeringLeadSecondaryId,
                     ActiveStatus = ActiveStatus.Active
                 };
                 await _db.IncidentValidationAssignedRoles.AddAsync(IncidentValidationAssignedRole);
@@ -490,6 +499,7 @@ namespace Repositories.Common
                     Regulatory = request.validationGates.Regulatory,
                     IsOtherEvent = request.validationGates.IsOtherEvent,
                     OtherEventDetail = request.validationGates.OtherEventDetail,
+                    ContainmentStatus = request.validationGates.ContainmentStatus,
                     ActiveStatus = ActiveStatus.Active
                 };
                 await _db.IncidentValidationGates.AddAsync(IncidentValidationGate);
@@ -506,7 +516,8 @@ namespace Repositories.Common
                     var statusLegend = await _db.StatusLegends.FirstOrDefaultAsync(x => x.Name == StatusLegendEnum.Validated.ToString());
 
                     incident.StatusLegendId = statusLegend?.Id ?? (int)StatusLegendEnum.Validated;
-                    //incident.SeverityLevelId = (int)SeverityEnum.Low;
+                    // Persist validation metadata that lives on the incident record
+                    incident.ImpactScope = request.ImpactScope ?? incident.ImpactScope;
                     incident.UpdatedOn = DateTime.Now;
                     incident.UpdatedBy = userIdParsed;
                 }
@@ -575,6 +586,9 @@ namespace Repositories.Common
                     AssignResponseTeams = "1",//request.AssignResponseTeams,
                     ConfirmedSeverityLevelId = request.ConfirmedSeverityLevelId,
                     DiscoveryPerimeterId = request.DiscoveryPerimeterId,
+                    ValidationDecision = request.ValidationDecision,
+                    BasisForValidation = request.BasisForValidation,
+                    CriticalCustomerPresent = request.CriticalCustomerPresent
                 };
 
                 await _db.IncidentValidations.AddAsync(incidentValidation);
@@ -655,9 +669,13 @@ namespace Repositories.Common
                     IncidentValidationId = incidentValidation.Id,
                     IncidentId = request.Id,
                     IncidentCommander = request.assignedRole.IncidentCommanderId,
+                    IncidentCommanderSecondary = request.assignedRole.IncidentCommanderSecondaryId,
                     FieldEnvRep = request.assignedRole.FieldEnvRepId,
+                    FieldEnvRepSecondary = request.assignedRole.FieldEnvRepSecondaryId,
                     GEC_Coordinator = request.assignedRole.GECCoordinatorId,
+                    GEC_CoordinatorSecondary = request.assignedRole.GECCoordinatorSecondaryId,
                     EngineeringLead = request.assignedRole.EngineeringLeadId,
+                    EngineeringLeadSecondary = request.assignedRole.EngineeringLeadSecondaryId,
                     ActiveStatus = ActiveStatus.Active
                 };
                 await _db.IncidentValidationAssignedRoles.AddAsync(IncidentValidationAssignedRole);
@@ -673,6 +691,7 @@ namespace Repositories.Common
                     Regulatory = request.validationGates.Regulatory,
                     IsOtherEvent = request.validationGates.IsOtherEvent,
                     OtherEventDetail = request.validationGates.OtherEventDetail,
+                    ContainmentStatus = request.validationGates.ContainmentStatus,
                     ActiveStatus = ActiveStatus.Active
                 };
                 await _db.IncidentValidationGates.AddAsync(IncidentValidationGate);
@@ -767,7 +786,8 @@ namespace Repositories.Common
                     var statusLegend = await _db.StatusLegends.FirstOrDefaultAsync(x => x.Name == StatusLegendEnum.Validated.ToString());
 
                     incident.StatusLegendId = statusLegend?.Id ?? (int)StatusLegendEnum.Validated;
-                    //incident.SeverityLevelId = (int)SeverityEnum.Low;
+                    // Persist validation metadata that lives on the incident record
+                    incident.ImpactScope = request.ImpactScope ?? incident.ImpactScope;
                     incident.UpdatedOn = DateTime.Now;
                     incident.UpdatedBy = userIdParsed;
                 }
@@ -1095,82 +1115,43 @@ namespace Repositories.Common
         {
             try
             {
-                // Get default status (Pending)
                 var defaultStatus = await _db.Progress
-                    .FirstOrDefaultAsync(p => !p.IsDeleted && p.Name.ToLower().Contains("Not Started"));
-                
-                var defaultStatusId = defaultStatus?.Id ?? 1; // Fallback to ID 1 if not found
+                    .Where(p => p.Name != null && p.Name.ToLower().Contains("incomplete"))
+                    .OrderBy(p => p.Id)
+                    .FirstOrDefaultAsync();
+                var defaultStatusId = defaultStatus?.Id ?? 1;
 
-                // Get role IDs by name
-                var engineeringRole = await _db.IncidentRoles
-                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("Engineering"));
-                var mrcRole = await _db.IncidentRoles
-                    .FirstOrDefaultAsync(r => !r.IsDeleted && (r.Name.ToLower().Contains("M&R Crew") || r.Name.ToLower().Contains("maintenance")));
-                var customerServiceRole = await _db.IncidentRoles
-                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("Customer Service"));
-                var icRole = await _db.IncidentRoles
-                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("IC"));
-                var ferRole = await _db.IncidentRoles
-                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("FER"));
+                var roles = await _db.IncidentRoles
+                    .Where(r => !r.IsDeleted)
+                    .ToListAsync();
 
-                // Define the 5 default Restoration tasks
+                long? FindRole(params string[] keys) =>
+                    roles.FirstOrDefault(r =>
+                        !string.IsNullOrWhiteSpace(r.Name) &&
+                        keys.Any(k => r.Name.ToLower().Contains(k.ToLower()))
+                    )?.Id;
+
+                string BuildRoleIds(params long?[] ids)
+                {
+                    var valid = ids.Where(i => i.HasValue).Select(i => i!.Value).Distinct().ToList();
+                    return valid.Any() ? string.Join(",", valid) : "1";
+                }
+
+                var icRoleId = FindRole("ic", "incident commander");
+                var crewRoleId = FindRole("crew", "field crew");
+                var engineeringRoleId = FindRole("engineering");
+                var logisticsRoleId = FindRole("logistics");
+                var gecRoleId = FindRole("gec");
+
                 var defaultRestorationTasks = new List<IncidentValidationTask>
                 {
-                    new IncidentValidationTask
-                    {
-                        IncidentId = incidentId,
-                        IncidentValidationId = incidentValidationId,
-                        TaskDescription = "Pressure test completed for Segment A",
-                        RoleIds = engineeringRole?.Id.ToString() ?? "1", // Engineering
-                        StatusId = defaultStatusId,
-                        CreatedOn = DateTime.UtcNow,
-                        IsDeleted = false,
-                        ActiveStatus = ActiveStatus.Active
-                    },
-                    new IncidentValidationTask
-                    {
-                        IncidentId = incidentId,
-                        IncidentValidationId = incidentValidationId,
-                        TaskDescription = "Pressure test in progress for Segment B",
-                        RoleIds = engineeringRole?.Id.ToString() ?? "1", // Engineering
-                        StatusId = defaultStatusId,
-                        CreatedOn = DateTime.UtcNow,
-                        IsDeleted = false,
-                        ActiveStatus = ActiveStatus.Active
-                    },
-                    new IncidentValidationTask
-                    {
-                        IncidentId = incidentId,
-                        IncidentValidationId = incidentValidationId,
-                        TaskDescription = "Inspect and reinstall regulators and meters",
-                        RoleIds = mrcRole?.Id.ToString() ?? "2", // M&R Crew
-                        StatusId = defaultStatusId,
-                        CreatedOn = DateTime.UtcNow,
-                        IsDeleted = false,
-                        ActiveStatus = ActiveStatus.Active
-                    },
-                    new IncidentValidationTask
-                    {
-                        IncidentId = incidentId,
-                        IncidentValidationId = incidentValidationId,
-                        TaskDescription = "Relight customer appliances (residential)",
-                        RoleIds = customerServiceRole?.Id.ToString() ?? "3", // Customer Service
-                        StatusId = defaultStatusId,
-                        CreatedOn = DateTime.UtcNow,
-                        IsDeleted = false,
-                        ActiveStatus = ActiveStatus.Active
-                    },
-                    new IncidentValidationTask
-                    {
-                        IncidentId = incidentId,
-                        IncidentValidationId = incidentValidationId,
-                        TaskDescription = "Confirm all lines dried and restored",
-                        RoleIds = $"{icRole?.Id ?? 1},{ferRole?.Id ?? 2}", // IC / FER
-                        StatusId = defaultStatusId,
-                        CreatedOn = DateTime.UtcNow,
-                        IsDeleted = false,
-                        ActiveStatus = ActiveStatus.Active
-                    }
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Confirm source of intrusion repaired", RoleIds = BuildRoleIds(icRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Confirm water removal complete", RoleIds = BuildRoleIds(crewRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Confirm affected system section is clear", RoleIds = BuildRoleIds(engineeringRoleId, crewRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Confirm required materials delivered", RoleIds = BuildRoleIds(logisticsRoleId, gecRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Restore affected service", RoleIds = BuildRoleIds(crewRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Relight appliances where required", RoleIds = BuildRoleIds(crewRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Confirm impacted customers restored", RoleIds = BuildRoleIds(icRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active }
                 };
 
                 await _db.IncidentValidationTasks.AddRangeAsync(defaultRestorationTasks);
@@ -1186,86 +1167,41 @@ namespace Repositories.Common
         {
             try
             {
-                // Get default status (Not Started)
                 var defaultStatus = await _db.Progress
-                    .FirstOrDefaultAsync(p => !p.IsDeleted && p.Name.ToLower().Contains("Not Started"));
-                
-                var defaultStatusId = defaultStatus?.Id ?? 1; // Fallback to ID 1 if not found
+                    .Where(p => p.Name != null && p.Name.ToLower().Contains("incomplete"))
+                    .OrderBy(p => p.Id)
+                    .FirstOrDefaultAsync();
+                var defaultStatusId = defaultStatus?.Id ?? 1;
 
-                // Get role names for closeout tasks
-                var icRole = await _db.IncidentRoles
-                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("IC"));
-                var gecRole = await _db.IncidentRoles
-                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("GEC"));
-                var engineeringRole = await _db.IncidentRoles
-                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("Engineering"));
-                var ferRole = await _db.IncidentRoles
-                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("FER"));
-                var vendorRole = await _db.IncidentRoles
-                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("Vendor"));
-                var complianceRole = await _db.IncidentRoles
-                    .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("Compliance"));
-                var accountingRole = await _db.IncidentRoles
-                   .FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("Accounting"));
+                var roles = await _db.IncidentRoles
+                    .Where(r => !r.IsDeleted)
+                    .ToListAsync();
 
-                // Define the 5 default Closeout tasks
+                long? FindRole(params string[] keys) =>
+                    roles.FirstOrDefault(r =>
+                        !string.IsNullOrWhiteSpace(r.Name) &&
+                        keys.Any(k => r.Name.ToLower().Contains(k.ToLower()))
+                    )?.Id;
+
+                string BuildRoleIds(params long?[] ids)
+                {
+                    var valid = ids.Where(i => i.HasValue).Select(i => i!.Value).Distinct().ToList();
+                    return valid.Any() ? string.Join(",", valid) : "1";
+                }
+
+                var crewRoleId = FindRole("crew", "field crew");
+                var icRoleId = FindRole("ic", "incident commander");
+                var ferRoleId = FindRole("fer", "environmental");
+                var engineeringRoleId = FindRole("engineering");
+
                 var defaultCloseoutTasks = new List<ValidationCloseout>
                 {
-                    new ValidationCloseout
-                    {
-                        IncidentId = incidentId,
-                        IncidentValidationId = incidentValidationId,
-                        Description = "Generate Major Customer Report (MCR)",
-                        Role = $"{icRole?.Id.ToString() ?? "IC"},{gecRole?.Id.ToString() ?? "1"}", // IC / GEC
-                        Status = defaultStatusId.ToString(),
-                        CreatedOn = DateTime.UtcNow,
-                        IsDeleted = false,
-                        ActiveStatus = ActiveStatus.Active
-                    },
-                    new ValidationCloseout
-                    {
-                        IncidentId = incidentId,
-                        IncidentValidationId = incidentValidationId,
-                        Description = "Prepare CPUC / PHMSA Report",
-                        Role = $"{engineeringRole?.Id.ToString() ?? "1"},{complianceRole?.Id.ToString() ?? "1"}", // Engineering / Compliance
-                        Status = defaultStatusId.ToString(),
-                        CreatedOn = DateTime.UtcNow,
-                        IsDeleted = false,
-                        ActiveStatus = ActiveStatus.Active
-                    },
-                    new ValidationCloseout
-                    {
-                        IncidentId = incidentId,
-                        IncidentValidationId = incidentValidationId,
-                        Description = "Environmental Summary & Disposal Documentation",
-                        Role = $"{ferRole?.Id.ToString() ?? "1"},{vendorRole?.Id.ToString() ?? "1"}", // FER / Vendor
-                        Status = defaultStatusId.ToString(),
-                        CreatedOn = DateTime.UtcNow,
-                        IsDeleted = false,
-                        ActiveStatus = ActiveStatus.Active
-                    },
-                    new ValidationCloseout
-                    {
-                        IncidentId = incidentId,
-                        IncidentValidationId = incidentValidationId,
-                        Description = "Finalize Cost Breakdown (Labor, Equipment, Material)",
-                        Role = $"{gecRole?.Id.ToString() ?? "1"},{accountingRole?.Id.ToString() ??"1"}", 
-                        Status = defaultStatusId.ToString(),
-                        CreatedOn = DateTime.UtcNow,
-                        IsDeleted = false,
-                        ActiveStatus = ActiveStatus.Active
-                    },
-                    new ValidationCloseout
-                    {
-                        IncidentId = incidentId,
-                        IncidentValidationId = incidentValidationId,
-                        Description = "Submit Lessons Learned Report",
-                        Role = $"{icRole?.Id.ToString() ?? "1"},{ferRole?.Id.ToString()  ?? "1"},{engineeringRole?.Id.ToString()  ?? "1"}", // IC / FER / Engineering
-                        Status = defaultStatusId.ToString(),
-                        CreatedOn = DateTime.UtcNow,
-                        IsDeleted = false,
-                        ActiveStatus = ActiveStatus.Active
-                    }
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, Description = "Perform final field verification", Role = BuildRoleIds(crewRoleId), Status = defaultStatusId.ToString(), CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, Description = "Confirm incident area clear of water", Role = BuildRoleIds(icRoleId), Status = defaultStatusId.ToString(), CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, Description = "Complete environmental/disposal documentation", Role = BuildRoleIds(ferRoleId), Status = defaultStatusId.ToString(), CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, Description = "Complete incident summary", Role = BuildRoleIds(icRoleId), Status = defaultStatusId.ToString(), CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, Description = "Create follow-up work orders if needed", Role = BuildRoleIds(engineeringRoleId), Status = defaultStatusId.ToString(), CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, Description = "Approve incident closeout", Role = BuildRoleIds(icRoleId), Status = defaultStatusId.ToString(), CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active }
                 };
 
                 await _db.ValidationCloseouts.AddRangeAsync(defaultCloseoutTasks);
@@ -1282,23 +1218,41 @@ namespace Repositories.Common
             try
             {
                 var defaultStatus = await _db.Progress
-                    .FirstOrDefaultAsync(p => !p.IsDeleted && p.Name.ToLower().Contains("Not Started"));
+                    .Where(p => p.Name != null && p.Name.ToLower().Contains("incomplete"))
+                    .OrderBy(p => p.Id)
+                    .FirstOrDefaultAsync();
                 var defaultStatusId = defaultStatus?.Id ?? 1;
 
-                var icRole = await _db.IncidentRoles.FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("IC"));
-                var ferRole = await _db.IncidentRoles.FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("FER"));
-                var gecRole = await _db.IncidentRoles.FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("GEC"));
+                var roles = await _db.IncidentRoles
+                    .Where(r => !r.IsDeleted)
+                    .ToListAsync();
+
+                long? FindRole(params string[] keys) =>
+                    roles.FirstOrDefault(r =>
+                        !string.IsNullOrWhiteSpace(r.Name) &&
+                        keys.Any(k => r.Name.ToLower().Contains(k.ToLower()))
+                    )?.Id;
+
+                string BuildRoleIds(params long?[] ids)
+                {
+                    var valid = ids.Where(i => i.HasValue).Select(i => i!.Value).Distinct().ToList();
+                    return valid.Any() ? string.Join(",", valid) : "1";
+                }
+
+                var icRoleId = FindRole("ic", "incident commander");
+                var dispatchRoleId = FindRole("dispatch");
+                var ferRoleId = FindRole("fer", "environmental");
+                var fieldCrewRoleId = FindRole("field crew", "crew");
 
                 var defaultAssessmentTasks = new List<IncidentValidationAssessmentTask>
                 {
-                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Create MCR", RoleIds = icRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
-                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Notify Claims & Engineering", RoleIds = icRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
-                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Establish ICP (site access verified)", RoleIds = icRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
-                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Prepare containment area (drums/totes/Baker tank)", RoleIds = ferRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
-                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Label containers; log IDs and capacity", RoleIds = ferRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
-                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Retrieve system maps (regulators, BO streets, elevations)", RoleIds = gecRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
-                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Mark low points & squeeze points", RoleIds = gecRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
-                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Initiate cost tracking (RBA) for vendors", RoleIds = gecRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active }
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Confirm MCR created", RoleIds = BuildRoleIds(icRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Review outage calls in affected area", RoleIds = BuildRoleIds(icRoleId, dispatchRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Confirm spread classification", RoleIds = BuildRoleIds(icRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Contact local water agency", RoleIds = BuildRoleIds(icRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Request vacuum truck", RoleIds = BuildRoleIds(ferRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Confirm disposal method", RoleIds = BuildRoleIds(ferRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Confirm water containment in place", RoleIds = BuildRoleIds(fieldCrewRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active }
                 };
                 await _db.IncidentValidationAssessmentTasks.AddRangeAsync(defaultAssessmentTasks);
                 await _db.SaveChangesAsync();
@@ -1314,16 +1268,42 @@ namespace Repositories.Common
             try
             {
                 var defaultStatus = await _db.Progress
-                    .FirstOrDefaultAsync(p => !p.IsDeleted && p.Name.ToLower().Contains("Not Started"));
+                    .Where(p => p.Name != null && p.Name.ToLower().Contains("incomplete"))
+                    .OrderBy(p => p.Id)
+                    .FirstOrDefaultAsync();
                 var defaultStatusId = defaultStatus?.Id ?? 1;
 
-                var engineeringRole = await _db.IncidentRoles.FirstOrDefaultAsync(r => !r.IsDeleted && r.Name.ToLower().Contains("Engineering"));
+                var roles = await _db.IncidentRoles
+                    .Where(r => !r.IsDeleted)
+                    .ToListAsync();
+
+                long? FindRole(params string[] keys) =>
+                    roles.FirstOrDefault(r =>
+                        !string.IsNullOrWhiteSpace(r.Name) &&
+                        keys.Any(k => r.Name.ToLower().Contains(k.ToLower()))
+                    )?.Id;
+
+                string BuildRoleIds(params long?[] ids)
+                {
+                    var valid = ids.Where(i => i.HasValue).Select(i => i!.Value).Distinct().ToList();
+                    return valid.Any() ? string.Join(",", valid) : "1";
+                }
+
+                var icRoleId = FindRole("ic", "incident commander");
+                var engineeringRoleId = FindRole("engineering");
+                var crewRoleId = FindRole("crew", "field crew");
+                var ferRoleId = FindRole("fer", "environmental");
 
                 var defaultRepairTasks = new List<IncidentValidationRepairTask>
                 {
-                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Use \"Identifying Source of Leak\" Checklist (Pg. 4)", RoleIds = engineeringRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
-                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Identify ideal purge locations to prevent further outage (use engineering data)", RoleIds = engineeringRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
-                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Verify vacuum truck fittings (2\" cam-lock and 2\" → ¾\" adaptors available)", RoleIds = engineeringRole?.Id.ToString() ?? "1", StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active }
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Confirm source of intrusion identified", RoleIds = BuildRoleIds(icRoleId, engineeringRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Identify purge points", RoleIds = BuildRoleIds(engineeringRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Identify extraction points", RoleIds = BuildRoleIds(engineeringRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Excavate affected location if needed", RoleIds = BuildRoleIds(crewRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Remove water from affected main/service", RoleIds = BuildRoleIds(crewRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Inspect affected meter/regulator/service", RoleIds = BuildRoleIds(crewRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Confirm vacuum truck onsite", RoleIds = BuildRoleIds(ferRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active },
+                    new() { IncidentId = incidentId, IncidentValidationId = incidentValidationId, TaskDescription = "Confirm water removal/disposal in progress", RoleIds = BuildRoleIds(ferRoleId), StatusId = defaultStatusId, CreatedOn = DateTime.UtcNow, IsDeleted = false, ActiveStatus = ActiveStatus.Active }
                 };
                 await _db.IncidentValidationRepairTasks.AddRangeAsync(defaultRepairTasks);
                 await _db.SaveChangesAsync();

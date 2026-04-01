@@ -699,11 +699,53 @@ async function GetIncidentList(statusID, severityID, description) {
     }
 }
 
+/**
+ * Current instant as yyyy-MM-ddTHH:mm in US Pacific (IANA America/Los_Angeles, includes DST).
+ */
+function formatDateTimeLocalPacificNow() {
+    const pad = (n) => String(n).padStart(2, "0");
+    try {
+        const d = new Date();
+        const formatter = new Intl.DateTimeFormat("en-CA", {
+            timeZone: "America/Los_Angeles",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hourCycle: "h23",
+        });
+        const parts = formatter.formatToParts(d);
+        const g = (type) => parts.find((p) => p.type === type)?.value ?? "";
+        const y = g("year");
+        const mo = g("month").padStart(2, "0");
+        const da = g("day").padStart(2, "0");
+        const h = g("hour").padStart(2, "0");
+        const mi = g("minute").padStart(2, "0");
+        if (!y || !mo || !da) throw new Error("incomplete Pacific parts");
+        return `${y}-${mo}-${da}T${h}:${mi}`;
+    } catch (e) {
+        const d = new Date();
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+}
+
+/** New incidents: default caller call time to current US Pacific (not server clock, not device TZ). */
+function syncCallerCallTimeToPacific() {
+    const v = formatDateTimeLocalPacificNow();
+    const $visible = $("#CallTimedatetime");
+    const $hidden = $("#hdnCallTimedatetime");
+    if ($visible.length) $visible.val(v);
+    if ($hidden.length) $hidden.val(v);
+}
+
 async function LoadIncidentModal(id = 0) {
     try {
         showLoader($(".main-content"));
 
-        const url = id > 0
+        const incidentId = parseInt(id, 10) || 0;
+
+        const url = incidentId > 0
             ? `/Incidents/EditIncident?id=${id}`   // Edit mode
             : `/Incidents/AddIncident`;            // Add mode
 
@@ -719,7 +761,13 @@ async function LoadIncidentModal(id = 0) {
         const content = await response.text();
         $("#incidentAddEditModalContainer").empty().html(content);
 
-        // Show Bootstrap modal
+        if (incidentId === 0) {
+            syncCallerCallTimeToPacific();
+            $("#addIncidentModal").one("shown.bs.modal", function () {
+                syncCallerCallTimeToPacific();
+            });
+        }
+
         $("#addIncidentModal").modal("show");
 
     } catch (error) {

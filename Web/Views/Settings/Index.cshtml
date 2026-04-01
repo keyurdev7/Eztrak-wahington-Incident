@@ -122,31 +122,31 @@
     }
 
         /* Sidebar */
-        .settings-container .sidebar,
-        .team-container .sidebar {
-            width: 250px;
+        .settings-container .settings-sidebar,
+        .team-container .team-sidebar {
+            width: 260px;
             background: #fff;
             border-radius: 12px;
             padding: 20px 0;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-            .settings-container .sidebar h3,
-            .team-container .sidebar h3 {
+            .settings-container .settings-sidebar h3,
+            .team-container .team-sidebar h3 {
                 margin: 0 0 15px 20px;
                 font-size: 16px;
                 font-weight: bold;
             }
 
-            .settings-container .sidebar ul,
-            .team-container .sidebar ul {
+            .settings-container .settings-sidebar ul,
+            .team-container .team-sidebar ul {
                 list-style: none;
                 margin: 0;
                 padding: 0;
             }
 
-                .settings-container .sidebar ul li,
-                .team-container .sidebar ul li {
+                .settings-container .settings-sidebar ul li,
+                .team-container .team-sidebar ul li {
                     padding: 12px 20px;
                     display: flex;
                     align-items: center;
@@ -154,23 +154,25 @@
                     font-size: 14px;
                     color: #333;
                     cursor: pointer;
+                    min-height: 44px;
+                    white-space: nowrap;
                 }
 
-                    .settings-container .sidebar ul li.active,
-                    .team-container .sidebar ul li.active {
+                    .settings-container .settings-sidebar ul li.active,
+                    .team-container .team-sidebar ul li.active {
                         background-color: #ffddcc;
                         font-weight: bold;
                         color: #f54e00;
                         border-left: 4px solid #f54e00;
                     }
 
-                    .settings-container .sidebar ul li:hover,
-                    .team-container .sidebar ul li:hover {
+                    .settings-container .settings-sidebar ul li:hover,
+                    .team-container .team-sidebar ul li:hover {
                         background-color: #f3f4f6;
                     }
 
-            .settings-container .sidebar i,
-            .team-container .sidebar i {
+            .settings-container .settings-sidebar i,
+            .team-container .team-sidebar i {
                 font-size: 16px;
             }
 
@@ -341,7 +343,7 @@
             margin: 0;
         }
 
-    .btnAddNew, .btnAddNewSource, .btnAddNewEvent, .btnAddNewseverityLevl, .btnAddNewstatusLegend,
+    .btnAddNew, .btnAddNewSource, .btnAddNewEvent, .btnAddNewstatusLegend,
     .btnAddNewAsset, .btnAddNewAssetType, .btnAddNewPolicy {
         background-color: #f54e00;
         color: #fff;
@@ -439,6 +441,15 @@
         display: flex;
         gap: 20px;
         margin-bottom: 25px;
+    }
+
+    .accountTypesRightSec #UserManagementlist .row.topCard {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .accountTypesRightSec #UserManagementlist .user-table .table-responsive {
+        overflow-x: auto;
     }
 
     .topCard .icon {
@@ -1217,13 +1228,13 @@
 
         <div class="settings-container" id="mainContainer">
             <!-- Sidebar -->
-            <div class="sidebar settingsidebar">
+            <div class="settings-sidebar settingsidebar">
                 <h3>Configuration</h3>
                 <ul>
                     <li class="active settingAllTab" data-tab="source"><i class="fa-solid fa-user-group"></i> Source</li>
                     <li class="settingAllTab" data-tab="event"><i class="fa-regular fa-file-lines"></i> Incident Types</li>
                     <li class="settingAllTab" data-tab="eventSubType"><i class="fa-regular fa-file-lines"></i> Incident Sub-Types</li>
-                    <li class="settingAllTab" data-tab="severity"><i class="fa-solid fa-triangle-exclamation"></i> Severity Levels</li>
+                    @* Severity levels are fixed (seeded); admin CRUD removed. *@
                     <li class="settingAllTab" data-tab="asset"><i class="fa-solid fa-barcode"></i> Asset Types</li>
                     @* <li class="settingAllTab" data-tab="type"><i class="fa-solid fa-building"></i> Asset Types</li> *@
                     <li class="settingAllTab" data-tab="status"><i class="fa-solid fa-palette"></i> Status Legend</li>
@@ -1232,9 +1243,8 @@
                     <li class="settingAllTab" data-tab="incidentRole"> <i class="fa-solid fa-user-shield"></i> Incident Roles</li>
                     <li class="settingAllTab" data-tab="incidentShift"> <i class="fa-solid fa-clock"></i> Incident Shift </li>
                     @* <li class="settingAllTab" data-tab="teams"><i class="fa-brands fa-teamspeak"></i> Assign Response Teams</li> *@
-                    <li class="settingAllTab" data-tab="user" onclick="showContent('user')"><i class="fa fa-user-circle"></i> User Management</li>
                     <li class="settingAllTab" data-tab="teamManagement" onclick="showContent('team')">
-                        <i class="fa-solid fa-people-group"></i> Team Management
+                        <i class="fa-solid fa-people-group"></i> User Settings
                     </li>
                     <li class="settingAllTab" data-tab="progress"><i class="fa-solid fa-bars-progress"></i>Status Master</li>
                     <li class="settingAllTab" data-tab="equipmentfields"><i class="fa-solid fa-toolbox"></i>Equipment Fields</li>
@@ -1278,19 +1288,7 @@
                     <div id="addEventSubType"></div>
                     <div id="eventSubTypeList"></div>
                 </div>
-                <div id="severity" class="setting-tab-content">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3>Severity Levels</h3>
-                        <button class="btn btn-primary btnAddNewseverityLevl">
-                            <i class="fa-solid fa-plus"></i> Add New
-                        </button>
-                    </div>
-
-                    <div id="addseverityLevl">
-                    </div>
-                    <div id="severityLevlList">
-                    </div>
-                </div>
+                @* Severity tab removed — levels are fixed in database. *@
                 <div id="asset" class="setting-tab-content">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h3>Asset Types</h3>
@@ -1457,141 +1455,13 @@
             </div>
 
         </div>
-        <div class="user-management hidden" id="userManagement">
-            <div class="header">
-                <div class="d-flex align-item-center">
-                    <div onclick="backToMain()" class="backIcon"><i class="fa fa-arrow-left-long"></i></div>
-                    <div class="title-info">
-                        <h2 class="mb-0">User Management</h2>
-                        <p>Manage system users and their role-based permissions</p>
-                    </div>
-                </div>
-                <button class="btn-add btn btn-primary btnAddNewUserManagement" ><i class="fa-solid fa-plus"></i> Add User</button>
-            </div>
-
-
-            <div id="UserManagementlist">
-            </div>
-            <!-- User Table -->
-
-
-            <!-------------Role and permisssion-------------->
-            <div class="Bordercard rolePermission p-4">
-                <h2>Role Permissions Reference</h2>
-
-                <div class="role-container">
-
-                    <!-- Super Administrator -->
-                    <div class="role-card">
-                        <div class="role-title master-admin">Super Administrator</div>
-                        <p>Full access to all functionality and super administration.</p>
-                        <h4>Permissions:</h4>
-                        <ul class="permissions">
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can create incidents</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can edit incidents</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can manage settings</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can assign teams</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can send alerts</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> has desktop access</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can validate incidents</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can view all incidents</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can view settings</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can complete tasks</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can view reports</li>
-                        </ul>
-                    </div>
-
-                    <!-- System Administrator -->
-                    <div class="role-card">
-                        <div class="role-title dispatch">System Administrator</div>
-                        <p>Full access to all functionality and system administration.</p>
-                        <h4>Permissions:</h4>
-                        <ul class="permissions">
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can create incidents</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can edit incidents</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can manage settings</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can assign teams</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can send alerts</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> has desktop access</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can validate incidents</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can view all incidents</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can view settings</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can complete tasks</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can view reports</li>
-                        </ul>
-                    </div>
-
-                    <!-- Manager -->
-                    <div class="role-card">
-                        <div class="role-title service-center">Manager</div>
-                        <p>Can create incidents, manage settings, send alerts, desktop access, view all incidents. No settings access.</p>
-                        <h4>Permissions:</h4>
-                        <ul class="permissions">
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can create incidents</li>
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can edit incidents</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can manage settings</li>
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can assign teams</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can send alerts</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> has desktop access</li>
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can validate incidents</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can view all incidents</li>
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can view settings</li>
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can complete tasks</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can view reports</li>
-                        </ul>
-                    </div>
-
-                    <!-- Technician -->
-                    <div class="role-card">
-                        <div class="role-title service-teams">Technician</div>
-                        <p>Can only send alerts, view settings, has desktop access and complete tasks. No settings access.</p>
-                        <h4>Permissions:</h4>
-                        <ul class="permissions">
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can create incidents</li>
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can edit incidents</li>
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can manage settings</li>
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can assign teams</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can send alerts</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> has desktop access</li>
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can validate incidents</li>
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can view all incidents</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can view settings</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can complete tasks</li>
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can view reports</li>
-                        </ul>
-                    </div>
-
-                    <!-- Guest -->
-                    <div class="role-card">
-                        <div class="role-title service-teams">Guest</div>
-                        <p>Can only view all incidents, view reports and complete tasks. No other settings.</p>
-                        <h4>Permissions:</h4>
-                        <ul class="permissions">
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can create incidents</li>
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can edit incidents</li>
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can manage settings</li>
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can assign teams</li>
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can send alerts</li>
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> has desktop access</li>
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can validate incidents</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can view all incidents</li>
-                            <li class="denied"><i class="fa-solid fa-xmark"></i> can view settings</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can complete tasks</li>
-                            <li class="allowed"><i class="fa-solid fa-check"></i> can view reports</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-
-        </div>
         <div class="team-management hidden" id="teamManagement">
             <div class="header">
                 <div class="d-flex align-item-center">
                     <div onclick="backToMain()" class="backIcon"><i class="fa fa-arrow-left-long"></i></div>
                     <div class="title-info">
-                        <h2 class="mb-0">Team Management</h2>
-                        <p>Manage teams, users, and response policies</p>
+                        <h2 class="mb-0">User Settings</h2>
+                        <p>Manage company, users, account types, and response policies</p>
                     </div>
                 </div>
             </div>
@@ -1599,11 +1469,12 @@
 
             <div class="team-container" id="teamContainer">
                 <!-- Sidebar -->
-                <div class="sidebar teamsidebar">
+                <div class="team-sidebar teamsidebar">
                     <h3>Sections</h3>
                     <ul>
-                        <li class="active teamAllTab" data-tab="Iteams"><i class="fa-solid fa-user-group"></i> Teams</li>
+                        <li class="active teamAllTab" data-tab="Iteams"><i class="fa-solid fa-user-group"></i> Company</li>
                         <li class="teamAllTab" data-tab="Iusers"><i class="fa-regular fa-user"></i>Users</li>
+                        <li class="teamAllTab" data-tab="IaccountTypes"><i class="fa fa-user-circle"></i> Account Types</li>
                         @* <li class="teamAllTab" data-tab="Ipolicies"><i class="fa-regular fa-file-lines"></i>Policies</li> *@
                     </ul>
                 </div>
@@ -1613,8 +1484,8 @@
                 <div class="content" id="rightContent">
                     <div id="Iteams" class="team-tab-content active teamRightSec">
                         <div class="d-flex align-items-center justify-content-between mb-3">
-                            <h3 class="mb-0">Teams</h3>
-                            <button class="btn-add btnAddNewIncidentTeam"><i class="fa-solid fa-plus"></i> Add Team</button>
+                            <h3 class="mb-0">Company</h3>
+                            <button class="btn-add btnAddNewIncidentTeam"><i class="fa-solid fa-plus"></i> Add Company</button>
                         </div>
 
                         <div id="addIncidentTeam">
@@ -1631,6 +1502,110 @@
                         <div id="addUser">
                         </div>
                         <div id="Userlist">
+                        </div>
+                    </div>
+
+                    <div id="IaccountTypes" class="team-tab-content accountTypesRightSec">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h3 class="mb-0">Account Types</h3>
+                            <button type="button" class="btn-add btn btn-primary btnAddNewUserManagement"><i class="fa-solid fa-plus"></i> Add New</button>
+                        </div>
+                        <div id="UserManagementlist">
+                        </div>
+                        <div class="Bordercard rolePermission p-4 mt-4">
+                            <h2>Role Permissions Reference</h2>
+                            <div class="role-container">
+                                <div class="role-card">
+                                    <div class="role-title master-admin">Super Administrator</div>
+                                    <p>Full access to all functionality and super administration.</p>
+                                    <h4>Permissions:</h4>
+                                    <ul class="permissions">
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can create incidents</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can edit incidents</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can manage settings</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can assign teams</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can send alerts</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> has desktop access</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can validate incidents</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can view all incidents</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can view settings</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can complete tasks</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can view reports</li>
+                                    </ul>
+                                </div>
+                                <div class="role-card">
+                                    <div class="role-title dispatch">System Administrator</div>
+                                    <p>Full access to all functionality and system administration.</p>
+                                    <h4>Permissions:</h4>
+                                    <ul class="permissions">
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can create incidents</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can edit incidents</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can manage settings</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can assign teams</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can send alerts</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> has desktop access</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can validate incidents</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can view all incidents</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can view settings</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can complete tasks</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can view reports</li>
+                                    </ul>
+                                </div>
+                                <div class="role-card">
+                                    <div class="role-title service-center">Manager</div>
+                                    <p>Can create incidents, manage settings, send alerts, desktop access, view all incidents. No settings access.</p>
+                                    <h4>Permissions:</h4>
+                                    <ul class="permissions">
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can create incidents</li>
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can edit incidents</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can manage settings</li>
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can assign teams</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can send alerts</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> has desktop access</li>
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can validate incidents</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can view all incidents</li>
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can view settings</li>
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can complete tasks</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can view reports</li>
+                                    </ul>
+                                </div>
+                                <div class="role-card">
+                                    <div class="role-title service-teams">Technician</div>
+                                    <p>Can only send alerts, view settings, has desktop access and complete tasks. No settings access.</p>
+                                    <h4>Permissions:</h4>
+                                    <ul class="permissions">
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can create incidents</li>
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can edit incidents</li>
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can manage settings</li>
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can assign teams</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can send alerts</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> has desktop access</li>
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can validate incidents</li>
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can view all incidents</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can view settings</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can complete tasks</li>
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can view reports</li>
+                                    </ul>
+                                </div>
+                                <div class="role-card">
+                                    <div class="role-title service-teams">Guest</div>
+                                    <p>Can only view all incidents, view reports and complete tasks. No other settings.</p>
+                                    <h4>Permissions:</h4>
+                                    <ul class="permissions">
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can create incidents</li>
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can edit incidents</li>
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can manage settings</li>
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can assign teams</li>
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can send alerts</li>
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> has desktop access</li>
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can validate incidents</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can view all incidents</li>
+                                        <li class="denied"><i class="fa-solid fa-xmark"></i> can view settings</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can complete tasks</li>
+                                        <li class="allowed"><i class="fa-solid fa-check"></i> can view reports</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     @* <div id="Ipolicies" class="team-tab-content policiesRightSec ">
@@ -1711,48 +1686,23 @@
 
 
 
-    /*****************for user*************** */
-    //     function showContent(type) {
-    //   if (type === 'user') {
-    //       console.log('hello');
-    //     document.getElementById('mainContainer').classList.add('hidden'); // hide sidebar + right
-    //     document.getElementById('userManagement').classList.remove('hidden'); // show user mgmt
-    //   } else {
-    //     document.getElementById('mainContainer').classList.remove('hidden');
-    //     document.getElementById('userManagement').classList.add('hidden');
-    //   }
-    // }
-
-    // function backToMain() {
-    //   document.getElementById('mainContainer').classList.remove('hidden');
-    //   document.getElementById('userManagement').classList.add('hidden');
-    // }
         function showContent(type) {
-        if (type === 'user') {
+        if (type === 'team') {
             document.getElementById('mainContainer').classList.add('hidden');
-            document.getElementById('userManagement').classList.remove('hidden');
-            document.getElementById('teamManagement').classList.add('hidden'); // hide team if open
-        } else if (type === 'team') {
-            document.getElementById('mainContainer').classList.add('hidden');
-            document.getElementById('userManagement').classList.add('hidden'); // hide user mgmt
-            document.getElementById('teamManagement').classList.remove('hidden'); // show team
+            document.getElementById('teamManagement').classList.remove('hidden');
         } else {
             document.getElementById('mainContainer').classList.remove('hidden');
-            document.getElementById('userManagement').classList.add('hidden');
             document.getElementById('teamManagement').classList.add('hidden');
         }
     }
 
         function backToMain() {
-        // Show main container
         document.getElementById('mainContainer').classList.remove('hidden');
-        // Hide both user and team management sections
-        document.getElementById('userManagement').classList.add('hidden');
         document.getElementById('teamManagement').classList.add('hidden');
 
         // Reset active tab in sidebar
-        document.querySelectorAll(".sidebar ul li").forEach(el => el.classList.remove("active"));
-        document.querySelector('.sidebar ul li[data-tab="source"]').classList.add("active");
+        document.querySelectorAll(".settingsidebar ul li").forEach(el => el.classList.remove("active"));
+        document.querySelector('.settingsidebar ul li[data-tab="source"]').classList.add("active");
 
         // Hide all tab content
         document.querySelectorAll(".tab-content").forEach(content => content.classList.remove("active"));

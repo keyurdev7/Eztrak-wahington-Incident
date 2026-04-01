@@ -1,4 +1,4 @@
-﻿
+
 $(function () {
 
     let currentStep = 1;
@@ -583,6 +583,23 @@ async function SaveIncidentValidation() {
             }
             else if (val.name === "IVValidation.ValidationNotes") {
                 formData.append("ValidationNotes", val.value);
+                form.push({ name: val.name, value: val.value });
+            }
+
+            else if (val.name === "IVValidation.ValidationDecision") {
+                formData.append("ValidationDecision", val.value);
+                form.push({ name: val.name, value: val.value });
+            }
+            else if (val.name === "IVValidation.BasisForValidation") {
+                formData.append("BasisForValidation", val.value);
+                form.push({ name: val.name, value: val.value });
+            }
+            else if (val.name === "IVValidation.ImpactScope") {
+                formData.append("ImpactScope", val.value);
+                form.push({ name: val.name, value: val.value });
+            }
+            else if (val.name === "IVValidation.CriticalCustomerPresent") {
+                formData.append("CriticalCustomerPresent", val.value);
                 form.push({ name: val.name, value: val.value });
             }
 

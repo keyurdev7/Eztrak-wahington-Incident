@@ -13,7 +13,14 @@
                     <option value="">Select Severity Level</option>
                     @foreach (var item in ViewBag.SeverityLevels as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)
                     {
-                        <option value="@item.Value" selected="@(item.Value == Model.SeverityID?.ToString())">@item.Text</option>
+                        if (item.Value == Model.SeverityID?.ToString())
+                        {
+                            <option value="@item.Value" selected>@item.Text</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
                     }
                 </select>
             </div>
@@ -23,9 +30,30 @@
                 <label>Discovery Perimeter <span style="color:red">*</span></label>
                 <select class="form-select" name="DiscoveryPerimeterId" id="DiscoveryPerimeterId" required>
                     <option value="">Select Discovery Perimeter</option>
-                    <option value="1" selected="@(Model.DiscoveryPerimeter == 1)">1 Mile</option>
-                    <option value="2" selected="@(Model.DiscoveryPerimeter == 2)">3 Miles</option>
-                    <option value="3" selected="@(Model.DiscoveryPerimeter == 3)">5 Miles</option>
+                    @if (Model.DiscoveryPerimeter == 1)
+                    {
+                        <option value="1" selected>1 Mile</option>
+                    }
+                    else
+                    {
+                        <option value="1">1 Mile</option>
+                    }
+                    @if (Model.DiscoveryPerimeter == 2)
+                    {
+                        <option value="2" selected>3 Miles</option>
+                    }
+                    else
+                    {
+                        <option value="2">3 Miles</option>
+                    }
+                    @if (Model.DiscoveryPerimeter == 3)
+                    {
+                        <option value="3" selected>5 Miles</option>
+                    }
+                    else
+                    {
+                        <option value="3">5 Miles</option>
+                    }
                 </select>
             </div>
         </div>

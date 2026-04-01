@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Folder Include="Services\AssignedPermissionService\" />
+    <Folder Include="Services\Session\Interface\" />
     <Folder Include="Users\" />
     <Folder Include="Users\Interface\" />
     <Folder Include="Services\Order\" />

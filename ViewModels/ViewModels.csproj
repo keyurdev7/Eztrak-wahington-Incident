@@ -57,6 +57,7 @@
     <Folder Include="AssignedPermission\" />
     <Folder Include="Cart\" />
     <Folder Include="Asset\Asset\" />
+    <Folder Include="Session\" />
     <Folder Include="WorkOrderEquipment\" />
     <Folder Include="WorkOrder\Interface\" />
     <Folder Include="Dashboard\WorkOrder\" />

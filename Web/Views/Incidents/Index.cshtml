@@ -160,6 +160,7 @@
         .incident-table table {
             width: 100%;
             border-collapse: collapse;
+        table-layout: fixed; /* deterministic column widths */
         }
 
         .incident-table th, .incident-table td {
@@ -167,12 +168,40 @@
             text-align: left;
             font-size: 14px;
             border-bottom: 1px solid #f3f4f6;
+            overflow: hidden; /* keep fixed row height */
+            text-overflow: ellipsis;
+            vertical-align: middle;
         }
 
         .incident-table th {
             background: #f9fafb;
             font-weight: 600;
             color: #374151;
+        }
+
+        /* Fixed column widths (table columns order in _IncidentGrid.cshtml) */
+        .incident-table th:nth-child(1), .incident-table td:nth-child(1) { width: 34px; }
+        .incident-table th:nth-child(2), .incident-table td:nth-child(2) { width: 70px; }   /* Status */
+        .incident-table th:nth-child(3), .incident-table td:nth-child(3) { width: 86px; }   /* Image */
+        .incident-table th:nth-child(4), .incident-table td:nth-child(4) { width: 90px; }   /* Phase */
+        .incident-table th:nth-child(5), .incident-table td:nth-child(5) { width: 90px; }   /* Progress */
+        .incident-table th:nth-child(6), .incident-table td:nth-child(6) { width: 92px; }   /* Severity (hidden) */
+        .incident-table th:nth-child(7), .incident-table td:nth-child(7) { width: 170px; }  /* Event Type */
+        .incident-table th:nth-child(8), .incident-table td:nth-child(8) { width: 170px; }  /* Source */
+        .incident-table th:nth-child(9), .incident-table td:nth-child(9) { width: 170px; }  /* Asset Type */
+        .incident-table th:nth-child(10), .incident-table td:nth-child(10) { width: 240px; } /* Description */
+        .incident-table th:nth-child(11), .incident-table td:nth-child(11) { width: 130px; } /* Intersection */
+        .incident-table th:nth-child(12), .incident-table td:nth-child(12) { width: 160px; } /* Location */
+        .incident-table th:nth-child(13), .incident-table td:nth-child(13) { width: 150px; } /* ES Indicators */
+        .incident-table th:nth-child(14), .incident-table td:nth-child(14) { width: 190px; } /* Date/Time */
+
+        /* Fixed row height */
+        .incident-table tbody tr {
+            height: 86px;
+        }
+        .incident-table tbody td {
+            padding-top: 10px;
+            padding-bottom: 10px;
         }
 
 

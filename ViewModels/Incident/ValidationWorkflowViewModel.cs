@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 using Models;
@@ -110,6 +110,12 @@ namespace ViewModels.Incident
 
         public string IncidentLocation { get; set; } = default!;
         public string Source { get; set; } = default!;
+
+        // Dropdowns for validation outcome/metadata
+        public string ValidationDecision { get; set; } = default!;
+        public string BasisForValidation { get; set; } = default!;
+        public string ImpactScope { get; set; } = default!;
+        public string CriticalCustomerPresent { get; set; } = default!;
     }
 
     public class IncidentResponseTeamViewModel
@@ -153,6 +159,12 @@ namespace ViewModels.Incident
         public string incidentValidationAssessment { get; set; } = default!;
         public string Source { get; set; } = default!;
         public string IncidentLocation { get; set; } = default!;
+
+        // Persisted dropdowns for validation outcome/metadata
+        public string ValidationDecision { get; set; } = default!;
+        public string BasisForValidation { get; set; } = default!;
+        public string ImpactScope { get; set; } = default!;
+        public string CriticalCustomerPresent { get; set; } = default!;
         
 
         //public string listCommunicationVM { get; set; } = default!;
@@ -199,18 +211,24 @@ namespace ViewModels.Incident
         public long? LocationId { get; set; }
         public long? SeverityID { get; set; }
         public long? DiscoveryPerimeter { get; set; }
+        public string DiscoveryPerimeterName { get; set; } = string.Empty;
         public string ICPLocation { get; set; } = default!;
         public string Source { get; set; } = default!;
         public string SeverityName { get; set; } = default!;
+        public string SeverityColor { get; set; } = string.Empty;
         public float Lat { get; set; } = default!;
         public float Lon { get; set; } = default!;
     }
     public class IncidentValidationAssignedRoleViewModel
     {
         public long? IncidentCommanderId { get; set; }
+        public long? IncidentCommanderSecondaryId { get; set; }
         public long? FieldEnvRepId { get; set; }
+        public long? FieldEnvRepSecondaryId { get; set; }
         public long? GECCoordinatorId { get; set; }
+        public long? GECCoordinatorSecondaryId { get; set; }
         public long? EngineeringLeadId { get; set; }
+        public long? EngineeringLeadSecondaryId { get; set; }
     }
 
     public class IncidentValidationValidationGatesViewModel 
@@ -221,6 +239,9 @@ namespace ViewModels.Incident
         public string Regulatory { get; set; }
         public bool IsOtherEvent { get; set; }
         public string OtherEventDetail { get; set; }
+
+        // Dropdown for containment progress/status
+        public string ContainmentStatus { get; set; } = default!;
     }
 
     public class IncidentValidationPersonalViewModel

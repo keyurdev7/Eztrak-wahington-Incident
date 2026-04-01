@@ -1,4 +1,4 @@
-﻿@using ViewModels.Dashboard
+@using ViewModels.Dashboard
 @model DashboardViewModel
 @{
     ViewData["Title"] = "Administrator Dashboard";
@@ -620,12 +620,12 @@
                         <p class="titleDescription">Interactive map showing all incident locations with status indicators</p> *@
                         <div class="position-relative" style="height: calc(100vh - 100px); min-height: 600px;">
                             <!-- Status Legend (transparent and collapsible) -->
-                            <div class="incident-locations" id="statusLegend">
+                            <div class="incident-locations collapsed" id="statusLegend">
                                 <div class="statusLegendInfo" onclick="toggleLegend()">
                                     <i class="fa fa-layer-group"></i> Status Legend
-                                    <i class="fa fa-chevron-up ms-2" id="legendToggleIcon"></i>
+                                    <i class="fa fa-chevron-down ms-2" id="legendToggleIcon"></i>
                                 </div>
-                                <div class="status-legend" id="statusLegendContent">
+                                <div class="status-legend" id="statusLegendContent" style="display:none">
                                     <div class="legend-item"><i class="fa-solid fa-circle submitted"></i><span>Submitted (@Model.IncidentDashboard.TotalSubmittedCount)</span></div>
                                     <div class="legend-item"><i class="fa-solid fa-circle started"></i><span>Validated (@Model.IncidentDashboard.TotalValidatedCount)</span></div>
                                     <div class="legend-item"><i class="fa-solid fa-circle completed"></i><span>Completed (@Model.IncidentDashboard.TotalCompletedCount)</span></div>
@@ -659,14 +659,14 @@
                                     <button id="incidentListToggleBtn"
                                             type="button"
                                             class="btn btn-sm btn-light btn-col"
-                                            aria-expanded="true"
+                                            aria-expanded="false"
                                             aria-controls="incidentListContent"
                                             title="Collapse/Expand">
-                                        <i class="fa fa-chevron-up"></i>
+                                        <i class="fa fa-chevron-down"></i>
                                     </button>
                                 </div>
 
-                                <div id="incidentListContent" class="ListHeight mt-3">
+                                <div id="incidentListContent" class="ListHeight mt-3" style="display:none">
                                     <div class="recentList">
                                         @if (Model.IncidentDashboard.ListIncidentRecentViewModel.Count > 0)
                                         {

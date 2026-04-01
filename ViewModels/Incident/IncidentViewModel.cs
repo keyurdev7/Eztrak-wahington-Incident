@@ -89,6 +89,7 @@ namespace ViewModels.Incident
     {
         public string CallerName { get; set; } = default!;
         public string CallerPhoneNumber { get; set; } = default!;
+        public string? CallerPhoneNumberType { get; set; }
         public string CallerAddress { get; set; } = default!;
         public List<SelectListItem> Relationships { get; set; } = new();
         public long? RelationshipId { get; set; } = default!;
@@ -226,6 +227,9 @@ namespace ViewModels.Incident
         public string DiscoveryPerimeterName { get; set; }
         public string AssignResponseTeams { get; set; }
         public string ValidationNotes { get; set; }
+        public string ValidationDecision { get; set; } = string.Empty;
+        public string BasisForValidation { get; set; } = string.Empty;
+        public string CriticalCustomerPresent { get; set; } = string.Empty;
         public long CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
         public string CreatedDateInFormat { get; set; }
@@ -381,6 +385,7 @@ namespace ViewModels.Incident
         public string Exception { get; set; } = string.Empty;
         public string IndependentInspection { get; set; } = string.Empty;
         public string Regulatory { get; set; } = string.Empty;
+        public string ContainmentStatus { get; set; } = string.Empty;
     }
     public class IncidentValidationNoteViewModel
     {
@@ -583,6 +588,10 @@ namespace ViewModels.Incident
         public string Notes { get; set; } = string.Empty;
         public long? ImageCount { get; set; }
         public int SortOrder { get; set; }
+
+        // Display columns in checklist tables
+        public string LastUpdated { get; set; } = "--";
+        public string UpdatedBy { get; set; } = "--";
     }
     public class IncidentEditTaskListViewModel
     {

@@ -45,6 +45,7 @@ namespace Models
 
         public string? CallerName { get; set; }
         public string? CallerPhoneNumber { get; set; }
+        public string? CallerPhoneNumberTypes { get; set; }
         public string? CallerAddress { get; set; }
         public DateTime CallTime { get; set; }
         public string? LocationAddress { get; set; }

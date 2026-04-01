@@ -152,6 +152,7 @@
 		<Folder Include="Storage\Assets\Documents\" />
 		<Folder Include="Storage\Assets\Others\" />
 		<Folder Include="Views\AssignedPermission\" />
+		<Folder Include="Views\SessionMonitoring\" />
 		<Folder Include="wwwroot\js\bundles\" />
 		<Folder Include="wwwroot\Templates\" />
 		<Folder Include="Views\Cart\" />

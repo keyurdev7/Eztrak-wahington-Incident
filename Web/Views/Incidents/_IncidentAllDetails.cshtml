@@ -981,6 +981,19 @@
                         <div class="card">
                             <h3>Supporting Information</h3>
 
+                            @if (Model.DescriptionChecklistItems?.Any() == true)
+                            {
+                                <div class="note-title">
+                                    <i class="fa-regular fa-list-check"></i> Incident Checklist
+                                </div>
+                                <ul class="mb-3" style="padding-left: 18px; list-style: disc;">
+                                    @foreach (var item in Model.DescriptionChecklistItems)
+                                    {
+                                        <li>@item</li>
+                                    }
+                                </ul>
+                            }
+
                             <!-- Service Notes -->
                             <div class="note-title">
                                 <i class="fa-regular fa-file-lines"></i> Service Representative Notes

@@ -17,7 +17,6 @@ namespace Web.Controllers
         #region Init Service
         private readonly IRelationshipService<RelationshipModifyViewModel, RelationshipModifyViewModel, RelationshipDetailViewModel> _iRelationshipService;
         private readonly IEventTypeService<EventTypeModifyViewModel, EventTypeModifyViewModel, EventTypeDetailViewModel> _iEventTypeService;
-        private readonly ISeverityLevelService<SeverityLevelModifyViewModel, SeverityLevelModifyViewModel, SeverityLevelDetailViewModel> _iSeverityLevelService;
         private readonly IStatusLegendService<StatusLegendModifyViewModel, StatusLegendModifyViewModel, StatusLegendDetailViewModel> _iStatusLegendService;
         private readonly IAssetIdService<AssetIdModifyViewModel, AssetIdModifyViewModel, AssetIdDetailViewModel> _iAssetIdService;
         private readonly IAssetTypeService<AssetTypeModifyViewModel, AssetTypeModifyViewModel, AssetTypeDetailViewModel> _iAssetTypeService;
@@ -35,7 +34,7 @@ namespace Web.Controllers
         #endregion
 
         #region Ctor
-        public SettingsController(IRelationshipService<RelationshipModifyViewModel, RelationshipModifyViewModel, RelationshipDetailViewModel> iRelationshipService, IEventTypeService<EventTypeModifyViewModel, EventTypeModifyViewModel, EventTypeDetailViewModel> iEventTypeService, ISeverityLevelService<SeverityLevelModifyViewModel, SeverityLevelModifyViewModel, SeverityLevelDetailViewModel> iSeverityLevelService, IStatusLegendService<StatusLegendModifyViewModel, StatusLegendModifyViewModel, StatusLegendDetailViewModel> iStatusLegendService, IAssetIdService<AssetIdModifyViewModel, AssetIdModifyViewModel, AssetIdDetailViewModel> iAssetIdService,
+        public SettingsController(IRelationshipService<RelationshipModifyViewModel, RelationshipModifyViewModel, RelationshipDetailViewModel> iRelationshipService, IEventTypeService<EventTypeModifyViewModel, EventTypeModifyViewModel, EventTypeDetailViewModel> iEventTypeService, IStatusLegendService<StatusLegendModifyViewModel, StatusLegendModifyViewModel, StatusLegendDetailViewModel> iStatusLegendService, IAssetIdService<AssetIdModifyViewModel, AssetIdModifyViewModel, AssetIdDetailViewModel> iAssetIdService,
             IAssetTypeService<AssetTypeModifyViewModel, AssetTypeModifyViewModel, AssetTypeDetailViewModel> iAssetTypeService, IIncidentTeamService<IncidentTeamModifyViewModel, IncidentTeamModifyViewModel, IncidentTeamDetailViewModel> iIncidentTeamService,
             IUserManagementService<UserManagementModifyViewModel, UserManagementModifyViewModel, UserDetailViewModel> iUserManagementService,
             IPolicyService<PolicyModifyViewModel, PolicyModifyViewModel, PolicyDetailViewModel> iPolicyService, IUsersinService<UserModifyViewModel, UserModifyViewModel, UserDetailViewModel> iusersinService,
@@ -45,7 +44,6 @@ namespace Web.Controllers
         {
             _iRelationshipService = iRelationshipService;
             _iEventTypeService = iEventTypeService;
-            _iSeverityLevelService = iSeverityLevelService;
             _iStatusLegendService = iStatusLegendService;
             _iAssetIdService = iAssetIdService;
             _iAssetTypeService = iAssetTypeService;
@@ -310,86 +308,26 @@ namespace Web.Controllers
         #endregion
 
         #region SeverityLevel
+        // Severity levels are fixed (DB-seeded); configuration UI removed — endpoints disabled.
         [HttpGet]
-        public async Task<IActionResult> GetAllSeverity()
-        {
-            var model = await _iSeverityLevelService.GetAllSeverityLevels();
-            return PartialView("~/Views/Settings/SeverityLevel/_ListSeverityLevel.cshtml", model);
-        }
+        public IActionResult GetAllSeverity() =>
+            NotFound("Severity levels are fixed and cannot be edited from Settings.");
 
         [HttpGet]
-        public async Task<IActionResult> AddSeverity()
-        {
-            var model = new SeverityLevelModifyViewModel();
-            return PartialView("~/Views/Settings/SeverityLevel/_AddSeverityLevel.cshtml", model);
-        }
+        public IActionResult AddSeverity() =>
+            NotFound("Severity levels are fixed and cannot be edited from Settings.");
 
         [HttpGet]
-        public async Task<IActionResult> GetSeverityById(long id)
-        {
-            var model = await _iSeverityLevelService.GetSeverityLevelById(id);
-            return PartialView("~/Views/Settings/SeverityLevel/_AddSeverityLevel.cshtml", model);
-        }
+        public IActionResult GetSeverityById(long id) =>
+            NotFound("Severity levels are fixed and cannot be edited from Settings.");
 
         [HttpPost]
-        public async Task<IActionResult> SaveSeverity([FromForm] SeverityLevelModifyViewModel severityLevel)
-        {
-            if (severityLevel == null)
-                return BadRequest(new { success = false, message = "Invalid request data." });
-
-            try
-            {
-                long Id = 0;
-                if (severityLevel.Id > 0)
-                {
-                    Id = await _iSeverityLevelService.UpdateSeverityLevel(severityLevel);
-                }
-                else
-                {
-                    Id = await _iSeverityLevelService.SaveSeverityLevel(severityLevel);
-                }
-                if (Id == 0)
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                        new { success = false, message = "Failed to save severity level." });
-
-                var successMsg = $"Severity level saved successfully!";
-
-                return Ok(new { success = true, data = successMsg });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new { success = false, message = "An unexpected error occurred." });
-            }
-        }
+        public IActionResult SaveSeverity([FromForm] SeverityLevelModifyViewModel severityLevel) =>
+            NotFound("Severity levels are fixed and cannot be edited from Settings.");
 
         [HttpGet]
-        public async Task<IActionResult> DeleteSeverityById(long id)
-        {
-            if (id == 0)
-                return BadRequest(new { success = false, message = "Invalid request data." });
-
-            try
-            {
-                long Id = 0;
-                if (id > 0)
-                {
-                    Id = await _iSeverityLevelService.DeleteSeverityLevel(id);
-                }
-                if (Id == 0)
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                        new { success = false, message = "Failed to delete severity level." });
-
-                var successMsg = $"Severity level deleted successfully!";
-
-                return Ok(new { success = true, data = successMsg });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new { success = false, message = "An unexpected error occurred." });
-            }
-        }
+        public IActionResult DeleteSeverityById(long id) =>
+            NotFound("Severity levels are fixed and cannot be edited from Settings.");
         #endregion
 
         #region StatusLegend

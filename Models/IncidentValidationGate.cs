@@ -1,4 +1,4 @@
-﻿using Models.Models.Shared;
+using Models.Models.Shared;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -25,5 +25,8 @@ namespace Models
         public string? Regulatory { get; set; }
         public bool IsOtherEvent { get; set; }
         public string? OtherEventDetail { get; set; }
+
+        // Containment progress/status (persisted from dropdown)
+        public string? ContainmentStatus { get; set; }
     }
 }
