@@ -495,6 +495,24 @@
     .incident-details {
         display: flex;
         align-items: center;
+        gap: 10px;
+    }
+
+    .incident-media {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #fff1eb 0%, #ffe2d2 100%);
+        border: 1px solid #ffd5c2;
+        color: #f54e00;
+    }
+
+    .incident-media i {
+        font-size: 16px;
     }
 
     .incident-icon {
@@ -524,10 +542,23 @@
 
     .incident-info p {
         color: #4b5563;
-        font-size: 14px;
+        font-size: 13px;
         line-height: normal;
         margin-bottom: 0;
         font-weight: 300;
+    }
+
+    .incident-meta-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+
+    .incident-subtext {
+        display: block;
+        color: #6b7280;
+        font-size: 12px;
     }
 
     .incident-severity {
@@ -687,17 +718,22 @@
 
                                                     <a href="/IncidentDetail/Index/@item.id">
                                                     <div class="incident-details">
+                                                        <div class="incident-media">
+                                                            <i class="fa-solid fa-triangle-exclamation"></i>
+                                                        </div>
                                                         <span class="dot" style="width: 12px;height: 12px;min-width: 12px;border-radius: 50%;display: inline-block;background-color:@item.incidentstatusColor"></span>
-                                                        <div class="incident-info" style="margin-left: 20px;">
-                                                            <h4>@item.incidentId</h4>
+                                                        <div class="incident-info">
+                                                            <div class="incident-meta-row">
+                                                                <h4>@item.incidentId</h4>
                                                            
-                                                            @if(!string.IsNullOrEmpty(item.severity))
+                                                                @if(!string.IsNullOrEmpty(item.severity))
                                                     
-                                                            {
-                                                                <div class="incident-severity">@item.severity</div>
-                                                            }
+                                                                {
+                                                                    <div class="incident-severity">@item.severity</div>
+                                                                }
+                                                            </div>
                                                             <p>@item.incidentloc</p>
-                                                            <p>@item.eventtype</p>
+                                                            <span class="incident-subtext">@item.eventtype</span>
                                                         </div>
                                                         </div>
                                                     </a>

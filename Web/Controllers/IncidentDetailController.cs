@@ -90,7 +90,7 @@ namespace Web.Controllers
 
         #region Map
         [HttpPost]
-        public async Task<JsonResult> AddMapChat([FromBody] IncidentMapChatRequest request)
+        public async Task<JsonResult> AddMapChat([FromForm] IncidentMapChatRequest request, [FromForm] List<IFormFile>? Files)
         {
             if (request == null)
             {
@@ -99,10 +99,21 @@ namespace Web.Controllers
 
             try
             {
+                var uploadedFiles = new List<IFormFile>();
+                if (Files != null && Files.Any())
+                    uploadedFiles.AddRange(Files);
+                if (Request?.Form?.Files != null && Request.Form.Files.Count > 0)
+                    uploadedFiles.AddRange(Request.Form.Files);
+
+                request.Files = uploadedFiles
+                    .GroupBy(f => $"{f.FileName}|{f.Length}")
+                    .Select(g => g.First())
+                    .ToList();
+
                 long id = await _iIncidentService.AddMapChat(request);
                 if (id > 0)
                 {
-                    return Json(new { success = true, message = "Success" });
+                    return Json(new { success = true, message = "Success", attachmentUrls = request.AttachmentUrls ?? string.Empty });
                 }
                 return Json(new { success = false, message = "Failed to delete location." });
             }
@@ -431,16 +442,27 @@ namespace Web.Controllers
 
         #region ValidationNOte
         [HttpPost]
-        public async Task<JsonResult> SaveValidationNote([FromBody] SaveValidationNoteRequest request)
+        public async Task<JsonResult> SaveValidationNote([FromForm] SaveValidationNoteRequest request, [FromForm] List<IFormFile>? Files)
         {
             if (request == null || request.IncidentId <= 0 || string.IsNullOrWhiteSpace(request.Notes))
                 return Json(new { success = false, message = "Invalid request." });
 
             try
             {
+                var uploadedFiles = new List<IFormFile>();
+                if (Files != null && Files.Any())
+                    uploadedFiles.AddRange(Files);
+                if (Request?.Form?.Files != null && Request.Form.Files.Count > 0)
+                    uploadedFiles.AddRange(Request.Form.Files);
+
+                request.Files = uploadedFiles
+                    .GroupBy(f => $"{f.FileName}|{f.Length}")
+                    .Select(g => g.First())
+                    .ToList();
+
                 var id = await _iIncidentService.SaveValidationNoteAsync(request);
                 if (id > 0)
-                    return Json(new { success = true, id, message = "Saved" });
+                    return Json(new { success = true, id, message = "Saved", attachmentUrls = request.AttachmentUrls ?? string.Empty });
 
                 return Json(new { success = false, message = "Save failed." });
             }
@@ -452,10 +474,21 @@ namespace Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SavePostDetails([FromForm] IncidentViewPostViewModel incidentViewPostViewModel)
+        public async Task<IActionResult> SavePostDetails([FromForm] IncidentViewPostViewModel incidentViewPostViewModel, [FromForm] List<IFormFile>? Files)
         {
             try
             {
+                var uploadedFiles = new List<IFormFile>();
+                if (Files != null && Files.Any())
+                    uploadedFiles.AddRange(Files);
+
+                if (Request?.Form?.Files != null && Request.Form.Files.Count > 0)
+                    uploadedFiles.AddRange(Request.Form.Files);
+
+                incidentViewPostViewModel.Files = uploadedFiles
+                    .GroupBy(f => $"{f.FileName}|{f.Length}")
+                    .Select(g => g.First())
+                    .ToList();
 
                 List<IncidentViewPostViewModel> listIncidentViewPostViewModel = await _iIncidentService.SavePostDetails(incidentViewPostViewModel);
 

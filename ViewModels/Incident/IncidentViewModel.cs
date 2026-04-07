@@ -393,6 +393,7 @@ namespace ViewModels.Incident
         public long? IncidentId { get; set; }
         public long? IncidentValidationId { get; set; }
         public string Notes { get; set; }
+        public string? AttachmentUrls { get; set; }
         public bool IsDeleted { get; set; }
         public int ActiveStatus { get; set; }
         public DateTime? CreatedOn { get; set; }
@@ -532,6 +533,8 @@ namespace ViewModels.Incident
         public string? TimeforMessage { get; set; }
         public string? Message { get; set; }
         public long IncidentViewType { get; set; }
+        public string? AttachmentUrls { get; set; }
+        public List<IFormFile> Files { get; set; } = new();
 
     }
 

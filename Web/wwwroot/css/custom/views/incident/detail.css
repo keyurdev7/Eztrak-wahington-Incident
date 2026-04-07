@@ -1186,6 +1186,36 @@
     font-size: 14px;
 }
 
+/* Match Validation notes cards with other checklist tabs */
+#validation .validation-notes .update-item {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+#validation .validation-notes .update-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+#validation .validation-notes .update-time {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+#validation .validation-notes .update-email {
+    font-size: 0.65rem;
+    color: #9ca3af;
+}
+
 #validation .validatedBy {
     border-right: 1px solid #c1c1c1;
     margin-right: 6px;
@@ -1596,6 +1626,80 @@
     font-size: 0.85rem;
     border-radius: 8px;
     transition: all 0.2s ease;
+}
+
+.notes-submit-btn {
+    margin-top: 8px;
+}
+
+/* Unified note message box + attachment layout */
+.validation-notes .note-message-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 10px;
+}
+
+.validation-notes .note-attachments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.validation-notes .note-image-link {
+    display: inline-block;
+}
+
+.validation-notes .note-image-thumb {
+    width: 68px;
+    height: 68px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+}
+
+.validation-notes .note-file-link {
+    color: #2563eb;
+}
+
+.map-notes .update-item {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.map-notes .note-message-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 10px;
+}
+
+.map-notes .note-attachments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.map-notes .note-image-link {
+    display: inline-block;
+}
+
+.map-notes .note-image-thumb {
+    width: 68px;
+    height: 68px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+}
+
+.map-notes .note-file-link {
+    color: #2563eb;
 }
 
 #assessment .notes-submit-btn:hover {

@@ -29,6 +29,26 @@
     var completedRepair = RepairList?.Count(t => t.FieldStatus?.ToLower() == "complete") ?? 0;
     var RepairPr  = totalRepair > 0 ? Math.Round((double)completedRepair / totalRepair * 100) : 0;
     var totalpr = (assessmentpr + percentCloseOut + restorationpr + RepairPr) / 4;
+
+    bool IsImageFile(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return false;
+        var ext = System.IO.Path.GetExtension(path)?.ToLowerInvariant();
+        return ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif" || ext == ".bmp" || ext == ".webp" || ext == ".svg";
+    }
+
+    (string Message, string AttachmentUrls) ParseMapChat(string? rawMessage)
+    {
+        const string marker = "[[ATTACH]]";
+        if (string.IsNullOrWhiteSpace(rawMessage))
+            return (string.Empty, string.Empty);
+        var markerIndex = rawMessage.IndexOf(marker, StringComparison.Ordinal);
+        if (markerIndex < 0)
+            return (rawMessage, string.Empty);
+        var message = rawMessage[..markerIndex].Trim();
+        var attachments = rawMessage[(markerIndex + marker.Length)..].Trim();
+        return (message, attachments);
+    }
 }
   
 <link href="~/css/custom/views/incident/detail.css" rel="stylesheet" />
@@ -269,11 +289,33 @@
                                                 <div class="card-body chat-body" id="chatMessages" style="padding:0; max-height: 200px; overflow:auto;">
                                                     @foreach (var item in Model.listIncidentMapChats)
                                                     {
-                                                        <div class="update-item-map d-flex justify-content-between align-items-start mb-2">
-                                                            <div class="update-message">@item.ChatMessage</div>
-                                                            <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
-                                                                <span class="update-time-map">@item.SentBy</span>
-                                                                <span class="update-email postby-div-map text-muted">admin@eztrak.com</span>
+                                                        var parsedMapNote = ParseMapChat(item.ChatMessage);
+                                                        <div class="update-item notes-item mb-2">
+                                                            <div class="update-message note-message-box">@parsedMapNote.Message</div>
+                                                            @if (!string.IsNullOrWhiteSpace(parsedMapNote.AttachmentUrls))
+                                                            {
+                                                                <div class="note-attachments mt-1">
+                                                                    @foreach (var file in parsedMapNote.AttachmentUrls.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                                                                    {
+                                                                        var fileUrl = file.Trim();
+                                                                        if (IsImageFile(fileUrl))
+                                                                        {
+                                                                            <a href="@fileUrl" target="_blank" class="note-image-link" title="@System.IO.Path.GetFileName(fileUrl)">
+                                                                                <img src="@fileUrl" alt="@System.IO.Path.GetFileName(fileUrl)" class="note-image-thumb" />
+                                                                            </a>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <a href="@fileUrl" target="_blank" class="d-block text-decoration-none small note-file-link">
+                                                                                <i class="fa-solid fa-paperclip me-1"></i>@System.IO.Path.GetFileName(fileUrl)
+                                                                            </a>
+                                                                        }
+                                                                    }
+                                                                </div>
+                                                            }
+                                                            <div class="update-meta">
+                                                                <span class="update-time">@item.SentBy</span>
+                                                                <span class="update-email postby-div text-muted">admin@eztrak.com</span>
                                                             </div>
                                                         </div>
                                                     }
@@ -282,7 +324,8 @@
                                                 <div class="chat-input-area" style="padding-top:8px;">
                                                     <div class="mesgsend">
                                                         <textarea rows="3" class="form-control mb-2" id="messageInput" placeholder="Add new note..."></textarea>
-                                                        <button class="btn btn-update w-100" id="sendBtn" data-type="1">
+                                                        <input type="file" class="form-control mt-2" id="mapNoteFiles" multiple />
+                                                        <button class="btn btn-update w-100 mt-2" id="sendBtn" data-type="1">
                                                             <i class="fa-solid fa-paper-plane me-2" style="color:#ffffff !important"></i>Add Note
                                                         </button>
                                                     </div>
@@ -1166,17 +1209,49 @@
                                                 {
                                                     foreach (var n in Model.incidentValidationsDetailsViewModel.IncidentValidationNotesList)
                                                     {
-                                                        <div class="update-item-map d-flex justify-content-between align-items-start mb-2">
-                                                            <div class="update-message flex-grow-1 me-3">@n.Notes</div>
-                                                            <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
-                                                                <span class="update-time-map">@n.CreatedOn</span>
-                                                                <span class="update-email postby-div-map text-muted">admin@eztrak.com</span>
+                                                        <div class="update-item notes-item mb-2">
+                                                            <div class="update-message note-message-box">@n.Notes</div>
+                                                            @if (!string.IsNullOrWhiteSpace(n.AttachmentUrls))
+                                                            {
+                                                                <div class="note-attachments mt-1">
+                                                                    @foreach (var file in n.AttachmentUrls.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                                                                    {
+                                                                        var fileUrl = file.Trim();
+                                                                        var isImage = fileUrl.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase)
+                                                                            || fileUrl.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase)
+                                                                            || fileUrl.EndsWith(".png", StringComparison.OrdinalIgnoreCase)
+                                                                            || fileUrl.EndsWith(".gif", StringComparison.OrdinalIgnoreCase)
+                                                                            || fileUrl.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase)
+                                                                            || fileUrl.EndsWith(".webp", StringComparison.OrdinalIgnoreCase)
+                                                                            || fileUrl.EndsWith(".svg", StringComparison.OrdinalIgnoreCase);
+                                                                        if (isImage)
+                                                                        {
+                                                                            <a href="@fileUrl" target="_blank" class="note-image-link" title="@System.IO.Path.GetFileName(fileUrl)">
+                                                                                <img src="@fileUrl" alt="@System.IO.Path.GetFileName(fileUrl)" class="note-image-thumb" />
+                                                                            </a>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <a href="@fileUrl" target="_blank" class="d-block text-decoration-none small note-file-link">
+                                                                                <i class="fa-solid fa-paperclip me-1"></i>@System.IO.Path.GetFileName(fileUrl)
+                                                                            </a>
+                                                                        }
+                                                                    }
+                                                                </div>
+                                                            }
+                                                            <div class="update-meta">
+                                                                <span class="update-time">@n.CreatedOn</span>
+                                                                <span class="update-email postby-div text-muted">admin@eztrak.com</span>
                                                             </div>
                                                         </div>
                                                     }
                                                 }
                                             </div>
                                             <textarea class="form-control mt-3" rows="3" id="addNote" placeholder="Add new note..."></textarea>
+                                            <input type="file" class="form-control mt-2" id="validationNoteFiles" multiple />
+                                            <button type="button" class="btn btn-update notes-submit-btn mt-2" id="btnSaveValidationNote">
+                                                <i class="fa-solid fa-paper-plane me-2"></i>Add Note
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -1449,17 +1524,49 @@
                                                 {
                                                     foreach (var n in Model.incidentValidationsDetailsViewModel.IncidentValidationNotesList)
                                                     {
-                                                        <div class="update-item-map d-flex justify-content-between align-items-start mb-2">
-                                                            <div class="update-message flex-grow-1 me-3">@n.Notes</div>
-                                                            <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
-                                                                <span class="update-time-map">@n.CreatedOn</span>
-                                                                <span class="update-email postby-div-map text-muted">admin@eztrak.com</span>
+                                                        <div class="update-item notes-item mb-2">
+                                                            <div class="update-message note-message-box">@n.Notes</div>
+                                                            @if (!string.IsNullOrWhiteSpace(n.AttachmentUrls))
+                                                            {
+                                                                <div class="note-attachments mt-1">
+                                                                    @foreach (var file in n.AttachmentUrls.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                                                                    {
+                                                                        var fileUrl = file.Trim();
+                                                                        var isImage = fileUrl.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase)
+                                                                            || fileUrl.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase)
+                                                                            || fileUrl.EndsWith(".png", StringComparison.OrdinalIgnoreCase)
+                                                                            || fileUrl.EndsWith(".gif", StringComparison.OrdinalIgnoreCase)
+                                                                            || fileUrl.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase)
+                                                                            || fileUrl.EndsWith(".webp", StringComparison.OrdinalIgnoreCase)
+                                                                            || fileUrl.EndsWith(".svg", StringComparison.OrdinalIgnoreCase);
+                                                                        if (isImage)
+                                                                        {
+                                                                            <a href="@fileUrl" target="_blank" class="note-image-link" title="@System.IO.Path.GetFileName(fileUrl)">
+                                                                                <img src="@fileUrl" alt="@System.IO.Path.GetFileName(fileUrl)" class="note-image-thumb" />
+                                                                            </a>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <a href="@fileUrl" target="_blank" class="d-block text-decoration-none small note-file-link">
+                                                                                <i class="fa-solid fa-paperclip me-1"></i>@System.IO.Path.GetFileName(fileUrl)
+                                                                            </a>
+                                                                        }
+                                                                    }
+                                                                </div>
+                                                            }
+                                                            <div class="update-meta">
+                                                                <span class="update-time">@n.CreatedOn</span>
+                                                                <span class="update-email postby-div text-muted">admin@eztrak.com</span>
                                                             </div>
                                                         </div>
                                                     }
                                                 }
                                             </div>
                                             <textarea class="form-control mt-3" rows="3" id="addNote" placeholder="Add new note..."></textarea>
+                                            <input type="file" class="form-control mt-2" id="validationNoteFiles" multiple />
+                                            <button type="button" class="btn btn-update notes-submit-btn mt-2" id="btnSaveValidationNote">
+                                                <i class="fa-solid fa-paper-plane me-2"></i>Add Note
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -3165,12 +3272,16 @@
         window.mapInstance = map;
 
         var incidents = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ListIncidentLocationMapViewModel));
-        var firstObj = incidents[0];
+        var defaultMapCenter = [-118.2437, 34.0522];
+        var firstObj = (incidents && incidents.length > 0) ? incidents[0] : null;
+        var mapCenter = (firstObj && firstObj.lon != null && firstObj.lat != null)
+            ? [firstObj.lon, firstObj.lat]
+            : defaultMapCenter;
 
         window.view = new MapView({
             container: "map",
             map: map,
-            center: [firstObj.lon, firstObj.lat],
+            center: mapCenter,
             zoom: 6,
             ui: {
                 components: ["zoom"] // Ensure zoom controls are visible
@@ -3406,14 +3517,21 @@
             month: 'short',
             day: '2-digit'
         });
-        document.getElementById("validatedDate").textContent = formattedDate;
+        var validatedDateEl = document.getElementById("validatedDate");
+        if (validatedDateEl) {
+            validatedDateEl.textContent = formattedDate;
+        }
     });
 </script>
 <script>
        const sendBtn = document.getElementById('sendBtn');
        const messageInput = document.getElementById('messageInput');
+       const mapNoteFiles = document.getElementById('mapNoteFiles');
        const roleSelect = '';
        const chatMessages = document.getElementById('chatMessages');
+       if (!sendBtn || !messageInput || !chatMessages) {
+           // Map notes UI not present on this layout
+       } else {
        let now = new Date();
             let hours = now.getHours().toString().padStart(2, "0");
             let minutes = now.getMinutes().toString().padStart(2, "0");
@@ -3432,13 +3550,20 @@
 
       showLoader($("#chatMessages"));
 
-      const payload = { IncidentId: id, ChatMessage: message, SentBy: role };
+      const formData = new FormData();
+      formData.append('IncidentId', id);
+      formData.append('ChatMessage', message);
+      formData.append('SentBy', role);
+      if (mapNoteFiles && mapNoteFiles.files && mapNoteFiles.files.length > 0) {
+          for (let i = 0; i < mapNoteFiles.files.length; i++) {
+              formData.append('Files', mapNoteFiles.files[i]);
+          }
+      }
 
       try {
         const res = await fetch("/IncidentDetail/AddMapChat", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+          body: formData
         });
 
         const json = await res.json();
@@ -3450,11 +3575,12 @@
          @*  newMsg.innerHTML = `<span class="badge role-badge">${role}</span> ${message}`; *@
 
 
-        newMsg.innerHTML = `<div class="update-item-map d-flex justify-content-between align-items-start mb-2">
-                                                    <div class="update-message">${message}</div>
-                                                    <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
-                                                        <span class="update-time-map">${role}</span>
-                                                        <span class="update-email postby-div-map text-muted">admin@eztrak.com</span>
+        newMsg.innerHTML = `<div class="update-item notes-item mb-2">
+                                                    <div class="update-message note-message-box">${escapeHtml(message)}</div>
+                                                    ${renderMapAttachmentLinks(json.attachmentUrls)}
+                                                    <div class="update-meta">
+                                                        <span class="update-time">${role}</span>
+                                                        <span class="update-email postby-div text-muted">admin@eztrak.com</span>
                                                     </div>
                                                 </div>
                                                 `;
@@ -3470,6 +3596,7 @@
 
           // Clear input
           messageInput.value = '';
+          if (mapNoteFiles) mapNoteFiles.value = '';
 
         }
          hideLoader($("#chatMessages"));
@@ -3487,20 +3614,53 @@
       }
     });
 
+       }
+
+    function escapeHtml(unsafe) {
+      return (unsafe || '')
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function renderMapAttachmentLinks(attachmentUrls) {
+      if (!attachmentUrls) return '';
+      const links = attachmentUrls
+        .split(',')
+        .map(x => x && x.trim())
+        .filter(Boolean)
+        .map(url => {
+          const name = url.split('/').pop() || 'attachment';
+          if (/\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(url)) {
+            return `<a href="${url}" target="_blank" class="note-image-link" title="${name}"><img src="${url}" alt="${name}" class="note-image-thumb" /></a>`;
+          }
+          return `<a href="${url}" target="_blank" class="d-block text-decoration-none small note-file-link"><i class="fa-solid fa-paperclip me-1"></i>${name}</a>`;
+        })
+        .join('');
+      return links ? `<div class="note-attachments mt-1">${links}</div>` : '';
+    }
+
 </script>
 <script>
-    document.getElementById("reportDate").addEventListener("change", function () {
-        const dateInput = this.value; // e.g. "2025-10-09"
-        const selectedDate = new Date(dateInput);
-        const formattedDate = selectedDate.toLocaleString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-        }); // e.g. "Oct 9, 2025"
-
-        // Update Daily Summary date
-        document.getElementById("summaryDate").textContent = formattedDate;
-         });
+    (function () {
+        var reportDateEl = document.getElementById("reportDate");
+        if (!reportDateEl) return;
+        reportDateEl.addEventListener("change", function () {
+            const dateInput = this.value;
+            const selectedDate = new Date(dateInput);
+            const formattedDate = selectedDate.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+            var summaryDateEl = document.getElementById("summaryDate");
+            if (summaryDateEl) {
+                summaryDateEl.textContent = formattedDate;
+            }
+        });
+    })();
 </script>
 <script>
     $(document).ready(function () {
@@ -3557,8 +3717,12 @@
 </script>
 <script>
     (function () {
-           const textarea = document.getElementById('addNote');
            const notesBody = document.getElementById('validationNotesBody');
+           const textarea = notesBody ? notesBody.querySelector('#addNote') : null;
+           const fileInput = notesBody ? notesBody.querySelector('#validationNoteFiles') : null;
+           const saveButton = notesBody ? notesBody.querySelector('#btnSaveValidationNote') : null;
+           const notesList = notesBody ? notesBody.querySelector('.section-body-part') : null;
+           if (!textarea || !notesBody || !notesList) return;
 
            // helper to escape html (prevent XSS)
            function escapeHtml(unsafe) {
@@ -3577,24 +3741,28 @@
                    saveNote();
                }
            });
+           if (saveButton) {
+               saveButton.addEventListener('click', function () { saveNote(); });
+           }
 
            async function saveNote() {
                const text = textarea.value.trim();
                if (!text) return;
 
-               const payload = {
-                   IncidentId: '@Model.Id',
-                   IncidentValidationId: @Model.incidentValidationsDetailsViewModel?.IncidentValidationId ?? 0,
-                   Notes: text
-               };
+               const formData = new FormData();
+               formData.append('IncidentId', '@Model.Id');
+               formData.append('IncidentValidationId', '@Model.incidentValidationsDetailsViewModel?.IncidentValidationId ?? 0');
+               formData.append('Notes', text);
+               if (fileInput && fileInput.files && fileInput.files.length > 0) {
+                   for (let i = 0; i < fileInput.files.length; i++) {
+                       formData.append('Files', fileInput.files[i]);
+                   }
+               }
 
                try {
                    const res = await fetch('@Url.Action("SaveValidationNote", "IncidentDetail")', {
                        method: 'POST',
-                       headers: {
-                           'Content-Type': 'application/json'
-                       },
-                       body: JSON.stringify(payload)
+                       body: formData
                    });
                    const json = await res.json();
                    if (json && json.success) {
@@ -3611,11 +3779,12 @@
                        const safeText = escapeHtml(text);
 
                        const noteHtml = `
-                           <div class="update-item-map d-flex justify-content-between align-items-start mb-2" data-note-id="${json.id || ''}">
-                               <div class="update-message flex-grow-1 me-3">${safeText}</div>
-                               <div class="update-meta text-end d-flex flex-column align-items-end" style="white-space:nowrap">
-                                   <span class="update-time-map">${formattedTime}</span>
-                                   <span class="update-email postby-div-map text-muted">admin@eztrak.com</span>
+                           <div class="update-item notes-item mb-2" data-note-id="${json.id || ''}">
+                               <div class="update-message note-message-box">${safeText}</div>
+                               ${renderValidationAttachmentLinks(json.attachmentUrls)}
+                               <div class="update-meta">
+                                   <span class="update-time">${formattedTime}</span>
+                                   <span class="update-email postby-div text-muted">admin@eztrak.com</span>
                                </div>
                            </div>
                        `;
@@ -3623,7 +3792,7 @@
                        // insert new note at top (mirrors behavior of update-list code)
                        // use jQuery if available for convenience, fallback to DOM methods
                        if (window.jQuery) {
-                           const $nb = $('#validationNotesBody');
+                           const $nb = $(notesList);
                            // if you want to replace full list based on server data in future:
                            // $nb.empty(); $nb.append(...);
                            $nb.prepend(noteHtml);
@@ -3635,11 +3804,12 @@
                        } else {
                            const wrapper = document.createElement('div');
                            wrapper.innerHTML = noteHtml;
-                           notesBody.insertBefore(wrapper.firstElementChild, notesBody.firstChild);
+                           notesList.insertBefore(wrapper.firstElementChild, notesList.firstChild);
                        }
 
                        // clear textarea
                        textarea.value = '';
+                       if (fileInput) fileInput.value = '';
                        textarea.focus();
                    } else {
                        alert(json.message || 'Failed to save note.');
@@ -3648,6 +3818,22 @@
                    console.error(err);
                    alert('Error saving note.');
                }
+           }
+           function renderValidationAttachmentLinks(attachmentUrls) {
+               if (!attachmentUrls) return '';
+               const links = attachmentUrls
+                   .split(',')
+                   .map(x => x && x.trim())
+                   .filter(Boolean)
+                   .map(url => {
+                       const name = url.split('/').pop() || 'attachment';
+                       if (/\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(url)) {
+                           return `<a href="${url}" target="_blank" class="note-image-link" title="${name}"><img src="${url}" alt="${name}" class="note-image-thumb" /></a>`;
+                       }
+                       return `<a href="${url}" target="_blank" class="d-block text-decoration-none small note-file-link"><i class="fa-solid fa-paperclip me-1"></i>${name}</a>`;
+                   })
+                   .join('');
+               return links ? `<div class="note-attachments mt-1">${links}</div>` : '';
            }
        })();
 </script>

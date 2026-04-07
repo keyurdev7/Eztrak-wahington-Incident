@@ -21,6 +21,9 @@ namespace Repositories.Common
 {
     public class IncidentService : IIncidentService
     {
+        private const string PostAttachmentMarker = "[[ATTACH]]";
+        private const string ValidationNoteAttachmentMarker = "[[ATTACH]]";
+        private const string MapChatAttachmentMarker = "[[ATTACH]]";
         private readonly ApplicationDbContext _db;
         private readonly ILogger<IncidentService> _logger;
         private readonly IAdditionalLocationsService _iAdditionalLocationsService;
@@ -1149,21 +1152,36 @@ namespace Repositories.Common
 
                 #region IncidentValidationNotes
 
+                // Load raw rows from DB; ParseValidationNoteAndAttachments cannot run inside EF SQL translation.
+                var validationNotesRaw = await _db.IncidentValidationNotes
+                    .AsNoTracking()
+                    .Where(n => !n.IsDeleted && n.IncidentId == id)
+                    .OrderByDescending(n => n.CreatedOn)
+                    .Select(n => new
+                    {
+                        n.Id,
+                        n.IncidentId,
+                        n.IncidentValidationId,
+                        n.Notes,
+                        n.CreatedBy,
+                        n.CreatedOn
+                    })
+                    .ToListAsync();
 
-                var IncidentvalidationNotes = await _db.IncidentValidationNotes
-            .AsNoTracking()
-            .Where(n => !n.IsDeleted && n.IncidentId == id)
-            .OrderByDescending(n => n.CreatedOn)
-             .Select(n => new IncidentValidationNoteViewModel
-             {
-                 Id = n.Id,
-                 IncidentId = n.IncidentId,
-                 IncidentValidationId = n.IncidentValidationId,
-                 Notes = n.Notes,
-                 CreatedBy = n.CreatedBy,
-                 CreatedOn = n.CreatedOn
-             })
-                .ToListAsync();
+                var IncidentvalidationNotes = validationNotesRaw.Select(n =>
+                {
+                    var parsed = ParseValidationNoteAndAttachments(n.Notes);
+                    return new IncidentValidationNoteViewModel
+                    {
+                        Id = n.Id,
+                        IncidentId = n.IncidentId,
+                        IncidentValidationId = n.IncidentValidationId,
+                        Notes = parsed.Notes,
+                        AttachmentUrls = parsed.AttachmentUrls,
+                        CreatedBy = n.CreatedBy,
+                        CreatedOn = n.CreatedOn
+                    };
+                }).ToList();
                 #endregion
 
                 #region IncidentValidationRepair
@@ -1652,10 +1670,18 @@ namespace Repositories.Common
 
             try
             {
+                var attachmentPaths = await SaveAttachments(request.Files ?? new List<IFormFile>());
+                request.AttachmentUrls = attachmentPaths;
+                var finalMessage = request.ChatMessage ?? string.Empty;
+                if (!string.IsNullOrWhiteSpace(attachmentPaths))
+                {
+                    finalMessage = $"{finalMessage}{Environment.NewLine}{MapChatAttachmentMarker}{attachmentPaths}";
+                }
+
                 var notes = new IncidentMapChat
                 {
                     IncidentId = request.IncidentId,
-                    ChatMessage = request.ChatMessage,
+                    ChatMessage = finalMessage,
                     SentBy = request.SentBy,
                 };
 
@@ -1688,6 +1714,19 @@ namespace Repositories.Common
                 _logger.LogError(ex, "Error GetIncidentMapChatChat.");
                 return new List<IncidentMapChat>();
             }
+        }
+        private (string Message, string AttachmentUrls) ParseMapChatMessageAndAttachments(string? rawMessage)
+        {
+            if (string.IsNullOrWhiteSpace(rawMessage))
+                return (string.Empty, string.Empty);
+
+            var markerIndex = rawMessage.IndexOf(MapChatAttachmentMarker, StringComparison.Ordinal);
+            if (markerIndex < 0)
+                return (rawMessage, string.Empty);
+
+            var message = rawMessage[..markerIndex].Trim();
+            var attachments = rawMessage[(markerIndex + MapChatAttachmentMarker.Length)..].Trim();
+            return (message, attachments);
         }
         #endregion
 
@@ -2028,11 +2067,19 @@ namespace Repositories.Common
                     }
                 }
 
+                var attachmentPaths = await SaveAttachments(request.Files ?? new List<IFormFile>());
+                request.AttachmentUrls = attachmentPaths;
+                var finalNoteText = request.Notes ?? string.Empty;
+                if (!string.IsNullOrWhiteSpace(attachmentPaths))
+                {
+                    finalNoteText = $"{finalNoteText}{Environment.NewLine}{ValidationNoteAttachmentMarker}{attachmentPaths}";
+                }
+
                 var note = new IncidentValidationNotes
                 {
                     IncidentId = request.IncidentId,
                     IncidentValidationId = incidentValidationId,
-                    Notes = request.Notes,
+                    Notes = finalNoteText,
                     CreatedOn = DateTime.UtcNow,
                     CreatedBy = userIdParsed,
                     UpdatedOn = DateTime.UtcNow,
@@ -2051,6 +2098,19 @@ namespace Repositories.Common
                 _logger.LogError(ex, "Error SaveValidationNoteAsync.");
                 return 0;
             }
+        }
+        private (string Notes, string AttachmentUrls) ParseValidationNoteAndAttachments(string? rawNote)
+        {
+            if (string.IsNullOrWhiteSpace(rawNote))
+                return (string.Empty, string.Empty);
+
+            var markerIndex = rawNote.IndexOf(ValidationNoteAttachmentMarker, StringComparison.Ordinal);
+            if (markerIndex < 0)
+                return (rawNote, string.Empty);
+
+            var notes = rawNote[..markerIndex].Trim();
+            var attachments = rawNote[(markerIndex + ValidationNoteAttachmentMarker.Length)..].Trim();
+            return (notes, attachments);
         }
 
         #region private methods
@@ -2795,23 +2855,34 @@ namespace Repositories.Common
                 //}
             };
 
-            return PostDetails.Select(p => new IncidentViewPostViewModel
+            return PostDetails.Select(p =>
             {
-                Id = p.Id,
-                IncidentId = p.IncidentId,
-                Message = p.Message,
-                TimeforMessage = p.MessageTime,
-                IncidentViewType = p.IncidentViewType
+                var parsed = ParsePostMessageAndAttachments(p.Message);
+                return new IncidentViewPostViewModel
+                {
+                    Message = parsed.Message,
+                    AttachmentUrls = parsed.AttachmentUrls,
+                    Id = p.Id,
+                    IncidentId = p.IncidentId,
+                    TimeforMessage = p.MessageTime,
+                    IncidentViewType = p.IncidentViewType
+                };
             }).ToList();
         }
 
         public async Task<List<IncidentViewPostViewModel>> SavePostDetails(IncidentViewPostViewModel incidentViewPostViewModel)
         {
+            var attachmentPaths = await SaveAttachments(incidentViewPostViewModel.Files ?? new List<IFormFile>());
+            var finalMessage = incidentViewPostViewModel.Message ?? string.Empty;
+            if (!string.IsNullOrWhiteSpace(attachmentPaths))
+            {
+                finalMessage = $"{finalMessage}{Environment.NewLine}{PostAttachmentMarker}{attachmentPaths}";
+            }
 
             var IncidentPostDetail = new IncidentPostDetail
             {
                 IncidentId = incidentViewPostViewModel.IncidentId,
-                Message = incidentViewPostViewModel.Message,
+                Message = finalMessage,
                 MessageTime = incidentViewPostViewModel.TimeforMessage,
                 IncidentViewType = incidentViewPostViewModel.IncidentViewType,
                 ActiveStatus = Enums.ActiveStatus.Active
@@ -2822,6 +2893,19 @@ namespace Repositories.Common
 
             List<IncidentViewPostViewModel> listIncidentViewPostViewModel = await GetPostDetailVM(incidentViewPostViewModel.IncidentId, incidentViewPostViewModel.IncidentViewType);
             return listIncidentViewPostViewModel;
+        }
+        private (string Message, string AttachmentUrls) ParsePostMessageAndAttachments(string? rawMessage)
+        {
+            if (string.IsNullOrWhiteSpace(rawMessage))
+                return (string.Empty, string.Empty);
+
+            var markerIndex = rawMessage.IndexOf(PostAttachmentMarker, StringComparison.Ordinal);
+            if (markerIndex < 0)
+                return (rawMessage, string.Empty);
+
+            var message = rawMessage[..markerIndex].Trim();
+            var attachments = rawMessage[(markerIndex + PostAttachmentMarker.Length)..].Trim();
+            return (message, attachments);
         }
         #endregion
         public async Task<List<IncidentViewTaskListViewModel>> GetvalidationTaskVM(long incidentId)

@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace ViewModels.Incident
 {
@@ -11,5 +12,7 @@ namespace ViewModels.Incident
         public long IncidentId { get; set; }
         public long IncidentValidationId { get; set; }   // optional (0) if none
         public string Notes { get; set; } = string.Empty;
+        public string? AttachmentUrls { get; set; }
+        public List<IFormFile> Files { get; set; } = new();
     }
 }

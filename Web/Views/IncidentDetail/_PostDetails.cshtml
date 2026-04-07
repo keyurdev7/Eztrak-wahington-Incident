@@ -1,6 +1,14 @@
-﻿@using System.Web
+@using System.Web
 @using ViewModels.Incident
 @model IncidentViewModel
+@{
+    bool IsImageFile(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return false;
+        var ext = System.IO.Path.GetExtension(path)?.ToLowerInvariant();
+        return ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif" || ext == ".bmp" || ext == ".webp" || ext == ".svg";
+    }
+}
 
 
 <form id="NewPostDetailForm">
@@ -20,7 +28,28 @@
                         @foreach (var post in Model.IncidentViewRepairViewModel.listIncidentViewPostViewModel.OrderByDescending(x => x.Id))
                         {
                             <div class="update-item notes-item">
-                                <div class="update-message">@post.Message</div>
+                                <div class="update-message note-message-box">@post.Message</div>
+                                @if (!string.IsNullOrWhiteSpace(post.AttachmentUrls))
+                                {
+                                    <div class="note-attachments mt-1">
+                                        @foreach (var file in post.AttachmentUrls.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                                        {
+                                            var fileUrl = file.Trim();
+                                            if (IsImageFile(fileUrl))
+                                            {
+                                                <a href="@fileUrl" target="_blank" class="note-image-link" title="@System.IO.Path.GetFileName(fileUrl)">
+                                                    <img src="@fileUrl" alt="@System.IO.Path.GetFileName(fileUrl)" class="note-image-thumb" />
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a href="@fileUrl" target="_blank" class="d-block text-decoration-none small note-file-link">
+                                                    <i class="fa-solid fa-paperclip me-1"></i>@System.IO.Path.GetFileName(fileUrl)
+                                                </a>
+                                            }
+                                        }
+                                    </div>
+                                }
                                 <div class="update-meta">
                                     <span class="update-time">@post.TimeforMessage</span>
                                     <span class="update-email postby-div">admin@eztrak.com</span>
@@ -38,6 +67,7 @@
                 </div>
                 <div class="update-footer notes-footer">
                     <textarea rows="3" class="form-control notes-textarea" id="postvalue" placeholder="Add new note..."></textarea>
+                    <input type="file" class="form-control mt-2" id="postFiles" multiple />
                     <button class="btn btn-update notes-submit-btn" id="btn_PostDetail_Save" data-type="1">
                         <i class="fa-solid fa-paper-plane me-2"></i>Add Note
                     </button>
@@ -58,7 +88,28 @@
                         @foreach (var post in Model.IncidentViewCloseoutViewModel.listIncidentViewPostViewModel.OrderByDescending(x => x.Id))
                         {
                             <div class="update-item notes-item">
-                                <div class="update-message">@post.Message</div>
+                                <div class="update-message note-message-box">@post.Message</div>
+                                @if (!string.IsNullOrWhiteSpace(post.AttachmentUrls))
+                                {
+                                    <div class="note-attachments mt-1">
+                                        @foreach (var file in post.AttachmentUrls.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                                        {
+                                            var fileUrl = file.Trim();
+                                            if (IsImageFile(fileUrl))
+                                            {
+                                                <a href="@fileUrl" target="_blank" class="note-image-link" title="@System.IO.Path.GetFileName(fileUrl)">
+                                                    <img src="@fileUrl" alt="@System.IO.Path.GetFileName(fileUrl)" class="note-image-thumb" />
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a href="@fileUrl" target="_blank" class="d-block text-decoration-none small note-file-link">
+                                                    <i class="fa-solid fa-paperclip me-1"></i>@System.IO.Path.GetFileName(fileUrl)
+                                                </a>
+                                            }
+                                        }
+                                    </div>
+                                }
                                 <div class="update-meta">
                                     <span class="update-time">@post.TimeforMessage</span>
                                     <span class="update-email postby-div">admin@eztrak.com</span>
@@ -76,6 +127,7 @@
                 </div>
                 <div class="update-footer notes-footer">
                     <textarea rows="3" class="form-control notes-textarea" id="postvalue" placeholder="Add new note..."></textarea>
+                    <input type="file" class="form-control mt-2" id="postFiles" multiple />
                     <button class="btn btn-update notes-submit-btn" id="btn_PostDetail_Save" data-type="2">
                         <i class="fa-solid fa-paper-plane me-2"></i>Add Note
                     </button>
@@ -98,7 +150,28 @@
                         @foreach (var post in Model.IncidentAssessmentDetails.listIncidentViewPostViewModel.OrderByDescending(x => x.Id))
                         {
                             <div class="update-item notes-item">
-                                <div class="update-message">@post.Message</div>
+                                <div class="update-message note-message-box">@post.Message</div>
+                                @if (!string.IsNullOrWhiteSpace(post.AttachmentUrls))
+                                {
+                                    <div class="note-attachments mt-1">
+                                        @foreach (var file in post.AttachmentUrls.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                                        {
+                                            var fileUrl = file.Trim();
+                                            if (IsImageFile(fileUrl))
+                                            {
+                                                <a href="@fileUrl" target="_blank" class="note-image-link" title="@System.IO.Path.GetFileName(fileUrl)">
+                                                    <img src="@fileUrl" alt="@System.IO.Path.GetFileName(fileUrl)" class="note-image-thumb" />
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a href="@fileUrl" target="_blank" class="d-block text-decoration-none small note-file-link">
+                                                    <i class="fa-solid fa-paperclip me-1"></i>@System.IO.Path.GetFileName(fileUrl)
+                                                </a>
+                                            }
+                                        }
+                                    </div>
+                                }
                                 <div class="update-meta">
                                     <span class="update-time">@post.TimeforMessage</span>
                                     <span class="update-email postby-div">admin@eztrak.com</span>
@@ -116,6 +189,7 @@
                 </div>
                 <div class="update-footer notes-footer">
                     <textarea rows="3" class="form-control notes-textarea" id="postvalue" placeholder="Add new note..."></textarea>
+                    <input type="file" class="form-control mt-2" id="postFiles" multiple />
                     <button class="btn btn-update notes-submit-btn" id="btn_PostDetail_Save" data-type="3">
                         <i class="fa-solid fa-paper-plane me-2"></i>Add Note
                     </button>
@@ -137,7 +211,28 @@
                         @foreach (var post in Model.IncidentViewRestorationViewModel.listIncidentViewPostViewModel.OrderByDescending(x => x.Id))
                         {
                             <div class="update-item notes-item">
-                                <div class="update-message">@post.Message</div>
+                                <div class="update-message note-message-box">@post.Message</div>
+                                @if (!string.IsNullOrWhiteSpace(post.AttachmentUrls))
+                                {
+                                    <div class="note-attachments mt-1">
+                                        @foreach (var file in post.AttachmentUrls.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                                        {
+                                            var fileUrl = file.Trim();
+                                            if (IsImageFile(fileUrl))
+                                            {
+                                                <a href="@fileUrl" target="_blank" class="note-image-link" title="@System.IO.Path.GetFileName(fileUrl)">
+                                                    <img src="@fileUrl" alt="@System.IO.Path.GetFileName(fileUrl)" class="note-image-thumb" />
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a href="@fileUrl" target="_blank" class="d-block text-decoration-none small note-file-link">
+                                                    <i class="fa-solid fa-paperclip me-1"></i>@System.IO.Path.GetFileName(fileUrl)
+                                                </a>
+                                            }
+                                        }
+                                    </div>
+                                }
                                 <div class="update-meta">
                                     <span class="update-time">@post.TimeforMessage</span>
                                     <span class="update-email postby-div-map">admin@eztrak.com</span>
@@ -155,6 +250,7 @@
                 </div>
                 <div class="update-footer notes-footer">
                     <textarea rows="3" class="form-control notes-textarea" id="postvalue" placeholder="Add new note..."></textarea>
+                    <input type="file" class="form-control mt-2" id="postFiles" multiple />
                     <button class="btn btn-update notes-submit-btn" id="btn_PostDetail_Save" data-type="4">
                         <i class="fa-solid fa-paper-plane me-2"></i>Add Note
                     </button>
@@ -257,6 +353,12 @@
             // get message from the textarea inside the same card/footer as the clicked button
             var message = $card.find("#postvalue").val();
             formData.append("IncidentViewPostViewModel.Message", message);
+            var fileInput = $card.find("#postFiles")[0];
+            if (fileInput && fileInput.files && fileInput.files.length > 0) {
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    formData.append("Files", fileInput.files[i]);
+                }
+            }
 
             let response = await fetch("/IncidentDetail/SavePostDetails", {
                 method: "POST",
@@ -275,7 +377,8 @@
                 result.data.forEach(item => {
                     $updateList.append(`
                         <div class="update-item notes-item">
-                            <div class="update-message">${item.Message || ''}</div>
+                            <div class="update-message note-message-box">${item.Message || ''}</div>
+                            ${renderAttachmentLinks(item.AttachmentUrls)}
                             <div class="update-meta">
                                 <span class="update-time">${item.TimeforMessage || ''}</span>
                                 <span class="update-email postby-div">admin@eztrak.com</span>
@@ -295,6 +398,7 @@
 
                 // clear textarea
                 $card.find("#postvalue").val("");
+                $card.find("#postFiles").val("");
             }
 
 
@@ -304,5 +408,23 @@
         } finally {
             hideLoader($("#addIncidentModal"));
         }
+    }
+
+    function renderAttachmentLinks(attachmentUrls) {
+        if (!attachmentUrls) return "";
+        const links = attachmentUrls
+            .split(",")
+            .map(x => x && x.trim())
+            .filter(Boolean)
+            .map(url => {
+                const name = url.split("/").pop() || "attachment";
+                if (/\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(url)) {
+                    return `<a href="${url}" target="_blank" class="note-image-link" title="${name}"><img src="${url}" alt="${name}" class="note-image-thumb" /></a>`;
+                }
+                return `<a href="${url}" target="_blank" class="d-block text-decoration-none small note-file-link"><i class="fa-solid fa-paperclip me-1"></i>${name}</a>`;
+            })
+            .join("");
+
+        return links ? `<div class="note-attachments mt-1">${links}</div>` : "";
     }
 </script>

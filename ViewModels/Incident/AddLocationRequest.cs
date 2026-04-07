@@ -1,4 +1,4 @@
-﻿using Models.Models.Shared;
+using Models.Models.Shared;
 
 using System;
 using System.Collections.Generic;
@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace ViewModels.Incident
 {
@@ -20,6 +21,8 @@ namespace ViewModels.Incident
         public long? IncidentId { get; set; }
         public string ChatMessage { get; set; }
         public string SentBy { get; set; }
+        public string? AttachmentUrls { get; set; }
+        public List<IFormFile> Files { get; set; } = new();
     }
     public class AssestmentFilterRequest
     {
